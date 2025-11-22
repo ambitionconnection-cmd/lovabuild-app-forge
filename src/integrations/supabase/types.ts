@@ -14,7 +14,344 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      brands: {
+        Row: {
+          banner_url: string | null
+          category: Database["public"]["Enums"]["category_type"] | null
+          created_at: string | null
+          description: string | null
+          history: string | null
+          id: string
+          instagram_url: string | null
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          official_website: string | null
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          banner_url?: string | null
+          category?: Database["public"]["Enums"]["category_type"] | null
+          created_at?: string | null
+          description?: string | null
+          history?: string | null
+          id?: string
+          instagram_url?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          official_website?: string | null
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          banner_url?: string | null
+          category?: Database["public"]["Enums"]["category_type"] | null
+          created_at?: string | null
+          description?: string | null
+          history?: string | null
+          id?: string
+          instagram_url?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          official_website?: string | null
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      drops: {
+        Row: {
+          affiliate_link: string | null
+          brand_id: string | null
+          created_at: string | null
+          description: string | null
+          discount_code: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean | null
+          is_pro_exclusive: boolean | null
+          product_images: string[] | null
+          release_date: string
+          shop_id: string | null
+          slug: string
+          status: Database["public"]["Enums"]["drop_status"] | null
+          title: string
+          updated_at: string | null
+          video_url: string | null
+        }
+        Insert: {
+          affiliate_link?: string | null
+          brand_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount_code?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          is_pro_exclusive?: boolean | null
+          product_images?: string[] | null
+          release_date: string
+          shop_id?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["drop_status"] | null
+          title: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          affiliate_link?: string | null
+          brand_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount_code?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          is_pro_exclusive?: boolean | null
+          product_images?: string[] | null
+          release_date?: string
+          shop_id?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["drop_status"] | null
+          title?: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drops_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drops_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string
+          is_pro: boolean | null
+          pro_expires_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id: string
+          is_pro?: boolean | null
+          pro_expires_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          is_pro?: boolean | null
+          pro_expires_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      shops: {
+        Row: {
+          address: string
+          brand_id: string | null
+          category: Database["public"]["Enums"]["category_type"] | null
+          city: string
+          country: string
+          created_at: string | null
+          description: string | null
+          email: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_unique_shop: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          official_site: string | null
+          phone: string | null
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          address: string
+          brand_id?: string | null
+          category?: Database["public"]["Enums"]["category_type"] | null
+          city: string
+          country: string
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_unique_shop?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          official_site?: string | null
+          phone?: string | null
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string
+          brand_id?: string | null
+          category?: Database["public"]["Enums"]["category_type"] | null
+          city?: string
+          country?: string
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_unique_shop?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          official_site?: string | null
+          phone?: string | null
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shops_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_drop_reminders: {
+        Row: {
+          created_at: string | null
+          drop_id: string
+          id: string
+          is_notified: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          drop_id: string
+          id?: string
+          is_notified?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          drop_id?: string
+          id?: string
+          is_notified?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_drop_reminders_drop_id_fkey"
+            columns: ["drop_id"]
+            isOneToOne: false
+            referencedRelation: "drops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_drop_reminders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_favorite_brands: {
+        Row: {
+          brand_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorite_brands_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_favorite_brands_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_favorite_shops: {
+        Row: {
+          created_at: string | null
+          id: string
+          shop_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          shop_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          shop_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorite_shops_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_favorite_shops_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +360,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      category_type:
+        | "streetwear"
+        | "sneakers"
+        | "accessories"
+        | "luxury"
+        | "vintage"
+        | "sportswear"
+      drop_status: "upcoming" | "live" | "ended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +494,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      category_type: [
+        "streetwear",
+        "sneakers",
+        "accessories",
+        "luxury",
+        "vintage",
+        "sportswear",
+      ],
+      drop_status: ["upcoming", "live", "ended"],
+    },
   },
 } as const
