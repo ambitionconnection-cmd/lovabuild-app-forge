@@ -1,4 +1,4 @@
-import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X } from "lucide-react";
+import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X, Copy, Check } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +43,7 @@ const Drops = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [brandFilter, setBrandFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [copiedCodes, setCopiedCodes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchData();
@@ -120,6 +121,49 @@ const Drops = () => {
     } catch (error) {
       console.error('Error toggling reminder:', error);
       toast.error('Failed to update reminder');
+    }
+  };
+
+  const trackEvent = async (dropId: string, eventType: 'affiliate_click' | 'discount_code_copy') => {
+    try {
+      await supabase.from('affiliate_analytics').insert({
+        drop_id: dropId,
+        user_id: user?.id || null,
+        event_type: eventType,
+        ip_address: null, // Could be captured via edge function
+        user_agent: navigator.userAgent,
+        referrer: document.referrer || null,
+      });
+    } catch (error) {
+      console.error('Error tracking event:', error);
+    }
+  };
+
+  const handleAffiliateClick = (drop: Drop) => {
+    trackEvent(drop.id, 'affiliate_click');
+    window.open(drop.affiliate_link, '_blank');
+  };
+
+  const handleDiscountCodeCopy = async (drop: Drop) => {
+    if (!drop.discount_code) return;
+    
+    try {
+      await navigator.clipboard.writeText(drop.discount_code);
+      setCopiedCodes(prev => new Set(prev).add(drop.id));
+      trackEvent(drop.id, 'discount_code_copy');
+      toast.success(`Code "${drop.discount_code}" copied to clipboard!`);
+      
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedCodes(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(drop.id);
+          return newSet;
+        });
+      }, 2000);
+    } catch (error) {
+      console.error('Error copying code:', error);
+      toast.error('Failed to copy code');
     }
   };
 
@@ -371,9 +415,27 @@ const Drops = () => {
                         {format(new Date(drop.release_date), 'MMM d, yyyy')}
                       </div>
                       {drop.discount_code && (
-                        <Badge variant="outline" className="text-xs">
-                          {drop.discount_code}
-                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 px-2 text-xs gap-1.5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDiscountCodeCopy(drop);
+                          }}
+                        >
+                          {copiedCodes.has(drop.id) ? (
+                            <>
+                              <Check className="h-3 w-3" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              {drop.discount_code}
+                            </>
+                          )}
+                        </Button>
                       )}
                     </div>
 
@@ -382,7 +444,10 @@ const Drops = () => {
                         className="w-full mt-3" 
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(drop.affiliate_link, '_blank')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAffiliateClick(drop);
+                        }}
                       >
                         View Drop
                       </Button>
