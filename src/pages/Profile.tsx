@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const profileSchema = z.object({
   display_name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
@@ -42,6 +43,7 @@ interface NotificationPreferences {
   new_shop_openings: boolean;
   weekly_digest: boolean;
   promotional_emails: boolean;
+  digest_frequency?: 'weekly' | 'bi-weekly' | 'monthly';
 }
 
 const Profile = () => {
@@ -56,6 +58,7 @@ const Profile = () => {
     new_shop_openings: false,
     weekly_digest: true,
     promotional_emails: false,
+    digest_frequency: 'weekly',
   });
 
   const profileForm = useForm<ProfileFormValues>({
@@ -155,7 +158,7 @@ const Profile = () => {
       .slice(0, 2);
   };
 
-  const updateNotificationPreference = async (key: keyof NotificationPreferences, value: boolean) => {
+  const updateNotificationPreference = async (key: keyof NotificationPreferences, value: boolean | string) => {
     if (!user) return;
 
     const newPrefs = { ...notificationPrefs, [key]: value };
@@ -383,20 +386,46 @@ const Profile = () => {
                   </div>
 
                   {/* Weekly Digest */}
-                  <div className="flex items-start justify-between space-x-4 py-4 border-b">
-                    <div className="flex-1 space-y-1">
-                      <Label htmlFor="weekly-digest" className="text-base font-semibold cursor-pointer">
-                        Weekly Digest
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Receive a weekly summary of upcoming drops and new brands
-                      </p>
+                  <div className="space-y-4 py-4 border-b">
+                    <div className="flex items-start justify-between space-x-4">
+                      <div className="flex-1 space-y-1">
+                        <Label htmlFor="weekly-digest" className="text-base font-semibold cursor-pointer">
+                          Digest Emails
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive periodic summaries of upcoming drops and new brands
+                        </p>
+                      </div>
+                      <Switch
+                        id="weekly-digest"
+                        checked={notificationPrefs.weekly_digest}
+                        onCheckedChange={(checked) => updateNotificationPreference('weekly_digest', checked)}
+                      />
                     </div>
-                    <Switch
-                      id="weekly-digest"
-                      checked={notificationPrefs.weekly_digest}
-                      onCheckedChange={(checked) => updateNotificationPreference('weekly_digest', checked)}
-                    />
+                    
+                    {notificationPrefs.weekly_digest && (
+                      <div className="pl-4 space-y-2">
+                        <Label htmlFor="digest-frequency" className="text-sm font-medium">
+                          Frequency
+                        </Label>
+                        <Select
+                          value={notificationPrefs.digest_frequency || 'weekly'}
+                          onValueChange={(value) => updateNotificationPreference('digest_frequency', value)}
+                        >
+                          <SelectTrigger id="digest-frequency" className="w-full sm:w-[200px]">
+                            <SelectValue placeholder="Select frequency" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="weekly">Weekly (Every Monday)</SelectItem>
+                            <SelectItem value="bi-weekly">Bi-weekly (Every 2 weeks)</SelectItem>
+                            <SelectItem value="monthly">Monthly (First Monday)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Choose how often you want to receive digest emails
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Promotional Emails */}
