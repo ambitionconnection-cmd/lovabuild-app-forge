@@ -39,6 +39,10 @@ export const ScheduledExportManager = () => {
   const [loading, setLoading] = useState(true);
   const [testingId, setTestingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState<any[]>([]);
+  const [previewTotal, setPreviewTotal] = useState(0);
+  const [loadingPreview, setLoadingPreview] = useState(false);
   const [formData, setFormData] = useState({
     schedule_type: 'daily',
     export_format: 'csv',
@@ -177,6 +181,39 @@ export const ScheduledExportManager = () => {
     }
   };
 
+  const handlePreview = async () => {
+    setLoadingPreview(true);
+    try {
+      // Build query with current filters
+      let query = supabase
+        .from('security_audit_log')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false });
+
+      // Apply filters
+      if (formData.filters.eventType && formData.filters.eventType !== 'all') {
+        query = query.eq('event_type', formData.filters.eventType);
+      }
+      if (formData.filters.userEmail) {
+        query = query.ilike('user_email', `%${formData.filters.userEmail}%`);
+      }
+
+      // Fetch first 10 records and total count
+      const { data, error, count } = await query.limit(10);
+
+      if (error) throw error;
+
+      setPreviewData(data || []);
+      setPreviewTotal(count || 0);
+      setPreviewOpen(true);
+    } catch (error) {
+      console.error('Error fetching preview:', error);
+      toast.error('Failed to load preview');
+    } finally {
+      setLoadingPreview(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -271,16 +308,87 @@ export const ScheduledExportManager = () => {
                 </div>
               </div>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                  Cancel
+              <DialogFooter className="flex-col sm:flex-row gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handlePreview}
+                  disabled={loadingPreview}
+                  className="w-full sm:w-auto"
+                >
+                  {loadingPreview ? 'Loading...' : 'Preview Data'}
                 </Button>
-                <Button onClick={handleCreate}>Create Schedule</Button>
+                <div className="flex gap-2 w-full sm:w-auto ml-auto">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleCreate}>Create Schedule</Button>
+                </div>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
       </CardHeader>
+
+      {/* Preview Dialog */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Export Preview</DialogTitle>
+            <DialogDescription>
+              Showing first 10 of {previewTotal} total audit log{previewTotal !== 1 ? 's' : ''} matching your filters
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-auto">
+            {previewData.length === 0 ? (
+              <div className="py-8 text-center text-muted-foreground">
+                No audit logs match the selected filters
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Timestamp</TableHead>
+                    <TableHead>Event Type</TableHead>
+                    <TableHead>User Email</TableHead>
+                    <TableHead>IP Address</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {previewData.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="text-sm">
+                        {format(new Date(log.created_at), 'MMM d, yyyy HH:mm:ss')}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs">
+                          {log.event_type.replace(/_/g, ' ').toUpperCase()}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {log.user_email || '-'}
+                      </TableCell>
+                      <TableCell className="text-sm font-mono">
+                        {log.ip_address || '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <CardContent>
         {loading ? (
           <p className="text-center text-muted-foreground py-8">Loading...</p>
