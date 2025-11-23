@@ -137,6 +137,33 @@ export type Database = {
           },
         ]
       }
+      login_attempts: {
+        Row: {
+          attempts: number
+          created_at: string
+          email: string
+          id: string
+          last_attempt: string
+          locked_until: string | null
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          email: string
+          id?: string
+          last_attempt?: string
+          locked_until?: string | null
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          email?: string
+          id?: string
+          last_attempt?: string
+          locked_until?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -357,7 +384,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_old_login_attempts: { Args: never; Returns: undefined }
     }
     Enums: {
       category_type:
