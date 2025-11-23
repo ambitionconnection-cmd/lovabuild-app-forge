@@ -2,3 +2,6 @@ project_id = "wgeelknadpxnmeomuenc"
 
 [functions.check-password-breach]
 verify_jwt = false
+
+[functions.track-email]
+verify_jwt = false
