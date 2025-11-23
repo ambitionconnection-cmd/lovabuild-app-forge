@@ -11,6 +11,7 @@ import { Loader2, Unlock, ArrowLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExportFilters';
+import { ScheduledExportManager } from '@/components/ScheduledExportManager';
 
 interface LoginAttempt {
   id: string;
@@ -316,6 +317,7 @@ export default function Admin() {
             <TabsTrigger value="accounts">Locked Accounts</TabsTrigger>
             <TabsTrigger value="ips">Locked IPs</TabsTrigger>
             <TabsTrigger value="audit">Audit Log</TabsTrigger>
+            <TabsTrigger value="scheduled">Scheduled Exports</TabsTrigger>
           </TabsList>
 
           <TabsContent value="accounts">
@@ -485,6 +487,10 @@ export default function Admin() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="scheduled">
+            <ScheduledExportManager />
           </TabsContent>
         </Tabs>
       </div>
