@@ -46,6 +46,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
+    // Check password against breach database
+    try {
+      const breachCheckResponse = await supabase.functions.invoke('check-password-breach', {
+        body: { password }
+      });
+
+      if (breachCheckResponse.error) {
+        console.error('Breach check failed:', breachCheckResponse.error);
+        // Continue with signup if breach check fails (fail open)
+      } else if (breachCheckResponse.data?.isBreached) {
+        toast.error("This password has been found in a data breach. Please choose a different password for your security.");
+        return { error: { message: 'Password compromised' } };
+      }
+    } catch (breachError) {
+      console.error('Breach check error:', breachError);
+      // Continue with signup if breach check fails (fail open)
+    }
+
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -276,6 +294,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updatePassword = async (newPassword: string) => {
+    // Check password against breach database
+    try {
+      const breachCheckResponse = await supabase.functions.invoke('check-password-breach', {
+        body: { password: newPassword }
+      });
+
+      if (breachCheckResponse.error) {
+        console.error('Breach check failed:', breachCheckResponse.error);
+        // Continue with password update if breach check fails (fail open)
+      } else if (breachCheckResponse.data?.isBreached) {
+        toast.error("This password has been found in a data breach. Please choose a different password for your security.");
+        return { error: { message: 'Password compromised' } };
+      }
+    } catch (breachError) {
+      console.error('Breach check error:', breachError);
+      // Continue with password update if breach check fails (fail open)
+    }
+
     const { error } = await supabase.auth.updateUser({
       password: newPassword
     });
