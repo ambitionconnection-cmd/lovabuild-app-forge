@@ -9,6 +9,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
 
 const signInSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255),
@@ -90,6 +91,8 @@ const Auth = () => {
       displayName: "",
     },
   });
+  
+  const signUpPassword = signUpForm.watch("password");
 
   const forgotPasswordForm = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -105,6 +108,8 @@ const Auth = () => {
       confirmPassword: "",
     },
   });
+  
+  const resetPasswordValue = resetPasswordForm.watch("password");
 
   const onSignIn = async (data: SignInFormValues) => {
     setIsLoading(true);
@@ -178,6 +183,7 @@ const Auth = () => {
                           <Input placeholder="••••••••" type="password" {...field} />
                         </FormControl>
                         <FormMessage />
+                        <PasswordStrengthIndicator password={resetPasswordValue} />
                       </FormItem>
                     )}
                   />
@@ -449,6 +455,7 @@ const Auth = () => {
                             <Input placeholder="••••••••" type="password" {...field} />
                           </FormControl>
                           <FormMessage />
+                          <PasswordStrengthIndicator password={signUpPassword} />
                         </FormItem>
                       )}
                     />
