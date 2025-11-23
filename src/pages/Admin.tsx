@@ -307,10 +307,16 @@ export default function Admin() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold">Security Dashboard</h1>
             <p className="text-muted-foreground">Monitor and manage login security</p>
           </div>
+          <Button
+            variant="default"
+            onClick={() => navigate('/analytics')}
+          >
+            View Analytics
+          </Button>
         </div>
 
         <Tabs defaultValue="accounts" className="space-y-4">
