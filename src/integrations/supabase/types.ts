@@ -66,6 +66,7 @@ export type Database = {
         Row: {
           banner_url: string | null
           category: Database["public"]["Enums"]["category_type"] | null
+          country: string | null
           created_at: string | null
           description: string | null
           history: string | null
@@ -81,6 +82,7 @@ export type Database = {
         Insert: {
           banner_url?: string | null
           category?: Database["public"]["Enums"]["category_type"] | null
+          country?: string | null
           created_at?: string | null
           description?: string | null
           history?: string | null
@@ -96,6 +98,7 @@ export type Database = {
         Update: {
           banner_url?: string | null
           category?: Database["public"]["Enums"]["category_type"] | null
+          country?: string | null
           created_at?: string | null
           description?: string | null
           history?: string | null
