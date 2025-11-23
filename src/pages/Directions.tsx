@@ -16,6 +16,7 @@ const Directions = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedShop, setSelectedShop] = useState<Tables<'shops'> | null>(null);
 
@@ -48,7 +49,8 @@ const Directions = () => {
       filtered = filtered.filter(shop =>
         shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         shop.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        shop.city.toLowerCase().includes(searchQuery.toLowerCase())
+        shop.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        shop.country.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -56,15 +58,24 @@ const Directions = () => {
       filtered = filtered.filter(shop => shop.category === selectedCategory);
     }
 
+    if (selectedCountry !== "all") {
+      filtered = filtered.filter(shop => shop.country === selectedCountry);
+    }
+
     if (selectedCity !== "all") {
       filtered = filtered.filter(shop => shop.city === selectedCity);
     }
 
     setFilteredShops(filtered);
-  }, [searchQuery, selectedCategory, selectedCity, shops]);
+  }, [searchQuery, selectedCategory, selectedCountry, selectedCity, shops]);
 
-  // Get unique cities
-  const cities = Array.from(new Set(shops.map(shop => shop.city))).sort();
+  // Get unique countries and cities
+  const countries = Array.from(new Set(shops.map(shop => shop.country))).sort();
+  const cities = Array.from(new Set(
+    shops
+      .filter(shop => selectedCountry === "all" || shop.country === selectedCountry)
+      .map(shop => shop.city)
+  )).sort();
 
   const getDirections = (shop: Tables<'shops'>) => {
     if (shop.latitude && shop.longitude) {
@@ -139,6 +150,23 @@ const Directions = () => {
                   </SelectContent>
                 </Select>
 
+                <Select value={selectedCountry} onValueChange={(value) => {
+                  setSelectedCountry(value);
+                  setSelectedCity("all"); // Reset city when country changes
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Countries</SelectItem>
+                    {countries.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
                 <Select value={selectedCity} onValueChange={setSelectedCity}>
                   <SelectTrigger>
                     <SelectValue placeholder="City" />
@@ -181,7 +209,7 @@ const Directions = () => {
                       <div className="space-y-1 text-sm text-muted-foreground">
                         <div className="flex items-start gap-2">
                           <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                          <span>{shop.address}, {shop.city}</span>
+                          <span>{shop.address}, {shop.city}, {shop.country}</span>
                         </div>
                         {shop.phone && (
                           <div className="flex items-center gap-2">
