@@ -162,11 +162,47 @@ async function getUserPersonalizedDrops(userId: string) {
   return drops || [];
 }
 
+async function getUserDropReminders(userId: string) {
+  const now = new Date();
+  const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const { data: reminders, error } = await supabase
+    .from('user_drop_reminders')
+    .select(`
+      id,
+      created_at,
+      is_notified,
+      drops (
+        id,
+        title,
+        description,
+        release_date,
+        image_url,
+        discount_code,
+        brands (name, logo_url),
+        shops (name)
+      )
+    `)
+    .eq('user_id', userId)
+    .gte('drops.release_date', now.toISOString())
+    .lte('drops.release_date', oneWeekFromNow.toISOString())
+    .order('drops(release_date)', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching user drop reminders:', error);
+    return [];
+  }
+
+  // Filter out reminders where drops is null
+  return (reminders || []).filter(r => r.drops !== null);
+}
+
 function generateDigestEmail(
   displayName: string,
   upcomingDrops: any[],
   newBrands: any[],
-  personalizedDrops: any[]
+  personalizedDrops: any[],
+  dropReminders: any[]
 ): string {
   const now = new Date();
   const weekRange = `${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
@@ -252,6 +288,53 @@ function generateDigestEmail(
             <p style="margin: 0 0 30px 0; color: #666; font-size: 14px; line-height: 1.6;">
               Here's your weekly roundup of what's happening in the streetwear world for <strong>${weekRange}</strong>
             </p>
+
+            ${dropReminders.length > 0 ? `
+              <!-- Your Reminders Section -->
+              <div style="margin-bottom: 40px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+                  <span style="font-size: 24px;">🔔</span>
+                  <h2 style="margin: 0; color: #000; font-size: 22px;">Your Upcoming Reminders</h2>
+                </div>
+                <p style="margin: 0 0 16px 0; color: #666; font-size: 13px;">
+                  Drops you've set reminders for this week
+                </p>
+                <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 20px; border-radius: 12px; border: 2px solid #3b82f6;">
+                  ${dropReminders.map(reminder => {
+                    const drop = reminder.drops;
+                    return `
+                      <div style="background: #fff; border: 1px solid #3b82f6; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; gap: 16px; align-items: start;">
+                          ${drop.image_url ? `
+                            <img src="${drop.image_url}" alt="${drop.title}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;" />
+                          ` : ''}
+                          <div style="flex: 1;">
+                            <div style="background: #3b82f6; color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 8px;">
+                              🔔 REMINDER SET
+                            </div>
+                            <h3 style="margin: 0 0 8px 0; color: #000; font-size: 18px;">${drop.title}</h3>
+                            <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">
+                              <strong>${drop.brands?.name || drop.shops?.name || 'Unknown'}</strong>
+                            </p>
+                            <p style="margin: 0 0 8px 0; color: #1e40af; font-size: 13px; font-weight: 600;">
+                              📅 ${formatDate(drop.release_date)}
+                            </p>
+                            ${drop.description ? `
+                              <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">${drop.description.substring(0, 100)}${drop.description.length > 100 ? '...' : ''}</p>
+                            ` : ''}
+                            ${drop.discount_code ? `
+                              <div style="background: #dbeafe; padding: 8px 12px; border-radius: 4px; display: inline-block; margin-top: 8px;">
+                                <span style="color: #1e40af; font-size: 12px; font-weight: 600;">💰 Code: ${drop.discount_code}</span>
+                              </div>
+                            ` : ''}
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            ` : ''}
 
             ${personalizedDrops.length > 0 ? `
               <!-- Personalized Section -->
@@ -396,21 +479,26 @@ async function sendWeeklyDigests() {
     }
 
     try {
-      // Fetch personalized drops for this user
-      const personalizedDrops = await getUserPersonalizedDrops(profile.id);
-      console.log(`Found ${personalizedDrops.length} personalized drops for user ${profile.id}`);
+      // Fetch personalized data for this user
+      const [personalizedDrops, dropReminders] = await Promise.all([
+        getUserPersonalizedDrops(profile.id),
+        getUserDropReminders(profile.id)
+      ]);
+      
+      console.log(`Found ${personalizedDrops.length} personalized drops and ${dropReminders.length} reminders for user ${profile.id}`);
 
       const emailHtml = generateDigestEmail(
         profile.display_name,
         upcomingDrops,
         newBrands,
-        personalizedDrops
+        personalizedDrops,
+        dropReminders
       );
 
       const { error: sendError } = await resend.emails.send({
         from: 'HEARDROP Weekly <onboarding@resend.dev>',
         to: [userEmail],
-        subject: personalizedDrops.length > 0 ? '⭐ Your Personalized HEARDROP Digest' : '🔥 Your Weekly HEARDROP Digest',
+        subject: dropReminders.length > 0 ? '🔔 Your HEARDROP Reminders & Digest' : personalizedDrops.length > 0 ? '⭐ Your Personalized HEARDROP Digest' : '🔥 Your Weekly HEARDROP Digest',
         html: emailHtml,
       });
 
@@ -423,8 +511,8 @@ async function sendWeeklyDigests() {
       // Log notification
       await logNotification(
         profile.id,
-        personalizedDrops.length > 0 ? 'Your Personalized HEARDROP Digest' : 'Your Weekly HEARDROP Digest',
-        `${personalizedDrops.length} personalized drops, ${upcomingDrops.length} upcoming drops, and ${newBrands.length} new brands this week`
+        dropReminders.length > 0 ? 'Your HEARDROP Reminders & Digest' : personalizedDrops.length > 0 ? 'Your Personalized HEARDROP Digest' : 'Your Weekly HEARDROP Digest',
+        `${dropReminders.length} reminders, ${personalizedDrops.length} personalized drops, ${upcomingDrops.length} upcoming drops, and ${newBrands.length} new brands this week`
       );
 
       processed++;
