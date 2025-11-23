@@ -198,6 +198,7 @@ export type Database = {
           display_name: string | null
           id: string
           is_pro: boolean | null
+          notification_preferences: Json | null
           pro_expires_at: string | null
           updated_at: string | null
         }
@@ -207,6 +208,7 @@ export type Database = {
           display_name?: string | null
           id: string
           is_pro?: boolean | null
+          notification_preferences?: Json | null
           pro_expires_at?: string | null
           updated_at?: string | null
         }
@@ -216,6 +218,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           is_pro?: boolean | null
+          notification_preferences?: Json | null
           pro_expires_at?: string | null
           updated_at?: string | null
         }

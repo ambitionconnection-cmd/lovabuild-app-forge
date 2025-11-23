@@ -13,10 +13,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, User, Lock, CreditCard, Shield, Calendar, Mail, Crown, AlertCircle } from "lucide-react";
+import { ArrowLeft, User, Lock, CreditCard, Shield, Calendar, Mail, Crown, AlertCircle, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const profileSchema = z.object({
   display_name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
@@ -34,12 +36,27 @@ const passwordSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
+interface NotificationPreferences {
+  drop_reminders: boolean;
+  favorite_brand_drops: boolean;
+  new_shop_openings: boolean;
+  weekly_digest: boolean;
+  promotional_emails: boolean;
+}
+
 const Profile = () => {
   const { user, signOut, updatePassword } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = React.useState(false);
   const [profile, setProfile] = React.useState<any>(null);
+  const [notificationPrefs, setNotificationPrefs] = React.useState<NotificationPreferences>({
+    drop_reminders: true,
+    favorite_brand_drops: true,
+    new_shop_openings: false,
+    weekly_digest: true,
+    promotional_emails: false,
+  });
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -85,6 +102,11 @@ const Profile = () => {
       display_name: data.display_name || "",
       avatar_url: data.avatar_url || "",
     });
+    
+    // Load notification preferences
+    if (data.notification_preferences && typeof data.notification_preferences === 'object') {
+      setNotificationPrefs(data.notification_preferences as unknown as NotificationPreferences);
+    }
   };
 
   const onProfileSubmit = async (data: ProfileFormValues) => {
@@ -131,6 +153,29 @@ const Profile = () => {
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const updateNotificationPreference = async (key: keyof NotificationPreferences, value: boolean) => {
+    if (!user) return;
+
+    const newPrefs = { ...notificationPrefs, [key]: value };
+    setNotificationPrefs(newPrefs);
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        notification_preferences: newPrefs,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    if (error) {
+      toast.error("Failed to update notification preferences");
+      // Revert on error
+      setNotificationPrefs(notificationPrefs);
+    } else {
+      toast.success("Notification preferences updated");
+    }
   };
 
   const isProActive = profile?.is_pro && (!profile?.pro_expires_at || new Date(profile.pro_expires_at) > new Date());
@@ -191,10 +236,14 @@ const Profile = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile">
               <User className="w-4 h-4 mr-2" />
               Profile
+            </TabsTrigger>
+            <TabsTrigger value="notifications">
+              <Bell className="w-4 h-4 mr-2" />
+              Notifications
             </TabsTrigger>
             <TabsTrigger value="security">
               <Lock className="w-4 h-4 mr-2" />
@@ -253,6 +302,120 @@ const Profile = () => {
                     </Button>
                   </form>
                 </Form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Notifications Tab */}
+          <TabsContent value="notifications">
+            <Card>
+              <CardHeader>
+                <CardTitle>Email Notifications</CardTitle>
+                <CardDescription>Manage which emails you receive from HEARDROP</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Alert>
+                  <Mail className="h-4 w-4" />
+                  <AlertTitle>Email Address</AlertTitle>
+                  <AlertDescription>
+                    Notifications will be sent to {user.email}
+                  </AlertDescription>
+                </Alert>
+
+                <div className="space-y-6">
+                  {/* Drop Reminders */}
+                  <div className="flex items-start justify-between space-x-4 py-4 border-b">
+                    <div className="flex-1 space-y-1">
+                      <Label htmlFor="drop-reminders" className="text-base font-semibold cursor-pointer">
+                        Drop Reminders
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Get notified when drops you've set reminders for are about to go live
+                      </p>
+                    </div>
+                    <Switch
+                      id="drop-reminders"
+                      checked={notificationPrefs.drop_reminders}
+                      onCheckedChange={(checked) => updateNotificationPreference('drop_reminders', checked)}
+                    />
+                  </div>
+
+                  {/* Favorite Brand Drops */}
+                  <div className="flex items-start justify-between space-x-4 py-4 border-b">
+                    <div className="flex-1 space-y-1">
+                      <Label htmlFor="favorite-brands" className="text-base font-semibold cursor-pointer">
+                        Favorite Brand Drops
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive notifications when your favorite brands release new drops
+                      </p>
+                    </div>
+                    <Switch
+                      id="favorite-brands"
+                      checked={notificationPrefs.favorite_brand_drops}
+                      onCheckedChange={(checked) => updateNotificationPreference('favorite_brand_drops', checked)}
+                    />
+                  </div>
+
+                  {/* New Shop Openings */}
+                  <div className="flex items-start justify-between space-x-4 py-4 border-b">
+                    <div className="flex-1 space-y-1">
+                      <Label htmlFor="new-shops" className="text-base font-semibold cursor-pointer">
+                        New Shop Openings
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Get alerts when new shops are added near your favorite locations
+                      </p>
+                    </div>
+                    <Switch
+                      id="new-shops"
+                      checked={notificationPrefs.new_shop_openings}
+                      onCheckedChange={(checked) => updateNotificationPreference('new_shop_openings', checked)}
+                    />
+                  </div>
+
+                  {/* Weekly Digest */}
+                  <div className="flex items-start justify-between space-x-4 py-4 border-b">
+                    <div className="flex-1 space-y-1">
+                      <Label htmlFor="weekly-digest" className="text-base font-semibold cursor-pointer">
+                        Weekly Digest
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive a weekly summary of upcoming drops and new brands
+                      </p>
+                    </div>
+                    <Switch
+                      id="weekly-digest"
+                      checked={notificationPrefs.weekly_digest}
+                      onCheckedChange={(checked) => updateNotificationPreference('weekly_digest', checked)}
+                    />
+                  </div>
+
+                  {/* Promotional Emails */}
+                  <div className="flex items-start justify-between space-x-4 py-4">
+                    <div className="flex-1 space-y-1">
+                      <Label htmlFor="promotional" className="text-base font-semibold cursor-pointer">
+                        Promotional Emails
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive exclusive offers, discounts, and special announcements
+                      </p>
+                    </div>
+                    <Switch
+                      id="promotional"
+                      checked={notificationPrefs.promotional_emails}
+                      onCheckedChange={(checked) => updateNotificationPreference('promotional_emails', checked)}
+                    />
+                  </div>
+                </div>
+
+                <Alert className="bg-muted/50">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Note</AlertTitle>
+                  <AlertDescription>
+                    You can unsubscribe from all emails at any time. Critical account-related emails will still be sent.
+                  </AlertDescription>
+                </Alert>
               </CardContent>
             </Card>
           </TabsContent>
