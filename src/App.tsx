@@ -13,6 +13,7 @@ import GlobalIndex from "./pages/GlobalIndex";
 import Drops from "./pages/Drops";
 import MyHeardrop from "./pages/MyHeardrop";
 import Admin from "./pages/Admin";
+import NotificationHistory from "./pages/NotificationHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/drops" element={<ProtectedRoute><Drops /></ProtectedRoute>} />
             <Route path="/my-heardrop" element={<ProtectedRoute><MyHeardrop /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><NotificationHistory /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
