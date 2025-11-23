@@ -14,6 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
   updatePassword: (newPassword: string) => Promise<{ error: any }>;
+  resendVerificationEmail: (email: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
@@ -139,6 +140,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return { error: null };
   };
 
+  const resendVerificationEmail = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+      }
+    });
+    
+    if (error) {
+      toast.error(error.message);
+      return { error };
+    }
+    
+    toast.success("Verification email sent! Please check your inbox.");
+    return { error: null };
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -149,7 +168,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       signInWithGoogle, 
       signOut,
       resetPassword,
-      updatePassword
+      updatePassword,
+      resendVerificationEmail
     }}>
       {children}
     </AuthContext.Provider>
