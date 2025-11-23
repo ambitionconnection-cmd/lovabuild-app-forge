@@ -425,8 +425,29 @@ function generateDigestEmail(
   `;
 }
 
+function shouldSendDigest(frequency: string | undefined, currentDate: Date): boolean {
+  if (!frequency || frequency === 'weekly') {
+    return true; // Send every time (weekly)
+  }
+  
+  if (frequency === 'bi-weekly') {
+    // Send every other week (check week number)
+    const weekNumber = Math.floor(currentDate.getDate() / 7);
+    return weekNumber % 2 === 0;
+  }
+  
+  if (frequency === 'monthly') {
+    // Send only on first Monday of the month
+    const dayOfMonth = currentDate.getDate();
+    return dayOfMonth <= 7; // First week of the month
+  }
+  
+  return true; // Default to weekly if unknown frequency
+}
+
 async function sendWeeklyDigests() {
   console.log('Starting weekly digest job...');
+  const currentDate = new Date();
 
   // Get all profiles with weekly_digest enabled
   const { data: profiles, error: profilesError } = await supabase
@@ -439,13 +460,24 @@ async function sendWeeklyDigests() {
     return { processed: 0, errors: 0 };
   }
 
-  // Filter profiles with weekly_digest enabled
+  // Filter profiles with weekly_digest enabled and check frequency
   const eligibleProfiles = (profiles || []).filter(profile => {
-    const prefs = profile.notification_preferences as Record<string, boolean> | null;
-    return prefs?.weekly_digest === true;
+    const prefs = profile.notification_preferences as Record<string, any> | null;
+    if (!prefs?.weekly_digest) {
+      return false;
+    }
+    
+    const frequency = prefs.digest_frequency;
+    const shouldSend = shouldSendDigest(frequency, currentDate);
+    
+    if (!shouldSend) {
+      console.log(`Skipping user ${profile.id} with ${frequency} frequency`);
+    }
+    
+    return shouldSend;
   });
 
-  console.log(`Found ${eligibleProfiles.length} users with weekly digest enabled`);
+  console.log(`Found ${eligibleProfiles.length} users eligible for digest this cycle`);
 
   if (eligibleProfiles.length === 0) {
     return { processed: 0, errors: 0 };
