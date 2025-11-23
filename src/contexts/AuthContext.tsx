@@ -69,14 +69,62 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
+    // Check if account is locked
+    const { data: attemptData } = await supabase
+      .from('login_attempts')
+      .select('*')
+      .eq('email', email.toLowerCase())
+      .maybeSingle();
+
+    if (attemptData?.locked_until && new Date(attemptData.locked_until) > new Date()) {
+      const remainingMinutes = Math.ceil((new Date(attemptData.locked_until).getTime() - Date.now()) / 60000);
+      toast.error(`Account is locked. Please try again in ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}.`);
+      return { error: { message: 'Account locked' } };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      toast.error(error.message);
+      // Record failed attempt
+      const currentAttempts = (attemptData?.attempts || 0) + 1;
+      const shouldLock = currentAttempts >= 5;
+      
+      if (attemptData) {
+        await supabase
+          .from('login_attempts')
+          .update({
+            attempts: currentAttempts,
+            locked_until: shouldLock ? new Date(Date.now() + 15 * 60 * 1000).toISOString() : null,
+            last_attempt: new Date().toISOString()
+          })
+          .eq('email', email.toLowerCase());
+      } else {
+        await supabase
+          .from('login_attempts')
+          .insert({
+            email: email.toLowerCase(),
+            attempts: currentAttempts,
+            locked_until: shouldLock ? new Date(Date.now() + 15 * 60 * 1000).toISOString() : null,
+          });
+      }
+
+      if (shouldLock) {
+        toast.error('Too many failed attempts. Account locked for 15 minutes.');
+      } else {
+        toast.error(`Invalid credentials. ${5 - currentAttempts} attempt${5 - currentAttempts !== 1 ? 's' : ''} remaining.`);
+      }
       return { error };
+    }
+
+    // Reset attempts on successful login
+    if (attemptData) {
+      await supabase
+        .from('login_attempts')
+        .delete()
+        .eq('email', email.toLowerCase());
     }
 
     toast.success("Welcome back!");
