@@ -92,10 +92,81 @@ async function getNewBrands() {
   return brands || [];
 }
 
+async function getUserPersonalizedDrops(userId: string) {
+  const now = new Date();
+  const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  // Get user's favorite brands
+  const { data: favBrands, error: favBrandsError } = await supabase
+    .from('user_favorite_brands')
+    .select('brand_id')
+    .eq('user_id', userId);
+
+  if (favBrandsError) {
+    console.error('Error fetching favorite brands:', favBrandsError);
+    return [];
+  }
+
+  // Get user's favorite shops
+  const { data: favShops, error: favShopsError } = await supabase
+    .from('user_favorite_shops')
+    .select('shop_id')
+    .eq('user_id', userId);
+
+  if (favShopsError) {
+    console.error('Error fetching favorite shops:', favShopsError);
+  }
+
+  const favoriteBrandIds = favBrands?.map(f => f.brand_id) || [];
+  const favoriteShopIds = favShops?.map(f => f.shop_id) || [];
+
+  if (favoriteBrandIds.length === 0 && favoriteShopIds.length === 0) {
+    return [];
+  }
+
+  // Fetch drops from favorite brands or shops
+  let query = supabase
+    .from('drops')
+    .select(`
+      id,
+      title,
+      description,
+      release_date,
+      image_url,
+      discount_code,
+      status,
+      brands (name, logo_url),
+      shops (name)
+    `)
+    .gte('release_date', now.toISOString())
+    .lte('release_date', oneWeekFromNow.toISOString());
+
+  // Filter by favorite brands or shops
+  if (favoriteBrandIds.length > 0 && favoriteShopIds.length > 0) {
+    query = query.or(`brand_id.in.(${favoriteBrandIds.join(',')}),shop_id.in.(${favoriteShopIds.join(',')})`);
+  } else if (favoriteBrandIds.length > 0) {
+    query = query.in('brand_id', favoriteBrandIds);
+  } else if (favoriteShopIds.length > 0) {
+    query = query.in('shop_id', favoriteShopIds);
+  }
+
+  const { data: drops, error } = await query
+    .order('release_date', { ascending: true })
+    .limit(5);
+
+  if (error) {
+    console.error('Error fetching personalized drops:', error);
+    return [];
+  }
+
+  return drops || [];
+}
+
 function generateDigestEmail(
   displayName: string,
   upcomingDrops: any[],
-  newBrands: any[]
+  newBrands: any[],
+  personalizedDrops: any[]
 ): string {
   const now = new Date();
   const weekRange = `${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
@@ -181,6 +252,50 @@ function generateDigestEmail(
             <p style="margin: 0 0 30px 0; color: #666; font-size: 14px; line-height: 1.6;">
               Here's your weekly roundup of what's happening in the streetwear world for <strong>${weekRange}</strong>
             </p>
+
+            ${personalizedDrops.length > 0 ? `
+              <!-- Personalized Section -->
+              <div style="margin-bottom: 40px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+                  <span style="font-size: 24px;">⭐</span>
+                  <h2 style="margin: 0; color: #000; font-size: 22px;">Personalized For You</h2>
+                </div>
+                <p style="margin: 0 0 16px 0; color: #666; font-size: 13px;">
+                  Based on your favorite brands and shops
+                </p>
+                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 12px; border: 2px solid #fbbf24;">
+                  ${personalizedDrops.map(drop => `
+                    <div style="background: #fff; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                      <div style="display: flex; gap: 16px; align-items: start;">
+                        ${drop.image_url ? `
+                          <img src="${drop.image_url}" alt="${drop.title}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;" />
+                        ` : ''}
+                        <div style="flex: 1;">
+                          <div style="background: #fbbf24; color: #78350f; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 8px;">
+                            FROM YOUR FAVORITES
+                          </div>
+                          <h3 style="margin: 0 0 8px 0; color: #000; font-size: 18px;">${drop.title}</h3>
+                          <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">
+                            <strong>${drop.brands?.name || drop.shops?.name || 'Unknown'}</strong>
+                          </p>
+                          <p style="margin: 0 0 8px 0; color: #999; font-size: 13px;">
+                            📅 ${formatDate(drop.release_date)}
+                          </p>
+                          ${drop.description ? `
+                            <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">${drop.description.substring(0, 100)}${drop.description.length > 100 ? '...' : ''}</p>
+                          ` : ''}
+                          ${drop.discount_code ? `
+                            <div style="background: #fef3c7; padding: 8px 12px; border-radius: 4px; display: inline-block; margin-top: 8px;">
+                              <span style="color: #78350f; font-size: 12px; font-weight: 600;">💰 Code: ${drop.discount_code}</span>
+                            </div>
+                          ` : ''}
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
 
             <!-- Upcoming Drops Section -->
             <div style="margin-bottom: 40px;">
@@ -281,16 +396,21 @@ async function sendWeeklyDigests() {
     }
 
     try {
+      // Fetch personalized drops for this user
+      const personalizedDrops = await getUserPersonalizedDrops(profile.id);
+      console.log(`Found ${personalizedDrops.length} personalized drops for user ${profile.id}`);
+
       const emailHtml = generateDigestEmail(
         profile.display_name,
         upcomingDrops,
-        newBrands
+        newBrands,
+        personalizedDrops
       );
 
       const { error: sendError } = await resend.emails.send({
         from: 'HEARDROP Weekly <onboarding@resend.dev>',
         to: [userEmail],
-        subject: '🔥 Your Weekly HEARDROP Digest',
+        subject: personalizedDrops.length > 0 ? '⭐ Your Personalized HEARDROP Digest' : '🔥 Your Weekly HEARDROP Digest',
         html: emailHtml,
       });
 
@@ -303,8 +423,8 @@ async function sendWeeklyDigests() {
       // Log notification
       await logNotification(
         profile.id,
-        'Your Weekly HEARDROP Digest',
-        `${upcomingDrops.length} upcoming drops and ${newBrands.length} new brands this week`
+        personalizedDrops.length > 0 ? 'Your Personalized HEARDROP Digest' : 'Your Weekly HEARDROP Digest',
+        `${personalizedDrops.length} personalized drops, ${upcomingDrops.length} upcoming drops, and ${newBrands.length} new brands this week`
       );
 
       processed++;
