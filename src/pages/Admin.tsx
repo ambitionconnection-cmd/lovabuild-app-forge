@@ -13,6 +13,8 @@ import { format } from 'date-fns';
 import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExportFilters';
 import { ScheduledExportManager } from '@/components/ScheduledExportManager';
 import { EmailAnalytics } from '@/components/EmailAnalytics';
+import { BrandImageGenerator } from '@/components/BrandImageGenerator';
+import { Tables } from '@/integrations/supabase/types';
 
 interface LoginAttempt {
   id: string;
@@ -45,6 +47,7 @@ export default function Admin() {
   const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
   const [ipAttempts, setIpAttempts] = useState<IpAttempt[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [brands, setBrands] = useState<Tables<'brands'>[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,7 +66,7 @@ export default function Admin() {
   const fetchAttempts = async () => {
     setLoading(true);
     try {
-      const [loginRes, ipRes, auditRes] = await Promise.all([
+      const [loginRes, ipRes, auditRes, brandsRes] = await Promise.all([
         supabase
           .from('login_attempts')
           .select('*')
@@ -76,7 +79,11 @@ export default function Admin() {
           .from('security_audit_log')
           .select('*')
           .order('created_at', { ascending: false })
-          .limit(100)
+          .limit(100),
+        supabase
+          .from('brands')
+          .select('*')
+          .order('name')
       ]);
 
       if (loginRes.error) throw loginRes.error;
@@ -86,6 +93,7 @@ export default function Admin() {
       setLoginAttempts(loginRes.data || []);
       setIpAttempts(ipRes.data || []);
       setAuditLogs(auditRes.data || []);
+      setBrands(brandsRes.data || []);
     } catch (error) {
       console.error('Error fetching attempts:', error);
       toast.error('Failed to load security data');
@@ -326,6 +334,7 @@ export default function Admin() {
             <TabsTrigger value="audit">Audit Log</TabsTrigger>
             <TabsTrigger value="scheduled">Scheduled Exports</TabsTrigger>
             <TabsTrigger value="analytics">Email Analytics</TabsTrigger>
+            <TabsTrigger value="brands">Brand Images</TabsTrigger>
           </TabsList>
 
           <TabsContent value="accounts">
@@ -503,6 +512,13 @@ export default function Admin() {
 
           <TabsContent value="analytics">
             <EmailAnalytics />
+          </TabsContent>
+
+          <TabsContent value="brands">
+            <BrandImageGenerator 
+              brands={brands} 
+              onComplete={fetchAttempts} 
+            />
           </TabsContent>
         </Tabs>
       </div>
