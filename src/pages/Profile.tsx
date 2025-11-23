@@ -20,6 +20,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const profileSchema = z.object({
   display_name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
@@ -197,9 +198,12 @@ const Profile = () => {
             </Button>
             <h1 className="text-2xl font-bold tracking-tight">Profile Settings</h1>
           </div>
-          <Button variant="destructive" onClick={signOut}>
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Button variant="destructive" onClick={signOut}>
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 

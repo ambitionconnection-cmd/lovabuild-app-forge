@@ -9,6 +9,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface Drop {
   id: string;
@@ -95,6 +96,7 @@ const Index = () => {
             <Button variant="ghost" size="icon">
               <Search className="w-5 h-5" />
             </Button>
+            <LanguageSwitcher />
             {isAdmin && (
               <Button 
                 variant="ghost" 
