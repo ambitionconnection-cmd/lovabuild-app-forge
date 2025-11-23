@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.track-email]
 verify_jwt = false
+
+[functions.monitor-email-engagement]
+verify_jwt = false
