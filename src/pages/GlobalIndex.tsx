@@ -21,6 +21,7 @@ const GlobalIndex = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCountry, setSelectedCountry] = useState<string>("all");
 
   // Fetch brands and user favorites
   useEffect(() => {
@@ -69,7 +70,8 @@ const GlobalIndex = () => {
     if (searchQuery) {
       filtered = filtered.filter(brand =>
         brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        brand.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        brand.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        brand.country?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -77,8 +79,15 @@ const GlobalIndex = () => {
       filtered = filtered.filter(brand => brand.category === selectedCategory);
     }
 
+    if (selectedCountry !== "all") {
+      filtered = filtered.filter(brand => brand.country === selectedCountry);
+    }
+
     setFilteredBrands(filtered);
-  }, [searchQuery, selectedCategory, brands]);
+  }, [searchQuery, selectedCategory, selectedCountry, brands]);
+
+  // Get unique countries from brands
+  const countries = Array.from(new Set(brands.map(brand => brand.country).filter(Boolean))).sort();
 
   const toggleFavorite = async (brandId: string) => {
     if (!user) {
@@ -183,6 +192,20 @@ const GlobalIndex = () => {
                 />
               </div>
               
+              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Countries</SelectItem>
+                  {countries.map((country) => (
+                    <SelectItem key={country} value={country!}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue placeholder="Category" />
