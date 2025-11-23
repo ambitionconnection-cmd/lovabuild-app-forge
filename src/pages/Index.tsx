@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 interface Drop {
   id: string;
@@ -41,6 +42,7 @@ const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { isAdmin } = useIsAdmin();
+  const { t } = useTranslation();
   const [featuredDrops, setFeaturedDrops] = useState<Drop[]>([]);
   const [popularBrands, setPopularBrands] = useState<Brand[]>([]);
   const [nearbyShops, setNearbyShops] = useState<Shop[]>([]);
@@ -89,7 +91,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
-            <h1 className="text-2xl font-bold tracking-tight">HEARDROP</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t('app.name')}</h1>
           </div>
           
           <div className="flex items-center gap-3">
@@ -102,7 +104,7 @@ const Index = () => {
                 variant="ghost" 
                 size="icon" 
                 onClick={() => navigate("/admin")}
-                title="Admin Dashboard"
+                title={t('nav.admin')}
               >
                 <Shield className="w-5 h-5" />
               </Button>
@@ -119,19 +121,19 @@ const Index = () => {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2000')] bg-cover bg-center opacity-20" />
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center">
           <h2 className="text-5xl md:text-7xl font-bold text-foreground tracking-wider mb-4">
-            HEARDROP
+            {t('app.name')}
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl">
-            Your ultimate destination for streetwear drops, brands, and shops
+            {t('app.tagline')}
           </p>
           <div className="flex gap-4">
             <Button size="lg" onClick={() => navigate('/drops')}>
               <Zap className="mr-2 h-5 w-5" />
-              Explore Drops
+              {t('home.explorDrops')}
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/directions')}>
               <MapPin className="mr-2 h-5 w-5" />
-              Find Shops
+              {t('home.findShops')}
             </Button>
           </div>
         </div>
@@ -143,11 +145,11 @@ const Index = () => {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-3xl font-bold mb-2">Featured Drops</h3>
-              <p className="text-muted-foreground">Don't miss these upcoming releases</p>
+              <h3 className="text-3xl font-bold mb-2">{t('home.featuredDrops')}</h3>
+              <p className="text-muted-foreground">{t('home.featuredDropsDesc')}</p>
             </div>
             <Button variant="ghost" onClick={() => navigate('/drops')}>
-              View All
+              {t('home.viewAll')}
             </Button>
           </div>
           
@@ -166,7 +168,7 @@ const Index = () => {
           ) : featuredDrops.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
-                No featured drops available at the moment
+                {t('home.noFeaturedDrops')}
               </CardContent>
             </Card>
           ) : (
@@ -181,12 +183,12 @@ const Index = () => {
                         <Zap className="h-12 w-12 text-muted-foreground" />
                       </div>
                     )}
-                    <Badge className="absolute top-2 right-2">Featured</Badge>
+                    <Badge className="absolute top-2 right-2">{t('drops.featured')}</Badge>
                   </div>
                   <CardContent className="p-4">
                     <h4 className="font-semibold text-lg mb-1 line-clamp-1">{drop.title}</h4>
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                      {drop.description || 'Upcoming release'}
+                      {drop.description || t('drops.upcoming')}
                     </p>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4 mr-1" />
@@ -203,11 +205,11 @@ const Index = () => {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-3xl font-bold mb-2">Popular Brands</h3>
-              <p className="text-muted-foreground">Explore trending streetwear labels</p>
+              <h3 className="text-3xl font-bold mb-2">{t('home.popularBrands')}</h3>
+              <p className="text-muted-foreground">{t('home.popularBrandsDesc')}</p>
             </div>
             <Button variant="ghost" onClick={() => navigate('/global-index')}>
-              View All
+              {t('home.viewAll')}
             </Button>
           </div>
           
@@ -225,7 +227,7 @@ const Index = () => {
           ) : popularBrands.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
-                No brands available yet
+                {t('home.noBrands')}
               </CardContent>
             </Card>
           ) : (
@@ -255,11 +257,11 @@ const Index = () => {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-3xl font-bold mb-2">Shop Locations</h3>
-              <p className="text-muted-foreground">Discover streetwear stores near you</p>
+              <h3 className="text-3xl font-bold mb-2">{t('home.shopLocations')}</h3>
+              <p className="text-muted-foreground">{t('home.shopLocationsDesc')}</p>
             </div>
             <Button variant="ghost" onClick={() => navigate('/directions')}>
-              View All
+              {t('home.viewAll')}
             </Button>
           </div>
           
@@ -277,7 +279,7 @@ const Index = () => {
           ) : nearbyShops.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
-                No shops available yet
+                {t('home.noShops')}
               </CardContent>
             </Card>
           ) : (
@@ -310,31 +312,31 @@ const Index = () => {
 
         {/* Quick Navigation */}
         <section>
-          <h3 className="text-3xl font-bold mb-6">Explore More</h3>
+          <h3 className="text-3xl font-bold mb-6">{t('home.exploreMore')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <NavBlock
-              title="Directions"
+              title={t('nav.directions')}
               icon={MapPin}
               to="/directions"
               variant="directions"
             />
             
             <NavBlock
-              title="Global Index"
+              title={t('nav.globalIndex')}
               icon={Globe}
               to="/global-index"
               variant="global"
             />
             
             <NavBlock
-              title="Drops"
+              title={t('nav.drops')}
               icon={Zap}
               to="/drops"
               variant="drops"
             />
             
             <NavBlock
-              title="My Heardrop"
+              title={t('nav.myHeardrop')}
               icon={Heart}
               to="/my-heardrop"
               variant="heardrop"
