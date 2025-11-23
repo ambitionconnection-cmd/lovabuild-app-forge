@@ -137,6 +137,33 @@ export type Database = {
           },
         ]
       }
+      ip_login_attempts: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          ip_address: string
+          last_attempt: string
+          locked_until: string | null
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          ip_address: string
+          last_attempt?: string
+          locked_until?: string | null
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          ip_address?: string
+          last_attempt?: string
+          locked_until?: string | null
+        }
+        Relationships: []
+      }
       login_attempts: {
         Row: {
           attempts: number
@@ -384,6 +411,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_ip_attempts: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
     }
     Enums: {

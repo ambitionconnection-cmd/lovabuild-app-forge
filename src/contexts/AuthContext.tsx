@@ -69,6 +69,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
+    // Check IP-based rate limiting first
+    try {
+      const ipCheckResponse = await supabase.functions.invoke('ip-rate-limit', {
+        body: { action: 'check' }
+      });
+
+      if (ipCheckResponse.data?.blocked) {
+        toast.error(ipCheckResponse.data.message);
+        return { error: { message: 'IP blocked' } };
+      }
+    } catch (ipError) {
+      console.error('IP rate limit check failed:', ipError);
+      // Continue with login even if IP check fails
+    }
+
     // Check if account is locked
     const { data: attemptData } = await supabase
       .from('login_attempts')
@@ -88,7 +103,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     if (error) {
-      // Record failed attempt
+      // Record IP-based failed attempt
+      try {
+        await supabase.functions.invoke('ip-rate-limit', {
+          body: { action: 'record', success: false }
+        });
+      } catch (ipError) {
+        console.error('Failed to record IP attempt:', ipError);
+      }
+
+      // Record email-based failed attempt
       const currentAttempts = (attemptData?.attempts || 0) + 1;
       const shouldLock = currentAttempts >= 5;
       
@@ -119,7 +143,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error };
     }
 
-    // Reset attempts on successful login
+    // Record successful IP attempt and reset email attempts
+    try {
+      await supabase.functions.invoke('ip-rate-limit', {
+        body: { action: 'record', success: true }
+      });
+    } catch (ipError) {
+      console.error('Failed to record IP success:', ipError);
+    }
+
     if (attemptData) {
       await supabase
         .from('login_attempts')
