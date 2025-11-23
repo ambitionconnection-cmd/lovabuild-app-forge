@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Directions from "./pages/Directions";
 import GlobalIndex from "./pages/GlobalIndex";
+import ShopMap from "./pages/ShopMap";
 import Drops from "./pages/Drops";
 import MyHeardrop from "./pages/MyHeardrop";
 import Admin from "./pages/Admin";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/directions" element={<ProtectedRoute><Directions /></ProtectedRoute>} />
             <Route path="/global-index" element={<ProtectedRoute><GlobalIndex /></ProtectedRoute>} />
+            <Route path="/shop-map" element={<ProtectedRoute><ShopMap /></ProtectedRoute>} />
             <Route path="/drops" element={<ProtectedRoute><Drops /></ProtectedRoute>} />
             <Route path="/my-heardrop" element={<ProtectedRoute><MyHeardrop /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
