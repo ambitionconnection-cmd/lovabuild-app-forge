@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExportFilters';
 import { ScheduledExportManager } from '@/components/ScheduledExportManager';
+import { EmailAnalytics } from '@/components/EmailAnalytics';
 
 interface LoginAttempt {
   id: string;
@@ -318,6 +319,7 @@ export default function Admin() {
             <TabsTrigger value="ips">Locked IPs</TabsTrigger>
             <TabsTrigger value="audit">Audit Log</TabsTrigger>
             <TabsTrigger value="scheduled">Scheduled Exports</TabsTrigger>
+            <TabsTrigger value="analytics">Email Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="accounts">
@@ -491,6 +493,10 @@ export default function Admin() {
 
           <TabsContent value="scheduled">
             <ScheduledExportManager />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <EmailAnalytics />
           </TabsContent>
         </Tabs>
       </div>

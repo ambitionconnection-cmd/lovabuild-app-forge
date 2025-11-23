@@ -14,6 +14,25 @@ const resendApiKey = Deno.env.get('RESEND_API_KEY')!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const resend = new Resend(resendApiKey);
 
+// Helper function to create trackable links
+function createTrackableLink(userId: string, targetUrl: string, emailType: string): string {
+  const trackingUrl = new URL(`${supabaseUrl}/functions/v1/track-email`);
+  trackingUrl.searchParams.set('u', userId);
+  trackingUrl.searchParams.set('t', emailType);
+  trackingUrl.searchParams.set('e', 'click');
+  trackingUrl.searchParams.set('url', targetUrl);
+  return trackingUrl.toString();
+}
+
+// Helper function to create tracking pixel URL
+function createTrackingPixel(userId: string, emailType: string): string {
+  const trackingUrl = new URL(`${supabaseUrl}/functions/v1/track-email`);
+  trackingUrl.searchParams.set('u', userId);
+  trackingUrl.searchParams.set('t', emailType);
+  trackingUrl.searchParams.set('e', 'open');
+  return trackingUrl.toString();
+}
+
 async function logNotification(userId: string, title: string, message: string) {
   const { error } = await supabase
     .from('notification_history')
@@ -198,12 +217,18 @@ async function getUserDropReminders(userId: string) {
 }
 
 function generateDigestEmail(
+  userId: string,
   displayName: string,
   upcomingDrops: any[],
   newBrands: any[],
   personalizedDrops: any[],
   dropReminders: any[]
 ): string {
+  const emailType = 'weekly_digest';
+  const appUrl = supabaseUrl.replace('//', '//');
+  const exploreLink = createTrackableLink(userId, appUrl, emailType);
+  const profileLink = createTrackableLink(userId, `${appUrl}/profile`, emailType);
+  const trackingPixelUrl = createTrackingPixel(userId, emailType);
   const now = new Date();
   const weekRange = `${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
 
@@ -404,7 +429,7 @@ function generateDigestEmail(
 
             <!-- CTA -->
             <div style="text-align: center; margin: 40px 0;">
-              <a href="${supabaseUrl.replace('//', '//')}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+              <a href="${exploreLink}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
                 Explore More on HEARDROP
               </a>
             </div>
@@ -416,9 +441,12 @@ function generateDigestEmail(
               You're receiving this weekly digest because you enabled it in your notification preferences.
             </p>
             <p style="margin: 0; color: #999; font-size: 12px;">
-              <a href="${supabaseUrl.replace('//', '//')}/profile" style="color: #667eea; text-decoration: none;">Manage preferences</a>
+              <a href="${profileLink}" style="color: #667eea; text-decoration: none;">Manage preferences</a>
             </p>
           </div>
+          
+          <!-- Tracking Pixel -->
+          <img src="${trackingPixelUrl}" width="1" height="1" style="display:block; border:0; outline:none;" alt="" />
         </div>
       </body>
     </html>
@@ -520,6 +548,7 @@ async function sendWeeklyDigests() {
       console.log(`Found ${personalizedDrops.length} personalized drops and ${dropReminders.length} reminders for user ${profile.id}`);
 
       const emailHtml = generateDigestEmail(
+        profile.id,
         profile.display_name,
         upcomingDrops,
         newBrands,

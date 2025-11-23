@@ -137,6 +137,33 @@ export type Database = {
           },
         ]
       }
+      email_analytics: {
+        Row: {
+          created_at: string
+          email_type: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_type: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_type?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ip_login_attempts: {
         Row: {
           attempts: number
