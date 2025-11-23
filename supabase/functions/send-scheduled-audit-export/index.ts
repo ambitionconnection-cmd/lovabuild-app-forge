@@ -121,13 +121,23 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Starting scheduled audit export job...');
+    const body = await req.json().catch(() => ({}));
+    const { exportId } = body; // Optional: if provided, only process this export
 
-    // Fetch all active scheduled exports
-    const { data: scheduledExports, error: fetchError } = await supabase
+    console.log('Starting scheduled audit export job...', exportId ? `for export ${exportId}` : '');
+
+    // Fetch active scheduled exports
+    let query = supabase
       .from('scheduled_audit_exports')
       .select('*')
       .eq('is_active', true);
+    
+    // If specific export ID provided, filter to just that one
+    if (exportId) {
+      query = query.eq('id', exportId);
+    }
+
+    const { data: scheduledExports, error: fetchError } = await query;
 
     if (fetchError) throw fetchError;
 
@@ -138,15 +148,18 @@ serve(async (req) => {
     
     for (const exportConfig of scheduledExports || []) {
       try {
-        // Check if we should run this export based on schedule
-        const lastRun = exportConfig.last_run_at ? new Date(exportConfig.last_run_at) : null;
-        const shouldRun = !lastRun || 
-          (exportConfig.schedule_type === 'daily' && now.getTime() - lastRun.getTime() >= 24 * 60 * 60 * 1000) ||
-          (exportConfig.schedule_type === 'weekly' && now.getTime() - lastRun.getTime() >= 7 * 24 * 60 * 60 * 1000);
+        // For manual triggers, skip the schedule check
+        if (!exportId) {
+          // Check if we should run this export based on schedule
+          const lastRun = exportConfig.last_run_at ? new Date(exportConfig.last_run_at) : null;
+          const shouldRun = !lastRun || 
+            (exportConfig.schedule_type === 'daily' && now.getTime() - lastRun.getTime() >= 24 * 60 * 60 * 1000) ||
+            (exportConfig.schedule_type === 'weekly' && now.getTime() - lastRun.getTime() >= 7 * 24 * 60 * 60 * 1000);
 
-        if (!shouldRun) {
-          console.log(`Skipping export ${exportConfig.id} - not due yet`);
-          continue;
+          if (!shouldRun) {
+            console.log(`Skipping export ${exportConfig.id} - not due yet`);
+            continue;
+          }
         }
 
         console.log(`Processing export ${exportConfig.id} for ${exportConfig.admin_email}`);
@@ -156,6 +169,12 @@ serve(async (req) => {
         
         if (!logs || logs.length === 0) {
           console.log(`No logs found for export ${exportConfig.id}`);
+          results.push({
+            id: exportConfig.id,
+            email: exportConfig.admin_email,
+            status: 'no_data',
+            message: 'No audit logs match the configured filters'
+          });
           continue;
         }
 

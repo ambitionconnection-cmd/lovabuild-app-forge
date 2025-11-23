@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Calendar, Plus, Trash2, Clock } from 'lucide-react';
+import { Calendar, Plus, Trash2, Clock, Send } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface ScheduledExport {
@@ -37,6 +37,7 @@ const EVENT_TYPES = [
 export const ScheduledExportManager = () => {
   const [exports, setExports] = useState<ScheduledExport[]>([]);
   const [loading, setLoading] = useState(true);
+  const [testingId, setTestingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     schedule_type: 'daily',
@@ -142,6 +143,37 @@ export const ScheduledExportManager = () => {
     } catch (error) {
       console.error('Error deleting export:', error);
       toast.error('Failed to delete export');
+    }
+  };
+
+  const handleTestNow = async (id: string, adminEmail: string) => {
+    setTestingId(id);
+    try {
+      toast.info('Sending test export...');
+      
+      const { data, error } = await supabase.functions.invoke('send-scheduled-audit-export', {
+        body: { exportId: id }
+      });
+
+      if (error) throw error;
+
+      const result = data?.results?.[0];
+      
+      if (result?.status === 'success') {
+        toast.success(`Test export sent to ${adminEmail} with ${result.count} events`);
+        fetchScheduledExports(); // Refresh to show updated last_run_at
+      } else if (result?.status === 'no_data') {
+        toast.warning(result.message || 'No audit logs match the configured filters');
+      } else if (result?.status === 'error') {
+        toast.error(`Failed to send export: ${result.error}`);
+      } else {
+        toast.error('Failed to send test export');
+      }
+    } catch (error) {
+      console.error('Error testing export:', error);
+      toast.error('Failed to trigger test export');
+    } finally {
+      setTestingId(null);
     }
   };
 
@@ -308,13 +340,25 @@ export const ScheduledExportManager = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(exp.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleTestNow(exp.id, exp.admin_email)}
+                        disabled={testingId === exp.id}
+                      >
+                        <Send className="h-4 w-4 mr-1" />
+                        {testingId === exp.id ? 'Sending...' : 'Test Now'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(exp.id)}
+                        disabled={testingId === exp.id}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
