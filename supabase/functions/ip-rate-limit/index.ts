@@ -93,6 +93,17 @@ serve(async (req) => {
         }
 
         console.log(`IP ${ipAddress}: ${currentAttempts} failed attempts${shouldLock ? ' - LOCKED' : ''}`);
+
+        // Log IP lockout event
+        if (shouldLock) {
+          await supabaseAdmin
+            .from('security_audit_log')
+            .insert({
+              event_type: 'ip_locked',
+              ip_address: ipAddress,
+              event_data: { attempts: currentAttempts, lockDuration: 30 }
+            });
+        }
       }
 
       return new Response(
