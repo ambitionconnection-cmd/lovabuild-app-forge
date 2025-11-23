@@ -26,11 +26,21 @@ interface IpAttempt {
   last_attempt: string;
 }
 
+interface AuditLog {
+  id: string;
+  event_type: string;
+  user_email: string | null;
+  ip_address: string | null;
+  event_data: any;
+  created_at: string;
+}
+
 export default function Admin() {
   const navigate = useNavigate();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
   const [ipAttempts, setIpAttempts] = useState<IpAttempt[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +59,7 @@ export default function Admin() {
   const fetchAttempts = async () => {
     setLoading(true);
     try {
-      const [loginRes, ipRes] = await Promise.all([
+      const [loginRes, ipRes, auditRes] = await Promise.all([
         supabase
           .from('login_attempts')
           .select('*')
@@ -57,14 +67,21 @@ export default function Admin() {
         supabase
           .from('ip_login_attempts')
           .select('*')
-          .order('last_attempt', { ascending: false })
+          .order('last_attempt', { ascending: false }),
+        supabase
+          .from('security_audit_log')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100)
       ]);
 
       if (loginRes.error) throw loginRes.error;
       if (ipRes.error) throw ipRes.error;
+      if (auditRes.error) throw auditRes.error;
 
       setLoginAttempts(loginRes.data || []);
       setIpAttempts(ipRes.data || []);
+      setAuditLogs(auditRes.data || []);
     } catch (error) {
       console.error('Error fetching attempts:', error);
       toast.error('Failed to load security data');
@@ -82,6 +99,15 @@ export default function Admin() {
 
       if (error) throw error;
 
+      // Log admin action
+      await supabase.functions.invoke('log-security-event', {
+        body: {
+          eventType: 'admin_unlock_account',
+          userEmail: email,
+          eventData: { accountId: id }
+        }
+      });
+
       toast.success(`Unlocked account: ${email}`);
       fetchAttempts();
     } catch (error) {
@@ -98,6 +124,14 @@ export default function Admin() {
         .eq('id', id);
 
       if (error) throw error;
+
+      // Log admin action
+      await supabase.functions.invoke('log-security-event', {
+        body: {
+          eventType: 'admin_unlock_ip',
+          eventData: { ipAddress: ip, ipAttemptId: id }
+        }
+      });
 
       toast.success(`Unlocked IP: ${ip}`);
       fetchAttempts();
@@ -144,6 +178,7 @@ export default function Admin() {
           <TabsList>
             <TabsTrigger value="accounts">Locked Accounts</TabsTrigger>
             <TabsTrigger value="ips">Locked IPs</TabsTrigger>
+            <TabsTrigger value="audit">Audit Log</TabsTrigger>
           </TabsList>
 
           <TabsContent value="accounts">
@@ -244,6 +279,62 @@ export default function Admin() {
                               <Unlock className="h-4 w-4 mr-2" />
                               Unlock
                             </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="audit">
+            <Card>
+              <CardHeader>
+                <CardTitle>Security Audit Log</CardTitle>
+                <CardDescription>
+                  Complete history of security events and admin actions (last 100 events)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {auditLogs.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No audit logs recorded</p>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Timestamp</TableHead>
+                        <TableHead>Event Type</TableHead>
+                        <TableHead>User Email</TableHead>
+                        <TableHead>IP Address</TableHead>
+                        <TableHead>Details</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {auditLogs.map((log) => (
+                        <TableRow key={log.id}>
+                          <TableCell className="text-sm">
+                            {new Date(log.created_at).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={
+                              log.event_type.includes('locked') ? 'destructive' :
+                              log.event_type.includes('success') ? 'default' :
+                              log.event_type.includes('failed') ? 'secondary' :
+                              'outline'
+                            }>
+                              {log.event_type.replace(/_/g, ' ').toUpperCase()}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {log.user_email || '-'}
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">
+                            {log.ip_address || '-'}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
+                            {log.event_data ? JSON.stringify(log.event_data) : '-'}
                           </TableCell>
                         </TableRow>
                       ))}

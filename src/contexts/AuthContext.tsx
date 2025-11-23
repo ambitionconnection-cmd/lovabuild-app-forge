@@ -112,12 +112,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: { message: 'Account locked' } };
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
+      // Log failed login attempt
+      try {
+        await supabase.functions.invoke('log-security-event', {
+          body: {
+            eventType: 'login_failed',
+            userEmail: email,
+            eventData: { reason: error.message }
+          }
+        });
+      } catch (logError) {
+        console.error('Failed to log security event:', logError);
+      }
       // Record IP-based failed attempt
       try {
         await supabase.functions.invoke('ip-rate-limit', {
@@ -151,6 +163,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (shouldLock) {
+        // Log account lockout
+        try {
+          await supabase.functions.invoke('log-security-event', {
+            body: {
+              eventType: 'account_locked',
+              userEmail: email,
+              eventData: { attempts: currentAttempts, lockDuration: 15 }
+            }
+          });
+        } catch (logError) {
+          console.error('Failed to log security event:', logError);
+        }
+
         // Send security alert email
         try {
           await supabase.functions.invoke('send-security-alert', {
@@ -171,6 +196,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         toast.error(`Invalid credentials. ${5 - currentAttempts} attempt${5 - currentAttempts !== 1 ? 's' : ''} remaining.`);
       }
       return { error };
+    }
+
+    // Log successful login
+    try {
+      await supabase.functions.invoke('log-security-event', {
+        body: {
+          eventType: 'login_success',
+          userEmail: email,
+          userId: signInData?.user?.id,
+          eventData: { method: 'email_password' }
+        }
+      });
+    } catch (logError) {
+      console.error('Failed to log security event:', logError);
     }
 
     // Record successful IP attempt and reset email attempts
