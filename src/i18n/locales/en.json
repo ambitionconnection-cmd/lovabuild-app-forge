@@ -1,0 +1,67 @@
+{
+  "nav": {
+    "directions": "Directions",
+    "globalIndex": "Global Index",
+    "drops": "Drops",
+    "myHeardrop": "My Heardrop",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "admin": "Admin"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "signOut": "Sign Out"
+  },
+  "profile": {
+    "title": "Profile",
+    "displayName": "Display Name",
+    "avatar": "Avatar",
+    "preferences": "Preferences",
+    "language": "Language",
+    "notificationSettings": "Notification Settings",
+    "save": "Save Changes"
+  },
+  "drops": {
+    "upcoming": "Upcoming Drops",
+    "live": "Live Now",
+    "ended": "Ended",
+    "featured": "Featured",
+    "proExclusive": "Pro Exclusive",
+    "setReminder": "Set Reminder",
+    "removeReminder": "Remove Reminder",
+    "viewDetails": "View Details"
+  },
+  "shops": {
+    "findShops": "Find Shops",
+    "nearMe": "Near Me",
+    "viewOnMap": "View on Map",
+    "getDirections": "Get Directions",
+    "contactInfo": "Contact Information"
+  },
+  "brands": {
+    "favoriteBrands": "Favorite Brands",
+    "addToFavorites": "Add to Favorites",
+    "removeFromFavorites": "Remove from Favorites",
+    "explore": "Explore Brands"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next"
+  }
+}

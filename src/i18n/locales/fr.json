@@ -1,0 +1,67 @@
+{
+  "nav": {
+    "directions": "Directions",
+    "globalIndex": "Index Global",
+    "drops": "Sorties",
+    "myHeardrop": "Mon Heardrop",
+    "notifications": "Notifications",
+    "profile": "Profil",
+    "admin": "Admin"
+  },
+  "auth": {
+    "signIn": "Se Connecter",
+    "signUp": "S'inscrire",
+    "email": "Email",
+    "password": "Mot de Passe",
+    "confirmPassword": "Confirmer le Mot de Passe",
+    "forgotPassword": "Mot de Passe Oublié?",
+    "dontHaveAccount": "Vous n'avez pas de compte?",
+    "alreadyHaveAccount": "Vous avez déjà un compte?",
+    "signOut": "Se Déconnecter"
+  },
+  "profile": {
+    "title": "Profil",
+    "displayName": "Nom d'Affichage",
+    "avatar": "Avatar",
+    "preferences": "Préférences",
+    "language": "Langue",
+    "notificationSettings": "Paramètres de Notification",
+    "save": "Enregistrer les Modifications"
+  },
+  "drops": {
+    "upcoming": "Sorties à Venir",
+    "live": "En Direct",
+    "ended": "Terminé",
+    "featured": "En Vedette",
+    "proExclusive": "Exclusif Pro",
+    "setReminder": "Définir un Rappel",
+    "removeReminder": "Supprimer le Rappel",
+    "viewDetails": "Voir les Détails"
+  },
+  "shops": {
+    "findShops": "Trouver des Boutiques",
+    "nearMe": "Près de Moi",
+    "viewOnMap": "Voir sur la Carte",
+    "getDirections": "Obtenir l'Itinéraire",
+    "contactInfo": "Informations de Contact"
+  },
+  "brands": {
+    "favoriteBrands": "Marques Favorites",
+    "addToFavorites": "Ajouter aux Favoris",
+    "removeFromFavorites": "Retirer des Favoris",
+    "explore": "Explorer les Marques"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant"
+  }
+}
