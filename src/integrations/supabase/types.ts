@@ -221,6 +221,45 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_audit_exports: {
+        Row: {
+          admin_email: string
+          admin_id: string
+          created_at: string
+          export_format: string
+          filters: Json | null
+          id: string
+          is_active: boolean | null
+          last_run_at: string | null
+          schedule_type: string
+          updated_at: string
+        }
+        Insert: {
+          admin_email: string
+          admin_id: string
+          created_at?: string
+          export_format: string
+          filters?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          schedule_type: string
+          updated_at?: string
+        }
+        Update: {
+          admin_email?: string
+          admin_id?: string
+          created_at?: string
+          export_format?: string
+          filters?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          schedule_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       security_audit_log: {
         Row: {
           created_at: string
