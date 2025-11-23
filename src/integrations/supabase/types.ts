@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_analytics: {
+        Row: {
+          created_at: string
+          drop_id: string
+          event_type: string
+          id: string
+          ip_address: string | null
+          referrer: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          drop_id: string
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          drop_id?: string
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_analytics_drop_id_fkey"
+            columns: ["drop_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_analytics_summary"
+            referencedColumns: ["drop_id"]
+          },
+          {
+            foreignKeyName: "affiliate_analytics_drop_id_fkey"
+            columns: ["drop_id"]
+            isOneToOne: false
+            referencedRelation: "drops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           banner_url: string | null
@@ -465,6 +513,13 @@ export type Database = {
             foreignKeyName: "user_drop_reminders_drop_id_fkey"
             columns: ["drop_id"]
             isOneToOne: false
+            referencedRelation: "affiliate_analytics_summary"
+            referencedColumns: ["drop_id"]
+          },
+          {
+            foreignKeyName: "user_drop_reminders_drop_id_fkey"
+            columns: ["drop_id"]
+            isOneToOne: false
             referencedRelation: "drops"
             referencedColumns: ["id"]
           },
@@ -572,7 +627,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      affiliate_analytics_summary: {
+        Row: {
+          affiliate_clicks: number | null
+          discount_code_copies: number | null
+          drop_id: string | null
+          drop_title: string | null
+          last_event_at: string | null
+          total_events: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_old_ip_attempts: { Args: never; Returns: undefined }
