@@ -131,9 +131,9 @@ const Index = () => {
               <Zap className="mr-2 h-5 w-5" />
               {t('home.explorDrops')}
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/directions')}>
-              <MapPin className="mr-2 h-5 w-5" />
-              {t('home.findShops')}
+            <Button size="lg" variant="outline" onClick={() => navigate('/shop-map')}>
+              <Globe className="mr-2 h-5 w-5" />
+              Global Map
             </Button>
           </div>
         </div>
@@ -260,9 +260,15 @@ const Index = () => {
               <h3 className="text-3xl font-bold mb-2">{t('home.shopLocations')}</h3>
               <p className="text-muted-foreground">{t('home.shopLocationsDesc')}</p>
             </div>
-            <Button variant="ghost" onClick={() => navigate('/directions')}>
-              {t('home.viewAll')}
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate('/shop-map')}>
+                <Globe className="h-4 w-4 mr-2" />
+                View Map
+              </Button>
+              <Button variant="ghost" onClick={() => navigate('/directions')}>
+                {t('home.viewAll')}
+              </Button>
+            </div>
           </div>
           
           {loading ? (
