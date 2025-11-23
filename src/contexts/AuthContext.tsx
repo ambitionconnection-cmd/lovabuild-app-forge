@@ -76,6 +76,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (ipCheckResponse.data?.blocked) {
+        // Send security alert for IP lock
+        try {
+          await supabase.functions.invoke('send-security-alert', {
+            body: {
+              email: email,
+              type: 'ip_locked',
+              details: {
+                lockDuration: ipCheckResponse.data.remainingMinutes
+              }
+            }
+          });
+        } catch (emailError) {
+          console.error('Failed to send IP lock alert:', emailError);
+        }
+        
         toast.error(ipCheckResponse.data.message);
         return { error: { message: 'IP blocked' } };
       }
@@ -136,6 +151,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (shouldLock) {
+        // Send security alert email
+        try {
+          await supabase.functions.invoke('send-security-alert', {
+            body: {
+              email: email,
+              type: 'account_locked',
+              details: {
+                attempts: currentAttempts,
+                lockDuration: 15
+              }
+            }
+          });
+        } catch (emailError) {
+          console.error('Failed to send security alert:', emailError);
+        }
         toast.error('Too many failed attempts. Account locked for 15 minutes.');
       } else {
         toast.error(`Invalid credentials. ${5 - currentAttempts} attempt${5 - currentAttempts !== 1 ? 's' : ''} remaining.`);
