@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, User, Lock, CreditCard, Shield, Calendar, Mail, Crown, AlertCircle, Bell } from "lucide-react";
+import { ArrowLeft, User, Lock, CreditCard, Shield, Calendar, Mail, Crown, AlertCircle, Bell, History } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -310,8 +310,16 @@ const Profile = () => {
           <TabsContent value="notifications">
             <Card>
               <CardHeader>
-                <CardTitle>Email Notifications</CardTitle>
-                <CardDescription>Manage which emails you receive from HEARDROP</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Email Notifications</CardTitle>
+                    <CardDescription>Manage which emails you receive from HEARDROP</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => navigate("/notifications")}>
+                    <History className="w-4 h-4 mr-2" />
+                    View History
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <Alert>
