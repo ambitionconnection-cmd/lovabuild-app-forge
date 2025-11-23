@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
-import { Resend } from "npm:resend@4.0.0";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -82,7 +82,6 @@ async function sendExportEmail(
 ) {
   const timestamp = new Date().toISOString().split('T')[0];
   const filename = `security_audit_log_${timestamp}.${exportFormat}`;
-  const contentType = exportFormat === 'csv' ? 'text/csv' : 'application/json';
   
   const { error } = await resend.emails.send({
     from: 'HEARDROP Security <onboarding@resend.dev>',
@@ -103,8 +102,7 @@ async function sendExportEmail(
     attachments: [
       {
         filename,
-        content: Buffer.from(content).toString('base64'),
-        content_type: contentType,
+        content: btoa(content),
       }
     ]
   });
@@ -206,13 +204,14 @@ serve(async (req) => {
         });
 
         console.log(`Successfully sent export to ${exportConfig.admin_email}`);
-      } catch (error) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         console.error(`Error processing export ${exportConfig.id}:`, error);
         results.push({
           id: exportConfig.id,
           email: exportConfig.admin_email,
           status: 'error',
-          error: error.message
+          error: errorMessage
         });
       }
     }
@@ -228,10 +227,11 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error in scheduled export function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
