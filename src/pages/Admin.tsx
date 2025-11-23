@@ -7,9 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Loader2, Unlock, ArrowLeft, Download, FileJson, FileSpreadsheet } from 'lucide-react';
+import { Loader2, Unlock, ArrowLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
+import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExportFilters';
 
 interface LoginAttempt {
   id: string;
@@ -146,21 +147,46 @@ export default function Admin() {
     return lockedUntil && new Date(lockedUntil) > new Date();
   };
 
-  const exportToCSV = async () => {
+  const exportToCSV = async (filters?: ExportFilters) => {
     try {
-      // Fetch all audit logs (not limited)
-      const { data, error } = await supabase
+      // Build query with filters
+      let query = supabase
         .from('security_audit_log')
         .select('*')
         .order('created_at', { ascending: false });
 
+      // Apply filters
+      if (filters) {
+        if (filters.startDate) {
+          query = query.gte('created_at', new Date(filters.startDate).toISOString());
+        }
+        if (filters.endDate) {
+          const endDate = new Date(filters.endDate);
+          endDate.setHours(23, 59, 59, 999);
+          query = query.lte('created_at', endDate.toISOString());
+        }
+        if (filters.eventType && filters.eventType !== 'all') {
+          query = query.eq('event_type', filters.eventType);
+        }
+        if (filters.userEmail) {
+          query = query.ilike('user_email', `%${filters.userEmail}%`);
+        }
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
+
+      if (!data || data.length === 0) {
+        toast.error('No audit logs match the selected filters');
+        return;
+      }
 
       // Define CSV headers
       const headers = ['Date/Time', 'Event Type', 'User Email', 'IP Address', 'Event Data'];
       
       // Convert data to CSV rows
-      const rows = (data || []).map(log => [
+      const rows = data.map(log => [
         format(new Date(log.created_at), 'yyyy-MM-dd HH:mm:ss'),
         log.event_type,
         log.user_email || 'N/A',
@@ -185,22 +211,47 @@ export default function Admin() {
       link.click();
       document.body.removeChild(link);
 
-      toast.success(`Exported ${data?.length || 0} audit log entries to CSV`);
+      toast.success(`Exported ${data.length} audit log entries to CSV`);
     } catch (error) {
       console.error('Error exporting to CSV:', error);
       toast.error('Failed to export audit logs');
     }
   };
 
-  const exportToJSON = async () => {
+  const exportToJSON = async (filters?: ExportFilters) => {
     try {
-      // Fetch all audit logs (not limited)
-      const { data, error } = await supabase
+      // Build query with filters
+      let query = supabase
         .from('security_audit_log')
         .select('*')
         .order('created_at', { ascending: false });
 
+      // Apply filters
+      if (filters) {
+        if (filters.startDate) {
+          query = query.gte('created_at', new Date(filters.startDate).toISOString());
+        }
+        if (filters.endDate) {
+          const endDate = new Date(filters.endDate);
+          endDate.setHours(23, 59, 59, 999);
+          query = query.lte('created_at', endDate.toISOString());
+        }
+        if (filters.eventType && filters.eventType !== 'all') {
+          query = query.eq('event_type', filters.eventType);
+        }
+        if (filters.userEmail) {
+          query = query.ilike('user_email', `%${filters.userEmail}%`);
+        }
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
+
+      if (!data || data.length === 0) {
+        toast.error('No audit logs match the selected filters');
+        return;
+      }
 
       // Create formatted JSON
       const jsonContent = JSON.stringify(data, null, 2);
@@ -216,10 +267,18 @@ export default function Admin() {
       link.click();
       document.body.removeChild(link);
 
-      toast.success(`Exported ${data?.length || 0} audit log entries to JSON`);
+      toast.success(`Exported ${data.length} audit log entries to JSON`);
     } catch (error) {
       console.error('Error exporting to JSON:', error);
       toast.error('Failed to export audit logs');
+    }
+  };
+
+  const handleExportWithFilters = (format: 'csv' | 'json', filters: ExportFilters) => {
+    if (format === 'csv') {
+      exportToCSV(filters);
+    } else {
+      exportToJSON(filters);
     }
   };
 
@@ -377,24 +436,7 @@ export default function Admin() {
                       Complete history of security events and admin actions (last 100 events)
                     </CardDescription>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={exportToCSV}
-                    >
-                      <FileSpreadsheet className="h-4 w-4 mr-2" />
-                      Export CSV
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={exportToJSON}
-                    >
-                      <FileJson className="h-4 w-4 mr-2" />
-                      Export JSON
-                    </Button>
-                  </div>
+                  <AuditLogExportFilters onExport={handleExportWithFilters} />
                 </div>
               </CardHeader>
               <CardContent>
