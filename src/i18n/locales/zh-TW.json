@@ -1,0 +1,67 @@
+{
+  "nav": {
+    "directions": "方向",
+    "globalIndex": "全球索引",
+    "drops": "新品發售",
+    "myHeardrop": "我的 Heardrop",
+    "notifications": "通知",
+    "profile": "個人資料",
+    "admin": "管理員"
+  },
+  "auth": {
+    "signIn": "登入",
+    "signUp": "註冊",
+    "email": "電子郵件",
+    "password": "密碼",
+    "confirmPassword": "確認密碼",
+    "forgotPassword": "忘記密碼？",
+    "dontHaveAccount": "還沒有帳戶？",
+    "alreadyHaveAccount": "已有帳戶？",
+    "signOut": "登出"
+  },
+  "profile": {
+    "title": "個人資料",
+    "displayName": "顯示名稱",
+    "avatar": "頭像",
+    "preferences": "偏好設定",
+    "language": "語言",
+    "notificationSettings": "通知設定",
+    "save": "儲存變更"
+  },
+  "drops": {
+    "upcoming": "即將發售",
+    "live": "正在發售",
+    "ended": "已結束",
+    "featured": "精選",
+    "proExclusive": "專業版獨享",
+    "setReminder": "設定提醒",
+    "removeReminder": "取消提醒",
+    "viewDetails": "查看詳情"
+  },
+  "shops": {
+    "findShops": "尋找商店",
+    "nearMe": "附近",
+    "viewOnMap": "在地圖上查看",
+    "getDirections": "取得路線",
+    "contactInfo": "聯絡資訊"
+  },
+  "brands": {
+    "favoriteBrands": "收藏品牌",
+    "addToFavorites": "加入收藏",
+    "removeFromFavorites": "從收藏中移除",
+    "explore": "探索品牌"
+  },
+  "common": {
+    "loading": "載入中...",
+    "error": "錯誤",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "確認",
+    "search": "搜尋",
+    "filter": "篩選",
+    "sort": "排序",
+    "close": "關閉",
+    "back": "返回",
+    "next": "下一步"
+  }
+}
