@@ -43,11 +43,13 @@ type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 const Auth = () => {
-  const { user, signIn, signUp, signInWithGoogle, resetPassword, updatePassword } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle, resetPassword, updatePassword, resendVerificationEmail } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = React.useState(false);
   const [showForgotPassword, setShowForgotPassword] = React.useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = React.useState(false);
+  const [verificationEmail, setVerificationEmail] = React.useState("");
   
   const searchParams = new URLSearchParams(location.search);
   const mode = searchParams.get('mode');
@@ -100,8 +102,13 @@ const Auth = () => {
 
   const onSignUp = async (data: SignUpFormValues) => {
     setIsLoading(true);
-    await signUp(data.email, data.password, data.displayName);
+    const { error } = await signUp(data.email, data.password, data.displayName);
     setIsLoading(false);
+    
+    if (!error) {
+      setVerificationEmail(data.email);
+      setShowVerificationMessage(true);
+    }
   };
 
   const handleGoogleSignIn = async () => {
@@ -124,6 +131,12 @@ const Auth = () => {
     if (!error) {
       navigate("/");
     }
+  };
+
+  const handleResendVerification = async () => {
+    setIsLoading(true);
+    await resendVerificationEmail(verificationEmail);
+    setIsLoading(false);
   };
 
   if (isResetMode) {
@@ -174,6 +187,51 @@ const Auth = () => {
                   </Button>
                 </form>
               </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (showVerificationMessage) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
+            <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Check Your Email</CardTitle>
+              <CardDescription>We've sent a verification link to {verificationEmail}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p>Please check your email and click the verification link to activate your account.</p>
+                <p>Didn't receive the email? Check your spam folder or request a new one.</p>
+              </div>
+              <Button 
+                type="button" 
+                className="w-full" 
+                onClick={handleResendVerification}
+                disabled={isLoading}
+              >
+                {isLoading ? "Sending..." : "Resend Verification Email"}
+              </Button>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="w-full" 
+                onClick={() => {
+                  setShowVerificationMessage(false);
+                  setVerificationEmail("");
+                }}
+              >
+                Back to Sign In
+              </Button>
             </CardContent>
           </Card>
         </div>
