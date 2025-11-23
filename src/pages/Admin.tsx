@@ -7,8 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Loader2, Unlock, ArrowLeft } from 'lucide-react';
+import { Loader2, Unlock, ArrowLeft, Download, FileJson, FileSpreadsheet } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { format } from 'date-fns';
 
 interface LoginAttempt {
   id: string;
@@ -143,6 +144,83 @@ export default function Admin() {
 
   const isLocked = (lockedUntil: string | null) => {
     return lockedUntil && new Date(lockedUntil) > new Date();
+  };
+
+  const exportToCSV = async () => {
+    try {
+      // Fetch all audit logs (not limited)
+      const { data, error } = await supabase
+        .from('security_audit_log')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Define CSV headers
+      const headers = ['Date/Time', 'Event Type', 'User Email', 'IP Address', 'Event Data'];
+      
+      // Convert data to CSV rows
+      const rows = (data || []).map(log => [
+        format(new Date(log.created_at), 'yyyy-MM-dd HH:mm:ss'),
+        log.event_type,
+        log.user_email || 'N/A',
+        log.ip_address || 'N/A',
+        JSON.stringify(log.event_data || {})
+      ]);
+
+      // Combine headers and rows
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ].join('\n');
+
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `security_audit_log_${format(new Date(), 'yyyy-MM-dd_HHmmss')}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success(`Exported ${data?.length || 0} audit log entries to CSV`);
+    } catch (error) {
+      console.error('Error exporting to CSV:', error);
+      toast.error('Failed to export audit logs');
+    }
+  };
+
+  const exportToJSON = async () => {
+    try {
+      // Fetch all audit logs (not limited)
+      const { data, error } = await supabase
+        .from('security_audit_log')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Create formatted JSON
+      const jsonContent = JSON.stringify(data, null, 2);
+
+      // Create and download file
+      const blob = new Blob([jsonContent], { type: 'application/json' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `security_audit_log_${format(new Date(), 'yyyy-MM-dd_HHmmss')}.json`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success(`Exported ${data?.length || 0} audit log entries to JSON`);
+    } catch (error) {
+      console.error('Error exporting to JSON:', error);
+      toast.error('Failed to export audit logs');
+    }
   };
 
   if (adminLoading || loading) {
@@ -292,10 +370,32 @@ export default function Admin() {
           <TabsContent value="audit">
             <Card>
               <CardHeader>
-                <CardTitle>Security Audit Log</CardTitle>
-                <CardDescription>
-                  Complete history of security events and admin actions (last 100 events)
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Security Audit Log</CardTitle>
+                    <CardDescription>
+                      Complete history of security events and admin actions (last 100 events)
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={exportToCSV}
+                    >
+                      <FileSpreadsheet className="h-4 w-4 mr-2" />
+                      Export CSV
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={exportToJSON}
+                    >
+                      <FileJson className="h-4 w-4 mr-2" />
+                      Export JSON
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {auditLogs.length === 0 ? (
