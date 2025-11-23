@@ -1,9 +1,8 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
@@ -26,19 +25,39 @@ const signUpSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const forgotPasswordSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255),
+});
+
+const resetPasswordSchema = z.object({
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 type SignInFormValues = z.infer<typeof signInSchema>;
 type SignUpFormValues = z.infer<typeof signUpSchema>;
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 const Auth = () => {
-  const { user, signIn, signUp, signInWithGoogle } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle, resetPassword, updatePassword } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showForgotPassword, setShowForgotPassword] = React.useState(false);
+  
+  const searchParams = new URLSearchParams(location.search);
+  const mode = searchParams.get('mode');
+  const isResetMode = mode === 'reset';
 
   React.useEffect(() => {
-    if (user) {
+    if (user && !isResetMode) {
       navigate("/");
     }
-  }, [user, navigate]);
+  }, [user, navigate, isResetMode]);
 
   const signInForm = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
@@ -55,6 +74,21 @@ const Auth = () => {
       password: "",
       confirmPassword: "",
       displayName: "",
+    },
+  });
+
+  const forgotPasswordForm = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const resetPasswordForm = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -75,6 +109,127 @@ const Auth = () => {
     await signInWithGoogle();
     setIsLoading(false);
   };
+
+  const onForgotPassword = async (data: ForgotPasswordFormValues) => {
+    setIsLoading(true);
+    await resetPassword(data.email);
+    setIsLoading(false);
+    setShowForgotPassword(false);
+  };
+
+  const onResetPassword = async (data: ResetPasswordFormValues) => {
+    setIsLoading(true);
+    const { error } = await updatePassword(data.password);
+    setIsLoading(false);
+    if (!error) {
+      navigate("/");
+    }
+  };
+
+  if (isResetMode) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
+            <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Reset Password</CardTitle>
+              <CardDescription>Enter your new password</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...resetPasswordForm}>
+                <form onSubmit={resetPasswordForm.handleSubmit(onResetPassword)} className="space-y-4">
+                  <FormField
+                    control={resetPasswordForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>New Password</FormLabel>
+                        <FormControl>
+                          <Input placeholder="••••••••" type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={resetPasswordForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm New Password</FormLabel>
+                        <FormControl>
+                          <Input placeholder="••••••••" type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Updating..." : "Update Password"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
+            <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Forgot Password</CardTitle>
+              <CardDescription>Enter your email to receive a reset link</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...forgotPasswordForm}>
+                <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)} className="space-y-4">
+                  <FormField
+                    control={forgotPasswordForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="you@example.com" type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Sending..." : "Send Reset Link"}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    className="w-full" 
+                    onClick={() => setShowForgotPassword(false)}
+                  >
+                    Back to Sign In
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -125,6 +280,16 @@ const Auth = () => {
                         </FormItem>
                       )}
                     />
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="px-0 text-sm"
+                        onClick={() => setShowForgotPassword(true)}
+                      >
+                        Forgot password?
+                      </Button>
+                    </div>
                     <Button type="submit" className="w-full" disabled={isLoading}>
                       {isLoading ? "Signing in..." : "Sign In"}
                     </Button>

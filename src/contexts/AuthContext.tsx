@@ -12,6 +12,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
+  updatePassword: (newPassword: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
@@ -109,8 +111,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     navigate("/auth");
   };
 
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth?mode=reset`,
+    });
+    
+    if (error) {
+      toast.error(error.message);
+      return { error };
+    }
+    
+    toast.success("Password reset link sent to your email");
+    return { error: null };
+  };
+
+  const updatePassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+    
+    if (error) {
+      toast.error(error.message);
+      return { error };
+    }
+    
+    toast.success("Password updated successfully");
+    return { error: null };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      signUp, 
+      signIn, 
+      signInWithGoogle, 
+      signOut,
+      resetPassword,
+      updatePassword
+    }}>
       {children}
     </AuthContext.Provider>
   );
