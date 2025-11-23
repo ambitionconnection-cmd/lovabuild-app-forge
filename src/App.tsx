@@ -12,6 +12,7 @@ import Directions from "./pages/Directions";
 import GlobalIndex from "./pages/GlobalIndex";
 import Drops from "./pages/Drops";
 import MyHeardrop from "./pages/MyHeardrop";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/global-index" element={<ProtectedRoute><GlobalIndex /></ProtectedRoute>} />
             <Route path="/drops" element={<ProtectedRoute><Drops /></ProtectedRoute>} />
             <Route path="/my-heardrop" element={<ProtectedRoute><MyHeardrop /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

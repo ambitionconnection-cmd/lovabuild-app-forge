@@ -1,12 +1,14 @@
-import { MapPin, Globe, Zap, Heart, Search, User } from "lucide-react";
+import { MapPin, Globe, Zap, Heart, Search, User, Shield } from "lucide-react";
 import { NavBlock } from "@/components/NavBlock";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { isAdmin } = useIsAdmin();
   // Mock notification count - will be replaced with real data
   const notificationCount = 3;
 
@@ -24,6 +26,16 @@ const Index = () => {
             <Button variant="ghost" size="icon">
               <Search className="w-5 h-5" />
             </Button>
+            {isAdmin && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => navigate("/admin")}
+                title="Admin Dashboard"
+              >
+                <Shield className="w-5 h-5" />
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={() => navigate("/profile")}>
               <User className="w-5 h-5" />
             </Button>
