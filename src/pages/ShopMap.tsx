@@ -105,9 +105,10 @@ const ShopMap = () => {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      style: 'mapbox://styles/mapbox/dark-v11',
       center: [20, 20],
       zoom: 1.5,
+      pitch: 0,
     });
 
     // Add navigation controls
@@ -121,9 +122,26 @@ const ShopMap = () => {
     // Add fullscreen control
     map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
 
+    // Add geolocate control to show user's location
+    const geolocateControl = new mapboxgl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true
+      },
+      trackUserLocation: true,
+      showUserHeading: true,
+      showAccuracyCircle: true,
+    });
+    
+    map.current.addControl(geolocateControl, 'top-right');
+
     // Wait for map to load before adding markers
     map.current.on('load', () => {
       updateMarkers();
+      
+      // Trigger geolocation on load to center on user
+      setTimeout(() => {
+        geolocateControl.trigger();
+      }, 1000);
     });
 
     return () => {
@@ -166,30 +184,52 @@ const ShopMap = () => {
 
       const brand = shop.brand_id ? brands[shop.brand_id] : null;
 
-      // Create custom marker element
+      // Create custom marker element with vibrant colors
       const el = document.createElement('div');
       el.className = 'custom-marker';
-      el.style.width = '32px';
-      el.style.height = '32px';
+      el.style.width = '40px';
+      el.style.height = '40px';
       el.style.cursor = 'pointer';
+      
+      const category = shop.category || 'streetwear';
+      const colorMap: Record<string, string> = {
+        streetwear: 'hsl(var(--drops))',
+        luxury: 'hsl(var(--pro-gold))',
+        sneakers: 'hsl(var(--directions))',
+        accessories: 'hsl(var(--heardrop))',
+        vintage: 'hsl(var(--global))',
+        sportswear: 'hsl(var(--primary))',
+      };
+      
+      const markerColor = colorMap[category] || 'hsl(var(--primary))';
+      
       el.innerHTML = `
         <div style="
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
-          border: 3px solid white;
+          width: 40px;
+          height: 40px;
+          background: ${markerColor};
+          border: 3px solid hsl(var(--background));
           border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 20px ${markerColor}40;
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: bold;
-          color: white;
-          font-size: 12px;
+          color: hsl(var(--background));
+          font-size: 16px;
+          transition: transform 0.2s;
         ">
-          ${shop.name.charAt(0)}
+          ${shop.name.charAt(0).toUpperCase()}
         </div>
       `;
+      
+      el.addEventListener('mouseenter', () => {
+        el.style.transform = 'scale(1.2)';
+      });
+      
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = 'scale(1)';
+      });
 
       // Create popup content
       const popupContent = `
@@ -274,17 +314,19 @@ const ShopMap = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-50">
+      <header className="border-b-2 border-primary/20 bg-gradient-to-r from-background via-primary/5 to-background sticky top-0 z-50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
           <div className="flex-1">
-            <h1 className="text-xl font-bold">GLOBAL SHOP MAP</h1>
-            <p className="text-sm text-muted-foreground">
-              {filteredShopCount} shop{filteredShopCount !== 1 ? 's' : ''} worldwide
+            <h1 className="text-2xl font-bold uppercase tracking-wider bg-gradient-to-r from-primary to-directions bg-clip-text text-transparent">
+              Global Shop Map
+            </h1>
+            <p className="text-sm text-muted-foreground font-medium">
+              📍 {filteredShopCount} shop{filteredShopCount !== 1 ? 's' : ''} worldwide
             </p>
           </div>
         </div>
@@ -293,16 +335,18 @@ const ShopMap = () => {
       <main className="relative">
         {/* Filter Card */}
         <div className="absolute top-4 left-4 z-10 max-w-sm">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Filter by Region</CardTitle>
-              <CardDescription className="text-xs">
-                Explore shops around the world
+          <Card className="glass-card border-2 border-primary/20 bg-background/95 backdrop-blur-md shadow-2xl">
+            <CardHeader className="pb-3 border-b border-primary/10">
+              <CardTitle className="text-lg font-bold uppercase tracking-wider text-primary">
+                🗺️ Explore Shops
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">
+                Find streetwear locations worldwide
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               <Select value={selectedContinent} onValueChange={setSelectedContinent}>
-                <SelectTrigger>
+                <SelectTrigger className="border-primary/20 focus:ring-primary">
                   <SelectValue placeholder="Select continent" />
                 </SelectTrigger>
                 <SelectContent>
@@ -314,11 +358,41 @@ const ShopMap = () => {
                 </SelectContent>
               </Select>
 
+              {/* Color Legend */}
+              <div className="mt-4 pt-4 border-t border-primary/10">
+                <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">
+                  Categories
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(var(--drops))'}}></div>
+                    <span>Streetwear</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(var(--pro-gold))'}}></div>
+                    <span>Luxury</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(var(--directions))'}}></div>
+                    <span>Sneakers</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(var(--heardrop))'}}></div>
+                    <span>Accessories</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Stats */}
-              <div className="mt-4 pt-4 border-t border-border">
+              <div className="mt-4 pt-4 border-t border-primary/10">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Shops visible:</span>
-                  <Badge variant="secondary">{filteredShopCount}</Badge>
+                  <span className="text-muted-foreground font-medium">Shops visible:</span>
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-primary/10 text-primary border-primary/20 font-bold"
+                  >
+                    {filteredShopCount}
+                  </Badge>
                 </div>
               </div>
             </CardContent>
