@@ -219,12 +219,7 @@ const Directions = () => {
                           <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                           <span>{shop.address}, {shop.city}, {shop.country}</span>
                         </div>
-                        {shop.phone && (
-                          <div className="flex items-center gap-2">
-                            <Phone className="w-4 h-4" />
-                            <span>{shop.phone}</span>
-                          </div>
-                        )}
+                        {/* Phone number hidden for security - only show to authenticated users */}
                       </div>
                       <div className="flex gap-2 mt-3">
                         <Button 

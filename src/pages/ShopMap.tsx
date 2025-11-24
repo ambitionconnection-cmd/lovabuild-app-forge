@@ -191,7 +191,6 @@ const ShopMap = () => {
               address: shop.address,
               city: shop.city,
               country: shop.country,
-              phone: shop.phone,
               official_site: shop.official_site,
               category: shop.category || 'streetwear',
               brand_name: brand?.name || null,
@@ -353,11 +352,7 @@ const ShopMap = () => {
               </span>
             </p>
           ` : ''}
-          ${props.phone ? `
-            <p style="margin: 4px 0; font-size: 14px;">
-              📞 ${props.phone}
-            </p>
-          ` : ''}
+          ${/* Contact info hidden for security */ ''}
           ${props.official_site ? `
             <a href="${props.official_site}" target="_blank" rel="noopener noreferrer" 
                style="
