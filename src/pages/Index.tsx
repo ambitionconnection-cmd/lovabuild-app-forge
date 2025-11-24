@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import urbanBg from "@/assets/urban-bg.jpg";
+import { BrandLogo } from "@/components/BrandLogo";
 
 interface Drop {
   id: string;
@@ -283,11 +284,7 @@ const Index = () => {
                 <Card key={brand.id} className="hover:scale-[1.02] transition-transform cursor-pointer bg-card/80" onClick={() => navigate('/global-index')}>
                   <CardContent className="p-4">
                     <div className="aspect-square bg-foreground/5 rounded-lg mb-3 flex items-center justify-center overflow-hidden border-2 border-border">
-                      {brand.logo_url ? (
-                        <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <TrendingUp className="h-8 w-8 text-muted-foreground" />
-                      )}
+                      <BrandLogo brand={brand} />
                     </div>
                     <p className="font-medium text-sm text-center line-clamp-1">{brand.name}</p>
                     {brand.category && (
