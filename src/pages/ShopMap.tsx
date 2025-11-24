@@ -94,11 +94,7 @@ const ShopMap = () => {
   useEffect(() => {
     if (!mapContainer.current || loading) return;
 
-    const mapboxToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
-    if (!mapboxToken) {
-      console.error('Mapbox token not found');
-      return;
-    }
+    const mapboxToken = 'pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ';
 
     // Initialize map
     mapboxgl.accessToken = mapboxToken;

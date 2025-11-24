@@ -15,11 +15,8 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick }) => {
   const [mapboxToken, setMapboxToken] = useState<string>('');
 
   useEffect(() => {
-    // Get Mapbox token from environment
-    const token = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
-    if (token) {
-      setMapboxToken(token);
-    }
+    // Set Mapbox token
+    setMapboxToken('pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ');
   }, []);
 
   useEffect(() => {
