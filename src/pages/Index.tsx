@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
-import urbanBg from "@/assets/urban-bg.jpg";
+import urbanBg from "@/assets/urban-bg-day.jpg";
 
 interface Drop {
   id: string;
@@ -125,17 +125,29 @@ const Index = () => {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${urbanBg})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
         
-        <div className="relative h-full flex flex-col items-center justify-center px-4 text-center">
-          <h2 className="text-6xl md:text-8xl font-black text-foreground tracking-widest mb-2 text-shadow-strong uppercase">
-            STREETWEAR
-          </h2>
-          <h3 className="text-4xl md:text-6xl font-black text-foreground tracking-widest mb-6 text-shadow-strong uppercase">
-            HUB
-          </h3>
-          <p className="text-lg md:text-xl text-foreground/90 mb-8 max-w-2xl font-semibold text-shadow-strong">
-            {t('app.tagline')}
+        <div className="relative h-full flex flex-col items-center justify-center px-4 text-center space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-5xl md:text-7xl font-black text-foreground tracking-wider text-shadow-strong uppercase">
+              HEARDROP
+            </h2>
+            <p className="text-lg md:text-2xl text-foreground/90 font-medium text-shadow-strong">
+              Your Global Guide Streetwear
+            </p>
+          </div>
+          
+          <div className="space-y-1 mt-8">
+            <h3 className="text-3xl md:text-5xl font-black text-foreground tracking-wide text-shadow-strong uppercase">
+              FIND SHOPS. TRACK DROPS.
+            </h3>
+            <h3 className="text-3xl md:text-5xl font-black text-foreground tracking-wide text-shadow-strong uppercase">
+              EXPLORE BRANDS.
+            </h3>
+          </div>
+          
+          <p className="text-base md:text-lg text-foreground/90 font-semibold text-shadow-strong mt-6">
+            Download HEARDROP Today!
           </p>
         </div>
       </div>
