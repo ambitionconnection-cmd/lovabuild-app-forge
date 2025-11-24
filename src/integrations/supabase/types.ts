@@ -186,6 +186,13 @@ export type Database = {
             referencedRelation: "shops"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "drops_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       email_analytics: {
@@ -599,6 +606,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "user_favorite_shops_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "user_favorite_shops_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -640,6 +654,74 @@ export type Database = {
           total_events: number | null
         }
         Relationships: []
+      }
+      shops_public: {
+        Row: {
+          address: string | null
+          brand_id: string | null
+          category: Database["public"]["Enums"]["category_type"] | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          image_url: string | null
+          is_active: boolean | null
+          is_unique_shop: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string | null
+          official_site: string | null
+          slug: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          brand_id?: string | null
+          category?: Database["public"]["Enums"]["category_type"] | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_unique_shop?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          official_site?: string | null
+          slug?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          brand_id?: string | null
+          category?: Database["public"]["Enums"]["category_type"] | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_unique_shop?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          official_site?: string | null
+          slug?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shops_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {

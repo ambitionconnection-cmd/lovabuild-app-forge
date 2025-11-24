@@ -62,9 +62,8 @@ const ShopMap = () => {
     try {
       const [shopsRes, brandsRes] = await Promise.all([
         supabase
-          .from('shops')
-          .select('id, name, slug, address, city, country, brand_id, category, latitude, longitude, official_site, image_url, description, is_active, is_unique_shop, created_at, updated_at')
-          .eq('is_active', true)
+          .from('shops_public')
+          .select('*')
           .not('latitude', 'is', null)
           .not('longitude', 'is', null),
         supabase
