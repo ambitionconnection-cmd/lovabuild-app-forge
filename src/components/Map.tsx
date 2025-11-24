@@ -244,7 +244,6 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, onRouteUpda
             name: shop.name,
             address: shop.address,
             city: shop.city,
-            phone: shop.phone,
             category: shop.category || 'streetwear',
           }
         }))
@@ -368,14 +367,13 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, onRouteUpda
       const shop = shops.find(s => s.id === properties.id);
       if (!shop) return;
 
-      // Create popup
+      // Create popup (contact info hidden for security)
       new mapboxgl.Popup({ offset: 25 })
         .setLngLat(coordinates)
         .setHTML(
           `<div class="p-3 bg-card rounded-lg">
             <h3 class="font-bold text-base mb-2">${properties.name}</h3>
             <p class="text-sm text-muted-foreground mb-1">📍 ${properties.address}, ${properties.city}</p>
-            ${properties.phone ? `<p class="text-sm">📞 ${properties.phone}</p>` : ''}
           </div>`
         )
         .addTo(map.current);
