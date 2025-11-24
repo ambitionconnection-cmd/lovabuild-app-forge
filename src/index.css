@@ -38,44 +38,50 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
     
-    /* HEARDROP Brand Colors */
-    --directions: 186 90% 50%;
+    /* HEARDROP Brand Colors - Enhanced Vibrancy */
+    --directions: 186 95% 55%;
     --directions-foreground: 220 20% 8%;
     
-    --global: 142 76% 45%;
+    --global: 142 90% 60%;
     --global-foreground: 220 20% 8%;
     
-    --drops: 271 76% 58%;
+    --drops: 271 85% 65%;
     --drops-foreground: 0 0% 98%;
     
     --heardrop: 25 95% 53%;
     --heardrop-foreground: 220 20% 8%;
     
     /* Utility Colors */
+    --logo-red: 0 100% 50%;
+    --logo-red-foreground: 0 0% 98%;
+    
     --pro-gold: 45 93% 58%;
     --pro-gold-foreground: 220 20% 8%;
     
-    --success: 142 76% 45%;
+    --success: 142 90% 60%;
     --warning: 45 93% 58%;
     --error: 0 84.2% 60.2%;
+    
+    /* Glassmorphism */
+    --glass-bg: 220 20% 8%;
+    --glass-opacity: 0.3;
+    --glass-border: 0 0% 100%;
+    --glass-border-opacity: 0.1;
+    
+    /* Effects */
+    --neon-glow: 0 0 20px currentColor;
+    --text-shadow-strong: 0 2px 8px rgba(0, 0, 0, 0.8);
     
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -92,5 +98,62 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Glassmorphism Effect */
+  .glass-effect {
+    background: hsl(var(--glass-bg) / var(--glass-opacity));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 2px solid hsl(var(--glass-border) / var(--glass-border-opacity));
+  }
+  
+  .glass-card {
+    background: hsl(var(--glass-bg) / 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  /* Text Effects */
+  .text-outline {
+    -webkit-text-stroke: 2px currentColor;
+    -webkit-text-fill-color: transparent;
+    text-stroke: 2px currentColor;
+    text-fill-color: transparent;
+  }
+  
+  .text-shadow-strong {
+    text-shadow: var(--text-shadow-strong);
+  }
+  
+  .text-neon {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+  
+  /* Background Blur Utilities */
+  .bg-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  
+  .bg-blur-md {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  .bg-blur-lg {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+  
+  /* Hover Effects */
+  .hover-glow {
+    transition: var(--transition-smooth);
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 20px currentColor;
   }
 }

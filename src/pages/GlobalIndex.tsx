@@ -139,14 +139,14 @@ const GlobalIndex = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card">
+        <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
           <div className="container mx-auto px-4 py-4 flex items-center gap-4">
             <Link to="/">
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
-            <h1 className="text-xl font-bold">GLOBAL INDEX</h1>
+            <h1 className="text-xl font-bold uppercase tracking-wider">GLOBAL INDEX</h1>
           </div>
         </header>
         <main className="container mx-auto px-4 py-8">
@@ -162,22 +162,22 @@ const GlobalIndex = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <h1 className="text-xl font-bold">GLOBAL INDEX</h1>
+          <h1 className="text-xl font-bold uppercase tracking-wider">GLOBAL INDEX</h1>
         </div>
       </header>
       
       <main className="container mx-auto px-4 py-8">
         {/* Search and Filter */}
-        <Card className="mb-8">
+        <Card className="mb-8 glass-card border-2">
           <CardHeader>
-            <CardTitle>Browse Brands</CardTitle>
+            <CardTitle className="uppercase tracking-wide">Browse Brands</CardTitle>
             <CardDescription>Discover streetwear and sneaker brands</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -222,7 +222,7 @@ const GlobalIndex = () => {
               </Select>
             </div>
 
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground font-medium">
               {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
             </p>
           </CardContent>
@@ -241,7 +241,7 @@ const GlobalIndex = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBrands.map((brand) => (
-              <Card key={brand.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card key={brand.id} className="overflow-hidden hover:scale-[1.02] transition-transform">
                 {/* Brand Banner */}
                 <div className="relative h-32 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20">
                   {brand.banner_url ? (
@@ -296,7 +296,7 @@ const GlobalIndex = () => {
                 <CardContent className="pt-0 space-y-4">
                   {/* Brand Name & Category */}
                   <div className="text-center">
-                    <h3 className="text-xl font-bold mb-1">{brand.name}</h3>
+                    <h3 className="text-xl font-bold mb-1 uppercase tracking-wide">{brand.name}</h3>
                     {brand.category && (
                       <Badge variant="outline" className="capitalize">
                         {brand.category}
