@@ -244,7 +244,7 @@ const GlobalIndex = () => {
             {filteredBrands.map((brand) => (
               <Card key={brand.id} className="overflow-hidden hover:scale-[1.02] transition-transform">
                 {/* Brand Banner */}
-                <div className="relative h-32 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20">
+                <div className="relative h-20 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20">
                   {brand.banner_url ? (
                     <img 
                       src={brand.banner_url} 
@@ -253,7 +253,7 @@ const GlobalIndex = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <GlobeIcon className="h-12 w-12 text-muted-foreground opacity-30" />
+                      <GlobeIcon className="h-8 w-8 text-muted-foreground opacity-30" />
                     </div>
                   )}
                   
@@ -261,14 +261,14 @@ const GlobalIndex = () => {
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="absolute top-2 right-2 rounded-full"
+                    className="absolute top-1.5 right-1.5 rounded-full h-7 w-7"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleFavorite(brand.id);
                     }}
                   >
                     <Heart 
-                      className={`w-4 h-4 ${
+                      className={`w-3.5 h-3.5 ${
                         favoriteBrands.has(brand.id) 
                           ? 'fill-primary text-primary' 
                           : ''
@@ -278,8 +278,8 @@ const GlobalIndex = () => {
                 </div>
 
                 {/* Brand Logo */}
-                <div className="px-6 -mt-12 mb-4 flex justify-center">
-                  <div className="w-24 h-24 rounded-xl bg-card border-4 border-background flex items-center justify-center overflow-hidden shadow-lg">
+                <div className="px-4 -mt-8 mb-2 flex justify-center">
+                  <div className="w-16 h-16 rounded-lg bg-card border-2 border-background flex items-center justify-center overflow-hidden shadow-lg">
                     {brand.logo_url ? (
                       <img 
                         src={brand.logo_url} 
@@ -287,26 +287,26 @@ const GlobalIndex = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-2xl font-bold text-muted-foreground">
+                      <span className="text-xl font-bold text-muted-foreground">
                         {brand.name.charAt(0)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <CardContent className="pt-0 space-y-4">
+                <CardContent className="pt-0 space-y-2.5 px-4 pb-3">
                   {/* Brand Name & Category */}
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-2 mb-1">
+                    <div className="flex items-center justify-center gap-1.5 mb-0.5">
                       {brand.country && (
-                        <span className="text-2xl" title={brand.country}>
+                        <span className="text-lg" title={brand.country}>
                           {getCountryFlag(brand.country)}
                         </span>
                       )}
-                      <h3 className="text-xl font-bold uppercase tracking-wide">{brand.name}</h3>
+                      <h3 className="text-base font-bold uppercase tracking-wide">{brand.name}</h3>
                     </div>
                     {brand.category && (
-                      <Badge variant="outline" className="capitalize">
+                      <Badge variant="outline" className="capitalize text-xs py-0">
                         {brand.category}
                       </Badge>
                     )}
@@ -314,21 +314,21 @@ const GlobalIndex = () => {
 
                   {/* Description */}
                   {brand.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-3">
+                    <p className="text-xs text-muted-foreground line-clamp-2">
                       {brand.description}
                     </p>
                   )}
 
                   {/* Links */}
-                  <div className="flex gap-2 pt-2">
+                  <div className="flex gap-1.5 pt-1">
                     {brand.official_website && (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1"
+                        className="flex-1 h-7 text-xs"
                         onClick={() => window.open(brand.official_website!, '_blank')}
                       >
-                        <ExternalLink className="w-4 h-4 mr-1" />
+                        <ExternalLink className="w-3 h-3 mr-1" />
                         Website
                       </Button>
                     )}
@@ -336,10 +336,10 @@ const GlobalIndex = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1"
+                        className="flex-1 h-7 text-xs"
                         onClick={() => window.open(brand.instagram_url!, '_blank')}
                       >
-                        <Instagram className="w-4 h-4 mr-1" />
+                        <Instagram className="w-3 h-3 mr-1" />
                         Instagram
                       </Button>
                     )}
@@ -347,11 +347,11 @@ const GlobalIndex = () => {
 
                   {/* History (expandable) */}
                   {brand.history && (
-                    <details className="text-sm">
+                    <details className="text-xs">
                       <summary className="cursor-pointer text-primary font-medium hover:underline">
                         Brand History
                       </summary>
-                      <p className="mt-2 text-muted-foreground">
+                      <p className="mt-1.5 text-muted-foreground">
                         {brand.history}
                       </p>
                     </details>
