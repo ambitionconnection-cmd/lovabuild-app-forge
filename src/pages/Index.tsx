@@ -51,6 +51,7 @@ const Index = () => {
   const [popularBrands, setPopularBrands] = useState<Brand[]>([]);
   const [nearbyShops, setNearbyShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dropSearchQuery, setDropSearchQuery] = useState("");
   useEffect(() => {
     fetchHomeData();
   }, []);
@@ -58,7 +59,7 @@ const Index = () => {
     try {
       const [dropsRes, brandsRes, shopsRes] = await Promise.all([supabase.from('drops').select('*').eq('is_featured', true).eq('status', 'upcoming').order('release_date', {
         ascending: true
-      }).limit(3), supabase.from('brands').select('*').eq('is_active', true).limit(6), supabase.from('shops').select('*').eq('is_active', true).limit(4)]);
+      }).limit(12), supabase.from('brands').select('*').eq('is_active', true).limit(6), supabase.from('shops').select('*').eq('is_active', true).limit(4)]);
       if (dropsRes.data) setFeaturedDrops(dropsRes.data);
       if (brandsRes.data) setPopularBrands(brandsRes.data);
       if (shopsRes.data) setNearbyShops(shopsRes.data);
@@ -68,6 +69,15 @@ const Index = () => {
       setLoading(false);
     }
   };
+
+  const filteredDrops = featuredDrops.filter(drop => {
+    if (!dropSearchQuery) return true;
+    const searchLower = dropSearchQuery.toLowerCase();
+    return (
+      drop.title.toLowerCase().includes(searchLower) ||
+      (drop.description?.toLowerCase().includes(searchLower) ?? false)
+    );
+  });
   return <div className="min-h-screen bg-background">
       {/* Header with Glassmorphism */}
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
@@ -152,6 +162,20 @@ const Index = () => {
               {t('home.viewAll')}
             </Button>
           </div>
+
+          {/* Search Bar */}
+          <div className="mb-6">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search drops..."
+                value={dropSearchQuery}
+                onChange={(e) => setDropSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+              />
+            </div>
+          </div>
           
           {loading ? <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[1, 2, 3].map(i => <Card key={i} className="overflow-hidden animate-pulse">
@@ -161,12 +185,12 @@ const Index = () => {
                     <div className="h-3 bg-muted rounded w-2/3" />
                   </CardContent>
                 </Card>)}
-            </div> : featuredDrops.length === 0 ? <Card>
+            </div> : filteredDrops.length === 0 ? <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
-                {t('home.noFeaturedDrops')}
+                {dropSearchQuery ? `No drops found matching "${dropSearchQuery}"` : t('home.noFeaturedDrops')}
               </CardContent>
             </Card> : <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredDrops.map(drop => <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/drops')}>
+              {filteredDrops.map(drop => <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/drops')}>
                   <div className="relative h-48 bg-muted overflow-hidden">
                     {drop.image_url ? <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
                         <Zap className="h-12 w-12 text-muted-foreground" />
