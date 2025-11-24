@@ -19,6 +19,7 @@ const Directions = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedShop, setSelectedShop] = useState<Tables<'shops'> | null>(null);
+  const [routeInfo, setRouteInfo] = useState<any>(null);
 
   // Fetch shops
   useEffect(() => {
@@ -124,7 +125,7 @@ const Directions = () => {
       </header>
       
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
           {/* Filters and Shop List */}
           <div className="lg:col-span-1 space-y-6">
             <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
@@ -259,15 +260,78 @@ const Directions = () => {
           </div>
 
           {/* Map */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 relative">
             <Card className="h-[800px] border-2 border-primary/20 shadow-2xl overflow-hidden">
               <CardContent className="p-0 h-full">
                 <Map 
                   shops={filteredShops} 
-                  onShopClick={setSelectedShop}
+                  onShopClick={(shop) => {
+                    setSelectedShop(shop);
+                    setRouteInfo(null);
+                  }}
+                  selectedShop={selectedShop}
+                  onRouteUpdate={setRouteInfo}
                 />
               </CardContent>
             </Card>
+
+            {/* Turn-by-turn directions panel */}
+            {selectedShop && routeInfo && (
+              <Card className="absolute bottom-4 right-4 w-80 max-h-96 overflow-hidden border-2 border-directions shadow-2xl animate-slide-in-right backdrop-blur-md bg-background/95">
+                <CardHeader className="border-b border-directions/20 pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-bold uppercase tracking-wider text-directions">
+                      🧭 Navigation
+                    </CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedShop(null);
+                        setRouteInfo(null);
+                      }}
+                      className="h-6 w-6 p-0"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  <CardDescription className="text-xs mt-2">
+                    <div className="flex items-center gap-4 text-foreground">
+                      <span className="font-semibold">
+                        📏 {(routeInfo.distance / 1000).toFixed(2)} km
+                      </span>
+                      <span className="font-semibold">
+                        ⏱️ {Math.ceil(routeInfo.duration / 60)} min
+                      </span>
+                    </div>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="max-h-80 overflow-y-auto">
+                    {routeInfo.steps.map((step: any, index: number) => (
+                      <div 
+                        key={index}
+                        className="p-3 border-b border-border/50 hover:bg-directions/5 transition-colors"
+                      >
+                        <div className="flex gap-3">
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-directions/20 text-directions flex items-center justify-center text-xs font-bold">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-foreground">
+                              {step.maneuver.instruction}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {step.distance > 0 ? `${Math.round(step.distance)}m` : 'Arrive'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>

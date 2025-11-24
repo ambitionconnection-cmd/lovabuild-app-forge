@@ -6,13 +6,17 @@ import { Tables } from '@/integrations/supabase/types';
 interface MapProps {
   shops: Tables<'shops'>[];
   onShopClick?: (shop: Tables<'shops'>) => void;
+  selectedShop?: Tables<'shops'> | null;
+  onRouteUpdate?: (route: any) => void;
 }
 
-const Map: React.FC<MapProps> = ({ shops, onShopClick }) => {
+const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, onRouteUpdate }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [mapboxToken, setMapboxToken] = useState<string>('');
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
     // Set Mapbox token
@@ -52,6 +56,33 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick }) => {
     
     map.current.addControl(geolocateControl, 'top-right');
 
+    // Listen for user location
+    geolocateControl.on('geolocate', (e: any) => {
+      setUserLocation([e.coords.longitude, e.coords.latitude]);
+      
+      // Add custom user location marker
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+      }
+      
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <div style="
+          width: 24px;
+          height: 24px;
+          background: hsl(186, 95%, 55%);
+          border: 4px solid white;
+          border-radius: 50%;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        "></div>
+      `;
+      
+      userMarkerRef.current = new mapboxgl.Marker(el)
+        .setLngLat([e.coords.longitude, e.coords.latitude])
+        .addTo(map.current!);
+    });
+
     // Wait for map to load, then trigger geolocation
     map.current.on('load', () => {
       setTimeout(() => {
@@ -63,9 +94,132 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick }) => {
     return () => {
       markersRef.current.forEach(marker => marker.remove());
       markersRef.current = [];
+      userMarkerRef.current?.remove();
       map.current?.remove();
     };
   }, [mapboxToken]);
+
+  // Fetch and display route when shop is selected
+  useEffect(() => {
+    if (!map.current || !selectedShop || !userLocation || !selectedShop.latitude || !selectedShop.longitude) {
+      // Clear route if no shop selected
+      if (map.current?.getSource('route')) {
+        if (map.current.getLayer('route-line')) map.current.removeLayer('route-line');
+        if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
+        if (map.current.getSource('route')) map.current.removeSource('route');
+      }
+      return;
+    }
+
+    const fetchRoute = async () => {
+      const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${userLocation[0]},${userLocation[1]};${selectedShop.longitude},${selectedShop.latitude}?geometries=geojson&steps=true&access_token=${mapboxToken}`;
+      
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.routes && data.routes.length > 0) {
+          const route = data.routes[0];
+          
+          // Notify parent component about route
+          if (onRouteUpdate) {
+            onRouteUpdate({
+              distance: route.distance,
+              duration: route.duration,
+              steps: route.legs[0].steps
+            });
+          }
+
+          // Remove existing route layers
+          if (map.current?.getSource('route')) {
+            if (map.current.getLayer('route-line')) map.current.removeLayer('route-line');
+            if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
+            map.current.removeSource('route');
+          }
+
+          // Add route source
+          map.current?.addSource('route', {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: route.geometry
+            }
+          });
+
+          // Add casing (outline) layer
+          map.current?.addLayer({
+            id: 'route-line-casing',
+            type: 'line',
+            source: 'route',
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': '#ffffff',
+              'line-width': 10,
+              'line-opacity': 0.8
+            }
+          });
+
+          // Add main route line with animation
+          map.current?.addLayer({
+            id: 'route-line',
+            type: 'line',
+            source: 'route',
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': 'hsl(186, 95%, 55%)',
+              'line-width': 6,
+              'line-opacity': 0.9
+            }
+          });
+
+          // Animate route drawing
+          let animationFrame = 0;
+          const totalFrames = 60;
+          
+          const animateRoute = () => {
+            if (animationFrame <= totalFrames) {
+              const progress = animationFrame / totalFrames;
+              map.current?.setPaintProperty('route-line', 'line-dasharray', [
+                progress * route.geometry.coordinates.length,
+                (1 - progress) * route.geometry.coordinates.length
+              ]);
+              animationFrame++;
+              requestAnimationFrame(animateRoute);
+            } else {
+              // Remove dash array after animation completes
+              map.current?.setPaintProperty('route-line', 'line-dasharray', null);
+            }
+          };
+          
+          animateRoute();
+
+          // Fit map to show route
+          const coordinates = route.geometry.coordinates;
+          const bounds = coordinates.reduce(
+            (bounds: mapboxgl.LngLatBounds, coord: [number, number]) => bounds.extend(coord),
+            new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
+          );
+          
+          map.current?.fitBounds(bounds, {
+            padding: 80,
+            maxZoom: 15,
+            duration: 1000
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching route:', error);
+      }
+    };
+
+    fetchRoute();
+  }, [selectedShop, userLocation, mapboxToken, onRouteUpdate]);
 
   useEffect(() => {
     if (!map.current || shops.length === 0) return;
