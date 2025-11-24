@@ -19,6 +19,7 @@ const Directions = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedShop, setSelectedShop] = useState<Omit<Tables<'shops'>, 'email' | 'phone'> | null>(null);
+  const [journeyStops, setJourneyStops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
   const [routeInfo, setRouteInfo] = useState<any>(null);
 
   // Fetch shops
@@ -77,6 +78,21 @@ const Directions = () => {
       .map(shop => shop.city)
   )).sort();
 
+  const addToJourney = (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => {
+    if (!journeyStops.find(s => s.id === shop.id)) {
+      setJourneyStops([...journeyStops, shop]);
+      setSelectedShop(null);
+    }
+  };
+
+  const removeFromJourney = (shopId: string) => {
+    setJourneyStops(journeyStops.filter(s => s.id !== shopId));
+  };
+
+  const isInJourney = (shopId: string) => {
+    return journeyStops.some(s => s.id === shopId);
+  };
+
   const getDirections = (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => {
     if (shop.latitude && shop.longitude) {
       window.open(
@@ -127,10 +143,57 @@ const Directions = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
           {/* Filters and Shop List */}
           <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
+            {/* Journey Stops */}
+            {journeyStops.length > 0 && (
+              <Card className="glass-card border-2 border-directions/20 bg-gradient-to-br from-directions/10 to-transparent backdrop-blur-md shadow-xl">
+                <CardHeader className="border-b border-directions/10 py-3">
+                  <CardTitle className="uppercase tracking-wider text-directions font-bold text-sm flex items-center justify-between">
+                    <span>🗺️ Your Journey ({journeyStops.length} stops)</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setJourneyStops([])}
+                      className="h-6 text-xs hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      Clear All
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 pt-3 pb-3">
+                  {journeyStops.map((stop, index) => (
+                    <div 
+                      key={stop.id}
+                      className="flex items-center gap-2 p-2 bg-background/50 rounded-lg border border-directions/20"
+                    >
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-directions text-directions-foreground flex items-center justify-center text-xs font-bold">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold truncate">{stop.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{stop.city}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFromJourney(stop.id)}
+                        className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
             <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
               <CardHeader className="border-b border-directions/10 py-3 lg:py-6">
                 <CardTitle className="uppercase tracking-wider text-directions font-bold text-sm lg:text-base">🔍 Search & Filter</CardTitle>
-                <CardDescription className="text-xs lg:text-sm">Find shops near you</CardDescription>
+                <CardDescription className="text-xs lg:text-sm">
+                  {journeyStops.length === 0 
+                    ? "Find shops near you" 
+                    : "Add one more location to your journey"}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 pt-4 pb-3 lg:space-y-4 lg:pt-6">
                 <Input
@@ -201,54 +264,81 @@ const Directions = () => {
                   </CardContent>
                 </Card>
               ) : (
-                filteredShops.map((shop) => (
-                  <Card 
-                    key={shop.id} 
-                    className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg border-2 ${
-                      selectedShop?.id === shop.id 
-                        ? 'bg-directions/10 border-directions shadow-lg shadow-directions/20' 
-                        : 'border-border hover:border-directions/50'
-                    }`}
-                    onClick={() => setSelectedShop(shop)}
-                  >
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold mb-2">{shop.name}</h3>
-                      <div className="space-y-1 text-sm text-muted-foreground">
-                        <div className="flex items-start gap-2">
-                          <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                          <span>{shop.address}, {shop.city}, {shop.country}</span>
+                filteredShops.map((shop) => {
+                  const inJourney = isInJourney(shop.id);
+                  return (
+                    <Card 
+                      key={shop.id} 
+                      className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg border-2 ${
+                        inJourney
+                          ? 'bg-directions/10 border-directions shadow-lg shadow-directions/20' 
+                          : selectedShop?.id === shop.id 
+                          ? 'bg-directions/5 border-directions/50' 
+                          : 'border-border hover:border-directions/50'
+                      }`}
+                      onClick={() => !inJourney && setSelectedShop(shop)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="font-semibold flex-1">{shop.name}</h3>
+                          {inJourney && (
+                            <span className="text-xs bg-directions text-directions-foreground px-2 py-1 rounded-full font-bold">
+                              #{journeyStops.findIndex(s => s.id === shop.id) + 1}
+                            </span>
+                          )}
                         </div>
-                        {/* Phone number hidden for security - only show to authenticated users */}
-                      </div>
-                      <div className="flex gap-2 mt-3">
-                        <Button 
-                          size="sm" 
-                          className="bg-directions hover:bg-directions/90 text-directions-foreground"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            getDirections(shop);
-                          }}
-                          disabled={!shop.latitude || !shop.longitude}
-                        >
-                          <Navigation className="w-4 h-4 mr-1" />
-                          Directions
-                        </Button>
-                        {shop.official_site && (
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.open(shop.official_site!, '_blank');
-                            }}
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
+                        <div className="space-y-1 text-sm text-muted-foreground">
+                          <div className="flex items-start gap-2">
+                            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                            <span>{shop.address}, {shop.city}, {shop.country}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-3">
+                          {!inJourney ? (
+                            <>
+                              <Button 
+                                size="sm" 
+                                className="bg-directions hover:bg-directions/90 text-directions-foreground"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToJourney(shop);
+                                }}
+                                disabled={!shop.latitude || !shop.longitude}
+                              >
+                                <Navigation className="w-4 h-4 mr-1" />
+                                Add to Journey
+                              </Button>
+                              {shop.official_site && (
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(shop.official_site!, '_blank');
+                                  }}
+                                >
+                                  <ExternalLink className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </>
+                          ) : (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="border-destructive/50 text-destructive hover:bg-destructive/10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeFromJourney(shop.id);
+                              }}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
               )}
             </div>
           </div>
@@ -260,17 +350,19 @@ const Directions = () => {
                 <Map 
                   shops={filteredShops} 
                   onShopClick={(shop) => {
-                    setSelectedShop(shop);
-                    setRouteInfo(null);
+                    if (!isInJourney(shop.id)) {
+                      setSelectedShop(shop);
+                    }
                   }}
                   selectedShop={selectedShop}
+                  journeyStops={journeyStops}
                   onRouteUpdate={setRouteInfo}
                 />
               </CardContent>
             </Card>
 
             {/* Turn-by-turn directions panel */}
-            {selectedShop && routeInfo && (
+            {(journeyStops.length > 0 || selectedShop) && routeInfo && (
               <Card className="absolute bottom-4 right-4 w-80 max-h-96 overflow-hidden border-2 border-directions shadow-2xl animate-slide-in-right backdrop-blur-md bg-background/95">
                 <CardHeader className="border-b border-directions/20 pb-3">
                   <div className="flex items-center justify-between">
@@ -281,7 +373,6 @@ const Directions = () => {
                       variant="ghost" 
                       size="sm"
                       onClick={() => {
-                        setSelectedShop(null);
                         setRouteInfo(null);
                       }}
                       className="h-6 w-6 p-0"
