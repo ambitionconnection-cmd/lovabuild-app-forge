@@ -260,7 +260,7 @@ const Directions = () => {
                     Drag to reorder your stops
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 pt-3 pb-3">
+                <CardContent className="space-y-3 pt-3 pb-3">
                   <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
@@ -280,6 +280,24 @@ const Directions = () => {
                       ))}
                     </SortableContext>
                   </DndContext>
+                  
+                  {journeyStops.length >= 2 && (
+                    <Button 
+                      className="w-full bg-directions hover:bg-directions/90 text-directions-foreground font-bold uppercase tracking-wider"
+                      onClick={() => {
+                        const waypoints = journeyStops
+                          .map(stop => `${stop.latitude},${stop.longitude}`)
+                          .join('/');
+                        window.open(
+                          `https://www.google.com/maps/dir/${waypoints}`,
+                          '_blank'
+                        );
+                      }}
+                    >
+                      <Navigation className="w-4 h-4 mr-2" />
+                      Start Navigation
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}
