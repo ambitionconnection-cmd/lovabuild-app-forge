@@ -10,6 +10,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const signInSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255),
@@ -119,6 +121,39 @@ const Auth = () => {
 
   const onSignUp = async (data: SignUpFormValues) => {
     setIsLoading(true);
+    
+    // Check password against breach database
+    try {
+      const { data: validationResult, error: validationError } = await supabase.functions.invoke(
+        'validate-password-strength',
+        {
+          body: { password: data.password }
+        }
+      );
+
+      if (validationError) {
+        console.error('Password validation error:', validationError);
+        toast.error('Unable to validate password. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!validationResult.valid) {
+        if (validationResult.breached) {
+          toast.error('This password has been exposed in a data breach. Please choose a different password.');
+        } else {
+          toast.error(validationResult.message || 'Password does not meet security requirements');
+        }
+        setIsLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error('Password validation error:', error);
+      toast.error('Unable to validate password. Please try again.');
+      setIsLoading(false);
+      return;
+    }
+    
     const { error } = await signUp(data.email, data.password, data.displayName);
     setIsLoading(false);
     
@@ -143,6 +178,39 @@ const Auth = () => {
 
   const onResetPassword = async (data: ResetPasswordFormValues) => {
     setIsLoading(true);
+    
+    // Check password against breach database
+    try {
+      const { data: validationResult, error: validationError } = await supabase.functions.invoke(
+        'validate-password-strength',
+        {
+          body: { password: data.password }
+        }
+      );
+
+      if (validationError) {
+        console.error('Password validation error:', validationError);
+        toast.error('Unable to validate password. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!validationResult.valid) {
+        if (validationResult.breached) {
+          toast.error('This password has been exposed in a data breach. Please choose a different password.');
+        } else {
+          toast.error(validationResult.message || 'Password does not meet security requirements');
+        }
+        setIsLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error('Password validation error:', error);
+      toast.error('Unable to validate password. Please try again.');
+      setIsLoading(false);
+      return;
+    }
+    
     const { error } = await updatePassword(data.password);
     setIsLoading(false);
     if (!error) {
