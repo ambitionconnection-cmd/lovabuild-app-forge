@@ -49,7 +49,7 @@ const ShopMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const [shops, setShops] = useState<Tables<'shops'>[]>([]);
+  const [shops, setShops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
   const [brands, setBrands] = useState<Record<string, Tables<'brands'>>>({});
   const [loading, setLoading] = useState(true);
   const [selectedContinent, setSelectedContinent] = useState<string>("all");
@@ -63,7 +63,7 @@ const ShopMap = () => {
       const [shopsRes, brandsRes] = await Promise.all([
         supabase
           .from('shops')
-          .select('*')
+          .select('id, name, slug, address, city, country, brand_id, category, latitude, longitude, official_site, image_url, description, is_active, is_unique_shop, created_at, updated_at')
           .eq('is_active', true)
           .not('latitude', 'is', null)
           .not('longitude', 'is', null),

@@ -4,9 +4,9 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tables } from '@/integrations/supabase/types';
 
 interface MapProps {
-  shops: Tables<'shops'>[];
-  onShopClick?: (shop: Tables<'shops'>) => void;
-  selectedShop?: Tables<'shops'> | null;
+  shops: Omit<Tables<'shops'>, 'email' | 'phone'>[];
+  onShopClick?: (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => void;
+  selectedShop?: Omit<Tables<'shops'>, 'email' | 'phone'> | null;
   onRouteUpdate?: (route: any) => void;
 }
 

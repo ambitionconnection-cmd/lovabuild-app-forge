@@ -11,14 +11,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Map from "@/components/Map";
 
 const Directions = () => {
-  const [shops, setShops] = useState<Tables<'shops'>[]>([]);
-  const [filteredShops, setFilteredShops] = useState<Tables<'shops'>[]>([]);
+  const [shops, setShops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
+  const [filteredShops, setFilteredShops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
-  const [selectedShop, setSelectedShop] = useState<Tables<'shops'> | null>(null);
+  const [selectedShop, setSelectedShop] = useState<Omit<Tables<'shops'>, 'email' | 'phone'> | null>(null);
   const [routeInfo, setRouteInfo] = useState<any>(null);
 
   // Fetch shops
@@ -26,7 +26,7 @@ const Directions = () => {
     const fetchShops = async () => {
       const { data, error } = await supabase
         .from('shops')
-        .select('*')
+        .select('id, name, slug, address, city, country, brand_id, category, latitude, longitude, official_site, image_url, description, is_active, is_unique_shop, created_at, updated_at')
         .eq('is_active', true)
         .order('name');
 
@@ -78,7 +78,7 @@ const Directions = () => {
       .map(shop => shop.city)
   )).sort();
 
-  const getDirections = (shop: Tables<'shops'>) => {
+  const getDirections = (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => {
     if (shop.latitude && shop.longitude) {
       window.open(
         `https://www.google.com/maps/dir/?api=1&destination=${shop.latitude},${shop.longitude}`,
