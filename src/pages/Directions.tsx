@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import Map from "@/components/Map";
+import { ShopDetailsModal } from "@/components/ShopDetailsModal";
 import {
   DndContext,
   closestCenter,
@@ -27,7 +28,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-type ShopType = Omit<Tables<'shops'>, 'email' | 'phone'>;
+type ShopType = Tables<'shops_public'>;
 
 interface SortableStopProps {
   stop: ShopType;
@@ -85,16 +86,18 @@ const SortableStop = ({ stop, index, onRemove }: SortableStopProps) => {
 };
 
 const Directions = () => {
-  const [shops, setShops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
-  const [filteredShops, setFilteredShops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
+  const [shops, setShops] = useState<ShopType[]>([]);
+  const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
-  const [selectedShop, setSelectedShop] = useState<Omit<Tables<'shops'>, 'email' | 'phone'> | null>(null);
-  const [journeyStops, setJourneyStops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
+  const [selectedShop, setSelectedShop] = useState<ShopType | null>(null);
+  const [journeyStops, setJourneyStops] = useState<ShopType[]>([]);
   const [routeInfo, setRouteInfo] = useState<any>(null);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedShopForDetails, setSelectedShopForDetails] = useState<ShopType | null>(null);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -176,7 +179,7 @@ const Directions = () => {
       .map(shop => shop.city)
   )).sort();
 
-  const addToJourney = (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => {
+  const addToJourney = (shop: ShopType) => {
     if (!journeyStops.find(s => s.id === shop.id)) {
       setJourneyStops([...journeyStops, shop]);
       setSelectedShop(null);
@@ -191,13 +194,18 @@ const Directions = () => {
     return journeyStops.some(s => s.id === shopId);
   };
 
-  const getDirections = (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => {
+  const getDirections = (shop: ShopType) => {
     if (shop.latitude && shop.longitude) {
       window.open(
         `https://www.google.com/maps/dir/?api=1&destination=${shop.latitude},${shop.longitude}`,
         '_blank'
       );
     }
+  };
+
+  const openShopDetails = (shop: ShopType) => {
+    setSelectedShopForDetails(shop);
+    setDetailsModalOpen(true);
   };
 
   if (loading) {
@@ -410,6 +418,17 @@ const Directions = () => {
                           </div>
                         </div>
                         <div className="flex gap-2 mt-3">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openShopDetails(shop);
+                            }}
+                          >
+                            <Info className="w-4 h-4 mr-1" />
+                            Details
+                          </Button>
                           {!inJourney ? (
                             <>
                               <Button 
@@ -422,7 +441,7 @@ const Directions = () => {
                                 disabled={!shop.latitude || !shop.longitude}
                               >
                                 <Navigation className="w-4 h-4 mr-1" />
-                                Add to Journey
+                                Add
                               </Button>
                               {shop.official_site && (
                                 <Button 
@@ -536,6 +555,16 @@ const Directions = () => {
           </div>
         </div>
       </main>
+
+      {/* Shop Details Modal */}
+      <ShopDetailsModal
+        shop={selectedShopForDetails}
+        isOpen={detailsModalOpen}
+        onClose={() => setDetailsModalOpen(false)}
+        onAddToJourney={addToJourney}
+        onGetDirections={getDirections}
+        isInJourney={selectedShopForDetails ? isInJourney(selectedShopForDetails.id) : false}
+      />
     </div>
   );
 };
