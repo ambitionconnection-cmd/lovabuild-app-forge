@@ -121,8 +121,7 @@ const Index = () => {
           </div>
           
           <p className="text-base md:text-lg text-foreground/90 font-semibold text-shadow-strong mt-6">
-            ​Martial Eagle        
-          </p>
+        </p>
         </div>
       </div>
 
