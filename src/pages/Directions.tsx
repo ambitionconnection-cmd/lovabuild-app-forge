@@ -281,7 +281,7 @@ const Directions = () => {
                     </SortableContext>
                   </DndContext>
                   
-                  {journeyStops.length >= 2 && (
+                  {journeyStops.length >= 1 && (
                     <Button 
                       className="w-full bg-directions hover:bg-directions/90 text-directions-foreground font-bold uppercase tracking-wider"
                       onClick={() => {
