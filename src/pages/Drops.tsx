@@ -126,13 +126,12 @@ const Drops = () => {
 
   const trackEvent = async (dropId: string, eventType: 'affiliate_click' | 'discount_code_copy') => {
     try {
-      await supabase.from('affiliate_analytics').insert({
-        drop_id: dropId,
-        user_id: user?.id || null,
-        event_type: eventType,
-        ip_address: null, // Could be captured via edge function
-        user_agent: navigator.userAgent,
-        referrer: document.referrer || null,
+      await supabase.functions.invoke('track-affiliate-analytics', {
+        body: {
+          drop_id: dropId,
+          event_type: eventType,
+          user_id: user?.id || null,
+        },
       });
     } catch (error) {
       console.error('Error tracking event:', error);
