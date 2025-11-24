@@ -12,10 +12,10 @@ interface NavBlockProps {
 }
 
 const variantStyles = {
-  directions: "bg-directions/50 text-directions-foreground border-directions active:bg-directions/75 hover:bg-directions/60",
-  global: "bg-global/50 text-global-foreground border-global active:bg-global/75 hover:bg-global/60",
-  drops: "bg-drops/50 text-drops-foreground border-drops active:bg-drops/75 hover:bg-drops/60",
-  heardrop: "bg-heardrop/50 text-heardrop-foreground border-heardrop active:bg-heardrop/75 hover:bg-heardrop/60",
+  directions: "bg-directions text-directions-foreground border-directions hover:bg-directions/90 active:bg-directions/95",
+  global: "bg-global text-global-foreground border-global hover:bg-global/90 active:bg-global/95",
+  drops: "bg-drops text-drops-foreground border-drops hover:bg-drops/90 active:bg-drops/95",
+  heardrop: "bg-heardrop text-heardrop-foreground border-heardrop hover:bg-heardrop/90 active:bg-heardrop/95",
 };
 
 const subtitles = {

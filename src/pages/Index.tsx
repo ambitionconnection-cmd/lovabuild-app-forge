@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
-import urbanBg from "@/assets/urban-bg-bright.jpg";
+import urbanBg from "@/assets/urban-bg.jpg";
 
 interface Drop {
   id: string;
@@ -125,7 +125,7 @@ const Index = () => {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${urbanBg})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/30 to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-white" />
         
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center space-y-6">
           <div className="space-y-2">
