@@ -140,6 +140,38 @@ const Profile = () => {
   const onPasswordSubmit = async (data: PasswordFormValues) => {
     setIsPasswordLoading(true);
 
+    // Check password against breach database
+    try {
+      const { data: validationResult, error: validationError } = await supabase.functions.invoke(
+        'validate-password-strength',
+        {
+          body: { password: data.newPassword }
+        }
+      );
+
+      if (validationError) {
+        console.error('Password validation error:', validationError);
+        toast.error('Unable to validate password. Please try again.');
+        setIsPasswordLoading(false);
+        return;
+      }
+
+      if (!validationResult.valid) {
+        if (validationResult.breached) {
+          toast.error('This password has been exposed in a data breach. Please choose a different password.');
+        } else {
+          toast.error(validationResult.message || 'Password does not meet security requirements');
+        }
+        setIsPasswordLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error('Password validation error:', error);
+      toast.error('Unable to validate password. Please try again.');
+      setIsPasswordLoading(false);
+      return;
+    }
+
     const { error } = await updatePassword(data.newPassword);
 
     if (!error) {
