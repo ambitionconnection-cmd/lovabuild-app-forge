@@ -126,7 +126,7 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12 space-y-16">
+      <main className="container mx-auto px-4 pt-6 pb-12 space-y-16">
         {/* Quick Navigation - Mobile First */}
         <section>
           <h3 className="text-3xl font-bold mb-6 uppercase tracking-wide">{t('home.exploreMore')}</h3>
