@@ -11,6 +11,7 @@ import { Tables } from "@/integrations/supabase/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { getCountryFlag } from "@/lib/countryFlags";
 
 const GlobalIndex = () => {
   const { user } = useAuth();
@@ -296,19 +297,19 @@ const GlobalIndex = () => {
                 <CardContent className="pt-0 space-y-4">
                   {/* Brand Name & Category */}
                   <div className="text-center">
-                    <h3 className="text-xl font-bold mb-1 uppercase tracking-wide">{brand.name}</h3>
-                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <div className="flex items-center justify-center gap-2 mb-1">
                       {brand.country && (
-                        <Badge variant="secondary" className="text-xs font-medium">
-                          {brand.country}
-                        </Badge>
+                        <span className="text-2xl" title={brand.country}>
+                          {getCountryFlag(brand.country)}
+                        </span>
                       )}
-                      {brand.category && (
-                        <Badge variant="outline" className="capitalize">
-                          {brand.category}
-                        </Badge>
-                      )}
+                      <h3 className="text-xl font-bold uppercase tracking-wide">{brand.name}</h3>
                     </div>
+                    {brand.category && (
+                      <Badge variant="outline" className="capitalize">
+                        {brand.category}
+                      </Badge>
+                    )}
                   </div>
 
                   {/* Description */}
