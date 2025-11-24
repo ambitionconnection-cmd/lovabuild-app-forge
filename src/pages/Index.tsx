@@ -86,9 +86,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header with Glassmorphism */}
-      <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg border-4 border-logo-red flex items-center justify-center">
@@ -125,7 +125,7 @@ const Index = () => {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${urbanBg})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/20 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/30 to-white" />
         
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center space-y-6">
           <div className="space-y-2">

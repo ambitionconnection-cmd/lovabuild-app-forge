@@ -11,23 +11,23 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 240 4% 95%;
-    --foreground: 240 5% 10%;
+    --background: 0 0% 100%;
+    --foreground: 240 5% 15%;
 
-    --card: 0 0% 98%;
-    --card-foreground: 240 5% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 5% 15%;
 
-    --popover: 240 5% 90%;
-    --popover-foreground: 240 5% 10%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 240 5% 15%;
 
     --primary: 258 89% 66%;
     --primary-foreground: 250 100% 97%;
 
-    --secondary: 240 5% 33%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 240 5% 85%;
+    --secondary-foreground: 240 5% 15%;
 
-    --muted: 240 4% 83%;
-    --muted-foreground: 240 5% 10%;
+    --muted: 240 4% 92%;
+    --muted-foreground: 240 5% 35%;
 
     --accent: 269 100% 98%;
     --accent-foreground: 270 91% 65%;
@@ -35,8 +35,8 @@ All colors MUST be HSL.
     --destructive: 0 72% 50%;
     --destructive-foreground: 0 85% 97%;
 
-    --border: 240 4% 83%;
-    --input: 240 4% 83%;
+    --border: 240 4% 90%;
+    --input: 240 4% 96%;
     --ring: 258 89% 66%;
 
     --radius: 0.5rem;
@@ -78,14 +78,15 @@ All colors MUST be HSL.
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5% 10%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 5% 15%;
     --sidebar-primary: 258 89% 66%;
     --sidebar-primary-foreground: 250 100% 97%;
-    --sidebar-accent: 240 5% 33%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 4% 83%;
+    --sidebar-accent: 240 5% 90%;
+    --sidebar-accent-foreground: 240 5% 15%;
+    --sidebar-border: 240 4% 90%;
     --sidebar-ring: 258 89% 66%;
+    --sidebar: 0 0% 100%;
     --chart-1: 255 91% 76%;
     --chart-2: 270 95% 75%;
     --chart-3: 234 89% 73%;
