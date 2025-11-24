@@ -165,75 +165,162 @@ const ShopMap = () => {
   };
 
   const updateMarkers = () => {
-    // Remove existing markers
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
+    if (!map.current) return;
 
     // Filter shops by continent
     const filteredShops = selectedContinent === "all" 
       ? shops 
       : shops.filter(shop => COUNTRY_TO_CONTINENT[shop.country] === selectedContinent);
 
-    // Add markers for filtered shops
-    filteredShops.forEach(shop => {
-      if (!shop.latitude || !shop.longitude) return;
+    // Create GeoJSON from filtered shops
+    const geojson: GeoJSON.FeatureCollection = {
+      type: 'FeatureCollection',
+      features: filteredShops
+        .filter(shop => shop.latitude && shop.longitude)
+        .map(shop => {
+          const brand = shop.brand_id ? brands[shop.brand_id] : null;
+          return {
+            type: 'Feature' as const,
+            geometry: {
+              type: 'Point' as const,
+              coordinates: [shop.longitude!, shop.latitude!]
+            },
+            properties: {
+              id: shop.id,
+              name: shop.name,
+              address: shop.address,
+              city: shop.city,
+              country: shop.country,
+              phone: shop.phone,
+              official_site: shop.official_site,
+              category: shop.category || 'streetwear',
+              brand_name: brand?.name || null,
+            }
+          };
+        })
+    };
 
-      const brand = shop.brand_id ? brands[shop.brand_id] : null;
+    // Remove existing source and layers if they exist
+    if (map.current.getSource('shops')) {
+      if (map.current.getLayer('clusters')) map.current.removeLayer('clusters');
+      if (map.current.getLayer('cluster-count')) map.current.removeLayer('cluster-count');
+      if (map.current.getLayer('unclustered-point')) map.current.removeLayer('unclustered-point');
+      map.current.removeSource('shops');
+    }
 
-      // Create custom marker element with vibrant colors
-      const el = document.createElement('div');
-      el.className = 'custom-marker';
-      el.style.width = '40px';
-      el.style.height = '40px';
-      el.style.cursor = 'pointer';
-      
-      const category = shop.category || 'streetwear';
-      const colorMap: Record<string, string> = {
-        streetwear: 'hsl(var(--drops))',
-        luxury: 'hsl(var(--pro-gold))',
-        sneakers: 'hsl(var(--directions))',
-        accessories: 'hsl(var(--heardrop))',
-        vintage: 'hsl(var(--global))',
-        sportswear: 'hsl(var(--primary))',
-      };
-      
-      const markerColor = colorMap[category] || 'hsl(var(--primary))';
-      
-      el.innerHTML = `
-        <div style="
-          width: 40px;
-          height: 40px;
-          background: ${markerColor};
-          border: 3px solid hsl(var(--background));
-          border-radius: 50%;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 20px ${markerColor}40;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-          color: hsl(var(--background));
-          font-size: 16px;
-          transition: transform 0.2s;
-        ">
-          ${shop.name.charAt(0).toUpperCase()}
-        </div>
-      `;
-      
-      el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.2)';
+    // Add source with clustering
+    map.current.addSource('shops', {
+      type: 'geojson',
+      data: geojson,
+      cluster: true,
+      clusterMaxZoom: 14,
+      clusterRadius: 50
+    });
+
+    // Add cluster circles layer with vibrant colors
+    map.current.addLayer({
+      id: 'clusters',
+      type: 'circle',
+      source: 'shops',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': [
+          'step',
+          ['get', 'point_count'],
+          'hsl(var(--directions))', // Start with directions color
+          10,
+          'hsl(var(--drops))', // Medium clusters
+          30,
+          'hsl(var(--pro-gold))' // Large clusters
+        ],
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          25,
+          10,
+          35,
+          30,
+          45
+        ],
+        'circle-stroke-width': 3,
+        'circle-stroke-color': 'hsl(var(--background))',
+        'circle-opacity': 0.9
+      }
+    });
+
+    // Add cluster count labels
+    map.current.addLayer({
+      id: 'cluster-count',
+      type: 'symbol',
+      source: 'shops',
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+        'text-size': 16
+      },
+      paint: {
+        'text-color': 'hsl(var(--background))'
+      }
+    });
+
+    // Add unclustered points layer with category-based colors
+    map.current.addLayer({
+      id: 'unclustered-point',
+      type: 'circle',
+      source: 'shops',
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-color': [
+          'match',
+          ['get', 'category'],
+          'streetwear', 'hsl(271, 85%, 65%)',
+          'luxury', 'hsl(45, 93%, 58%)',
+          'sneakers', 'hsl(186, 95%, 55%)',
+          'accessories', 'hsl(25, 95%, 53%)',
+          'vintage', 'hsl(142, 90%, 60%)',
+          'sportswear', 'hsl(200, 98%, 39%)',
+          'hsl(200, 98%, 39%)' // default
+        ],
+        'circle-radius': 20,
+        'circle-stroke-width': 3,
+        'circle-stroke-color': 'hsl(var(--background))',
+        'circle-opacity': 0.9
+      }
+    });
+
+    // Click handler for clusters - zoom in
+    map.current.on('click', 'clusters', (e) => {
+      if (!map.current) return;
+      const features = map.current.queryRenderedFeatures(e.point, {
+        layers: ['clusters']
       });
+      const clusterId = features[0].properties.cluster_id;
+      const source = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
       
-      el.addEventListener('mouseleave', () => {
-        el.style.transform = 'scale(1)';
+      source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err || !map.current) return;
+        map.current.easeTo({
+          center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
+          zoom: zoom
+        });
       });
+    });
 
-      // Create popup content
+    // Click handler for unclustered points - show detailed popup
+    map.current.on('click', 'unclustered-point', (e) => {
+      if (!map.current || !e.features?.[0]) return;
+      
+      const coordinates = (e.features[0].geometry as GeoJSON.Point).coordinates.slice() as [number, number];
+      const props = e.features[0].properties;
+
+      // Create popup content with styling
       const popupContent = `
         <div style="font-family: system-ui; max-width: 300px;">
           <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold;">
-            ${shop.name}
+            ${props.name}
           </h3>
-          ${brand ? `
+          ${props.brand_name ? `
             <div style="margin-bottom: 8px;">
               <span style="
                 display: inline-block;
@@ -243,17 +330,17 @@ const ShopMap = () => {
                 font-size: 12px;
                 color: hsl(var(--primary));
               ">
-                ${brand.name}
+                ${props.brand_name}
               </span>
             </div>
           ` : ''}
           <p style="margin: 4px 0; font-size: 14px; color: #666;">
-            📍 ${shop.address}
+            📍 ${props.address}
           </p>
           <p style="margin: 4px 0; font-size: 14px; color: #666;">
-            🌍 ${shop.city}, ${shop.country}
+            🌍 ${props.city}, ${props.country}
           </p>
-          ${shop.category ? `
+          ${props.category ? `
             <p style="margin: 4px 0; font-size: 12px;">
               <span style="
                 display: inline-block;
@@ -262,17 +349,17 @@ const ShopMap = () => {
                 border-radius: 3px;
                 text-transform: capitalize;
               ">
-                ${shop.category}
+                ${props.category}
               </span>
             </p>
           ` : ''}
-          ${shop.phone ? `
+          ${props.phone ? `
             <p style="margin: 4px 0; font-size: 14px;">
-              📞 ${shop.phone}
+              📞 ${props.phone}
             </p>
           ` : ''}
-          ${shop.official_site ? `
-            <a href="${shop.official_site}" target="_blank" rel="noopener noreferrer" 
+          ${props.official_site ? `
+            <a href="${props.official_site}" target="_blank" rel="noopener noreferrer" 
                style="
                  display: inline-block;
                  margin-top: 8px;
@@ -289,18 +376,24 @@ const ShopMap = () => {
         </div>
       `;
 
-      const popup = new mapboxgl.Popup({
-        offset: 25,
-        closeButton: true,
-        closeOnClick: true,
-      }).setHTML(popupContent);
+      new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: true })
+        .setLngLat(coordinates)
+        .setHTML(popupContent)
+        .addTo(map.current);
+    });
 
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([shop.longitude, shop.latitude])
-        .setPopup(popup)
-        .addTo(map.current!);
-
-      markersRef.current.push(marker);
+    // Change cursor on hover
+    map.current.on('mouseenter', 'clusters', () => {
+      if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+    });
+    map.current.on('mouseleave', 'clusters', () => {
+      if (map.current) map.current.getCanvas().style.cursor = '';
+    });
+    map.current.on('mouseenter', 'unclustered-point', () => {
+      if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+    });
+    map.current.on('mouseleave', 'unclustered-point', () => {
+      if (map.current) map.current.getCanvas().style.cursor = '';
     });
   };
 
