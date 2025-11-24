@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical, Info, Maximize2, Minimize2 } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical, Info, Maximize2, Minimize2, ChevronDown, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,6 +99,7 @@ const Directions = () => {
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedShopForDetails, setSelectedShopForDetails] = useState<ShopType | null>(null);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -250,77 +251,42 @@ const Directions = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
           {/* Filters and Shop List */}
           <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
-            {/* Journey Stops */}
-            {journeyStops.length > 0 && (
-              <Card className="glass-card border-2 border-directions/20 bg-gradient-to-br from-directions/10 to-transparent backdrop-blur-md shadow-xl">
-                <CardHeader className="border-b border-directions/10 py-3">
-                  <CardTitle className="uppercase tracking-wider text-directions font-bold text-sm flex items-center justify-between">
-                    <span>🗺️ Your Journey ({journeyStops.length} stops)</span>
+            <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
+              <CardHeader 
+                className="border-b border-directions/10 py-3 lg:py-6 cursor-pointer lg:cursor-default"
+                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="uppercase tracking-wider text-directions font-bold text-sm lg:text-base flex items-center gap-2">
+                      <span className="lg:hidden">
+                        {isFilterExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      </span>
+                      🔍 Search & Filter
+                    </CardTitle>
+                    <CardDescription className="text-xs lg:text-sm">
+                      📍 {filteredShops.length} shop{filteredShops.length !== 1 ? 's' : ''} found
+                    </CardDescription>
+                  </div>
+                  {(searchQuery || selectedCategory !== "all" || selectedCountry !== "all" || selectedCity !== "all") && (
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={() => setJourneyStops([])}
-                      className="h-6 text-xs hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      Clear All
-                    </Button>
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Drag to reorder your stops
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 pt-3 pb-3">
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={journeyStops.map(stop => stop.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      {journeyStops.map((stop, index) => (
-                        <SortableStop
-                          key={stop.id}
-                          stop={stop}
-                          index={index}
-                          onRemove={removeFromJourney}
-                        />
-                      ))}
-                    </SortableContext>
-                  </DndContext>
-                  
-                  {journeyStops.length >= 1 && (
-                    <Button 
-                      className="w-full bg-directions hover:bg-directions/90 text-directions-foreground font-bold uppercase tracking-wider"
-                      onClick={() => {
-                        const waypoints = journeyStops
-                          .map(stop => `${stop.latitude},${stop.longitude}`)
-                          .join('/');
-                        window.open(
-                          `https://www.google.com/maps/dir/${waypoints}`,
-                          '_blank'
-                        );
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSearchQuery("");
+                        setSelectedCategory("all");
+                        setSelectedCountry("all");
+                        setSelectedCity("all");
                       }}
+                      className="h-7 text-xs hover:bg-destructive/10 hover:text-destructive"
                     >
-                      <Navigation className="w-4 h-4 mr-2" />
-                      Start Navigation
+                      Clear Filter
                     </Button>
                   )}
-                </CardContent>
-              </Card>
-            )}
-
-            <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
-              <CardHeader className="border-b border-directions/10 py-3 lg:py-6">
-                <CardTitle className="uppercase tracking-wider text-directions font-bold text-sm lg:text-base">🔍 Search & Filter</CardTitle>
-                <CardDescription className="text-xs lg:text-sm">
-                  {journeyStops.length === 0 
-                    ? "Find shops near you" 
-                    : "Add one more location to your journey"}
-                </CardDescription>
+                </div>
               </CardHeader>
-              <CardContent className="space-y-3 pt-4 pb-3 lg:space-y-4 lg:pt-6">
+              <CardContent className={`space-y-3 pt-4 pb-3 lg:space-y-4 lg:pt-6 ${isFilterExpanded ? 'block' : 'hidden lg:block'}`}>
                 <Input
                   placeholder="Search shops..."
                   value={searchQuery}
@@ -373,10 +339,6 @@ const Directions = () => {
                     ))}
                   </SelectContent>
                 </Select>
-
-                <p className="text-sm font-semibold text-directions border-t border-directions/10 pt-4">
-                  📍 {filteredShops.length} shop{filteredShops.length !== 1 ? 's' : ''} found
-                </p>
               </CardContent>
             </Card>
 
@@ -494,6 +456,70 @@ const Directions = () => {
                   journeyStops={journeyStops}
                   onRouteUpdate={setRouteInfo}
                 />
+                
+                {/* Journey Stops Overlay - Compact for mobile */}
+                {journeyStops.length > 0 && (
+                  <div className="absolute top-4 left-4 right-16 lg:right-auto lg:max-w-xs z-10">
+                    <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
+                      <CardHeader className="py-2 px-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-xs uppercase tracking-wider text-directions font-bold flex items-center gap-1">
+                            🗺️ Journey ({journeyStops.length})
+                          </CardTitle>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => setJourneyStops([])}
+                            className="h-5 px-2 text-xs hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-2 space-y-2 max-h-[200px] overflow-y-auto">
+                        <DndContext
+                          sensors={sensors}
+                          collisionDetection={closestCenter}
+                          onDragEnd={handleDragEnd}
+                        >
+                          <SortableContext
+                            items={journeyStops.map(stop => stop.id)}
+                            strategy={verticalListSortingStrategy}
+                          >
+                            {journeyStops.map((stop, index) => (
+                              <SortableStop
+                                key={stop.id}
+                                stop={stop}
+                                index={index}
+                                onRemove={removeFromJourney}
+                              />
+                            ))}
+                          </SortableContext>
+                        </DndContext>
+                        
+                        {journeyStops.length >= 1 && (
+                          <Button 
+                            size="sm"
+                            className="w-full bg-directions hover:bg-directions/90 text-directions-foreground font-bold uppercase tracking-wider text-xs py-1 h-8"
+                            onClick={() => {
+                              const waypoints = journeyStops
+                                .map(stop => `${stop.latitude},${stop.longitude}`)
+                                .join('/');
+                              window.open(
+                                `https://www.google.com/maps/dir/${waypoints}`,
+                                '_blank'
+                              );
+                            }}
+                          >
+                            <Navigation className="w-3 h-3 mr-1" />
+                            Start Navigation
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
                 {/* Fullscreen Toggle Button */}
                 <Button
                   variant="secondary"
