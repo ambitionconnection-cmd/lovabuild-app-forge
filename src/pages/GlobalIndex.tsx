@@ -138,8 +138,8 @@ const GlobalIndex = () => {
 
   if (loading) {
   return (
-    <div className="min-h-screen bg-white">
-        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/50">
+    <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
           <div className="container mx-auto px-4 py-4 flex items-center gap-4">
             <Link to="/">
               <Button variant="ghost" size="icon">
@@ -161,8 +161,8 @@ const GlobalIndex = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/50">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
             <Button variant="ghost" size="icon">
