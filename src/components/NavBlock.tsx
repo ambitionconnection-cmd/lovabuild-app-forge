@@ -8,33 +8,52 @@ interface NavBlockProps {
   to: string;
   variant: "directions" | "global" | "drops" | "heardrop";
   badge?: number;
+  subtitle?: string;
 }
 
 const variantStyles = {
-  directions: "bg-directions text-directions-foreground hover:brightness-110",
-  global: "bg-global text-global-foreground hover:brightness-110",
-  drops: "bg-drops text-drops-foreground hover:brightness-110",
-  heardrop: "bg-heardrop text-heardrop-foreground hover:brightness-110",
+  directions: "bg-directions/90 text-directions-foreground border-directions hover:bg-directions",
+  global: "bg-global/90 text-global-foreground border-global hover:bg-global",
+  drops: "bg-drops/90 text-drops-foreground border-drops hover:bg-drops",
+  heardrop: "bg-heardrop/90 text-heardrop-foreground border-heardrop hover:bg-heardrop",
 };
 
-export const NavBlock = ({ title, icon: Icon, to, variant, badge }: NavBlockProps) => {
+const subtitles = {
+  directions: "Find stores near you",
+  global: "Browse all brands",
+  drops: "Exclusive releases",
+  heardrop: "Your favorites",
+};
+
+export const NavBlock = ({ title, icon: Icon, to, variant, badge, subtitle }: NavBlockProps) => {
   return (
     <Link
       to={to}
       className={cn(
-        "relative w-full rounded-xl p-8 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl",
-        "flex flex-col items-center justify-center gap-4",
-        "min-h-[140px]",
+        "relative w-full rounded-2xl p-6 transition-all duration-300",
+        "flex items-center gap-4 md:flex-col md:justify-center md:gap-3",
+        "min-h-[80px] md:min-h-[140px]",
+        "border-4 shadow-xl hover:shadow-2xl hover:scale-[1.02]",
+        "glass-effect",
         variantStyles[variant]
       )}
     >
       {badge !== undefined && badge > 0 && (
-        <div className="absolute top-4 right-4 bg-destructive text-destructive-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-lg">
+        <div className="absolute top-3 right-3 bg-destructive text-destructive-foreground rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold shadow-lg z-10">
           {badge}
         </div>
       )}
-      <Icon className="w-12 h-12" strokeWidth={2.5} />
-      <h2 className="text-2xl font-bold uppercase tracking-wider">{title}</h2>
+      
+      <Icon className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0" strokeWidth={2.5} />
+      
+      <div className="flex-1 md:text-center">
+        <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider mb-0.5 md:mb-1">
+          {title}
+        </h2>
+        <p className="text-xs md:text-sm opacity-90 font-medium">
+          {subtitle || subtitles[variant]}
+        </p>
+      </div>
     </Link>
   );
 };

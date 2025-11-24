@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import urbanBg from "@/assets/urban-bg.jpg";
 
 interface Drop {
   id: string;
@@ -86,11 +87,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
+      {/* Header with Glassmorphism */}
+      <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
+            <div className="w-10 h-10 rounded-lg border-4 border-logo-red flex items-center justify-center">
+              <span className="text-logo-red font-bold text-xl">H</span>
+            </div>
             <h1 className="text-2xl font-bold tracking-tight">{t('app.name')}</h1>
           </div>
           
@@ -116,36 +119,68 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Banner */}
-      <div className="relative h-[400px] overflow-hidden bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2000')] bg-cover bg-center opacity-20" />
+      {/* Hero Banner with Urban Background */}
+      <div className="relative h-[500px] md:h-[600px] overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${urbanBg})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
+        
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center">
-          <h2 className="text-5xl md:text-7xl font-bold text-foreground tracking-wider mb-4">
-            {t('app.name')}
+          <h2 className="text-6xl md:text-8xl font-black text-foreground tracking-widest mb-2 text-shadow-strong uppercase">
+            STREETWEAR
           </h2>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl">
+          <h3 className="text-4xl md:text-6xl font-black text-foreground tracking-widest mb-6 text-shadow-strong uppercase">
+            HUB
+          </h3>
+          <p className="text-lg md:text-xl text-foreground/90 mb-8 max-w-2xl font-semibold text-shadow-strong">
             {t('app.tagline')}
           </p>
-          <div className="flex gap-4">
-            <Button size="lg" onClick={() => navigate('/drops')}>
-              <Zap className="mr-2 h-5 w-5" />
-              {t('home.explorDrops')}
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/shop-map')}>
-              <Globe className="mr-2 h-5 w-5" />
-              Global Map
-            </Button>
-          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12 space-y-16">
+        {/* Quick Navigation - Mobile First */}
+        <section>
+          <h3 className="text-3xl font-bold mb-6 uppercase tracking-wide">{t('home.exploreMore')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            <NavBlock
+              title={t('nav.directions')}
+              icon={MapPin}
+              to="/directions"
+              variant="directions"
+            />
+            
+            <NavBlock
+              title={t('nav.globalIndex')}
+              icon={Globe}
+              to="/global-index"
+              variant="global"
+            />
+            
+            <NavBlock
+              title={t('nav.drops')}
+              icon={Zap}
+              to="/drops"
+              variant="drops"
+            />
+            
+            <NavBlock
+              title={t('nav.myHeardrop')}
+              icon={Heart}
+              to="/my-heardrop"
+              variant="heardrop"
+            />
+          </div>
+        </section>
+
         {/* Featured Drops */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-3xl font-bold mb-2">{t('home.featuredDrops')}</h3>
+              <h3 className="text-3xl font-bold mb-2 uppercase tracking-wide">{t('home.featuredDrops')}</h3>
               <p className="text-muted-foreground">{t('home.featuredDropsDesc')}</p>
             </div>
             <Button variant="ghost" onClick={() => navigate('/drops')}>
@@ -174,7 +209,7 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featuredDrops.map((drop) => (
-                <Card key={drop.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/drops')}>
+                <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/drops')}>
                   <div className="relative h-48 bg-muted overflow-hidden">
                     {drop.image_url ? (
                       <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" />
@@ -205,7 +240,7 @@ const Index = () => {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-3xl font-bold mb-2">{t('home.popularBrands')}</h3>
+              <h3 className="text-3xl font-bold mb-2 uppercase tracking-wide">{t('home.popularBrands')}</h3>
               <p className="text-muted-foreground">{t('home.popularBrandsDesc')}</p>
             </div>
             <Button variant="ghost" onClick={() => navigate('/global-index')}>
@@ -233,9 +268,9 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               {popularBrands.map((brand) => (
-                <Card key={brand.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/global-index')}>
+                <Card key={brand.id} className="hover:scale-[1.02] transition-transform cursor-pointer bg-card/80" onClick={() => navigate('/global-index')}>
                   <CardContent className="p-4">
-                    <div className="aspect-square bg-muted rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                    <div className="aspect-square bg-foreground/5 rounded-lg mb-3 flex items-center justify-center overflow-hidden border-2 border-border">
                       {brand.logo_url ? (
                         <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
                       ) : (
@@ -257,7 +292,7 @@ const Index = () => {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-3xl font-bold mb-2">{t('home.shopLocations')}</h3>
+              <h3 className="text-3xl font-bold mb-2 uppercase tracking-wide">{t('home.shopLocations')}</h3>
               <p className="text-muted-foreground">{t('home.shopLocationsDesc')}</p>
             </div>
             <div className="flex gap-2">
@@ -291,7 +326,7 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {nearbyShops.map((shop) => (
-                <Card key={shop.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/directions')}>
+                <Card key={shop.id} className="hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/directions')}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -314,40 +349,6 @@ const Index = () => {
               ))}
             </div>
           )}
-        </section>
-
-        {/* Quick Navigation */}
-        <section>
-          <h3 className="text-3xl font-bold mb-6">{t('home.exploreMore')}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <NavBlock
-              title={t('nav.directions')}
-              icon={MapPin}
-              to="/directions"
-              variant="directions"
-            />
-            
-            <NavBlock
-              title={t('nav.globalIndex')}
-              icon={Globe}
-              to="/global-index"
-              variant="global"
-            />
-            
-            <NavBlock
-              title={t('nav.drops')}
-              icon={Zap}
-              to="/drops"
-              variant="drops"
-            />
-            
-            <NavBlock
-              title={t('nav.myHeardrop')}
-              icon={Heart}
-              to="/my-heardrop"
-              variant="heardrop"
-            />
-          </div>
         </section>
       </main>
     </div>
