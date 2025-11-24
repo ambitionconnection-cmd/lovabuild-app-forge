@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical, Info } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical, Info, Maximize2, Minimize2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,6 +98,7 @@ const Directions = () => {
   const [routeInfo, setRouteInfo] = useState<any>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedShopForDetails, setSelectedShopForDetails] = useState<ShopType | null>(null);
+  const [isMapFullscreen, setIsMapFullscreen] = useState(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -479,9 +480,9 @@ const Directions = () => {
           </div>
 
           {/* Map */}
-          <div className="lg:col-span-2 relative order-1 lg:order-2">
-            <Card className="h-[400px] lg:h-[800px] border-2 border-primary/20 shadow-2xl overflow-hidden">
-              <CardContent className="p-0 h-full">
+          <div className={`lg:col-span-2 relative order-1 lg:order-2 ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
+            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[400px] lg:h-[800px]'}`}>
+              <CardContent className="p-0 h-full relative">
                 <Map 
                   shops={filteredShops} 
                   onShopClick={(shop) => {
@@ -493,6 +494,19 @@ const Directions = () => {
                   journeyStops={journeyStops}
                   onRouteUpdate={setRouteInfo}
                 />
+                {/* Fullscreen Toggle Button */}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="absolute top-4 right-4 z-10 bg-background/95 backdrop-blur-md shadow-lg hover:bg-background border border-border"
+                  onClick={() => setIsMapFullscreen(!isMapFullscreen)}
+                >
+                  {isMapFullscreen ? (
+                    <Minimize2 className="w-5 h-5" />
+                  ) : (
+                    <Maximize2 className="w-5 h-5" />
+                  )}
+                </Button>
               </CardContent>
             </Card>
 
