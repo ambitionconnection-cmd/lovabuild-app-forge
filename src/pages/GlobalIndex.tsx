@@ -297,11 +297,18 @@ const GlobalIndex = () => {
                   {/* Brand Name & Category */}
                   <div className="text-center">
                     <h3 className="text-xl font-bold mb-1 uppercase tracking-wide">{brand.name}</h3>
-                    {brand.category && (
-                      <Badge variant="outline" className="capitalize">
-                        {brand.category}
-                      </Badge>
-                    )}
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                      {brand.country && (
+                        <Badge variant="secondary" className="text-xs font-medium">
+                          {brand.country}
+                        </Badge>
+                      )}
+                      {brand.category && (
+                        <Badge variant="outline" className="capitalize">
+                          {brand.category}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
 
                   {/* Description */}
