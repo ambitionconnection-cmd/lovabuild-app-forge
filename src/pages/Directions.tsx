@@ -89,14 +89,16 @@ const Directions = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card">
+        <header className="border-b-2 border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background">
           <div className="container mx-auto px-4 py-4 flex items-center gap-4">
             <Link to="/">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="hover:bg-directions/10">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
-            <h1 className="text-xl font-bold">DIRECTIONS</h1>
+            <h1 className="text-2xl font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
+              Directions
+            </h1>
           </div>
         </header>
         <main className="container mx-auto px-4 py-8">
@@ -108,14 +110,16 @@ const Directions = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <header className="border-b-2 border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background sticky top-0 z-50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hover:bg-directions/10 hover:text-directions">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <h1 className="text-xl font-bold">DIRECTIONS</h1>
+          <h1 className="text-2xl font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
+            Directions
+          </h1>
         </div>
       </header>
       
@@ -123,16 +127,17 @@ const Directions = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Filters and Shop List */}
           <div className="lg:col-span-1 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Search & Filter</CardTitle>
+            <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
+              <CardHeader className="border-b border-directions/10">
+                <CardTitle className="uppercase tracking-wider text-directions font-bold">🔍 Search & Filter</CardTitle>
                 <CardDescription>Find shops near you</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-6">
                 <Input
                   placeholder="Search shops..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  className="border-directions/20 focus:ring-directions"
                 />
                 
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -181,8 +186,8 @@ const Directions = () => {
                   </SelectContent>
                 </Select>
 
-                <p className="text-sm text-muted-foreground">
-                  {filteredShops.length} shop{filteredShops.length !== 1 ? 's' : ''} found
+                <p className="text-sm font-semibold text-directions border-t border-directions/10 pt-4">
+                  📍 {filteredShops.length} shop{filteredShops.length !== 1 ? 's' : ''} found
                 </p>
               </CardContent>
             </Card>
@@ -199,8 +204,10 @@ const Directions = () => {
                 filteredShops.map((shop) => (
                   <Card 
                     key={shop.id} 
-                    className={`cursor-pointer transition-colors hover:bg-accent ${
-                      selectedShop?.id === shop.id ? 'bg-accent' : ''
+                    className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg border-2 ${
+                      selectedShop?.id === shop.id 
+                        ? 'bg-directions/10 border-directions shadow-lg shadow-directions/20' 
+                        : 'border-border hover:border-directions/50'
                     }`}
                     onClick={() => setSelectedShop(shop)}
                   >
@@ -221,7 +228,7 @@ const Directions = () => {
                       <div className="flex gap-2 mt-3">
                         <Button 
                           size="sm" 
-                          variant="outline"
+                          className="bg-directions hover:bg-directions/90 text-directions-foreground"
                           onClick={(e) => {
                             e.stopPropagation();
                             getDirections(shop);
@@ -253,7 +260,7 @@ const Directions = () => {
 
           {/* Map */}
           <div className="lg:col-span-2">
-            <Card className="h-[800px]">
+            <Card className="h-[800px] border-2 border-primary/20 shadow-2xl overflow-hidden">
               <CardContent className="p-0 h-full">
                 <Map 
                   shops={filteredShops} 
