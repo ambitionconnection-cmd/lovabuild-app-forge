@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,80 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import Map from "@/components/Map";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+type ShopType = Omit<Tables<'shops'>, 'email' | 'phone'>;
+
+interface SortableStopProps {
+  stop: ShopType;
+  index: number;
+  onRemove: (id: string) => void;
+}
+
+const SortableStop = ({ stop, index, onRemove }: SortableStopProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: stop.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 p-2 bg-background/50 rounded-lg border border-directions/20 transition-all ${
+        isDragging ? 'opacity-50 scale-105 shadow-lg z-50' : ''
+      }`}
+    >
+      <button
+        className="flex-shrink-0 cursor-grab active:cursor-grabbing hover:bg-directions/10 p-1 rounded transition-colors"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="w-4 h-4 text-directions" />
+      </button>
+      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-directions text-directions-foreground flex items-center justify-center text-xs font-bold">
+        {index + 1}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold truncate">{stop.name}</p>
+        <p className="text-xs text-muted-foreground truncate">{stop.city}</p>
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => onRemove(stop.id)}
+        className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
+      >
+        ✕
+      </Button>
+    </div>
+  );
+};
 
 const Directions = () => {
   const [shops, setShops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
@@ -21,6 +95,30 @@ const Directions = () => {
   const [selectedShop, setSelectedShop] = useState<Omit<Tables<'shops'>, 'email' | 'phone'> | null>(null);
   const [journeyStops, setJourneyStops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
   const [routeInfo, setRouteInfo] = useState<any>(null);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before drag starts
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setJourneyStops((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   // Fetch shops
   useEffect(() => {
@@ -158,30 +256,30 @@ const Directions = () => {
                       Clear All
                     </Button>
                   </CardTitle>
+                  <CardDescription className="text-xs">
+                    Drag to reorder your stops
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2 pt-3 pb-3">
-                  {journeyStops.map((stop, index) => (
-                    <div 
-                      key={stop.id}
-                      className="flex items-center gap-2 p-2 bg-background/50 rounded-lg border border-directions/20"
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={journeyStops.map(stop => stop.id)}
+                      strategy={verticalListSortingStrategy}
                     >
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-directions text-directions-foreground flex items-center justify-center text-xs font-bold">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate">{stop.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{stop.city}</p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFromJourney(stop.id)}
-                        className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        ✕
-                      </Button>
-                    </div>
-                  ))}
+                      {journeyStops.map((stop, index) => (
+                        <SortableStop
+                          key={stop.id}
+                          stop={stop}
+                          index={index}
+                          onRemove={removeFromJourney}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
                 </CardContent>
               </Card>
             )}
