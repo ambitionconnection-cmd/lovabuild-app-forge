@@ -126,13 +126,13 @@ const Directions = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
           {/* Filters and Shop List */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
             <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
-              <CardHeader className="border-b border-directions/10">
-                <CardTitle className="uppercase tracking-wider text-directions font-bold">🔍 Search & Filter</CardTitle>
-                <CardDescription>Find shops near you</CardDescription>
+              <CardHeader className="border-b border-directions/10 py-3 lg:py-6">
+                <CardTitle className="uppercase tracking-wider text-directions font-bold text-sm lg:text-base">🔍 Search & Filter</CardTitle>
+                <CardDescription className="text-xs lg:text-sm">Find shops near you</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 pt-6">
+              <CardContent className="space-y-3 pt-4 pb-3 lg:space-y-4 lg:pt-6">
                 <Input
                   placeholder="Search shops..."
                   value={searchQuery}
@@ -193,7 +193,7 @@ const Directions = () => {
             </Card>
 
             {/* Shop List */}
-            <div className="space-y-3 max-h-[500px] overflow-y-auto">
+            <div className="space-y-3 max-h-[250px] lg:max-h-[500px] overflow-y-auto">
               {filteredShops.length === 0 ? (
                 <Card>
                   <CardContent className="py-8 text-center">
@@ -254,8 +254,8 @@ const Directions = () => {
           </div>
 
           {/* Map */}
-          <div className="lg:col-span-2 relative">
-            <Card className="h-[800px] border-2 border-primary/20 shadow-2xl overflow-hidden">
+          <div className="lg:col-span-2 relative order-1 lg:order-2">
+            <Card className="h-[400px] lg:h-[800px] border-2 border-primary/20 shadow-2xl overflow-hidden">
               <CardContent className="p-0 h-full">
                 <Map 
                   shops={filteredShops} 
