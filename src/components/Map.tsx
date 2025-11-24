@@ -7,10 +7,11 @@ interface MapProps {
   shops: Omit<Tables<'shops'>, 'email' | 'phone'>[];
   onShopClick?: (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => void;
   selectedShop?: Omit<Tables<'shops'>, 'email' | 'phone'> | null;
+  journeyStops?: Omit<Tables<'shops'>, 'email' | 'phone'>[];
   onRouteUpdate?: (route: any) => void;
 }
 
-const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, onRouteUpdate }) => {
+const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, journeyStops = [], onRouteUpdate }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -99,10 +100,12 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, onRouteUpda
     };
   }, [mapboxToken]);
 
-  // Fetch and display route when shop is selected
+  // Fetch and display route when journey stops are selected
   useEffect(() => {
-    if (!map.current || !selectedShop || !userLocation || !selectedShop.latitude || !selectedShop.longitude) {
-      // Clear route if no shop selected
+    const stopsToUse = journeyStops.length > 0 ? journeyStops : (selectedShop ? [selectedShop] : []);
+    
+    if (!map.current || !userLocation || stopsToUse.length === 0) {
+      // Clear route if no stops selected
       if (map.current?.getSource('route')) {
         if (map.current.getLayer('route-line')) map.current.removeLayer('route-line');
         if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
@@ -112,7 +115,15 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, onRouteUpda
     }
 
     const fetchRoute = async () => {
-      const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${userLocation[0]},${userLocation[1]};${selectedShop.longitude},${selectedShop.latitude}?geometries=geojson&steps=true&access_token=${mapboxToken}`;
+      // Build waypoints: user location + all journey stops
+      const waypoints = [
+        `${userLocation[0]},${userLocation[1]}`,
+        ...stopsToUse
+          .filter(stop => stop.latitude && stop.longitude)
+          .map(stop => `${stop.longitude},${stop.latitude}`)
+      ].join(';');
+      
+      const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${waypoints}?geometries=geojson&steps=true&access_token=${mapboxToken}`;
       
       try {
         const response = await fetch(url);
@@ -121,12 +132,16 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, onRouteUpda
         if (data.routes && data.routes.length > 0) {
           const route = data.routes[0];
           
+          // Combine all steps from all legs for multi-stop journey
+          const allSteps = route.legs.flatMap((leg: any) => leg.steps);
+          
           // Notify parent component about route
           if (onRouteUpdate) {
             onRouteUpdate({
               distance: route.distance,
               duration: route.duration,
-              steps: route.legs[0].steps
+              steps: allSteps,
+              legs: route.legs
             });
           }
 
@@ -219,7 +234,7 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, onRouteUpda
     };
 
     fetchRoute();
-  }, [selectedShop, userLocation, mapboxToken, onRouteUpdate]);
+  }, [journeyStops, selectedShop, userLocation, mapboxToken, onRouteUpdate]);
 
   useEffect(() => {
     if (!map.current || shops.length === 0) return;
