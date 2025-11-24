@@ -19,6 +19,63 @@ const TRACKING_PIXEL = Uint8Array.from([
   0x00, 0x02, 0x02, 0x44, 0x01, 0x00, 0x3B
 ]);
 
+// Rate limiting: max 100 requests per IP per hour
+const RATE_LIMIT_MAX = 100;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+// In-memory rate limit tracking (resets when function cold starts)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+async function validateUserId(userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error validating user ID:', error);
+      return false;
+    }
+
+    return !!data;
+  } catch (error) {
+    console.error('Exception validating user ID:', error);
+    return false;
+  }
+}
+
+function checkRateLimit(ipAddress: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const record = rateLimitStore.get(ipAddress);
+
+  // Clean up expired entries periodically
+  if (rateLimitStore.size > 10000) {
+    for (const [ip, data] of rateLimitStore.entries()) {
+      if (data.resetTime < now) {
+        rateLimitStore.delete(ip);
+      }
+    }
+  }
+
+  if (!record || record.resetTime < now) {
+    // Create new record or reset expired record
+    rateLimitStore.set(ipAddress, {
+      count: 1,
+      resetTime: now + RATE_LIMIT_WINDOW_MS
+    });
+    return { allowed: true, remaining: RATE_LIMIT_MAX - 1 };
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  record.count++;
+  return { allowed: true, remaining: RATE_LIMIT_MAX - record.count };
+}
+
 async function trackEmailEvent(
   userId: string,
   emailType: string,
@@ -53,19 +110,104 @@ serve(async (req) => {
     const eventType = url.searchParams.get('e') as 'open' | 'click';
     const targetUrl = url.searchParams.get('url');
 
+    // Get IP address for rate limiting
+    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                      req.headers.get('x-real-ip') || 
+                      'unknown';
+
+    // Check rate limit
+    const rateLimit = checkRateLimit(ipAddress);
+    if (!rateLimit.allowed) {
+      console.warn(`Rate limit exceeded for IP: ${ipAddress}`);
+      // Return tracking pixel or redirect anyway to avoid revealing rate limiting
+      // But don't record the event
+      if (eventType === 'open') {
+        return new Response(TRACKING_PIXEL, {
+          status: 200,
+          headers: {
+            'Content-Type': 'image/gif',
+            'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+            'Expires': '0',
+            ...corsHeaders,
+          },
+        });
+      } else if (eventType === 'click' && targetUrl) {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            'Location': targetUrl,
+            ...corsHeaders,
+          },
+        });
+      }
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (!userId) {
+      console.warn('Missing user ID in tracking request');
       return new Response('Missing user ID', { status: 400, headers: corsHeaders });
     }
 
     if (!eventType || !['open', 'click'].includes(eventType)) {
+      console.warn(`Invalid event type: ${eventType}`);
       return new Response('Invalid event type', { status: 400, headers: corsHeaders });
     }
 
-    // Track the event
+    // Validate user ID exists
+    const isValidUser = await validateUserId(userId);
+    if (!isValidUser) {
+      console.warn(`Invalid or non-existent user ID attempted: ${userId} from IP: ${ipAddress}`);
+      
+      // Log suspicious activity
+      await supabase
+        .from('security_audit_log')
+        .insert({
+          event_type: 'invalid_email_tracking_attempt',
+          user_id: userId,
+          ip_address: ipAddress,
+          event_data: { 
+            email_type: emailType,
+            event_type: eventType,
+            user_agent: req.headers.get('user-agent')
+          }
+        });
+      
+      // Return success response to avoid revealing validation
+      // But don't record the event
+      if (eventType === 'open') {
+        return new Response(TRACKING_PIXEL, {
+          status: 200,
+          headers: {
+            'Content-Type': 'image/gif',
+            'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+            'Expires': '0',
+            ...corsHeaders,
+          },
+        });
+      } else if (eventType === 'click' && targetUrl) {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            'Location': targetUrl,
+            ...corsHeaders,
+          },
+        });
+      }
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Track the event (only if user is valid and rate limit not exceeded)
     await trackEmailEvent(userId, emailType, eventType, {
       target_url: targetUrl || null,
       user_agent: req.headers.get('user-agent'),
       timestamp: new Date().toISOString(),
+      ip_address: ipAddress,
     });
 
     // Handle based on event type
