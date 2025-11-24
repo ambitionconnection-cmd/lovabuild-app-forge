@@ -49,7 +49,7 @@ const ShopMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const [shops, setShops] = useState<Omit<Tables<'shops'>, 'email' | 'phone'>[]>([]);
+  const [shops, setShops] = useState<Tables<'shops_public'>[]>([]);
   const [brands, setBrands] = useState<Record<string, Tables<'brands'>>>({});
   const [loading, setLoading] = useState(true);
   const [selectedContinent, setSelectedContinent] = useState<string>("all");

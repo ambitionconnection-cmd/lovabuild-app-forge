@@ -440,6 +440,7 @@ export type Database = {
           longitude: number | null
           name: string
           official_site: string | null
+          opening_hours: Json | null
           phone: string | null
           slug: string
           updated_at: string | null
@@ -461,6 +462,7 @@ export type Database = {
           longitude?: number | null
           name: string
           official_site?: string | null
+          opening_hours?: Json | null
           phone?: string | null
           slug: string
           updated_at?: string | null
@@ -482,6 +484,7 @@ export type Database = {
           longitude?: number | null
           name?: string
           official_site?: string | null
+          opening_hours?: Json | null
           phone?: string | null
           slug?: string
           updated_at?: string | null
@@ -672,6 +675,7 @@ export type Database = {
           longitude: number | null
           name: string | null
           official_site: string | null
+          opening_hours: Json | null
           slug: string | null
           updated_at: string | null
         }
@@ -691,6 +695,7 @@ export type Database = {
           longitude?: number | null
           name?: string | null
           official_site?: string | null
+          opening_hours?: Json | null
           slug?: string | null
           updated_at?: string | null
         }
@@ -710,6 +715,7 @@ export type Database = {
           longitude?: number | null
           name?: string | null
           official_site?: string | null
+          opening_hours?: Json | null
           slug?: string | null
           updated_at?: string | null
         }
