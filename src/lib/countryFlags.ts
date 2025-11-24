@@ -21,6 +21,23 @@ export const getCountryFlag = (country: string): string => {
     'Spain': '🇪🇸',
     'Portugal': '🇵🇹',
     'Australia': '🇦🇺',
+    'Brazil': '🇧🇷',
+    'Argentina': '🇦🇷',
+    'Chile': '🇨🇱',
+    'Nigeria': '🇳🇬',
+    'Kenya': '🇰🇪',
+    'Senegal': '🇸🇳',
+    'United Arab Emirates': '🇦🇪',
+    'UAE': '🇦🇪',
+    'Malaysia': '🇲🇾',
+    'Czech Republic': '🇨🇿',
+    'Poland': '🇵🇱',
+    'Vietnam': '🇻🇳',
+    'Indonesia': '🇮🇩',
+    'Singapore': '🇸🇬',
+    'Hong Kong': '🇭🇰',
+    'Taiwan': '🇹🇼',
+    'Mexico': '🇲🇽',
   };
 
   return countryFlags[country] || '🌍';
