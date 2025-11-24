@@ -13,7 +13,6 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import urbanBg from "@/assets/urban-bg.jpg";
 import { BrandLogo } from "@/components/BrandLogo";
-
 interface Drop {
   id: string;
   title: string;
@@ -24,14 +23,12 @@ interface Drop {
   is_featured: boolean;
   brand_id: string;
 }
-
 interface Brand {
   id: string;
   name: string;
   logo_url: string;
   category: string;
 }
-
 interface Shop {
   id: string;
   name: string;
@@ -39,43 +36,29 @@ interface Shop {
   country: string;
   category: string;
 }
-
 const Index = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const navigate = useNavigate();
-  const { isAdmin } = useIsAdmin();
-  const { t } = useTranslation();
+  const {
+    isAdmin
+  } = useIsAdmin();
+  const {
+    t
+  } = useTranslation();
   const [featuredDrops, setFeaturedDrops] = useState<Drop[]>([]);
   const [popularBrands, setPopularBrands] = useState<Brand[]>([]);
   const [nearbyShops, setNearbyShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     fetchHomeData();
   }, []);
-
   const fetchHomeData = async () => {
     try {
-      const [dropsRes, brandsRes, shopsRes] = await Promise.all([
-        supabase
-          .from('drops')
-          .select('*')
-          .eq('is_featured', true)
-          .eq('status', 'upcoming')
-          .order('release_date', { ascending: true })
-          .limit(3),
-        supabase
-          .from('brands')
-          .select('*')
-          .eq('is_active', true)
-          .limit(6),
-        supabase
-          .from('shops')
-          .select('*')
-          .eq('is_active', true)
-          .limit(4)
-      ]);
-
+      const [dropsRes, brandsRes, shopsRes] = await Promise.all([supabase.from('drops').select('*').eq('is_featured', true).eq('status', 'upcoming').order('release_date', {
+        ascending: true
+      }).limit(3), supabase.from('brands').select('*').eq('is_active', true).limit(6), supabase.from('shops').select('*').eq('is_active', true).limit(4)]);
       if (dropsRes.data) setFeaturedDrops(dropsRes.data);
       if (brandsRes.data) setPopularBrands(brandsRes.data);
       if (shopsRes.data) setNearbyShops(shopsRes.data);
@@ -85,9 +68,7 @@ const Index = () => {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header with Glassmorphism */}
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -103,16 +84,9 @@ const Index = () => {
               <Search className="w-5 h-5" />
             </Button>
             <LanguageSwitcher />
-            {isAdmin && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => navigate("/admin")}
-                title={t('nav.admin')}
-              >
+            {isAdmin && <Button variant="ghost" size="icon" onClick={() => navigate("/admin")} title={t('nav.admin')}>
                 <Shield className="w-5 h-5" />
-              </Button>
-            )}
+              </Button>}
             <Button variant="ghost" size="icon" onClick={() => navigate("/profile")}>
               <User className="w-5 h-5" />
             </Button>
@@ -122,10 +96,9 @@ const Index = () => {
 
       {/* Hero Banner with Urban Background */}
       <div className="relative h-[500px] md:h-[600px] overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${urbanBg})` }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{
+        backgroundImage: `url(${urbanBg})`
+      }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-background" />
         
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center space-y-6">
@@ -148,7 +121,7 @@ const Index = () => {
           </div>
           
           <p className="text-base md:text-lg text-foreground/90 font-semibold text-shadow-strong mt-6">
-            Download HEARDROP Today!
+            ​Martial Eagle        
           </p>
         </div>
       </div>
@@ -159,33 +132,13 @@ const Index = () => {
         <section>
           <h3 className="text-3xl font-bold mb-6 uppercase tracking-wide">{t('home.exploreMore')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-            <NavBlock
-              title={t('nav.directions')}
-              icon={MapPin}
-              to="/directions"
-              variant="directions"
-            />
+            <NavBlock title={t('nav.directions')} icon={MapPin} to="/directions" variant="directions" />
             
-            <NavBlock
-              title={t('nav.globalIndex')}
-              icon={Globe}
-              to="/global-index"
-              variant="global"
-            />
+            <NavBlock title={t('nav.globalIndex')} icon={Globe} to="/global-index" variant="global" />
             
-            <NavBlock
-              title={t('nav.drops')}
-              icon={Zap}
-              to="/drops"
-              variant="drops"
-            />
+            <NavBlock title={t('nav.drops')} icon={Zap} to="/drops" variant="drops" />
             
-            <NavBlock
-              title={t('nav.myHeardrop')}
-              icon={Heart}
-              to="/my-heardrop"
-              variant="heardrop"
-            />
+            <NavBlock title={t('nav.myHeardrop')} icon={Heart} to="/my-heardrop" variant="heardrop" />
           </div>
         </section>
 
@@ -201,36 +154,24 @@ const Index = () => {
             </Button>
           </div>
           
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="overflow-hidden animate-pulse">
+          {loading ? <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map(i => <Card key={i} className="overflow-hidden animate-pulse">
                   <div className="h-48 bg-muted" />
                   <CardContent className="p-4">
                     <div className="h-4 bg-muted rounded mb-2" />
                     <div className="h-3 bg-muted rounded w-2/3" />
                   </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : featuredDrops.length === 0 ? (
-            <Card>
+                </Card>)}
+            </div> : featuredDrops.length === 0 ? <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
                 {t('home.noFeaturedDrops')}
               </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredDrops.map((drop) => (
-                <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/drops')}>
+            </Card> : <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredDrops.map(drop => <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/drops')}>
                   <div className="relative h-48 bg-muted overflow-hidden">
-                    {drop.image_url ? (
-                      <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
+                    {drop.image_url ? <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
                         <Zap className="h-12 w-12 text-muted-foreground" />
-                      </div>
-                    )}
+                      </div>}
                     <Badge className="absolute top-2 right-2">{t('drops.featured')}</Badge>
                   </div>
                   <CardContent className="p-4">
@@ -243,10 +184,8 @@ const Index = () => {
                       {format(new Date(drop.release_date), 'MMM d, yyyy')}
                     </div>
                   </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                </Card>)}
+            </div>}
         </section>
 
         {/* Popular Brands */}
@@ -261,40 +200,28 @@ const Index = () => {
             </Button>
           </div>
           
-          {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Card key={i} className="animate-pulse">
+          {loading ? <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+              {[1, 2, 3, 4, 5, 6].map(i => <Card key={i} className="animate-pulse">
                   <CardContent className="p-4">
                     <div className="aspect-square bg-muted rounded-lg mb-2" />
                     <div className="h-3 bg-muted rounded" />
                   </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : popularBrands.length === 0 ? (
-            <Card>
+                </Card>)}
+            </div> : popularBrands.length === 0 ? <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
                 {t('home.noBrands')}
               </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-              {popularBrands.map((brand) => (
-                <Card key={brand.id} className="hover:scale-[1.02] transition-transform cursor-pointer bg-card/80" onClick={() => navigate('/global-index')}>
+            </Card> : <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+              {popularBrands.map(brand => <Card key={brand.id} className="hover:scale-[1.02] transition-transform cursor-pointer bg-card/80" onClick={() => navigate('/global-index')}>
                   <CardContent className="p-4">
                     <div className="aspect-square bg-foreground/5 rounded-lg mb-3 flex items-center justify-center overflow-hidden border-2 border-border">
                       <BrandLogo brand={brand} />
                     </div>
                     <p className="font-medium text-sm text-center line-clamp-1">{brand.name}</p>
-                    {brand.category && (
-                      <p className="text-xs text-muted-foreground text-center capitalize">{brand.category}</p>
-                    )}
+                    {brand.category && <p className="text-xs text-muted-foreground text-center capitalize">{brand.category}</p>}
                   </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                </Card>)}
+            </div>}
         </section>
 
         {/* Nearby Shops */}
@@ -315,27 +242,19 @@ const Index = () => {
             </div>
           </div>
           
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="animate-pulse">
+          {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map(i => <Card key={i} className="animate-pulse">
                   <CardContent className="p-4">
                     <div className="h-4 bg-muted rounded mb-2" />
                     <div className="h-3 bg-muted rounded w-2/3" />
                   </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : nearbyShops.length === 0 ? (
-            <Card>
+                </Card>)}
+            </div> : nearbyShops.length === 0 ? <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
                 {t('home.noShops')}
               </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {nearbyShops.map((shop) => (
-                <Card key={shop.id} className="hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/directions')}>
+            </Card> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {nearbyShops.map(shop => <Card key={shop.id} className="hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/directions')}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -346,22 +265,16 @@ const Index = () => {
                         <p className="text-sm text-muted-foreground line-clamp-1">
                           {shop.city}, {shop.country}
                         </p>
-                        {shop.category && (
-                          <Badge variant="outline" className="mt-2 text-xs capitalize">
+                        {shop.category && <Badge variant="outline" className="mt-2 text-xs capitalize">
                             {shop.category}
-                          </Badge>
-                        )}
+                          </Badge>}
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                </Card>)}
+            </div>}
         </section>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
