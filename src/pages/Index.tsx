@@ -129,7 +129,7 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 pt-6 pb-12 space-y-16">
+      <main className="container mx-auto px-4 pt-2 md:pt-6 pb-12 space-y-16">
         {/* Quick Navigation - Mobile First */}
         <section>
           
