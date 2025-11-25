@@ -13,6 +13,7 @@ import Map from "@/components/Map";
 import { ShopDetailsModal } from "@/components/ShopDetailsModal";
 import { NearbyShopsSheet } from "@/components/NearbyShopsSheet";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DndContext,
   closestCenter,
@@ -725,6 +726,53 @@ const Directions = () => {
                       </div>
                     ))}
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Pinned Shops List Below Map */}
+            {!isMapFullscreen && journeyStops.length > 0 && (
+              <Card className="mt-4 border-2 border-directions/20 shadow-lg rounded-none lg:rounded-xl">
+                <CardHeader className="border-b border-directions/10 py-3">
+                  <CardTitle className="text-sm uppercase tracking-wider text-directions font-bold flex items-center gap-2">
+                    📍 Pinned Shops ({journeyStops.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <ScrollArea className="h-[150px]">
+                    <div className="space-y-2 pr-4">
+                      {journeyStops.map((shop, index) => (
+                        <div 
+                          key={shop.id}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer border border-border/50"
+                          onClick={() => {
+                            setMapCenter([Number(shop.longitude), Number(shop.latitude)]);
+                            setMapZoom(15);
+                            setHighlightedShopId(shop.id);
+                          }}
+                        >
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-directions text-directions-foreground text-sm font-bold flex-shrink-0">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-foreground truncate">{shop.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{shop.address}, {shop.city}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeFromJourney(shop.id);
+                            }}
+                            className="flex-shrink-0 h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
                 </CardContent>
               </Card>
             )}
