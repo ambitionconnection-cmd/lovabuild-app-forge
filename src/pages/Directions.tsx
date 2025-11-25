@@ -564,8 +564,8 @@ const Directions = () => {
           </div>
 
           {/* Map - Full height on mobile, fixed height on desktop */}
-          <div className={`lg:col-span-7 relative ${isMapFullscreen ? 'fixed inset-0 z-[100]' : 'h-[calc(100vh-200px)] lg:h-[800px]'}`}>
-            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden h-full ${isMapFullscreen ? 'rounded-none' : 'rounded-none lg:rounded-xl'}`}>
+          <div className={`lg:col-span-7 relative flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
+            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-200px)] lg:h-[600px] rounded-none lg:rounded-xl'}`}>
               <CardContent className="p-0 h-full relative">
                 <div className="w-full h-full">
                   <Map 
@@ -739,7 +739,7 @@ const Directions = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4">
-                  <ScrollArea className="h-[150px]">
+                  <ScrollArea className="h-[180px]">
                     <div className="space-y-2 pr-4">
                       {journeyStops.map((shop, index) => (
                         <div 
