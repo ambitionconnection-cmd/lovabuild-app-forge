@@ -289,12 +289,12 @@ const Map: React.FC<MapProps> = ({
 
       // Add source with clustering
       map.current.addSource('shops', {
-      type: 'geojson',
-      data: geojson,
-      cluster: true,
-      clusterMaxZoom: 14,
-      clusterRadius: 50
-    });
+        type: 'geojson',
+        data: geojson,
+        cluster: true,
+        clusterMaxZoom: 14,
+        clusterRadius: 50
+      });
 
     // Add cluster circles layer
     map.current.addLayer({
