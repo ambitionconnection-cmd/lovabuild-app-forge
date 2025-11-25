@@ -20,6 +20,7 @@ import { DropsCalendar } from '@/components/DropsCalendar';
 import { Tables } from '@/integrations/supabase/types';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/AdminSidebar';
+import { AdminStatsCards } from '@/components/AdminStatsCards';
 
 interface LoginAttempt {
   id: string;
@@ -55,6 +56,14 @@ export default function Admin() {
   const [brands, setBrands] = useState<Tables<'brands'>[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("accounts");
+  
+  // Stats state
+  const [stats, setStats] = useState({
+    totalBrands: 0,
+    totalShops: 0,
+    upcomingDrops: 0,
+    lockedAccounts: 0,
+  });
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -72,7 +81,7 @@ export default function Admin() {
   const fetchAttempts = async () => {
     setLoading(true);
     try {
-      const [loginRes, ipRes, auditRes, brandsRes] = await Promise.all([
+      const [loginRes, ipRes, auditRes, brandsRes, shopsRes, dropsRes] = await Promise.all([
         supabase
           .from('login_attempts')
           .select('*')
@@ -89,7 +98,14 @@ export default function Admin() {
         supabase
           .from('brands')
           .select('*')
-          .order('name')
+          .order('name'),
+        supabase
+          .from('shops')
+          .select('id'),
+        supabase
+          .from('drops')
+          .select('id, status')
+          .eq('status', 'upcoming')
       ]);
 
       if (loginRes.error) throw loginRes.error;
@@ -100,6 +116,19 @@ export default function Admin() {
       setIpAttempts(ipRes.data || []);
       setAuditLogs(auditRes.data || []);
       setBrands(brandsRes.data || []);
+      
+      // Calculate locked accounts (those with locked_until in the future)
+      const lockedCount = loginRes.data?.filter(
+        attempt => attempt.locked_until && new Date(attempt.locked_until) > new Date()
+      ).length || 0;
+      
+      // Update stats
+      setStats({
+        totalBrands: brandsRes.data?.length || 0,
+        totalShops: shopsRes.data?.length || 0,
+        upcomingDrops: dropsRes.data?.length || 0,
+        lockedAccounts: lockedCount,
+      });
     } catch (error) {
       console.error('Error fetching attempts:', error);
       toast.error('Failed to load security data');
@@ -340,6 +369,14 @@ export default function Admin() {
           </header>
 
           <main className="p-6">
+            <AdminStatsCards
+              totalBrands={stats.totalBrands}
+              totalShops={stats.totalShops}
+              upcomingDrops={stats.upcomingDrops}
+              lockedAccounts={stats.lockedAccounts}
+              loading={loading}
+            />
+            
             {activeTab === "accounts" && (
             <Card>
               <CardHeader>
