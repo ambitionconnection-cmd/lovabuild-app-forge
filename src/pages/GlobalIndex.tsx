@@ -25,6 +25,7 @@ const GlobalIndex = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("name-asc");
   const [shopModalOpen, setShopModalOpen] = useState(false);
   const [selectedBrandForShops, setSelectedBrandForShops] = useState<{ id: string; name: string } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -69,7 +70,7 @@ const GlobalIndex = () => {
     }
   };
 
-  // Filter brands
+  // Filter and sort brands
   useEffect(() => {
     let filtered = brands;
 
@@ -89,8 +90,22 @@ const GlobalIndex = () => {
       filtered = filtered.filter(brand => brand.country === selectedCountry);
     }
 
-    setFilteredBrands(filtered);
-  }, [searchQuery, selectedCategory, selectedCountry, brands]);
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "country":
+          return (a.country || "").localeCompare(b.country || "");
+        default:
+          return 0;
+      }
+    });
+
+    setFilteredBrands(sorted);
+  }, [searchQuery, selectedCategory, selectedCountry, sortBy, brands]);
 
   // Get unique countries from brands
   const countries = Array.from(new Set(brands.map(brand => brand.country).filter(Boolean))).sort();
@@ -240,9 +255,22 @@ const GlobalIndex = () => {
                   </Select>
                 </div>
 
-                <p className="text-sm text-muted-foreground font-medium">
-                  {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
-                </p>
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  <p className="text-sm text-muted-foreground font-medium">
+                    {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
+                  </p>
+                  
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                      <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                      <SelectItem value="country">Country</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </CollapsibleContent>
           </Card>
