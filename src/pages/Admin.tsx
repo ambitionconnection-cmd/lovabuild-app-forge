@@ -8,7 +8,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, Unlock, ArrowLeft } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExportFilters';
 import { ScheduledExportManager } from '@/components/ScheduledExportManager';
@@ -19,6 +18,8 @@ import { ShopManagement } from '@/components/ShopManagement';
 import { DropManagement } from '@/components/DropManagement';
 import { DropsCalendar } from '@/components/DropsCalendar';
 import { Tables } from '@/integrations/supabase/types';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AdminSidebar } from '@/components/AdminSidebar';
 
 interface LoginAttempt {
   id: string;
@@ -53,6 +54,7 @@ export default function Admin() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [brands, setBrands] = useState<Tables<'brands'>[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<string>("accounts");
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -309,45 +311,36 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/')}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold">Security Dashboard</h1>
-            <p className="text-muted-foreground">Monitor and manage login security</p>
-          </div>
-          <Button
-            variant="default"
-            onClick={() => navigate('/analytics')}
-          >
-            View Analytics
-          </Button>
-        </div>
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen flex w-full bg-background">
+        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        
+        <div className="flex-1">
+          <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="flex h-16 items-center gap-4 px-6">
+              <SidebarTrigger />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/')}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex-1">
+                <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+                <p className="text-sm text-muted-foreground">Manage security, content, and analytics</p>
+              </div>
+              <Button
+                variant="default"
+                onClick={() => navigate('/analytics')}
+              >
+                View Analytics
+              </Button>
+            </div>
+          </header>
 
-        <Tabs defaultValue="accounts" className="space-y-4">
-          <div className="w-full overflow-x-auto">
-            <TabsList className="w-full justify-start flex-nowrap">
-              <TabsTrigger value="accounts">Locked Accounts</TabsTrigger>
-              <TabsTrigger value="ips">Locked IPs</TabsTrigger>
-              <TabsTrigger value="audit">Audit Log</TabsTrigger>
-              <TabsTrigger value="scheduled">Scheduled Exports</TabsTrigger>
-              <TabsTrigger value="analytics">Email Analytics</TabsTrigger>
-              <TabsTrigger value="brand-images">Brand Images</TabsTrigger>
-              <TabsTrigger value="brands">Brands</TabsTrigger>
-              <TabsTrigger value="shops">Shops</TabsTrigger>
-              <TabsTrigger value="drops">Drops</TabsTrigger>
-              <TabsTrigger value="calendar">Calendar</TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="accounts">
+          <main className="p-6">
+            {activeTab === "accounts" && (
             <Card>
               <CardHeader>
                 <CardTitle>Email-Based Login Attempts</CardTitle>
@@ -399,9 +392,9 @@ export default function Admin() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+            )}
 
-          <TabsContent value="ips">
+            {activeTab === "ips" && (
             <Card>
               <CardHeader>
                 <CardTitle>IP-Based Login Attempts</CardTitle>
@@ -453,9 +446,9 @@ export default function Admin() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+            )}
 
-          <TabsContent value="audit">
+            {activeTab === "audit" && (
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -514,40 +507,41 @@ export default function Admin() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+            )}
 
-          <TabsContent value="scheduled">
-            <ScheduledExportManager />
-          </TabsContent>
+            {activeTab === "scheduled" && (
+              <ScheduledExportManager />
+            )}
 
-          <TabsContent value="analytics">
-            <EmailAnalytics />
-          </TabsContent>
+            {activeTab === "analytics" && (
+              <EmailAnalytics />
+            )}
 
-          <TabsContent value="brand-images">
-            <BrandImageGenerator 
-              brands={brands} 
-              onComplete={fetchAttempts} 
-            />
-          </TabsContent>
+            {activeTab === "brand-images" && (
+              <BrandImageGenerator 
+                brands={brands} 
+                onComplete={fetchAttempts} 
+              />
+            )}
 
-          <TabsContent value="brands">
-            <BrandManagement />
-          </TabsContent>
+            {activeTab === "brands" && (
+              <BrandManagement />
+            )}
 
-        <TabsContent value="shops">
-          <ShopManagement />
-        </TabsContent>
+            {activeTab === "shops" && (
+              <ShopManagement />
+            )}
 
-        <TabsContent value="drops">
-          <DropManagement />
-        </TabsContent>
+            {activeTab === "drops" && (
+              <DropManagement />
+            )}
 
-        <TabsContent value="calendar">
-          <DropsCalendar />
-        </TabsContent>
-        </Tabs>
+            {activeTab === "calendar" && (
+              <DropsCalendar />
+            )}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
