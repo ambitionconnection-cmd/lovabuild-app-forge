@@ -581,6 +581,7 @@ const Directions = () => {
                     initialCenter={mapCenter}
                     initialZoom={mapZoom}
                     highlightedShopId={highlightedShopId}
+                    isFullscreen={isMapFullscreen}
                   />
                 </div>
                 
