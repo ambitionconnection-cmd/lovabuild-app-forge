@@ -64,6 +64,13 @@ export default function Admin() {
     upcomingDrops: 0,
     lockedAccounts: 0,
   });
+  
+  const [trends, setTrends] = useState<{
+    brands?: { value: number; percentage: number; direction: "up" | "down" | "neutral" };
+    shops?: { value: number; percentage: number; direction: "up" | "down" | "neutral" };
+    drops?: { value: number; percentage: number; direction: "up" | "down" | "neutral" };
+    locked?: { value: number; percentage: number; direction: "up" | "down" | "neutral" };
+  }>({});
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -78,10 +85,44 @@ export default function Admin() {
     }
   }, [isAdmin]);
 
+  const calculateTrend = (current: number, previous: number) => {
+    if (previous === 0) {
+      return { value: current, percentage: 0, direction: "neutral" as const };
+    }
+    
+    const change = current - previous;
+    const percentage = (change / previous) * 100;
+    
+    return {
+      value: Math.abs(change),
+      percentage: Math.abs(percentage),
+      direction: change > 0 ? "up" as const : change < 0 ? "down" as const : "neutral" as const,
+    };
+  };
+
   const fetchAttempts = async () => {
     setLoading(true);
     try {
-      const [loginRes, ipRes, auditRes, brandsRes, shopsRes, dropsRes] = await Promise.all([
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+      
+      const [
+        loginRes, 
+        ipRes, 
+        auditRes, 
+        brandsRes, 
+        shopsRes, 
+        dropsRes,
+        // Trend data - last 7 days
+        brandsLastWeek,
+        shopsLastWeek,
+        dropsLastWeek,
+        // Trend data - previous 7 days (8-14 days ago)
+        brandsPrevWeek,
+        shopsPrevWeek,
+        dropsPrevWeek,
+      ] = await Promise.all([
         supabase
           .from('login_attempts')
           .select('*')
@@ -101,11 +142,42 @@ export default function Admin() {
           .order('name'),
         supabase
           .from('shops')
-          .select('id'),
+          .select('id, created_at'),
         supabase
           .from('drops')
-          .select('id, status')
+          .select('id, status, created_at')
+          .eq('status', 'upcoming'),
+        // Last 7 days counts
+        supabase
+          .from('brands')
+          .select('id')
+          .gte('created_at', sevenDaysAgo.toISOString()),
+        supabase
+          .from('shops')
+          .select('id')
+          .gte('created_at', sevenDaysAgo.toISOString()),
+        supabase
+          .from('drops')
+          .select('id')
           .eq('status', 'upcoming')
+          .gte('created_at', sevenDaysAgo.toISOString()),
+        // Previous 7 days counts (8-14 days ago)
+        supabase
+          .from('brands')
+          .select('id')
+          .gte('created_at', fourteenDaysAgo.toISOString())
+          .lt('created_at', sevenDaysAgo.toISOString()),
+        supabase
+          .from('shops')
+          .select('id')
+          .gte('created_at', fourteenDaysAgo.toISOString())
+          .lt('created_at', sevenDaysAgo.toISOString()),
+        supabase
+          .from('drops')
+          .select('id')
+          .eq('status', 'upcoming')
+          .gte('created_at', fourteenDaysAgo.toISOString())
+          .lt('created_at', sevenDaysAgo.toISOString()),
       ]);
 
       if (loginRes.error) throw loginRes.error;
@@ -121,6 +193,26 @@ export default function Admin() {
       const lockedCount = loginRes.data?.filter(
         attempt => attempt.locked_until && new Date(attempt.locked_until) > new Date()
       ).length || 0;
+      
+      // Calculate trends
+      const brandsThisWeek = brandsLastWeek.data?.length || 0;
+      const brandsPreviousWeek = brandsPrevWeek.data?.length || 0;
+      
+      const shopsThisWeek = shopsLastWeek.data?.length || 0;
+      const shopsPreviousWeek = shopsPrevWeek.data?.length || 0;
+      
+      const dropsThisWeek = dropsLastWeek.data?.length || 0;
+      const dropsPreviousWeek = dropsPrevWeek.data?.length || 0;
+      
+      // For locked accounts, we'll use a simple comparison (current vs average would need historical data)
+      const lockedTrend = calculateTrend(lockedCount, 0); // Simplified for now
+      
+      setTrends({
+        brands: calculateTrend(brandsThisWeek, brandsPreviousWeek),
+        shops: calculateTrend(shopsThisWeek, shopsPreviousWeek),
+        drops: calculateTrend(dropsThisWeek, dropsPreviousWeek),
+        locked: { value: lockedCount, percentage: 0, direction: "neutral" }, // Simplified
+      });
       
       // Update stats
       setStats({
@@ -375,6 +467,7 @@ export default function Admin() {
               upcomingDrops={stats.upcomingDrops}
               lockedAccounts={stats.lockedAccounts}
               loading={loading}
+              trends={trends}
             />
             
             {activeTab === "accounts" && (
