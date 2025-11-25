@@ -114,138 +114,150 @@ const Map: React.FC<MapProps> = ({
 
   // Fetch and display route when journey stops are selected
   useEffect(() => {
-    const stopsToUse = journeyStops.length > 0 ? journeyStops : (selectedShop ? [selectedShop] : []);
-    
-    if (!map.current || !userLocation || stopsToUse.length === 0) {
-      // Clear route if no stops selected
-      if (map.current?.getSource('route')) {
-        if (map.current.getLayer('route-line')) map.current.removeLayer('route-line');
-        if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
-        if (map.current.getSource('route')) map.current.removeSource('route');
-      }
-      return;
-    }
+    if (!map.current) return;
 
-    const fetchRoute = async () => {
-      // Build waypoints: user location + all journey stops
-      const waypoints = [
-        `${userLocation[0]},${userLocation[1]}`,
-        ...stopsToUse
-          .filter(stop => stop.latitude && stop.longitude)
-          .map(stop => `${stop.longitude},${stop.latitude}`)
-      ].join(';');
-      
-      const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${waypoints}?geometries=geojson&steps=true&access_token=${mapboxToken}`;
-      
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.routes && data.routes.length > 0) {
-          const route = data.routes[0];
-          
-          // Combine all steps from all legs for multi-stop journey
-          const allSteps = route.legs.flatMap((leg: any) => leg.steps);
-          
-          // Notify parent component about route
-          if (onRouteUpdate) {
-            onRouteUpdate({
-              distance: route.distance,
-              duration: route.duration,
-              steps: allSteps,
-              legs: route.legs
+    const stopsToUse = journeyStops.length > 0 ? journeyStops : (selectedShop ? [selectedShop] : []);
+
+    const updateRoute = () => {
+      if (!map.current) return;
+
+      if (!userLocation || stopsToUse.length === 0) {
+        // Clear route if no stops selected
+        if (map.current.getSource('route')) {
+          if (map.current.getLayer('route-line')) map.current.removeLayer('route-line');
+          if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
+          if (map.current.getSource('route')) map.current.removeSource('route');
+        }
+        return;
+      }
+
+      const fetchRoute = async () => {
+        // Build waypoints: user location + all journey stops
+        const waypoints = [
+          `${userLocation[0]},${userLocation[1]}`,
+          ...stopsToUse
+            .filter(stop => stop.latitude && stop.longitude)
+            .map(stop => `${stop.longitude},${stop.latitude}`)
+        ].join(';');
+
+        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${waypoints}?geometries=geojson&steps=true&access_token=${mapboxToken}`;
+
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.routes && data.routes.length > 0) {
+            const route = data.routes[0];
+
+            // Combine all steps from all legs for multi-stop journey
+            const allSteps = route.legs.flatMap((leg: any) => leg.steps);
+
+            // Notify parent component about route
+            if (onRouteUpdate) {
+              onRouteUpdate({
+                distance: route.distance,
+                duration: route.duration,
+                steps: allSteps,
+                legs: route.legs
+              });
+            }
+
+            // Remove existing route layers
+            if (map.current?.getSource('route')) {
+              if (map.current.getLayer('route-line')) map.current.removeLayer('route-line');
+              if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
+              map.current.removeSource('route');
+            }
+
+            // Add route source
+            map.current?.addSource('route', {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                properties: {},
+                geometry: route.geometry
+              }
+            });
+
+            // Add casing (outline) layer
+            map.current?.addLayer({
+              id: 'route-line-casing',
+              type: 'line',
+              source: 'route',
+              layout: {
+                'line-join': 'round',
+                'line-cap': 'round'
+              },
+              paint: {
+                'line-color': '#ffffff',
+                'line-width': 10,
+                'line-opacity': 0.8
+              }
+            });
+
+            // Add main route line with animation
+            map.current?.addLayer({
+              id: 'route-line',
+              type: 'line',
+              source: 'route',
+              layout: {
+                'line-join': 'round',
+                'line-cap': 'round'
+              },
+              paint: {
+                'line-color': 'hsl(186, 95%, 55%)',
+                'line-width': 6,
+                'line-opacity': 0.9
+              }
+            });
+
+            // Animate route drawing
+            let animationFrame = 0;
+            const totalFrames = 60;
+
+            const animateRoute = () => {
+              if (animationFrame <= totalFrames) {
+                const progress = animationFrame / totalFrames;
+                map.current?.setPaintProperty('route-line', 'line-dasharray', [
+                  progress * route.geometry.coordinates.length,
+                  (1 - progress) * route.geometry.coordinates.length
+                ]);
+                animationFrame++;
+                requestAnimationFrame(animateRoute);
+              } else {
+                // Remove dash array after animation completes
+                map.current?.setPaintProperty('route-line', 'line-dasharray', null);
+              }
+            };
+
+            animateRoute();
+
+            // Fit map to show route
+            const coordinates = route.geometry.coordinates;
+            const bounds = coordinates.reduce(
+              (bounds: mapboxgl.LngLatBounds, coord: [number, number]) => bounds.extend(coord),
+              new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
+            );
+
+            map.current?.fitBounds(bounds, {
+              padding: 80,
+              maxZoom: 15,
+              duration: 1000
             });
           }
-
-          // Remove existing route layers
-          if (map.current?.getSource('route')) {
-            if (map.current.getLayer('route-line')) map.current.removeLayer('route-line');
-            if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
-            map.current.removeSource('route');
-          }
-
-          // Add route source
-          map.current?.addSource('route', {
-            type: 'geojson',
-            data: {
-              type: 'Feature',
-              properties: {},
-              geometry: route.geometry
-            }
-          });
-
-          // Add casing (outline) layer
-          map.current?.addLayer({
-            id: 'route-line-casing',
-            type: 'line',
-            source: 'route',
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round'
-            },
-            paint: {
-              'line-color': '#ffffff',
-              'line-width': 10,
-              'line-opacity': 0.8
-            }
-          });
-
-          // Add main route line with animation
-          map.current?.addLayer({
-            id: 'route-line',
-            type: 'line',
-            source: 'route',
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round'
-            },
-            paint: {
-              'line-color': 'hsl(186, 95%, 55%)',
-              'line-width': 6,
-              'line-opacity': 0.9
-            }
-          });
-
-          // Animate route drawing
-          let animationFrame = 0;
-          const totalFrames = 60;
-          
-          const animateRoute = () => {
-            if (animationFrame <= totalFrames) {
-              const progress = animationFrame / totalFrames;
-              map.current?.setPaintProperty('route-line', 'line-dasharray', [
-                progress * route.geometry.coordinates.length,
-                (1 - progress) * route.geometry.coordinates.length
-              ]);
-              animationFrame++;
-              requestAnimationFrame(animateRoute);
-            } else {
-              // Remove dash array after animation completes
-              map.current?.setPaintProperty('route-line', 'line-dasharray', null);
-            }
-          };
-          
-          animateRoute();
-
-          // Fit map to show route
-          const coordinates = route.geometry.coordinates;
-          const bounds = coordinates.reduce(
-            (bounds: mapboxgl.LngLatBounds, coord: [number, number]) => bounds.extend(coord),
-            new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
-          );
-          
-          map.current?.fitBounds(bounds, {
-            padding: 80,
-            maxZoom: 15,
-            duration: 1000
-          });
+        } catch (error) {
+          console.error('Error fetching route:', error);
         }
-      } catch (error) {
-        console.error('Error fetching route:', error);
-      }
+      };
+
+      fetchRoute();
     };
 
-    fetchRoute();
+    if (map.current.isStyleLoaded()) {
+      updateRoute();
+    } else {
+      map.current.once('style.load', updateRoute);
+    }
   }, [journeyStops, selectedShop, userLocation, mapboxToken, onRouteUpdate]);
 
   useEffect(() => {
