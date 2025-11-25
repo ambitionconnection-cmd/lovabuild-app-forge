@@ -24,6 +24,8 @@ interface NearbyShopsSheetProps {
   journeyStops: ShopType[];
   selectedShop: ShopType | null;
   highlightedShopId: string | null;
+  userLocation: { lat: number; lng: number } | null;
+  calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
 }
 
 export const NearbyShopsSheet = ({
@@ -38,6 +40,8 @@ export const NearbyShopsSheet = ({
   journeyStops,
   selectedShop,
   highlightedShopId,
+  userLocation,
+  calculateDistance,
 }: NearbyShopsSheetProps) => {
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
@@ -59,6 +63,10 @@ export const NearbyShopsSheet = ({
           ) : (
             shops.map((shop) => {
               const inJourney = isInJourney(shop.id);
+              const distance = userLocation && shop.latitude && shop.longitude
+                ? calculateDistance(userLocation.lat, userLocation.lng, Number(shop.latitude), Number(shop.longitude))
+                : null;
+              
               return (
                 <Card 
                   key={shop.id}
@@ -76,11 +84,18 @@ export const NearbyShopsSheet = ({
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-semibold flex-1">{shop.name}</h3>
-                      {inJourney && (
-                        <span className="text-xs bg-directions text-directions-foreground px-2 py-1 rounded-full font-bold">
-                          #{journeyStops.findIndex(s => s.id === shop.id) + 1}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {distance !== null && (
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-bold whitespace-nowrap">
+                            {distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`}
+                          </span>
+                        )}
+                        {inJourney && (
+                          <span className="text-xs bg-directions text-directions-foreground px-2 py-1 rounded-full font-bold">
+                            #{journeyStops.findIndex(s => s.id === shop.id) + 1}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-1 text-sm text-muted-foreground mb-3">
                       <div className="flex items-start gap-2">

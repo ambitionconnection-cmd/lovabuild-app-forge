@@ -108,6 +108,8 @@ const Directions = () => {
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [mapZoom, setMapZoom] = useState<number>(12);
   const [highlightedShopId, setHighlightedShopId] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [sortByDistance, setSortByDistance] = useState(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -120,6 +122,37 @@ const Directions = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  // Calculate distance between two coordinates using Haversine formula
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+  };
+
+  // Get user's location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          setSortByDistance(true); // Auto-enable distance sorting when location is available
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        }
+      );
+    }
+  }, []);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -189,7 +222,7 @@ const Directions = () => {
     }
   }, [shops, searchParams]);
 
-  // Filter shops
+  // Filter and sort shops
   useEffect(() => {
     let filtered = shops;
 
@@ -214,8 +247,18 @@ const Directions = () => {
       filtered = filtered.filter(shop => shop.city === selectedCity);
     }
 
+    // Sort by distance if enabled and user location is available
+    if (sortByDistance && userLocation) {
+      filtered = [...filtered].sort((a, b) => {
+        if (!a.latitude || !a.longitude || !b.latitude || !b.longitude) return 0;
+        const distA = calculateDistance(userLocation.lat, userLocation.lng, Number(a.latitude), Number(a.longitude));
+        const distB = calculateDistance(userLocation.lat, userLocation.lng, Number(b.latitude), Number(b.longitude));
+        return distA - distB;
+      });
+    }
+
     setFilteredShops(filtered);
-  }, [searchQuery, selectedCategory, selectedCountry, selectedCity, shops]);
+  }, [searchQuery, selectedCategory, selectedCountry, selectedCity, shops, sortByDistance, userLocation]);
 
   // Get unique countries and cities
   const countries = Array.from(new Set(shops.map(shop => shop.country))).sort();
@@ -348,6 +391,23 @@ const Directions = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
+                {userLocation && (
+                  <div className="flex items-center justify-between p-3 bg-directions/5 rounded-lg border border-directions/20">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Navigation className="w-4 h-4 text-directions" />
+                      <span className="font-medium">Sort by proximity</span>
+                    </div>
+                    <Button
+                      variant={sortByDistance ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSortByDistance(!sortByDistance)}
+                      className={sortByDistance ? "bg-directions hover:bg-directions/90 text-directions-foreground" : ""}
+                    >
+                      {sortByDistance ? "On" : "Off"}
+                    </Button>
+                  </div>
+                )}
+                
                 <Input
                   placeholder="Search shops..."
                   value={searchQuery}
@@ -414,6 +474,10 @@ const Directions = () => {
               ) : (
                 filteredShops.slice(0, 20).map((shop) => {
                   const inJourney = isInJourney(shop.id);
+                  const distance = userLocation && shop.latitude && shop.longitude
+                    ? calculateDistance(userLocation.lat, userLocation.lng, Number(shop.latitude), Number(shop.longitude))
+                    : null;
+                  
                   return (
                     <Card 
                       key={shop.id}
@@ -431,11 +495,18 @@ const Directions = () => {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="font-semibold text-sm flex-1">{shop.name}</h3>
-                          {inJourney && (
-                            <span className="text-xs bg-directions text-directions-foreground px-2 py-1 rounded-full font-bold">
-                              #{journeyStops.findIndex(s => s.id === shop.id) + 1}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {distance !== null && (
+                              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-bold whitespace-nowrap">
+                                {distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`}
+                              </span>
+                            )}
+                            {inJourney && (
+                              <span className="text-xs bg-directions text-directions-foreground px-2 py-1 rounded-full font-bold">
+                                #{journeyStops.findIndex(s => s.id === shop.id) + 1}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="space-y-1 text-xs text-muted-foreground mb-2">
                           <div className="flex items-start gap-2">
@@ -677,6 +748,23 @@ const Directions = () => {
           </SheetHeader>
           
           <div className="space-y-4 mt-6">
+            {userLocation && (
+              <div className="flex items-center justify-between p-3 bg-directions/5 rounded-lg border border-directions/20">
+                <div className="flex items-center gap-2 text-sm">
+                  <Navigation className="w-4 h-4 text-directions" />
+                  <span className="font-medium">Sort by proximity</span>
+                </div>
+                <Button
+                  variant={sortByDistance ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSortByDistance(!sortByDistance)}
+                  className={sortByDistance ? "bg-directions hover:bg-directions/90 text-directions-foreground" : ""}
+                >
+                  {sortByDistance ? "On" : "Off"}
+                </Button>
+              </div>
+            )}
+            
             <Input
               placeholder="Search shops..."
               value={searchQuery}
@@ -765,6 +853,8 @@ const Directions = () => {
         journeyStops={journeyStops}
         selectedShop={selectedShop}
         highlightedShopId={highlightedShopId}
+        userLocation={userLocation}
+        calculateDistance={calculateDistance}
       />
 
       {/* Shop Details Modal */}
