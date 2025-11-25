@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type InquiryType = "new-submission" | "correction" | "partnership" | "other";
 
@@ -53,7 +54,7 @@ const Contact = () => {
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedType) {
@@ -66,14 +67,28 @@ const Contact = () => {
       return;
     }
 
-    // Here you would typically send the form data to your backend
-    console.log("Contact form submitted:", { ...formData, type: selectedType });
-    
-    toast.success("Message sent successfully! We'll get back to you soon.");
-    
-    // Reset form
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setSelectedType(null);
+    try {
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          inquiry_type: selectedType
+        });
+
+      if (error) throw error;
+
+      toast.success("Message sent successfully! We'll get back to you soon.");
+      
+      // Reset form
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      setSelectedType(null);
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      toast.error("Failed to send message. Please try again.");
+    }
   };
 
   return (

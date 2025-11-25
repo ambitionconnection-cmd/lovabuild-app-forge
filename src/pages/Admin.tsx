@@ -13,6 +13,7 @@ import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExpor
 import { ScheduledExportManager } from '@/components/ScheduledExportManager';
 import { EmailAnalytics } from '@/components/EmailAnalytics';
 import { BrandImageGenerator } from '@/components/BrandImageGenerator';
+import { ContactManagement } from '@/components/ContactManagement';
 import { BrandManagement } from '@/components/BrandManagement';
 import { ShopManagement } from '@/components/ShopManagement';
 import { DropManagement } from '@/components/DropManagement';
@@ -645,6 +646,10 @@ export default function Admin() {
 
             {activeTab === "analytics" && (
               <EmailAnalytics />
+            )}
+
+            {activeTab === "contact-messages" && (
+              <ContactManagement />
             )}
 
             {activeTab === "brand-images" && (
