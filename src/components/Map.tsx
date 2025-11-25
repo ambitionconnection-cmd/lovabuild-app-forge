@@ -100,11 +100,22 @@ const Map: React.FC<MapProps> = ({
     map.current.on('load', () => {
       setTimeout(() => {
         geolocateControl.trigger();
+        // Ensure map resizes correctly after initial layout on all devices
+        map.current?.resize();
       }, 500);
     });
 
+    const handleResize = () => {
+      if (map.current) {
+        map.current.resize();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
     // Cleanup
     return () => {
+      window.removeEventListener('resize', handleResize);
       markersRef.current.forEach(marker => marker.remove());
       markersRef.current = [];
       userMarkerRef.current?.remove();
