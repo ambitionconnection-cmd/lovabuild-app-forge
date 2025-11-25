@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ export const ShopManagement = () => {
   const [editingShop, setEditingShop] = useState<Shop | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingShop, setDeletingShop] = useState<Shop | null>(null);
+  const [selectedShops, setSelectedShops] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchData();
@@ -114,6 +116,53 @@ export const ShopManagement = () => {
     }
   };
 
+  const toggleSelectShop = (shopId: string) => {
+    setSelectedShops((prev) => {
+      const next = new Set(prev);
+      if (next.has(shopId)) {
+        next.delete(shopId);
+      } else {
+        next.add(shopId);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedShops.size === filteredShops.length) {
+      setSelectedShops(new Set());
+    } else {
+      setSelectedShops(new Set(filteredShops.map((s) => s.id)));
+    }
+  };
+
+  const handleBulkActivate = async (activate: boolean) => {
+    if (selectedShops.size === 0) return;
+
+    try {
+      const { error } = await supabase
+        .from("shops")
+        .update({ is_active: activate })
+        .in("id", Array.from(selectedShops));
+
+      if (error) throw error;
+
+      await supabase.functions.invoke("log-security-event", {
+        body: {
+          eventType: "shops_bulk_update",
+          eventData: { count: selectedShops.size, is_active: activate },
+        },
+      });
+
+      toast.success(`${selectedShops.size} shop(s) ${activate ? "activated" : "deactivated"}`);
+      setSelectedShops(new Set());
+      fetchData();
+    } catch (error: any) {
+      console.error("Error updating shops:", error);
+      toast.error(error.message || "Failed to update shops");
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -132,10 +181,22 @@ export const ShopManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Shop Management</CardTitle>
-            <Button onClick={handleAdd}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Shop
-            </Button>
+            <div className="flex gap-2">
+              {selectedShops.size > 0 && (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => handleBulkActivate(true)}>
+                    Activate ({selectedShops.size})
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => handleBulkActivate(false)}>
+                    Deactivate ({selectedShops.size})
+                  </Button>
+                </>
+              )}
+              <Button onClick={handleAdd}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Shop
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -155,6 +216,12 @@ export const ShopManagement = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedShops.size === filteredShops.length && filteredShops.length > 0}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Brand</TableHead>
                   <TableHead>City</TableHead>
@@ -167,13 +234,19 @@ export const ShopManagement = () => {
               <TableBody>
                 {filteredShops.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
                       No shops found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredShops.map((shop) => (
                     <TableRow key={shop.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedShops.has(shop.id)}
+                          onCheckedChange={() => toggleSelectShop(shop.id)}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{shop.name}</TableCell>
                       <TableCell>{getBrandName(shop.brand_id)}</TableCell>
                       <TableCell>{shop.city}</TableCell>
