@@ -9,9 +9,21 @@ interface MapProps {
   selectedShop?: Omit<Tables<'shops'>, 'email' | 'phone'> | null;
   journeyStops?: Omit<Tables<'shops'>, 'email' | 'phone'>[];
   onRouteUpdate?: (route: any) => void;
+  initialCenter?: [number, number] | null;
+  initialZoom?: number;
+  highlightedShopId?: string | null;
 }
 
-const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, journeyStops = [], onRouteUpdate }) => {
+const Map: React.FC<MapProps> = ({ 
+  shops, 
+  onShopClick, 
+  selectedShop, 
+  journeyStops = [], 
+  onRouteUpdate,
+  initialCenter,
+  initialZoom,
+  highlightedShopId
+}) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -33,8 +45,8 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, journeyStop
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/dark-v11',
-      center: [2.3522, 48.8566], // Default to Paris
-      zoom: 12,
+      center: initialCenter || [2.3522, 48.8566], // Use provided center or default to Paris
+      zoom: initialZoom || 12,
     });
 
     // Add navigation controls
@@ -98,7 +110,7 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, journeyStop
       userMarkerRef.current?.remove();
       map.current?.remove();
     };
-  }, [mapboxToken]);
+  }, [mapboxToken, initialCenter, initialZoom]);
 
   // Fetch and display route when journey stops are selected
   useEffect(() => {
@@ -346,9 +358,24 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, journeyStop
           'sportswear', 'hsl(200, 98%, 39%)',
           'hsl(200, 98%, 39%)' // default
         ],
-        'circle-radius': 16,
-        'circle-stroke-width': 3,
-        'circle-stroke-color': 'hsl(209, 40%, 96%)',
+        'circle-radius': [
+          'case',
+          ['==', ['get', 'id'], highlightedShopId || ''],
+          22, // Larger size for highlighted shop
+          16  // Normal size
+        ],
+        'circle-stroke-width': [
+          'case',
+          ['==', ['get', 'id'], highlightedShopId || ''],
+          5,  // Thicker stroke for highlighted shop
+          3   // Normal stroke
+        ],
+        'circle-stroke-color': [
+          'case',
+          ['==', ['get', 'id'], highlightedShopId || ''],
+          'hsl(0, 0%, 100%)', // White stroke for highlighted shop
+          'hsl(209, 40%, 96%)' // Normal stroke color
+        ],
         'circle-opacity': 0.9
       }
     });
@@ -413,8 +440,8 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, journeyStop
       if (map.current) map.current.getCanvas().style.cursor = '';
     });
 
-    // Fit map to bounds if there are shops
-    if (shops.length > 0) {
+    // Fit map to bounds if there are shops and no initial center provided
+    if (shops.length > 0 && !initialCenter) {
       const bounds = new mapboxgl.LngLatBounds();
       shops.forEach(shop => {
         if (shop.latitude && shop.longitude) {
@@ -429,7 +456,7 @@ const Map: React.FC<MapProps> = ({ shops, onShopClick, selectedShop, journeyStop
         });
       }
     }
-  }, [shops, onShopClick]);
+  }, [shops, onShopClick, highlightedShopId, initialCenter]);
 
   if (!mapboxToken) {
     return (

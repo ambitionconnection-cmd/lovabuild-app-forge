@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Globe as GlobeIcon } from "lucide-react";
+import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Globe as GlobeIcon, Video, Store } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,6 +24,8 @@ const GlobalIndex = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
+  const [shopModalOpen, setShopModalOpen] = useState(false);
+  const [selectedBrandForShops, setSelectedBrandForShops] = useState<{ id: string; name: string } | null>(null);
 
   // Fetch brands and user favorites
   useEffect(() => {
@@ -319,13 +322,13 @@ const GlobalIndex = () => {
                     </p>
                   )}
 
-                  {/* Links */}
-                  <div className="flex gap-1.5 pt-1">
+                  {/* Links - Row 1 */}
+                  <div className="grid grid-cols-2 gap-1.5 pt-1">
                     {brand.official_website && (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 h-7 text-xs"
+                        className="h-7 text-xs"
                         onClick={() => window.open(brand.official_website!, '_blank')}
                       >
                         <ExternalLink className="w-3 h-3 mr-1" />
@@ -336,11 +339,38 @@ const GlobalIndex = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 h-7 text-xs"
+                        className="h-7 text-xs"
                         onClick={() => window.open(brand.instagram_url!, '_blank')}
                       >
                         <Instagram className="w-3 h-3 mr-1" />
                         Instagram
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Links - Row 2 */}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        setSelectedBrandForShops({ id: brand.id, name: brand.name });
+                        setShopModalOpen(true);
+                      }}
+                    >
+                      <Store className="w-3 h-3 mr-1" />
+                      Shop(s)
+                    </Button>
+                    {brand.tiktok_url && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => window.open(brand.tiktok_url!, '_blank')}
+                      >
+                        <Video className="w-3 h-3 mr-1" />
+                        TikTok
                       </Button>
                     )}
                   </div>
@@ -362,6 +392,19 @@ const GlobalIndex = () => {
           </div>
         )}
       </main>
+
+      {/* Shop List Modal */}
+      {selectedBrandForShops && (
+        <ShopListModal
+          brandId={selectedBrandForShops.id}
+          brandName={selectedBrandForShops.name}
+          isOpen={shopModalOpen}
+          onClose={() => {
+            setShopModalOpen(false);
+            setSelectedBrandForShops(null);
+          }}
+        />
+      )}
     </div>
   );
 };
