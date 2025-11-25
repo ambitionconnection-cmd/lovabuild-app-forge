@@ -12,6 +12,7 @@ interface MapProps {
   initialCenter?: [number, number] | null;
   initialZoom?: number;
   highlightedShopId?: string | null;
+  isFullscreen?: boolean;
 }
 
 const Map: React.FC<MapProps> = ({ 
@@ -22,7 +23,8 @@ const Map: React.FC<MapProps> = ({
   onRouteUpdate,
   initialCenter,
   initialZoom,
-  highlightedShopId
+  highlightedShopId,
+  isFullscreen = false
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -122,6 +124,16 @@ const Map: React.FC<MapProps> = ({
       map.current?.remove();
     };
   }, [mapboxToken, initialCenter, initialZoom]);
+
+  // Handle fullscreen resize
+  useEffect(() => {
+    if (map.current) {
+      // Small delay to ensure DOM has updated
+      setTimeout(() => {
+        map.current?.resize();
+      }, 100);
+    }
+  }, [isFullscreen]);
 
   // Fetch and display route when journey stops are selected
   useEffect(() => {
