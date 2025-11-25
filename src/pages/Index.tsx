@@ -101,27 +101,27 @@ const Index = () => {
       </header>
 
       {/* Hero Banner with Urban Background */}
-      <div className="relative h-[400px] md:h-[600px] overflow-hidden">
+      <div className="relative h-[320px] md:h-[600px] overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center" style={{
         backgroundImage: `url(${urbanBg})`
       }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-background" />
         
-        <div className="relative h-full flex flex-col items-center justify-start md:justify-center px-4 pt-6 md:pt-0 text-center space-y-3 md:space-y-6">
-          <div className="space-y-1 md:space-y-2">
-            <h2 className="text-5xl md:text-7xl font-black text-foreground tracking-wider text-shadow-strong uppercase">
+        <div className="relative h-full flex flex-col items-center justify-start md:justify-center px-4 pt-4 md:pt-0 text-center space-y-2 md:space-y-6">
+          <div className="space-y-0.5 md:space-y-2">
+            <h2 className="text-4xl md:text-7xl font-black text-foreground tracking-wider text-shadow-strong uppercase">
               HEARDROP
             </h2>
-            <p className="text-lg md:text-2xl text-foreground/90 font-medium text-shadow-strong">
+            <p className="text-base md:text-2xl text-foreground/90 font-medium text-shadow-strong">
               Your Global Guide Streetwear
             </p>
           </div>
           
-          <div className="space-y-1 mt-3 md:mt-8">
-            <h3 className="text-3xl md:text-5xl font-black text-foreground tracking-wide text-shadow-strong uppercase">
+          <div className="space-y-0.5 mt-2 md:mt-8">
+            <h3 className="text-2xl md:text-5xl font-black text-foreground tracking-wide text-shadow-strong uppercase">
               FIND SHOPS. TRACK DROPS.
             </h3>
-            <h3 className="text-3xl md:text-5xl font-black text-foreground tracking-wide text-shadow-strong uppercase">
+            <h3 className="text-2xl md:text-5xl font-black text-foreground tracking-wide text-shadow-strong uppercase">
               EXPLORE BRANDS.
             </h3>
           </div>
