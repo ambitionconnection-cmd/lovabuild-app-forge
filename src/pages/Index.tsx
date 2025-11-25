@@ -13,6 +13,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import urbanBg from "@/assets/urban-bg.jpg";
 import { BrandLogo } from "@/components/BrandLogo";
+import { ChevronDown } from "lucide-react";
 interface Drop {
   id: string;
   title: string;
@@ -125,13 +126,22 @@ const Index = () => {
               EXPLORE BRANDS.
             </h3>
           </div>
+          
+          {/* Scroll Indicator */}
+          <button
+            onClick={() => document.getElementById('navigation-section')?.scrollIntoView({ behavior: 'smooth' })}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-8 animate-bounce text-foreground/80 hover:text-foreground transition-colors"
+            aria-label="Scroll to navigation"
+          >
+            <ChevronDown className="w-8 h-8 md:w-10 md:h-10" />
+          </button>
         </div>
       </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 -mt-4 md:pt-6 pb-12 space-y-16">
         {/* Quick Navigation - Mobile First */}
-        <section>
+        <section id="navigation-section">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             <NavBlock title={t('nav.directions')} icon={MapPin} to="/directions" variant="directions" />
