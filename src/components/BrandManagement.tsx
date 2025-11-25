@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
@@ -21,6 +22,7 @@ export const BrandManagement = () => {
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingBrand, setDeletingBrand] = useState<Brand | null>(null);
+  const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchBrands();
@@ -102,6 +104,53 @@ export const BrandManagement = () => {
     }
   };
 
+  const toggleSelectBrand = (brandId: string) => {
+    setSelectedBrands((prev) => {
+      const next = new Set(prev);
+      if (next.has(brandId)) {
+        next.delete(brandId);
+      } else {
+        next.add(brandId);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedBrands.size === filteredBrands.length) {
+      setSelectedBrands(new Set());
+    } else {
+      setSelectedBrands(new Set(filteredBrands.map((b) => b.id)));
+    }
+  };
+
+  const handleBulkActivate = async (activate: boolean) => {
+    if (selectedBrands.size === 0) return;
+
+    try {
+      const { error } = await supabase
+        .from("brands")
+        .update({ is_active: activate })
+        .in("id", Array.from(selectedBrands));
+
+      if (error) throw error;
+
+      await supabase.functions.invoke("log-security-event", {
+        body: {
+          eventType: "brands_bulk_update",
+          eventData: { count: selectedBrands.size, is_active: activate },
+        },
+      });
+
+      toast.success(`${selectedBrands.size} brand(s) ${activate ? "activated" : "deactivated"}`);
+      setSelectedBrands(new Set());
+      fetchBrands();
+    } catch (error: any) {
+      console.error("Error updating brands:", error);
+      toast.error(error.message || "Failed to update brands");
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -120,10 +169,22 @@ export const BrandManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Brand Management</CardTitle>
-            <Button onClick={handleAdd}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Brand
-            </Button>
+            <div className="flex gap-2">
+              {selectedBrands.size > 0 && (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => handleBulkActivate(true)}>
+                    Activate ({selectedBrands.size})
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => handleBulkActivate(false)}>
+                    Deactivate ({selectedBrands.size})
+                  </Button>
+                </>
+              )}
+              <Button onClick={handleAdd}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Brand
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -143,6 +204,12 @@ export const BrandManagement = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedBrands.size === filteredBrands.length && filteredBrands.length > 0}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Country</TableHead>
                   <TableHead>Category</TableHead>
@@ -155,13 +222,19 @@ export const BrandManagement = () => {
               <TableBody>
                 {filteredBrands.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
                       No brands found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredBrands.map((brand) => (
                     <TableRow key={brand.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedBrands.has(brand.id)}
+                          onCheckedChange={() => toggleSelectBrand(brand.id)}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{brand.name}</TableCell>
                       <TableCell>{brand.country || "-"}</TableCell>
                       <TableCell>
