@@ -564,7 +564,7 @@ const Directions = () => {
 
           {/* Map - Full height on mobile, 70% on desktop */}
           <div className={`lg:col-span-7 relative flex-1 flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
-            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden flex-1 ${isMapFullscreen ? 'h-screen rounded-none' : 'lg:h-[800px] rounded-none lg:rounded-xl'}`}>
+            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden flex-1 ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[70vh] lg:h-[800px] rounded-none lg:rounded-xl'}`}>
               <CardContent className="p-0 h-full relative">
                 <Map 
                   shops={filteredShops} 
