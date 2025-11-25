@@ -13,7 +13,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import urbanBg from "@/assets/urban-bg.jpg";
 import { BrandLogo } from "@/components/BrandLogo";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 interface Drop {
   id: string;
   title: string;
@@ -53,8 +53,19 @@ const Index = () => {
   const [nearbyShops, setNearbyShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [dropSearchQuery, setDropSearchQuery] = useState("");
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  
   useEffect(() => {
     fetchHomeData();
+  }, []);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   const fetchHomeData = async () => {
     try {
@@ -75,6 +86,11 @@ const Index = () => {
     const searchLower = dropSearchQuery.toLowerCase();
     return drop.title.toLowerCase().includes(searchLower) || (drop.description?.toLowerCase().includes(searchLower) ?? false);
   });
+  
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
   return <div className="min-h-screen bg-background">
       {/* Header with Glassmorphism */}
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
@@ -295,6 +311,17 @@ const Index = () => {
             </div>}
         </section>
       </main>
+      
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:scale-110 transition-all duration-300 animate-fade-in"
+          aria-label="Back to top"
+        >
+          <ChevronUp className="w-6 h-6" />
+        </button>
+      )}
     </div>;
 };
 export default Index;
