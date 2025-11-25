@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical, Info, Maximize2, Minimize2, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,8 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import Map from "@/components/Map";
 import { ShopDetailsModal } from "@/components/ShopDetailsModal";
+import { NearbyShopsSheet } from "@/components/NearbyShopsSheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import {
   DndContext,
   closestCenter,
@@ -100,7 +103,8 @@ const Directions = () => {
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedShopForDetails, setSelectedShopForDetails] = useState<ShopType | null>(null);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
-  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const [isShopsSheetOpen, setIsShopsSheetOpen] = useState(false);
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [mapZoom, setMapZoom] = useState<number>(12);
   const [highlightedShopId, setHighlightedShopId] = useState<string | null>(null);
@@ -250,6 +254,13 @@ const Directions = () => {
     setDetailsModalOpen(true);
   };
 
+  const activeFilterCount = [
+    searchQuery,
+    selectedCategory !== "all",
+    selectedCountry !== "all", 
+    selectedCity !== "all"
+  ].filter(Boolean).length;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -273,47 +284,57 @@ const Directions = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b-2 border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background sticky top-0 z-50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/">
-            <Button variant="ghost" size="icon" className="hover:bg-directions/10 hover:text-directions">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
-            Directions
-          </h1>
+    <div className="min-h-screen bg-background flex flex-col lg:block">
+      <header className="border-b-2 border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background sticky top-0 z-50 backdrop-blur-sm flex-shrink-0">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Link to="/">
+              <Button variant="ghost" size="icon" className="hover:bg-directions/10 hover:text-directions">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <h1 className="text-xl lg:text-2xl font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
+              Directions
+            </h1>
+          </div>
+          
+          {/* Mobile Filter FAB */}
+          <Button
+            size="icon"
+            variant="secondary"
+            className="lg:hidden relative bg-directions/10 hover:bg-directions/20 border border-directions/30"
+            onClick={() => setIsFilterSheetOpen(true)}
+          >
+            <Filter className="w-5 h-5 text-directions" />
+            {activeFilterCount > 0 && (
+              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-directions text-directions-foreground text-xs">
+                {activeFilterCount}
+              </Badge>
+            )}
+          </Button>
         </div>
       </header>
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
-          {/* Filters and Shop List */}
-          <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
+      <main className="flex-1 lg:container lg:mx-auto lg:px-4 lg:py-8 relative flex flex-col lg:block">
+        <div className="lg:grid lg:grid-cols-10 lg:gap-6 flex-1 flex flex-col lg:flex-row relative">
+          {/* Desktop Sidebar - Filters and Shop List */}
+          <div className="hidden lg:block lg:col-span-3 space-y-6">
             <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
-              <CardHeader 
-                className="border-b border-directions/10 py-3 lg:py-6 cursor-pointer lg:cursor-default"
-                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-              >
+              <CardHeader className="border-b border-directions/10">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <CardTitle className="uppercase tracking-wider text-directions font-bold text-sm lg:text-base flex items-center gap-2">
-                      <span className="lg:hidden">
-                        {isFilterExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                      </span>
+                    <CardTitle className="uppercase tracking-wider text-directions font-bold">
                       🔍 Search & Filter
                     </CardTitle>
-                    <CardDescription className="text-xs lg:text-sm">
+                    <CardDescription>
                       📍 {filteredShops.length} shop{filteredShops.length !== 1 ? 's' : ''} found
                     </CardDescription>
                   </div>
-                  {(searchQuery || selectedCategory !== "all" || selectedCountry !== "all" || selectedCity !== "all") && (
+                  {activeFilterCount > 0 && (
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         setSearchQuery("");
                         setSelectedCategory("all");
                         setSelectedCountry("all");
@@ -321,12 +342,12 @@ const Directions = () => {
                       }}
                       className="h-7 text-xs hover:bg-destructive/10 hover:text-destructive"
                     >
-                      Clear Filter
+                      Clear All
                     </Button>
                   )}
                 </div>
               </CardHeader>
-              <CardContent className={`space-y-3 pt-4 pb-3 lg:space-y-4 lg:pt-6 ${isFilterExpanded ? 'block' : 'hidden lg:block'}`}>
+              <CardContent className="space-y-4 pt-6">
                 <Input
                   placeholder="Search shops..."
                   value={searchQuery}
@@ -382,8 +403,8 @@ const Directions = () => {
               </CardContent>
             </Card>
 
-            {/* Shop List */}
-            <div className="space-y-3 max-h-[250px] lg:max-h-[500px] overflow-y-auto">
+            {/* Desktop Shop List */}
+            <div className="space-y-3 max-h-[500px] overflow-y-auto">
               {filteredShops.length === 0 ? (
                 <Card>
                   <CardContent className="py-8 text-center">
@@ -391,39 +412,38 @@ const Directions = () => {
                   </CardContent>
                 </Card>
               ) : (
-                filteredShops.map((shop) => {
+                filteredShops.slice(0, 20).map((shop) => {
                   const inJourney = isInJourney(shop.id);
                   return (
                     <Card 
                       key={shop.id}
-                      id={`shop-${shop.id}`}
                       className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg border-2 ${
                         inJourney
                           ? 'bg-directions/10 border-directions shadow-lg shadow-directions/20' 
                           : selectedShop?.id === shop.id 
                           ? 'bg-directions/5 border-directions/50' 
                           : highlightedShopId === shop.id
-                          ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20 animate-pulse'
+                          ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20'
                           : 'border-border hover:border-directions/50'
                       }`}
                       onClick={() => !inJourney && setSelectedShop(shop)}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold flex-1">{shop.name}</h3>
+                          <h3 className="font-semibold text-sm flex-1">{shop.name}</h3>
                           {inJourney && (
                             <span className="text-xs bg-directions text-directions-foreground px-2 py-1 rounded-full font-bold">
                               #{journeyStops.findIndex(s => s.id === shop.id) + 1}
                             </span>
                           )}
                         </div>
-                        <div className="space-y-1 text-sm text-muted-foreground">
+                        <div className="space-y-1 text-xs text-muted-foreground mb-2">
                           <div className="flex items-start gap-2">
-                            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span>{shop.address}, {shop.city}, {shop.country}</span>
+                            <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                            <span className="line-clamp-2">{shop.address}, {shop.city}</span>
                           </div>
                         </div>
-                        <div className="flex gap-2 mt-3">
+                        <div className="flex gap-2">
                           <Button 
                             size="sm" 
                             variant="outline"
@@ -431,42 +451,29 @@ const Directions = () => {
                               e.stopPropagation();
                               openShopDetails(shop);
                             }}
+                            className="text-xs h-7"
                           >
-                            <Info className="w-4 h-4 mr-1" />
+                            <Info className="w-3 h-3 mr-1" />
                             Details
                           </Button>
                           {!inJourney ? (
-                            <>
-                              <Button 
-                                size="sm" 
-                                className="bg-directions hover:bg-directions/90 text-directions-foreground"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addToJourney(shop);
-                                }}
-                                disabled={!shop.latitude || !shop.longitude}
-                              >
-                                <Navigation className="w-4 h-4 mr-1" />
-                                Add
-                              </Button>
-                              {shop.official_site && (
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    window.open(shop.official_site!, '_blank');
-                                  }}
-                                >
-                                  <ExternalLink className="w-4 h-4" />
-                                </Button>
-                              )}
-                            </>
+                            <Button 
+                              size="sm" 
+                              className="text-xs h-7 bg-directions hover:bg-directions/90 text-directions-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToJourney(shop);
+                              }}
+                              disabled={!shop.latitude || !shop.longitude}
+                            >
+                              <Navigation className="w-3 h-3 mr-1" />
+                              Add
+                            </Button>
                           ) : (
                             <Button 
                               size="sm" 
                               variant="outline"
-                              className="border-destructive/50 text-destructive hover:bg-destructive/10"
+                              className="text-xs h-7 border-destructive/50 text-destructive hover:bg-destructive/10"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 removeFromJourney(shop.id);
@@ -484,9 +491,9 @@ const Directions = () => {
             </div>
           </div>
 
-          {/* Map */}
-          <div className={`lg:col-span-2 relative order-1 lg:order-2 ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
-            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[400px] lg:h-[800px]'}`}>
+          {/* Map - Full height on mobile, 70% on desktop */}
+          <div className={`lg:col-span-7 relative flex-1 flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
+            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden flex-1 ${isMapFullscreen ? 'h-screen rounded-none' : 'lg:h-[800px] rounded-none lg:rounded-xl'}`}>
               <CardContent className="p-0 h-full relative">
                 <Map 
                   shops={filteredShops} 
@@ -503,9 +510,9 @@ const Directions = () => {
                   highlightedShopId={highlightedShopId}
                 />
                 
-                {/* Journey Stops Overlay - Compact for mobile */}
+                {/* Journey Stops Overlay - Bottom left on mobile */}
                 {journeyStops.length > 0 && (
-                  <div className="absolute top-4 left-4 right-16 lg:right-auto lg:max-w-xs z-10">
+                  <div className="absolute bottom-20 lg:top-4 left-4 right-4 lg:right-auto lg:max-w-xs z-10">
                     <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
                       <CardHeader className="py-2 px-3">
                         <div className="flex items-center justify-between">
@@ -566,6 +573,16 @@ const Directions = () => {
                   </div>
                 )}
 
+                {/* Mobile Shops Toggle Button */}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="lg:hidden absolute bottom-4 right-4 z-10 bg-directions/90 backdrop-blur-md shadow-lg hover:bg-directions border border-directions text-directions-foreground"
+                  onClick={() => setIsShopsSheetOpen(true)}
+                >
+                  <MapPin className="w-5 h-5" />
+                </Button>
+
                 {/* Fullscreen Toggle Button */}
                 <Button
                   variant="secondary"
@@ -582,9 +599,9 @@ const Directions = () => {
               </CardContent>
             </Card>
 
-            {/* Turn-by-turn directions panel */}
+            {/* Turn-by-turn directions panel - Hidden on mobile when shops sheet is open */}
             {(journeyStops.length > 0 || selectedShop) && routeInfo && (
-              <Card className="absolute bottom-4 right-4 w-80 max-h-96 overflow-hidden border-2 border-directions shadow-2xl animate-slide-in-right backdrop-blur-md bg-background/95">
+              <Card className="hidden lg:block absolute bottom-4 right-4 w-80 max-h-96 overflow-hidden border-2 border-directions shadow-2xl animate-slide-in-right backdrop-blur-md bg-background/95">
                 <CardHeader className="border-b border-directions/20 pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-bold uppercase tracking-wider text-directions">
@@ -641,6 +658,114 @@ const Directions = () => {
           </div>
         </div>
       </main>
+
+      {/* Mobile Filter Sheet */}
+      <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle className="uppercase tracking-wider text-directions font-bold flex items-center justify-between">
+              🔍 Search & Filter
+              {activeFilterCount > 0 && (
+                <Badge className="bg-directions text-directions-foreground">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </SheetTitle>
+            <SheetDescription>
+              📍 {filteredShops.length} shop{filteredShops.length !== 1 ? 's' : ''} found
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="space-y-4 mt-6">
+            <Input
+              placeholder="Search shops..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="border-directions/20 focus:ring-directions"
+            />
+            
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="streetwear">Streetwear</SelectItem>
+                <SelectItem value="sneakers">Sneakers</SelectItem>
+                <SelectItem value="accessories">Accessories</SelectItem>
+                <SelectItem value="luxury">Luxury</SelectItem>
+                <SelectItem value="vintage">Vintage</SelectItem>
+                <SelectItem value="sportswear">Sportswear</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedCountry} onValueChange={(value) => {
+              setSelectedCountry(value);
+              setSelectedCity("all");
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Country" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Countries</SelectItem>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedCity} onValueChange={setSelectedCity}>
+              <SelectTrigger>
+                <SelectValue placeholder="City" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cities</SelectItem>
+                {cities.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    {city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {activeFilterCount > 0 && (
+              <Button 
+                variant="outline"
+                className="w-full border-destructive/50 text-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("all");
+                  setSelectedCountry("all");
+                  setSelectedCity("all");
+                }}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Clear All Filters
+              </Button>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Mobile Nearby Shops Sheet */}
+      <NearbyShopsSheet
+        shops={filteredShops}
+        isOpen={isShopsSheetOpen}
+        onOpenChange={setIsShopsSheetOpen}
+        onShopClick={(shop) => {
+          setSelectedShop(shop);
+          setIsShopsSheetOpen(false);
+        }}
+        onAddToJourney={addToJourney}
+        onRemoveFromJourney={removeFromJourney}
+        onOpenDetails={openShopDetails}
+        isInJourney={isInJourney}
+        journeyStops={journeyStops}
+        selectedShop={selectedShop}
+        highlightedShopId={highlightedShopId}
+      />
 
       {/* Shop Details Modal */}
       <ShopDetailsModal
