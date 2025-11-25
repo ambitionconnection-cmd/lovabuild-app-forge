@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -565,7 +565,7 @@ const Directions = () => {
 
           {/* Map - Full height on mobile, fixed height on desktop */}
           <div className={`lg:col-span-7 relative flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
-            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-200px)] lg:h-[600px] rounded-none lg:rounded-xl'}`}>
+            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-320px)] lg:h-[600px] rounded-none lg:rounded-xl'}`}>
               <CardContent className="p-0 h-full relative">
                 <div className="w-full h-full">
                   <Map 
@@ -730,48 +730,61 @@ const Directions = () => {
               </Card>
             )}
 
-            {/* Pinned Shops List Below Map */}
-            {!isMapFullscreen && journeyStops.length > 0 && (
+            {/* Nearby Shops List Below Map */}
+            {!isMapFullscreen && (
               <Card className="mt-4 border-2 border-directions/20 shadow-lg rounded-none lg:rounded-xl">
                 <CardHeader className="border-b border-directions/10 py-3">
                   <CardTitle className="text-sm uppercase tracking-wider text-directions font-bold flex items-center gap-2">
-                    📍 Pinned Shops ({journeyStops.length})
+                    📍 Nearby Shops ({filteredShops.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4">
-                  <ScrollArea className="h-[180px]">
-                    <div className="space-y-2 pr-4">
-                      {journeyStops.map((shop, index) => (
-                        <div 
-                          key={shop.id}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer border border-border/50"
-                          onClick={() => {
-                            setMapCenter([Number(shop.longitude), Number(shop.latitude)]);
-                            setMapZoom(15);
-                            setHighlightedShopId(shop.id);
-                          }}
-                        >
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-directions text-directions-foreground text-sm font-bold flex-shrink-0">
-                            {index + 1}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-foreground truncate">{shop.name}</p>
-                            <p className="text-xs text-muted-foreground truncate">{shop.address}, {shop.city}</p>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFromJourney(shop.id);
-                            }}
-                            className="flex-shrink-0 h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
+                  <ScrollArea className="h-[150px]">
+                    {filteredShops.length === 0 ? (
+                      <div className="flex items-center justify-center h-[120px] text-muted-foreground text-sm">
+                        No shops match your filters
+                      </div>
+                    ) : (
+                      <div className="space-y-2 pr-4">
+                        {filteredShops.map((shop) => {
+                          const distance = userLocation && shop.latitude && shop.longitude
+                            ? calculateDistance(userLocation.lat, userLocation.lng, Number(shop.latitude), Number(shop.longitude))
+                            : null;
+                          
+                          return (
+                            <div 
+                              key={shop.id}
+                              className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer border border-border/50"
+                              onClick={() => {
+                                setMapCenter([Number(shop.longitude), Number(shop.latitude)]);
+                                setMapZoom(15);
+                                setHighlightedShopId(shop.id);
+                              }}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-foreground truncate">{shop.name}</p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {shop.address}, {shop.city}
+                                  {distance !== null && ` • ${distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`}`}
+                                </p>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToJourney(shop);
+                                }}
+                                className="flex-shrink-0 h-8 w-8 p-0 hover:bg-directions/10 hover:text-directions"
+                                disabled={isInJourney(shop.id)}
+                              >
+                                {isInJourney(shop.id) ? <Check className="w-4 h-4 text-directions" /> : <Plus className="w-4 h-4" />}
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </ScrollArea>
                 </CardContent>
               </Card>
