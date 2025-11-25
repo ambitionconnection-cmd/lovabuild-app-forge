@@ -17,6 +17,7 @@ import { BrandImageGenerator } from '@/components/BrandImageGenerator';
 import { BrandManagement } from '@/components/BrandManagement';
 import { ShopManagement } from '@/components/ShopManagement';
 import { DropManagement } from '@/components/DropManagement';
+import { DropsCalendar } from '@/components/DropsCalendar';
 import { Tables } from '@/integrations/supabase/types';
 
 interface LoginAttempt {
@@ -341,6 +342,7 @@ export default function Admin() {
             <TabsTrigger value="brands">Brands</TabsTrigger>
             <TabsTrigger value="shops">Shops</TabsTrigger>
             <TabsTrigger value="drops">Drops</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
           </TabsList>
 
           <TabsContent value="accounts">
@@ -537,6 +539,10 @@ export default function Admin() {
 
         <TabsContent value="drops">
           <DropManagement />
+        </TabsContent>
+
+        <TabsContent value="calendar">
+          <DropsCalendar />
         </TabsContent>
         </Tabs>
       </div>
