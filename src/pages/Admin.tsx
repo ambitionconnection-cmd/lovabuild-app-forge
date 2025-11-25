@@ -14,6 +14,8 @@ import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExpor
 import { ScheduledExportManager } from '@/components/ScheduledExportManager';
 import { EmailAnalytics } from '@/components/EmailAnalytics';
 import { BrandImageGenerator } from '@/components/BrandImageGenerator';
+import { BrandManagement } from '@/components/BrandManagement';
+import { ShopManagement } from '@/components/ShopManagement';
 import { Tables } from '@/integrations/supabase/types';
 
 interface LoginAttempt {
@@ -334,7 +336,9 @@ export default function Admin() {
             <TabsTrigger value="audit">Audit Log</TabsTrigger>
             <TabsTrigger value="scheduled">Scheduled Exports</TabsTrigger>
             <TabsTrigger value="analytics">Email Analytics</TabsTrigger>
-            <TabsTrigger value="brands">Brand Images</TabsTrigger>
+            <TabsTrigger value="brand-images">Brand Images</TabsTrigger>
+            <TabsTrigger value="brands">Brands</TabsTrigger>
+            <TabsTrigger value="shops">Shops</TabsTrigger>
           </TabsList>
 
           <TabsContent value="accounts">
@@ -514,11 +518,19 @@ export default function Admin() {
             <EmailAnalytics />
           </TabsContent>
 
-          <TabsContent value="brands">
+          <TabsContent value="brand-images">
             <BrandImageGenerator 
               brands={brands} 
               onComplete={fetchAttempts} 
             />
+          </TabsContent>
+
+          <TabsContent value="brands">
+            <BrandManagement />
+          </TabsContent>
+
+          <TabsContent value="shops">
+            <ShopManagement />
           </TabsContent>
         </Tabs>
       </div>
