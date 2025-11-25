@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, MapPin, Phone, ExternalLink, Navigation, GripVertical, Info, Maximize2, Minimize2, ChevronDown, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -86,6 +86,7 @@ const SortableStop = ({ stop, index, onRemove }: SortableStopProps) => {
 };
 
 const Directions = () => {
+  const [searchParams] = useSearchParams();
   const [shops, setShops] = useState<ShopType[]>([]);
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,6 +101,9 @@ const Directions = () => {
   const [selectedShopForDetails, setSelectedShopForDetails] = useState<ShopType | null>(null);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
+  const [mapZoom, setMapZoom] = useState<number>(12);
+  const [highlightedShopId, setHighlightedShopId] = useState<string | null>(null);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -144,6 +148,42 @@ const Directions = () => {
 
     fetchShops();
   }, []);
+
+  // Handle URL parameters for centering map on specific shop
+  useEffect(() => {
+    if (shops.length === 0) return;
+
+    const shopId = searchParams.get('shopId');
+    const lat = searchParams.get('lat');
+    const lng = searchParams.get('lng');
+    const zoom = searchParams.get('zoom');
+
+    if (shopId && lat && lng) {
+      const parsedLat = parseFloat(lat);
+      const parsedLng = parseFloat(lng);
+      const parsedZoom = zoom ? parseInt(zoom) : 15;
+
+      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+        // Set map center and zoom
+        setMapCenter([parsedLng, parsedLat]);
+        setMapZoom(parsedZoom);
+        setHighlightedShopId(shopId);
+
+        // Find and auto-add shop to journey
+        const shop = shops.find(s => s.id === shopId);
+        if (shop && !journeyStops.find(s => s.id === shopId)) {
+          setJourneyStops([shop]);
+          setSelectedShop(shop);
+          
+          // Scroll to the shop in the list after a brief delay
+          setTimeout(() => {
+            const shopElement = document.getElementById(`shop-${shopId}`);
+            shopElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 500);
+        }
+      }
+    }
+  }, [shops, searchParams]);
 
   // Filter shops
   useEffect(() => {
@@ -355,12 +395,15 @@ const Directions = () => {
                   const inJourney = isInJourney(shop.id);
                   return (
                     <Card 
-                      key={shop.id} 
+                      key={shop.id}
+                      id={`shop-${shop.id}`}
                       className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg border-2 ${
                         inJourney
                           ? 'bg-directions/10 border-directions shadow-lg shadow-directions/20' 
                           : selectedShop?.id === shop.id 
                           ? 'bg-directions/5 border-directions/50' 
+                          : highlightedShopId === shop.id
+                          ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20 animate-pulse'
                           : 'border-border hover:border-directions/50'
                       }`}
                       onClick={() => !inJourney && setSelectedShop(shop)}
@@ -455,6 +498,9 @@ const Directions = () => {
                   selectedShop={selectedShop}
                   journeyStops={journeyStops}
                   onRouteUpdate={setRouteInfo}
+                  initialCenter={mapCenter}
+                  initialZoom={mapZoom}
+                  highlightedShopId={highlightedShopId}
                 />
                 
                 {/* Journey Stops Overlay - Compact for mobile */}

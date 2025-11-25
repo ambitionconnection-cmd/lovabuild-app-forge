@@ -77,6 +77,7 @@ export type Database = {
           name: string
           official_website: string | null
           slug: string
+          tiktok_url: string | null
           updated_at: string | null
         }
         Insert: {
@@ -93,6 +94,7 @@ export type Database = {
           name: string
           official_website?: string | null
           slug: string
+          tiktok_url?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -109,6 +111,7 @@ export type Database = {
           name?: string
           official_website?: string | null
           slug?: string
+          tiktok_url?: string | null
           updated_at?: string | null
         }
         Relationships: []
