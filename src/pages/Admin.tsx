@@ -332,18 +332,20 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="accounts" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="accounts">Locked Accounts</TabsTrigger>
-            <TabsTrigger value="ips">Locked IPs</TabsTrigger>
-            <TabsTrigger value="audit">Audit Log</TabsTrigger>
-            <TabsTrigger value="scheduled">Scheduled Exports</TabsTrigger>
-            <TabsTrigger value="analytics">Email Analytics</TabsTrigger>
-            <TabsTrigger value="brand-images">Brand Images</TabsTrigger>
-            <TabsTrigger value="brands">Brands</TabsTrigger>
-            <TabsTrigger value="shops">Shops</TabsTrigger>
-            <TabsTrigger value="drops">Drops</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto">
+            <TabsList className="w-full justify-start flex-nowrap">
+              <TabsTrigger value="accounts">Locked Accounts</TabsTrigger>
+              <TabsTrigger value="ips">Locked IPs</TabsTrigger>
+              <TabsTrigger value="audit">Audit Log</TabsTrigger>
+              <TabsTrigger value="scheduled">Scheduled Exports</TabsTrigger>
+              <TabsTrigger value="analytics">Email Analytics</TabsTrigger>
+              <TabsTrigger value="brand-images">Brand Images</TabsTrigger>
+              <TabsTrigger value="brands">Brands</TabsTrigger>
+              <TabsTrigger value="shops">Shops</TabsTrigger>
+              <TabsTrigger value="drops">Drops</TabsTrigger>
+              <TabsTrigger value="calendar">Calendar</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="accounts">
             <Card>
