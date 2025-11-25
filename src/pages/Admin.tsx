@@ -16,6 +16,7 @@ import { EmailAnalytics } from '@/components/EmailAnalytics';
 import { BrandImageGenerator } from '@/components/BrandImageGenerator';
 import { BrandManagement } from '@/components/BrandManagement';
 import { ShopManagement } from '@/components/ShopManagement';
+import { DropManagement } from '@/components/DropManagement';
 import { Tables } from '@/integrations/supabase/types';
 
 interface LoginAttempt {
@@ -339,6 +340,7 @@ export default function Admin() {
             <TabsTrigger value="brand-images">Brand Images</TabsTrigger>
             <TabsTrigger value="brands">Brands</TabsTrigger>
             <TabsTrigger value="shops">Shops</TabsTrigger>
+            <TabsTrigger value="drops">Drops</TabsTrigger>
           </TabsList>
 
           <TabsContent value="accounts">
@@ -529,9 +531,13 @@ export default function Admin() {
             <BrandManagement />
           </TabsContent>
 
-          <TabsContent value="shops">
-            <ShopManagement />
-          </TabsContent>
+        <TabsContent value="shops">
+          <ShopManagement />
+        </TabsContent>
+
+        <TabsContent value="drops">
+          <DropManagement />
+        </TabsContent>
         </Tabs>
       </div>
     </div>
