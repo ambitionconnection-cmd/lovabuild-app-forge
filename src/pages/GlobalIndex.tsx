@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Globe as GlobeIcon, Video, Store } from "lucide-react";
+import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Globe as GlobeIcon, Video, Store, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +27,7 @@ const GlobalIndex = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [shopModalOpen, setShopModalOpen] = useState(false);
   const [selectedBrandForShops, setSelectedBrandForShops] = useState<{ id: string; name: string } | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Fetch brands and user favorites
   useEffect(() => {
@@ -179,58 +181,72 @@ const GlobalIndex = () => {
       
       <main className="container mx-auto px-4 py-8">
         {/* Search and Filter */}
-        <Card className="mb-8 glass-card border-2">
-          <CardHeader>
-            <CardTitle className="uppercase tracking-wide">Browse Brands</CardTitle>
-            <CardDescription>Discover streetwear and sneaker brands</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search brands..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+        <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+          <Card className="mb-8 glass-card border-2">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="uppercase tracking-wide">Browse Brands</CardTitle>
+                  <CardDescription>Discover streetwear and sneaker brands</CardDescription>
+                </div>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm" className="w-9 p-0">
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`} />
+                    <span className="sr-only">Toggle filters</span>
+                  </Button>
+                </CollapsibleTrigger>
               </div>
-              
-              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
-                  {countries.map((country) => (
-                    <SelectItem key={country} value={country!}>
-                      {country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Search brands..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  
+                  <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                      <SelectValue placeholder="Country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Countries</SelectItem>
+                      {countries.map((country) => (
+                        <SelectItem key={country} value={country!}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="streetwear">Streetwear</SelectItem>
-                  <SelectItem value="sneakers">Sneakers</SelectItem>
-                  <SelectItem value="accessories">Accessories</SelectItem>
-                  <SelectItem value="luxury">Luxury</SelectItem>
-                  <SelectItem value="vintage">Vintage</SelectItem>
-                  <SelectItem value="sportswear">Sportswear</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="streetwear">Streetwear</SelectItem>
+                      <SelectItem value="sneakers">Sneakers</SelectItem>
+                      <SelectItem value="accessories">Accessories</SelectItem>
+                      <SelectItem value="luxury">Luxury</SelectItem>
+                      <SelectItem value="vintage">Vintage</SelectItem>
+                      <SelectItem value="sportswear">Sportswear</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <p className="text-sm text-muted-foreground font-medium">
-              {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
-            </p>
-          </CardContent>
-        </Card>
+                <p className="text-sm text-muted-foreground font-medium">
+                  {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
+                </p>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         {/* Brands Grid */}
         {filteredBrands.length === 0 ? (
