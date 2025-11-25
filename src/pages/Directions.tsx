@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -110,6 +110,8 @@ const Directions = () => {
   const [highlightedShopId, setHighlightedShopId] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [sortByDistance, setSortByDistance] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -342,19 +344,29 @@ const Directions = () => {
           </div>
           
           {/* Mobile Filter FAB */}
-          <Button
-            size="icon"
-            variant="secondary"
-            className="lg:hidden relative bg-directions/10 hover:bg-directions/20 border border-directions/30"
-            onClick={() => setIsFilterSheetOpen(true)}
-          >
-            <Filter className="w-5 h-5 text-directions" />
-            {activeFilterCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-directions text-directions-foreground text-xs">
-                {activeFilterCount}
-              </Badge>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant={debugMode ? "default" : "outline"}
+              className="text-xs"
+              onClick={() => setDebugMode(!debugMode)}
+            >
+              🐛 Debug
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
+              className="lg:hidden relative bg-directions/10 hover:bg-directions/20 border border-directions/30"
+              onClick={() => setIsFilterSheetOpen(true)}
+            >
+              <Filter className="w-5 h-5 text-directions" />
+              {activeFilterCount > 0 && (
+                <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-directions text-directions-foreground text-xs">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
+          </div>
         </div>
       </header>
       
@@ -563,9 +575,41 @@ const Directions = () => {
           </div>
 
           {/* Map - Full height on mobile, 70% on desktop */}
-          <div className={`lg:col-span-7 relative flex-1 flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
-            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden flex-1 ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[70vh] lg:h-[800px] rounded-none lg:rounded-xl'}`}>
-              <CardContent className="p-0 h-full relative">
+          <div 
+            ref={mapContainerRef}
+            className={`lg:col-span-7 relative flex-1 flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''} ${debugMode ? 'bg-red-500/20 border-8 border-yellow-400' : ''}`}
+          >
+            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden flex-1 ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[70vh] lg:h-[800px] rounded-none lg:rounded-xl'} ${debugMode ? 'bg-blue-500/20 border-8 border-green-400' : ''}`}>
+              <CardContent className={`p-0 h-full relative ${debugMode ? 'bg-purple-500/20 border-8 border-pink-400' : ''}`}>
+                {debugMode && (
+                  <div className="absolute inset-0 z-[200] pointer-events-none flex items-center justify-center">
+                    <div className="bg-black/90 text-white p-6 rounded-lg space-y-2 text-xs font-mono pointer-events-auto">
+                      <h3 className="text-lg font-bold mb-4 text-yellow-400">🐛 DEBUG MODE</h3>
+                      <div className="space-y-1">
+                        <p><span className="text-yellow-400">Map Container (outer div):</span></p>
+                        <p>Width: {mapContainerRef.current?.offsetWidth || 0}px</p>
+                        <p>Height: {mapContainerRef.current?.offsetHeight || 0}px</p>
+                        <p className="mt-3"><span className="text-green-400">Card element:</span></p>
+                        <p>Width: {mapContainerRef.current?.querySelector('.border-primary\\/20')?.clientWidth || 0}px</p>
+                        <p>Height: {mapContainerRef.current?.querySelector('.border-primary\\/20')?.clientHeight || 0}px</p>
+                        <p className="mt-3"><span className="text-pink-400">CardContent (inner):</span></p>
+                        <p>Width: {mapContainerRef.current?.querySelector('.p-0')?.clientWidth || 0}px</p>
+                        <p>Height: {mapContainerRef.current?.querySelector('.p-0')?.clientHeight || 0}px</p>
+                        <p className="mt-3"><span className="text-blue-400">Window:</span></p>
+                        <p>Width: {window.innerWidth}px</p>
+                        <p>Height: {window.innerHeight}px</p>
+                        <p className="mt-3"><span className="text-cyan-400">Device:</span></p>
+                        <p>User Agent: {navigator.userAgent.substring(0, 50)}...</p>
+                      </div>
+                      <button 
+                        onClick={() => setDebugMode(false)}
+                        className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded pointer-events-auto"
+                      >
+                        Close Debug
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <Map 
                   shops={filteredShops} 
                   onShopClick={(shop) => {
