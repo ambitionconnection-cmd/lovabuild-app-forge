@@ -255,37 +255,40 @@ const Map: React.FC<MapProps> = ({
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    // Create GeoJSON from shops
-    const geojson: GeoJSON.FeatureCollection = {
-      type: 'FeatureCollection',
-      features: shops
-        .filter(shop => shop.latitude && shop.longitude)
-        .map(shop => ({
-          type: 'Feature' as const,
-          geometry: {
-            type: 'Point' as const,
-            coordinates: [shop.longitude!, shop.latitude!]
-          },
-          properties: {
-            id: shop.id,
-            name: shop.name,
-            address: shop.address,
-            city: shop.city,
-            category: shop.category || 'streetwear',
-          }
-        }))
-    };
+    const addShopsToMap = () => {
+      if (!map.current) return;
 
-    // Remove existing source and layers if they exist
-    if (map.current.getSource('shops')) {
-      if (map.current.getLayer('clusters')) map.current.removeLayer('clusters');
-      if (map.current.getLayer('cluster-count')) map.current.removeLayer('cluster-count');
-      if (map.current.getLayer('unclustered-point')) map.current.removeLayer('unclustered-point');
-      map.current.removeSource('shops');
-    }
+      // Create GeoJSON from shops
+      const geojson: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: shops
+          .filter(shop => shop.latitude && shop.longitude)
+          .map(shop => ({
+            type: 'Feature' as const,
+            geometry: {
+              type: 'Point' as const,
+              coordinates: [shop.longitude!, shop.latitude!]
+            },
+            properties: {
+              id: shop.id,
+              name: shop.name,
+              address: shop.address,
+              city: shop.city,
+              category: shop.category || 'streetwear',
+            }
+          }))
+      };
 
-    // Add source with clustering
-    map.current.addSource('shops', {
+      // Remove existing source and layers if they exist
+      if (map.current.getSource('shops')) {
+        if (map.current.getLayer('clusters')) map.current.removeLayer('clusters');
+        if (map.current.getLayer('cluster-count')) map.current.removeLayer('cluster-count');
+        if (map.current.getLayer('unclustered-point')) map.current.removeLayer('unclustered-point');
+        map.current.removeSource('shops');
+      }
+
+      // Add source with clustering
+      map.current.addSource('shops', {
       type: 'geojson',
       data: geojson,
       cluster: true,
@@ -440,21 +443,29 @@ const Map: React.FC<MapProps> = ({
       if (map.current) map.current.getCanvas().style.cursor = '';
     });
 
-    // Fit map to bounds if there are shops and no initial center provided
-    if (shops.length > 0 && !initialCenter) {
-      const bounds = new mapboxgl.LngLatBounds();
-      shops.forEach(shop => {
-        if (shop.latitude && shop.longitude) {
-          bounds.extend([shop.longitude, shop.latitude]);
-        }
-      });
-      
-      if (!bounds.isEmpty()) {
-        map.current.fitBounds(bounds, {
-          padding: 50,
-          maxZoom: 15,
+      // Fit map to bounds if there are shops and no initial center provided
+      if (shops.length > 0 && !initialCenter) {
+        const bounds = new mapboxgl.LngLatBounds();
+        shops.forEach(shop => {
+          if (shop.latitude && shop.longitude) {
+            bounds.extend([shop.longitude, shop.latitude]);
+          }
         });
+        
+        if (!bounds.isEmpty()) {
+          map.current?.fitBounds(bounds, {
+            padding: 50,
+            maxZoom: 15,
+          });
+        }
       }
+    };
+
+    // Wait for style to load before adding sources/layers
+    if (map.current.isStyleLoaded()) {
+      addShopsToMap();
+    } else {
+      map.current.once('style.load', addShopsToMap);
     }
   }, [shops, onShopClick, highlightedShopId, initialCenter]);
 
