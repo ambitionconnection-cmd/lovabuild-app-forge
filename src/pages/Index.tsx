@@ -69,14 +69,10 @@ const Index = () => {
       setLoading(false);
     }
   };
-
   const filteredDrops = featuredDrops.filter(drop => {
     if (!dropSearchQuery) return true;
     const searchLower = dropSearchQuery.toLowerCase();
-    return (
-      drop.title.toLowerCase().includes(searchLower) ||
-      (drop.description?.toLowerCase().includes(searchLower) ?? false)
-    );
+    return drop.title.toLowerCase().includes(searchLower) || (drop.description?.toLowerCase().includes(searchLower) ?? false);
   });
   return <div className="min-h-screen bg-background">
       {/* Header with Glassmorphism */}
@@ -139,7 +135,7 @@ const Index = () => {
       <main className="container mx-auto px-4 pt-6 pb-12 space-y-16">
         {/* Quick Navigation - Mobile First */}
         <section>
-          <h3 className="text-3xl font-bold mb-6 uppercase tracking-wide">{t('home.exploreMore')}</h3>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             <NavBlock title={t('nav.directions')} icon={MapPin} to="/directions" variant="directions" />
             
@@ -167,13 +163,7 @@ const Index = () => {
           <div className="mb-6">
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search drops..."
-                value={dropSearchQuery}
-                onChange={(e) => setDropSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-              />
+              <input type="text" placeholder="Search drops..." value={dropSearchQuery} onChange={e => setDropSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all" />
             </div>
           </div>
           
