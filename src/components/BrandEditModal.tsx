@@ -28,6 +28,7 @@ export const BrandEditModal = ({ brand, isOpen, onClose, onSuccess }: BrandEditM
     slug: "",
     country: null,
     instagram_url: null,
+    tiktok_url: null,
     official_website: null,
     description: null,
     history: null,
@@ -47,6 +48,7 @@ export const BrandEditModal = ({ brand, isOpen, onClose, onSuccess }: BrandEditM
         slug: "",
         country: null,
         instagram_url: null,
+        tiktok_url: null,
         official_website: null,
         description: null,
         history: null,
@@ -76,6 +78,11 @@ export const BrandEditModal = ({ brand, isOpen, onClose, onSuccess }: BrandEditM
 
     if (formData.instagram_url && !validateUrl(formData.instagram_url)) {
       toast.error("Invalid Instagram URL");
+      return;
+    }
+
+    if (formData.tiktok_url && !validateUrl(formData.tiktok_url)) {
+      toast.error("Invalid TikTok URL");
       return;
     }
 
@@ -210,6 +217,17 @@ export const BrandEditModal = ({ brand, isOpen, onClose, onSuccess }: BrandEditM
               placeholder="https://instagram.com/..."
               value={formData.instagram_url || ""}
               onChange={(e) => setFormData({ ...formData, instagram_url: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tiktok_url">TikTok URL</Label>
+            <Input
+              id="tiktok_url"
+              type="url"
+              placeholder="https://tiktok.com/@..."
+              value={formData.tiktok_url || ""}
+              onChange={(e) => setFormData({ ...formData, tiktok_url: e.target.value })}
             />
           </div>
 
