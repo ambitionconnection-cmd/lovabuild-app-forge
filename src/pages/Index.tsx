@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import urbanBg from "@/assets/urban-bg.jpg";
 import { BrandLogo } from "@/components/BrandLogo";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { ContactAndShareSection } from "@/components/ContactAndShareSection";
 interface Drop {
   id: string;
   title: string;
@@ -310,6 +311,9 @@ const Index = () => {
                 </Card>)}
             </div>}
         </section>
+
+        {/* Contact and Share Section */}
+        <ContactAndShareSection />
       </main>
       
       {/* Back to Top Button */}
