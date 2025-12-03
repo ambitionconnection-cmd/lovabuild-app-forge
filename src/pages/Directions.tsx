@@ -307,37 +307,37 @@ const Directions = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b-2 border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background">
-          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+      <div className="min-h-screen bg-background pb-20">
+        <header className="border-b border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background">
+          <div className="container mx-auto px-3 py-2 flex items-center gap-3">
             <Link to="/">
-              <Button variant="ghost" size="icon" className="hover:bg-directions/10">
-                <ArrowLeft className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="hover:bg-directions/10 h-8 w-8">
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
+            <h1 className="text-base font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
               Directions
             </h1>
           </div>
         </header>
-        <main className="container mx-auto px-4 py-8">
-          <Skeleton className="w-full h-[600px] rounded-xl" />
+        <main className="container mx-auto px-3 py-4">
+          <Skeleton className="w-full h-[400px] rounded-xl" />
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:block">
-      <header className="border-b-2 border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background sticky top-0 z-50 backdrop-blur-sm flex-shrink-0">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-background flex flex-col lg:block pb-20">
+      <header className="border-b border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background sticky top-0 z-50 backdrop-blur-sm flex-shrink-0">
+        <div className="container mx-auto px-3 py-2 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
             <Link to="/">
-              <Button variant="ghost" size="icon" className="hover:bg-directions/10 hover:text-directions">
-                <ArrowLeft className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="hover:bg-directions/10 hover:text-directions h-8 w-8">
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-xl lg:text-2xl font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
+            <h1 className="text-base font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
               Directions
             </h1>
           </div>

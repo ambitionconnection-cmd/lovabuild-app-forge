@@ -202,18 +202,18 @@ const Drops = () => {
   const hasActiveFilters = searchQuery || statusFilter !== "all" || brandFilter !== "all" || categoryFilter !== "all";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="container mx-auto px-3 py-2">
+          <div className="flex items-center gap-3 mb-2">
             <Link to="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold">Drops</h1>
-            <Badge variant="outline" className="ml-auto">
+            <h1 className="text-base font-bold">Drops</h1>
+            <Badge variant="outline" className="ml-auto text-xs">
               {filteredDrops.length} {filteredDrops.length === 1 ? 'Drop' : 'Drops'}
             </Badge>
           </div>
@@ -318,45 +318,45 @@ const Drops = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 py-4">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <Card key={i} className="overflow-hidden animate-pulse">
-                <div className="h-64 bg-muted" />
-                <CardContent className="p-4">
-                  <div className="h-4 bg-muted rounded mb-2" />
-                  <div className="h-3 bg-muted rounded w-2/3" />
+                <div className="h-36 bg-muted" />
+                <CardContent className="p-2">
+                  <div className="h-3 bg-muted rounded mb-1" />
+                  <div className="h-2 bg-muted rounded w-2/3" />
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : filteredDrops.length === 0 ? (
           <Card>
-            <CardContent className="py-16 text-center">
-              <Zap className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2">
+            <CardContent className="py-8 text-center">
+              <Zap className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
+              <h3 className="text-base font-semibold mb-1">
                 {hasActiveFilters ? 'No drops match your filters' : 'No drops available'}
               </h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-xs text-muted-foreground mb-3">
                 {hasActiveFilters 
                   ? 'Try adjusting your search or filters' 
                   : 'Check back soon for new releases'}
               </p>
               {hasActiveFilters && (
-                <Button onClick={clearFilters}>Clear Filters</Button>
+                <Button size="sm" onClick={clearFilters}>Clear Filters</Button>
               )}
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredDrops.map((drop) => {
               const brand = brands.find(b => b.id === drop.brand_id);
               const hasReminder = reminders.has(drop.id);
 
               return (
                 <Card key={drop.id} className="overflow-hidden hover:shadow-lg transition-all group">
-                  <div className="relative h-64 bg-muted overflow-hidden">
+                  <div className="relative h-36 bg-muted overflow-hidden">
                     {drop.image_url ? (
                       <img 
                         src={drop.image_url} 
@@ -394,45 +394,33 @@ const Drops = () => {
                     </div>
                   </div>
 
-                  <CardContent className="p-4">
-                    <div className="mb-3">
-                      <h3 className="font-semibold text-lg mb-1 line-clamp-1">{drop.title}</h3>
+                  <CardContent className="p-2">
+                    <div className="mb-1">
+                      <h3 className="font-semibold text-xs mb-0.5 line-clamp-1">{drop.title}</h3>
                       {brand && (
-                        <p className="text-sm text-muted-foreground">{brand.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{brand.name}</p>
                       )}
                     </div>
 
-                    {drop.description && (
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {drop.description}
-                      </p>
-                    )}
-
-                    <div className="flex items-center justify-between text-sm border-t pt-3">
+                    <div className="flex items-center justify-between text-[10px] border-t pt-1.5 mt-1.5">
                       <div className="flex items-center text-muted-foreground">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {format(new Date(drop.release_date), 'MMM d, yyyy')}
+                        <Calendar className="h-3 w-3 mr-0.5" />
+                        {format(new Date(drop.release_date), 'MMM d')}
                       </div>
                       {drop.discount_code && (
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 px-2 text-xs gap-1.5"
+                          className="h-5 px-1.5 text-[10px] gap-1"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDiscountCodeCopy(drop);
                           }}
                         >
                           {copiedCodes.has(drop.id) ? (
-                            <>
-                              <Check className="h-3 w-3" />
-                              Copied
-                            </>
+                            <Check className="h-2.5 w-2.5" />
                           ) : (
-                            <>
-                              <Copy className="h-3 w-3" />
-                              {drop.discount_code}
-                            </>
+                            <Copy className="h-2.5 w-2.5" />
                           )}
                         </Button>
                       )}
@@ -440,7 +428,7 @@ const Drops = () => {
 
                     {drop.affiliate_link && (
                       <Button 
-                        className="w-full mt-3" 
+                        className="w-full mt-1.5 h-6 text-[10px]" 
                         variant="outline"
                         size="sm"
                         onClick={(e) => {
@@ -448,7 +436,7 @@ const Drops = () => {
                           handleAffiliateClick(drop);
                         }}
                       >
-                        View Drop
+                        View
                       </Button>
                     )}
                   </CardContent>
