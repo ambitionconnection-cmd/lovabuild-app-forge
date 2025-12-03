@@ -18,6 +18,7 @@ import { BrandManagement } from '@/components/BrandManagement';
 import { ShopManagement } from '@/components/ShopManagement';
 import { DropManagement } from '@/components/DropManagement';
 import { DropsCalendar } from '@/components/DropsCalendar';
+import { MediaManagement } from '@/components/MediaManagement';
 import { Tables } from '@/integrations/supabase/types';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/AdminSidebar';
@@ -673,6 +674,10 @@ export default function Admin() {
 
             {activeTab === "calendar" && (
               <DropsCalendar />
+            )}
+
+            {activeTab === "media" && (
+              <MediaManagement />
             )}
           </main>
         </div>
