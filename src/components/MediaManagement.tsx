@@ -22,6 +22,7 @@ export const MediaManagement = () => {
   const [newUrl, setNewUrl] = useState("");
   const [deletingImage, setDeletingImage] = useState<{ brand: Brand; type: "logo" | "banner" } | null>(null);
   const [uploadMode, setUploadMode] = useState<"url" | "file">("file");
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -61,6 +62,10 @@ export const MediaManagement = () => {
         throw new Error('Please upload a valid image file (JPG, PNG, WebP, or SVG)');
       }
 
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('File size must be less than 5MB');
+      }
+
       const fileName = `${selectedBrand.slug}-${uploadType}-${Date.now()}.${fileExt}`;
       const filePath = `${uploadType}s/${fileName}`;
 
@@ -83,6 +88,29 @@ export const MediaManagement = () => {
       toast.error(error.message || "Failed to upload file");
     } finally {
       setUploading(false);
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      handleFileUpload(file);
+    } else {
+      toast.error('Please drop a valid image file');
     }
   };
 
@@ -386,28 +414,49 @@ export const MediaManagement = () => {
 
             {uploadMode === "file" ? (
               <div className="space-y-2">
-                <Label>Select Image File</Label>
-                <Input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/svg+xml"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      handleFileUpload(file);
+                <Label>Select or Drop Image File</Label>
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`
+                    border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all
+                    ${isDragging 
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50'
                     }
-                  }}
-                  disabled={uploading}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Supported formats: JPG, PNG, WebP, SVG (max 5MB)
-                </p>
-                {uploading && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Uploading...
-                  </div>
-                )}
+                    ${uploading ? 'pointer-events-none opacity-50' : ''}
+                  `}
+                >
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                    }}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  {uploading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                      <span className="text-sm text-muted-foreground">Uploading...</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className={`w-8 h-8 ${isDragging ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className="text-sm font-medium">
+                        {isDragging ? 'Drop image here' : 'Click or drag image here'}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        JPG, PNG, WebP, SVG (max 5MB)
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="space-y-2">
