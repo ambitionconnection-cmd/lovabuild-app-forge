@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import haptic from "@/lib/haptics";
 
 interface Drop {
   id: string;
@@ -83,6 +84,7 @@ const Drops = () => {
 
   const toggleReminder = async (dropId: string) => {
     if (!user) {
+      haptic.warning();
       toast.error('Please sign in to set reminders');
       return;
     }
@@ -103,6 +105,7 @@ const Drops = () => {
           newSet.delete(dropId);
           return newSet;
         });
+        haptic.light();
         toast.success('Reminder removed');
       } else {
         // Add reminder
@@ -116,10 +119,12 @@ const Drops = () => {
         if (error) throw error;
 
         setReminders(prev => new Set(prev).add(dropId));
+        haptic.success();
         toast.success('Reminder set! You\'ll be notified before the drop');
       }
     } catch (error) {
       console.error('Error toggling reminder:', error);
+      haptic.error();
       toast.error('Failed to update reminder');
     }
   };
@@ -150,6 +155,7 @@ const Drops = () => {
       await navigator.clipboard.writeText(drop.discount_code);
       setCopiedCodes(prev => new Set(prev).add(drop.id));
       trackEvent(drop.id, 'discount_code_copy');
+      haptic.success();
       toast.success(`Code "${drop.discount_code}" copied to clipboard!`);
       
       // Reset copied state after 2 seconds
@@ -162,6 +168,7 @@ const Drops = () => {
       }, 2000);
     } catch (error) {
       console.error('Error copying code:', error);
+      haptic.error();
       toast.error('Failed to copy code');
     }
   };

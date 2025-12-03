@@ -232,4 +232,64 @@ All colors MUST be HSL.
   .pb-safe {
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 3.5rem);
   }
+
+  /* Touch feedback styles */
+  .touch-feedback {
+    @apply transition-all duration-150 ease-out;
+  }
+
+  .touch-feedback:active {
+    @apply scale-95 opacity-80;
+  }
+
+  /* Touch-friendly tap targets */
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Press and hold feedback */
+  .press-hold {
+    @apply transition-transform duration-200;
+  }
+
+  .press-hold:active {
+    @apply scale-95;
+    transition-duration: 50ms;
+  }
+
+  /* Smooth scrolling for touch */
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Global touch improvements */
+button, [role="button"], a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Swipe hint animation */
+@keyframes swipe-hint {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-5px); }
+}
+
+.swipe-hint {
+  animation: swipe-hint 1.5s ease-in-out infinite;
+}
+
+/* Pull indicator animation */
+@keyframes pull-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+
+.pull-indicator {
+  transition: transform 0.2s ease-out;
+}
+
+.pull-indicator.pulling {
+  animation: pull-rotate 0.5s ease-out;
 }
