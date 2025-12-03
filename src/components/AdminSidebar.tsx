@@ -46,10 +46,11 @@ const navGroups = [
     ],
   },
   {
-    label: "Tools",
+    label: "Media",
     icon: Image,
     items: [
-      { title: "Brand Images", value: "brand-images", icon: Image },
+      { title: "Media Library", value: "media", icon: Image },
+      { title: "AI Image Generator", value: "brand-images", icon: Image },
     ],
   },
 ];
