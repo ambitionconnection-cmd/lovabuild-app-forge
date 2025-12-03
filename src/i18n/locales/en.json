@@ -4,10 +4,12 @@
     "tagline": "Your ultimate destination for streetwear drops, brands, and shops"
   },
   "nav": {
-    "directions": "DIRECTIONS",
+    "home": "Home",
+    "directions": "Directions",
     "globalIndex": "GLOBAL INDEX",
-    "drops": "DROPS",
-    "myHeardrop": "MY HEARDROP",
+    "global": "Global",
+    "drops": "Drops",
+    "myHeardrop": "Favorites",
     "notifications": "Notifications",
     "profile": "Profile",
     "admin": "Admin"
