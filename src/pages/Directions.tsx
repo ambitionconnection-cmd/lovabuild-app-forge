@@ -55,35 +55,34 @@ const SortableStop = ({ stop, index, onRemove }: SortableStopProps) => {
     transition,
   };
 
-  return (
+    return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-2 p-2 bg-background/50 rounded-lg border border-directions/20 transition-all ${
+      className={`flex items-center gap-1 p-1 bg-background/50 rounded border border-directions/20 transition-all ${
         isDragging ? 'opacity-50 scale-105 shadow-lg z-50' : ''
       }`}
     >
       <button
-        className="flex-shrink-0 cursor-grab active:cursor-grabbing hover:bg-directions/10 p-1 rounded transition-colors"
+        className="flex-shrink-0 cursor-grab active:cursor-grabbing hover:bg-directions/10 p-0.5 rounded transition-colors"
         {...attributes}
         {...listeners}
       >
-        <GripVertical className="w-4 h-4 text-directions" />
+        <GripVertical className="w-3 h-3 text-directions" />
       </button>
-      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-directions text-directions-foreground flex items-center justify-center text-xs font-bold">
+      <div className="flex-shrink-0 w-4 h-4 rounded-full bg-directions text-directions-foreground flex items-center justify-center text-[10px] font-bold">
         {index + 1}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold truncate">{stop.name}</p>
-        <p className="text-xs text-muted-foreground truncate">{stop.city}</p>
+        <p className="text-[10px] font-semibold truncate">{stop.name}</p>
       </div>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => onRemove(stop.id)}
-        className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
+        className="h-4 w-4 p-0 hover:bg-destructive/10 hover:text-destructive"
       >
-        ✕
+        <X className="w-2.5 h-2.5" />
       </Button>
     </div>
   );
@@ -565,7 +564,7 @@ const Directions = () => {
 
           {/* Map - Full height on mobile, fixed height on desktop */}
           <div className={`lg:col-span-7 relative flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
-            <Card className={`border-2 border-primary/20 shadow-2xl overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-320px)] lg:h-[600px] rounded-none lg:rounded-xl'}`}>
+            <Card className={`border border-primary/20 shadow-lg overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-180px)] lg:h-[500px] rounded-none lg:rounded-xl'}`}>
               <CardContent className="p-0 h-full relative">
                 <div className="w-full h-full">
                   <Map 
@@ -587,24 +586,24 @@ const Directions = () => {
                 
                 {/* Journey Stops Overlay - Bottom left on mobile */}
                 {journeyStops.length > 0 && (
-                  <div className="absolute bottom-20 lg:top-4 left-4 right-4 lg:right-auto lg:max-w-xs z-10">
-                    <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
-                      <CardHeader className="py-2 px-3">
+                  <div className="absolute bottom-16 lg:top-2 left-2 right-2 lg:right-auto lg:max-w-[200px] z-10">
+                    <Card className="glass-card border border-directions/20 bg-background/95 backdrop-blur-md shadow-lg">
+                      <CardHeader className="py-1.5 px-2">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-xs uppercase tracking-wider text-directions font-bold flex items-center gap-1">
+                          <CardTitle className="text-[10px] uppercase tracking-wider text-directions font-bold flex items-center gap-1">
                             🗺️ Journey ({journeyStops.length})
                           </CardTitle>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             onClick={() => setJourneyStops([])}
-                            className="h-5 px-2 text-xs hover:bg-destructive/10 hover:text-destructive"
+                            className="h-4 px-1 text-[10px] hover:bg-destructive/10 hover:text-destructive"
                           >
                             Clear
                           </Button>
                         </div>
                       </CardHeader>
-                      <CardContent className="p-2 space-y-2 max-h-[200px] overflow-y-auto">
+                      <CardContent className="p-1.5 space-y-1 max-h-[120px] overflow-y-auto">
                         <DndContext
                           sensors={sensors}
                           collisionDetection={closestCenter}
@@ -628,7 +627,7 @@ const Directions = () => {
                         {journeyStops.length >= 1 && (
                           <Button 
                             size="sm"
-                            className="w-full bg-directions hover:bg-directions/90 text-directions-foreground font-bold uppercase tracking-wider text-xs py-1 h-8"
+                            className="w-full bg-directions hover:bg-directions/90 text-directions-foreground font-bold uppercase tracking-wider text-[10px] py-0.5 h-6"
                             onClick={() => {
                               const waypoints = journeyStops
                                 .map(stop => `${stop.latitude},${stop.longitude}`)
@@ -639,8 +638,8 @@ const Directions = () => {
                               );
                             }}
                           >
-                            <Navigation className="w-3 h-3 mr-1" />
-                            Start Navigation
+                            <Navigation className="w-2.5 h-2.5 mr-0.5" />
+                            Navigate
                           </Button>
                         )}
                       </CardContent>
@@ -652,23 +651,23 @@ const Directions = () => {
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="lg:hidden absolute bottom-4 right-4 z-10 bg-directions/90 backdrop-blur-md shadow-lg hover:bg-directions border border-directions text-directions-foreground"
+                  className="lg:hidden absolute bottom-2 right-2 z-10 bg-directions/90 backdrop-blur-md shadow-lg hover:bg-directions border border-directions text-directions-foreground h-8 w-8"
                   onClick={() => setIsShopsSheetOpen(true)}
                 >
-                  <MapPin className="w-5 h-5" />
+                  <MapPin className="w-4 h-4" />
                 </Button>
 
                 {/* Fullscreen Toggle Button */}
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="absolute top-4 right-4 z-10 bg-background/95 backdrop-blur-md shadow-lg hover:bg-background border border-border"
+                  className="absolute top-2 right-2 z-10 bg-background/95 backdrop-blur-md shadow-lg hover:bg-background border border-border h-8 w-8"
                   onClick={() => setIsMapFullscreen(!isMapFullscreen)}
                 >
                   {isMapFullscreen ? (
-                    <Minimize2 className="w-5 h-5" />
+                    <Minimize2 className="w-4 h-4" />
                   ) : (
-                    <Maximize2 className="w-5 h-5" />
+                    <Maximize2 className="w-4 h-4" />
                   )}
                 </Button>
               </CardContent>
@@ -731,23 +730,23 @@ const Directions = () => {
               </Card>
             )}
 
-            {/* Nearby Shops List Below Map */}
+            {/* Nearby Shops List Below Map - Hidden on mobile to save space */}
             {!isMapFullscreen && (
-              <Card className="mt-4 border-2 border-directions/20 shadow-lg rounded-none lg:rounded-xl">
-                <CardHeader className="border-b border-directions/10 py-3">
-                  <CardTitle className="text-sm uppercase tracking-wider text-directions font-bold flex items-center gap-2">
-                    📍 Nearby Shops ({filteredShops.length})
+              <Card className="hidden lg:block mt-2 border border-directions/20 shadow-md rounded-xl">
+                <CardHeader className="border-b border-directions/10 py-2 px-3">
+                  <CardTitle className="text-xs uppercase tracking-wider text-directions font-bold">
+                    📍 Nearby ({filteredShops.length})
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-4">
-                  <ScrollArea className="h-[150px]">
+                <CardContent className="p-2">
+                  <ScrollArea className="h-[100px]">
                     {filteredShops.length === 0 ? (
-                      <div className="flex items-center justify-center h-[120px] text-muted-foreground text-sm">
-                        No shops match your filters
+                      <div className="flex items-center justify-center h-[80px] text-muted-foreground text-xs">
+                        No shops found
                       </div>
                     ) : (
-                      <div className="space-y-2 pr-4">
-                        {filteredShops.map((shop) => {
+                      <div className="space-y-1 pr-2">
+                        {filteredShops.slice(0, 10).map((shop) => {
                           const distance = userLocation && shop.latitude && shop.longitude
                             ? calculateDistance(userLocation.lat, userLocation.lng, Number(shop.latitude), Number(shop.longitude))
                             : null;
@@ -755,7 +754,7 @@ const Directions = () => {
                           return (
                             <div 
                               key={shop.id}
-                              className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer border border-border/50"
+                              className="flex items-center gap-2 p-1.5 rounded bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
                               onClick={() => {
                                 setMapCenter([Number(shop.longitude), Number(shop.latitude)]);
                                 setMapZoom(15);
@@ -763,9 +762,9 @@ const Directions = () => {
                               }}
                             >
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-foreground truncate">{shop.name}</p>
-                                <p className="text-xs text-muted-foreground truncate">
-                                  {shop.address}, {shop.city}
+                                <p className="font-semibold text-xs truncate">{shop.name}</p>
+                                <p className="text-[10px] text-muted-foreground truncate">
+                                  {shop.city}
                                   {distance !== null && ` • ${distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`}`}
                                 </p>
                               </div>
@@ -776,10 +775,10 @@ const Directions = () => {
                                   e.stopPropagation();
                                   addToJourney(shop);
                                 }}
-                                className="flex-shrink-0 h-8 w-8 p-0 hover:bg-directions/10 hover:text-directions"
+                                className="flex-shrink-0 h-6 w-6 p-0 hover:bg-directions/10 hover:text-directions"
                                 disabled={isInJourney(shop.id)}
                               >
-                                {isInJourney(shop.id) ? <Check className="w-4 h-4 text-directions" /> : <Plus className="w-4 h-4" />}
+                                {isInJourney(shop.id) ? <Check className="w-3 h-3 text-directions" /> : <Plus className="w-3 h-3" />}
                               </Button>
                             </div>
                           );

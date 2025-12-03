@@ -45,20 +45,20 @@ export const NearbyShopsSheet = ({
 }: NearbyShopsSheetProps) => {
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader className="border-b border-directions/20">
-          <DrawerTitle className="uppercase tracking-wider text-directions font-bold">
+      <DrawerContent className="max-h-[70vh]">
+        <DrawerHeader className="border-b border-directions/20 py-2 px-3">
+          <DrawerTitle className="uppercase tracking-wider text-directions font-bold text-sm">
             📍 Nearby Shops
           </DrawerTitle>
-          <DrawerDescription>
+          <DrawerDescription className="text-xs">
             {shops.length} shop{shops.length !== 1 ? 's' : ''} found
           </DrawerDescription>
         </DrawerHeader>
         
-        <div className="overflow-y-auto p-4 space-y-3">
+        <div className="overflow-y-auto p-2 space-y-1.5">
           {shops.length === 0 ? (
-            <div className="py-8 text-center">
-              <p className="text-muted-foreground">No shops found</p>
+            <div className="py-6 text-center">
+              <p className="text-muted-foreground text-sm">No shops found</p>
             </div>
           ) : (
             shops.map((shop) => {
@@ -70,40 +70,37 @@ export const NearbyShopsSheet = ({
               return (
                 <Card 
                   key={shop.id}
-                  className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg border-2 ${
+                  className={`cursor-pointer transition-all duration-200 border ${
                     inJourney
-                      ? 'bg-directions/10 border-directions shadow-lg shadow-directions/20' 
+                      ? 'bg-directions/10 border-directions shadow-sm' 
                       : selectedShop?.id === shop.id 
                       ? 'bg-directions/5 border-directions/50' 
                       : highlightedShopId === shop.id
-                      ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20'
-                      : 'border-border hover:border-directions/50'
+                      ? 'bg-primary/10 border-primary shadow-sm'
+                      : 'border-border'
                   }`}
                   onClick={() => !inJourney && onShopClick(shop)}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold flex-1">{shop.name}</h3>
-                      <div className="flex items-center gap-2">
+                  <CardContent className="p-2">
+                    <div className="flex items-start justify-between mb-1">
+                      <h3 className="font-semibold text-xs flex-1 truncate">{shop.name}</h3>
+                      <div className="flex items-center gap-1 flex-shrink-0 ml-1">
                         {distance !== null && (
-                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-bold whitespace-nowrap">
+                          <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-bold">
                             {distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`}
                           </span>
                         )}
                         {inJourney && (
-                          <span className="text-xs bg-directions text-directions-foreground px-2 py-1 rounded-full font-bold">
+                          <span className="text-[10px] bg-directions text-directions-foreground px-1.5 py-0.5 rounded-full font-bold">
                             #{journeyStops.findIndex(s => s.id === shop.id) + 1}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="space-y-1 text-sm text-muted-foreground mb-3">
-                      <div className="flex items-start gap-2">
-                        <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        <span className="line-clamp-2">{shop.address}, {shop.city}</span>
-                      </div>
+                    <div className="text-[10px] text-muted-foreground mb-1.5 truncate">
+                      {shop.address}, {shop.city}
                     </div>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-1">
                       <Button 
                         size="sm" 
                         variant="outline"
@@ -111,48 +108,35 @@ export const NearbyShopsSheet = ({
                           e.stopPropagation();
                           onOpenDetails(shop);
                         }}
-                        className="flex-1"
+                        className="flex-1 h-6 text-[10px]"
                       >
-                        <Info className="w-4 h-4 mr-1" />
+                        <Info className="w-2.5 h-2.5 mr-0.5" />
                         Details
                       </Button>
                       {!inJourney ? (
                         <Button 
                           size="sm" 
-                          className="flex-1 bg-directions hover:bg-directions/90 text-directions-foreground"
+                          className="flex-1 bg-directions hover:bg-directions/90 text-directions-foreground h-6 text-[10px]"
                           onClick={(e) => {
                             e.stopPropagation();
                             onAddToJourney(shop);
                           }}
                           disabled={!shop.latitude || !shop.longitude}
                         >
-                          <Navigation className="w-4 h-4 mr-1" />
+                          <Navigation className="w-2.5 h-2.5 mr-0.5" />
                           Add
                         </Button>
                       ) : (
                         <Button 
                           size="sm" 
                           variant="outline"
-                          className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10"
+                          className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10 h-6 text-[10px]"
                           onClick={(e) => {
                             e.stopPropagation();
                             onRemoveFromJourney(shop.id);
                           }}
                         >
                           Remove
-                        </Button>
-                      )}
-                      {shop.official_site && (
-                        <Button 
-                          size="sm" 
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(shop.official_site!, '_blank');
-                          }}
-                          className="px-2"
-                        >
-                          <ExternalLink className="w-4 h-4" />
                         </Button>
                       )}
                     </div>
