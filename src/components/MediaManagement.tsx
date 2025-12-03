@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Upload, Search, Trash2, Copy, ExternalLink, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Upload, Search, Trash2, Copy, Image as ImageIcon, Loader2, FileUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -22,6 +21,7 @@ export const MediaManagement = () => {
   const [uploadType, setUploadType] = useState<"logo" | "banner">("logo");
   const [newUrl, setNewUrl] = useState("");
   const [deletingImage, setDeletingImage] = useState<{ brand: Brand; type: "logo" | "banner" } | null>(null);
+  const [uploadMode, setUploadMode] = useState<"url" | "file">("file");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -48,6 +48,43 @@ export const MediaManagement = () => {
   const filteredBrands = brands.filter((brand) =>
     brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleFileUpload = async (file: File) => {
+    if (!selectedBrand) return;
+    
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      const allowedTypes = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
+      
+      if (!fileExt || !allowedTypes.includes(fileExt)) {
+        throw new Error('Please upload a valid image file (JPG, PNG, WebP, or SVG)');
+      }
+
+      const fileName = `${selectedBrand.slug}-${uploadType}-${Date.now()}.${fileExt}`;
+      const filePath = `${uploadType}s/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('brand-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('brand-images')
+        .getPublicUrl(filePath);
+
+      await handleUrlUpdate(selectedBrand, uploadType, publicUrl);
+    } catch (error: any) {
+      console.error("Error uploading file:", error);
+      toast.error(error.message || "Failed to upload file");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleUrlUpdate = async (brand: Brand, type: "logo" | "banner", url: string) => {
     try {
@@ -313,31 +350,80 @@ export const MediaManagement = () => {
       </Card>
 
       {/* URL Update Dialog */}
-      <AlertDialog open={!!selectedBrand} onOpenChange={() => setSelectedBrand(null)}>
+      <AlertDialog open={!!selectedBrand} onOpenChange={() => { setSelectedBrand(null); setNewUrl(""); setUploadMode("file"); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               {uploadType === "logo" ? "Update Logo" : "Update Banner"} for {selectedBrand?.name}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Enter the URL of the new {uploadType}. Use a public URL (e.g., from /brands/ folder or an external CDN).
+              Upload an image file or enter a URL for the new {uploadType}.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Image URL</Label>
-              <Input
-                placeholder={`/brands/${selectedBrand?.slug || "brand"}-${uploadType}.png`}
-                value={newUrl}
-                onChange={(e) => setNewUrl(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                For local images, use paths like: /brands/brand-name-logo.png
-              </p>
+            {/* Toggle between upload modes */}
+            <div className="flex gap-2">
+              <Button
+                variant={uploadMode === "file" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setUploadMode("file")}
+                className="flex-1"
+              >
+                <FileUp className="w-4 h-4 mr-2" />
+                Upload File
+              </Button>
+              <Button
+                variant={uploadMode === "url" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setUploadMode("url")}
+                className="flex-1"
+              >
+                <ImageIcon className="w-4 h-4 mr-2" />
+                Enter URL
+              </Button>
             </div>
 
-            {newUrl && (
+            {uploadMode === "file" ? (
+              <div className="space-y-2">
+                <Label>Select Image File</Label>
+                <Input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleFileUpload(file);
+                    }
+                  }}
+                  disabled={uploading}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Supported formats: JPG, PNG, WebP, SVG (max 5MB)
+                </p>
+                {uploading && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Uploading...
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label>Image URL</Label>
+                <Input
+                  placeholder={`/brands/${selectedBrand?.slug || "brand"}-${uploadType}.png`}
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  For local images, use paths like: /brands/brand-name-logo.png
+                </p>
+              </div>
+            )}
+
+            {(newUrl || uploadMode === "url") && newUrl && (
               <div className="space-y-2">
                 <Label>Preview</Label>
                 <div className="border rounded-lg p-2 bg-muted">
@@ -355,12 +441,15 @@ export const MediaManagement = () => {
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setNewUrl("")}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => selectedBrand && handleUrlUpdate(selectedBrand, uploadType, newUrl)}
-            >
-              Save
-            </AlertDialogAction>
+            <AlertDialogCancel onClick={() => { setNewUrl(""); setUploadMode("file"); }}>Cancel</AlertDialogCancel>
+            {uploadMode === "url" && (
+              <AlertDialogAction
+                onClick={() => selectedBrand && handleUrlUpdate(selectedBrand, uploadType, newUrl)}
+                disabled={!newUrl}
+              >
+                Save
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
