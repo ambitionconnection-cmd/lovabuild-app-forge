@@ -176,27 +176,27 @@ const MyHeardrop = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20">
         <header className="border-b border-border bg-card">
-          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+          <div className="container mx-auto px-3 py-2 flex items-center gap-3">
             <Link to="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-xl font-bold">MY HEARDROP</h1>
+            <h1 className="text-base font-bold">MY HEARDROP</h1>
           </div>
         </header>
         
-        <main className="container mx-auto px-4 py-16">
-          <Card className="max-w-md mx-auto">
-            <CardContent className="py-12 text-center">
-              <Heart className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h2 className="text-2xl font-bold mb-2">Sign In Required</h2>
-              <p className="text-muted-foreground mb-6">
-                Sign in to view your favorites, reminders, and personalized recommendations
+        <main className="container mx-auto px-3 py-8">
+          <Card className="max-w-sm mx-auto">
+            <CardContent className="py-8 text-center">
+              <Heart className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+              <h2 className="text-lg font-bold mb-1">Sign In Required</h2>
+              <p className="text-xs text-muted-foreground mb-4">
+                Sign in to view your favorites and recommendations
               </p>
-              <Button onClick={() => navigate('/auth')}>
+              <Button size="sm" onClick={() => navigate('/auth')}>
                 Sign In
               </Button>
             </CardContent>
@@ -208,132 +208,103 @@ const MyHeardrop = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20">
         <header className="border-b border-border bg-card">
-          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+          <div className="container mx-auto px-3 py-2 flex items-center gap-3">
             <Link to="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-xl font-bold">MY HEARDROP</h1>
+            <h1 className="text-base font-bold">MY HEARDROP</h1>
           </div>
         </header>
-        <main className="container mx-auto px-4 py-8">
-          <Skeleton className="w-full h-[600px] rounded-xl" />
+        <main className="container mx-auto px-3 py-4">
+          <Skeleton className="w-full h-[400px] rounded-xl" />
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="container mx-auto px-3 py-2 flex items-center gap-3">
           <Link to="/">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-xl font-bold">MY HEARDROP</h1>
+          <h1 className="text-base font-bold">MY HEARDROP</h1>
         </div>
       </header>
       
-      <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="favorites" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="favorites">
-              <Heart className="w-4 h-4 mr-2" />
+      <main className="container mx-auto px-3 py-4">
+        <Tabs defaultValue="favorites" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3 h-9">
+            <TabsTrigger value="favorites" className="text-xs">
+              <Heart className="w-3 h-3 mr-1" />
               Favorites
             </TabsTrigger>
-            <TabsTrigger value="reminders">
-              <Bell className="w-4 h-4 mr-2" />
+            <TabsTrigger value="reminders" className="text-xs">
+              <Bell className="w-3 h-3 mr-1" />
               Reminders
             </TabsTrigger>
-            <TabsTrigger value="recommendations">
-              <TrendingUp className="w-4 h-4 mr-2" />
+            <TabsTrigger value="recommendations" className="text-xs">
+              <TrendingUp className="w-3 h-3 mr-1" />
               For You
             </TabsTrigger>
           </TabsList>
 
           {/* Favorites Tab */}
-          <TabsContent value="favorites" className="space-y-6">
+          <TabsContent value="favorites" className="space-y-4">
             {/* Favorite Brands */}
             <section>
-              <h2 className="text-2xl font-bold mb-4">Favorite Brands</h2>
+              <h2 className="text-sm font-bold mb-2">Favorite Brands</h2>
               {favoriteBrands.length === 0 ? (
                 <Card>
-                  <CardContent className="py-12 text-center">
-                    <Heart className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">No favorite brands yet</p>
+                  <CardContent className="py-6 text-center">
+                    <Heart className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-xs text-muted-foreground">No favorite brands yet</p>
                     <Button 
                       variant="link" 
+                      size="sm"
                       onClick={() => navigate('/global-index')}
-                      className="mt-2"
+                      className="mt-1 text-xs"
                     >
                       Browse brands
                     </Button>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {favoriteBrands.map((brand) => (
                     <Card key={brand.id} className="overflow-hidden">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-                              {brand.logo_url ? (
-                                <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="font-bold">{brand.name.charAt(0)}</span>
-                              )}
-                            </div>
-                            <div>
-                              <CardTitle className="text-lg">{brand.name}</CardTitle>
-                              {brand.category && (
-                                <Badge variant="outline" className="mt-1 capitalize text-xs">
-                                  {brand.category}
-                                </Badge>
-                              )}
-                            </div>
+                      <CardContent className="p-2">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="w-8 h-8 rounded bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+                            {brand.logo_url ? (
+                              <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-xs font-bold">{brand.name.charAt(0)}</span>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold truncate">{brand.name}</p>
+                            {brand.category && (
+                              <Badge variant="outline" className="capitalize text-[10px] py-0 h-4">
+                                {brand.category}
+                              </Badge>
+                            )}
                           </div>
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="h-6 w-6"
                             onClick={() => removeFavoriteBrand(brand.favoriteId)}
                           >
-                            <Trash2 className="w-4 h-4 text-destructive" />
+                            <Trash2 className="w-3 h-3 text-destructive" />
                           </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {brand.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {brand.description}
-                          </p>
-                        )}
-                        <div className="flex gap-2">
-                          {brand.official_website && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => window.open(brand.official_website!, '_blank')}
-                            >
-                              <Globe className="w-3 h-3 mr-1" />
-                              Website
-                            </Button>
-                          )}
-                          {brand.instagram_url && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => window.open(brand.instagram_url!, '_blank')}
-                            >
-                              <Instagram className="w-3 h-3 mr-1" />
-                              Instagram
-                            </Button>
-                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -344,53 +315,47 @@ const MyHeardrop = () => {
 
             {/* Favorite Shops */}
             <section>
-              <h2 className="text-2xl font-bold mb-4">Favorite Shops</h2>
+              <h2 className="text-sm font-bold mb-2">Favorite Shops</h2>
               {favoriteShops.length === 0 ? (
                 <Card>
-                  <CardContent className="py-12 text-center">
-                    <MapPin className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">No favorite shops yet</p>
+                  <CardContent className="py-6 text-center">
+                    <MapPin className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-xs text-muted-foreground">No favorite shops yet</p>
                     <Button 
                       variant="link" 
+                      size="sm"
                       onClick={() => navigate('/directions')}
-                      className="mt-2"
+                      className="mt-1 text-xs"
                     >
                       Find shops
                     </Button>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {favoriteShops.map((shop) => (
                     <Card key={shop.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h3 className="font-semibold text-lg">{shop.name}</h3>
-                            {shop.category && (
-                              <Badge variant="outline" className="mt-1 capitalize text-xs">
-                                {shop.category}
-                              </Badge>
-                            )}
+                      <CardContent className="p-2">
+                        <div className="flex items-start justify-between mb-1">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-xs truncate">{shop.name}</h3>
+                            <p className="text-[10px] text-muted-foreground truncate">
+                              {shop.city}, {shop.country}
+                            </p>
                           </div>
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="h-6 w-6"
                             onClick={() => removeFavoriteShop(shop.favoriteId)}
                           >
-                            <Trash2 className="w-4 h-4 text-destructive" />
+                            <Trash2 className="w-3 h-3 text-destructive" />
                           </Button>
-                        </div>
-                        <div className="space-y-2 text-sm text-muted-foreground">
-                          <p className="flex items-start gap-2">
-                            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span>{shop.address}, {shop.city}, {shop.country}</span>
-                          </p>
                         </div>
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="mt-3 w-full"
+                          className="w-full h-6 text-[10px]"
                           onClick={() => navigate('/directions')}
                         >
                           View on Map

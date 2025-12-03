@@ -159,21 +159,21 @@ const GlobalIndex = () => {
 
   if (loading) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
         <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
-          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+          <div className="container mx-auto px-3 py-2 flex items-center gap-3">
             <Link to="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-xl font-bold uppercase tracking-wider">GLOBAL INDEX</h1>
+            <h1 className="text-base font-bold uppercase tracking-wider">GLOBAL INDEX</h1>
           </div>
         </header>
-        <main className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <main className="container mx-auto px-3 py-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Skeleton key={i} className="h-[400px] rounded-xl" />
+              <Skeleton key={i} className="h-[200px] rounded-xl" />
             ))}
           </div>
         </main>
@@ -182,27 +182,27 @@ const GlobalIndex = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="container mx-auto px-3 py-2 flex items-center gap-3">
           <Link to="/">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-xl font-bold uppercase tracking-wider">GLOBAL INDEX</h1>
+          <h1 className="text-base font-bold uppercase tracking-wider">GLOBAL INDEX</h1>
         </div>
       </header>
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 py-4">
         {/* Search and Filter */}
         <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
-          <Card className="mb-8 glass-card border-2">
-            <CardHeader>
+          <Card className="mb-4 glass-card border">
+            <CardHeader className="py-2 px-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="uppercase tracking-wide">Browse Brands</CardTitle>
-                  <CardDescription>Discover streetwear and sneaker brands</CardDescription>
+                  <CardTitle className="uppercase tracking-wide text-sm">Browse Brands</CardTitle>
+                  <CardDescription className="text-xs">{filteredBrands.length} brands</CardDescription>
                 </div>
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" size="sm" className="w-9 p-0">
@@ -279,19 +279,19 @@ const GlobalIndex = () => {
         {/* Brands Grid */}
         {filteredBrands.length === 0 ? (
           <Card>
-            <CardContent className="py-16 text-center">
-              <p className="text-muted-foreground text-lg">No brands found</p>
-              <p className="text-sm text-muted-foreground mt-2">
+            <CardContent className="py-8 text-center">
+              <p className="text-muted-foreground text-sm">No brands found</p>
+              <p className="text-xs text-muted-foreground mt-1">
                 Try adjusting your search or filters
               </p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredBrands.map((brand) => (
               <Card key={brand.id} className="overflow-hidden hover:scale-[1.02] transition-transform">
                 {/* Brand Banner */}
-                <div className="relative h-20 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20">
+                <div className="relative h-14 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20">
                   {brand.banner_url ? (
                     <img 
                       src={brand.banner_url} 
@@ -325,8 +325,8 @@ const GlobalIndex = () => {
                 </div>
 
                 {/* Brand Logo */}
-                <div className="px-4 -mt-8 mb-2 flex justify-center">
-                  <div className="w-16 h-16 rounded-lg bg-card border-2 border-background flex items-center justify-center overflow-hidden shadow-lg">
+                <div className="px-2 -mt-6 mb-1 flex justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-card border border-background flex items-center justify-center overflow-hidden shadow-md">
                     {brand.logo_url ? (
                       <img 
                         src={brand.logo_url} 
@@ -334,102 +334,57 @@ const GlobalIndex = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-xl font-bold text-muted-foreground">
+                      <span className="text-sm font-bold text-muted-foreground">
                         {brand.name.charAt(0)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <CardContent className="pt-0 space-y-2.5 px-4 pb-3">
+                <CardContent className="pt-0 space-y-1.5 px-2 pb-2">
                   {/* Brand Name & Category */}
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                    <div className="flex items-center justify-center gap-1 mb-0.5">
                       {brand.country && (
-                        <span className="text-lg" title={brand.country}>
+                        <span className="text-xs" title={brand.country}>
                           {getCountryFlag(brand.country)}
                         </span>
                       )}
-                      <h3 className="text-base font-bold uppercase tracking-wide">{brand.name}</h3>
+                      <h3 className="text-xs font-bold uppercase tracking-wide line-clamp-1">{brand.name}</h3>
                     </div>
                     {brand.category && (
-                      <Badge variant="outline" className="capitalize text-xs py-0">
+                      <Badge variant="outline" className="capitalize text-[10px] py-0 h-4">
                         {brand.category}
                       </Badge>
                     )}
                   </div>
 
-                  {/* Description */}
-                  {brand.description && (
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {brand.description}
-                    </p>
-                  )}
-
-                  {/* Links - Row 1 */}
-                  <div className="grid grid-cols-2 gap-1.5 pt-1">
+                  {/* Links */}
+                  <div className="grid grid-cols-2 gap-1 pt-1">
                     {brand.official_website && (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-7 text-xs"
+                        className="h-6 text-[10px] px-1"
                         onClick={() => window.open(brand.official_website!, '_blank')}
                       >
-                        <ExternalLink className="w-3 h-3 mr-1" />
-                        Website
+                        <ExternalLink className="w-2.5 h-2.5 mr-0.5" />
+                        Web
                       </Button>
                     )}
-                    {brand.instagram_url && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs"
-                        onClick={() => window.open(brand.instagram_url!, '_blank')}
-                      >
-                        <Instagram className="w-3 h-3 mr-1" />
-                        Instagram
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* Links - Row 2 */}
-                  <div className="grid grid-cols-2 gap-1.5">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-7 text-xs"
+                      className="h-6 text-[10px] px-1"
                       onClick={() => {
                         setSelectedBrandForShops({ id: brand.id, name: brand.name });
                         setShopModalOpen(true);
                       }}
                     >
-                      <Store className="w-3 h-3 mr-1" />
-                      Shop(s)
+                      <Store className="w-2.5 h-2.5 mr-0.5" />
+                      Shops
                     </Button>
-                    {brand.tiktok_url && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs"
-                        onClick={() => window.open(brand.tiktok_url!, '_blank')}
-                      >
-                        <Video className="w-3 h-3 mr-1" />
-                        TikTok
-                      </Button>
-                    )}
                   </div>
-
-                  {/* History (expandable) */}
-                  {brand.history && (
-                    <details className="text-xs">
-                      <summary className="cursor-pointer text-primary font-medium hover:underline">
-                        Brand History
-                      </summary>
-                      <p className="mt-1.5 text-muted-foreground">
-                        {brand.history}
-                      </p>
-                    </details>
-                  )}
                 </CardContent>
               </Card>
             ))}
