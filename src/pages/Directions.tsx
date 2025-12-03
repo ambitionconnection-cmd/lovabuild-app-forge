@@ -14,6 +14,7 @@ import { ShopDetailsModal } from "@/components/ShopDetailsModal";
 import { NearbyShopsSheet } from "@/components/NearbyShopsSheet";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import haptic from "@/lib/haptics";
 import {
   DndContext,
   closestCenter,
@@ -270,12 +271,14 @@ const Directions = () => {
 
   const addToJourney = (shop: ShopType) => {
     if (!journeyStops.find(s => s.id === shop.id)) {
+      haptic.success();
       setJourneyStops([...journeyStops, shop]);
       setSelectedShop(null);
     }
   };
 
   const removeFromJourney = (shopId: string) => {
+    haptic.light();
     setJourneyStops(journeyStops.filter(s => s.id !== shopId));
   };
 

@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { getCountryFlag } from "@/lib/countryFlags";
+import haptic from "@/lib/haptics";
 
 const GlobalIndex = () => {
   const { user } = useAuth();
@@ -112,6 +113,7 @@ const GlobalIndex = () => {
 
   const toggleFavorite = async (brandId: string) => {
     if (!user) {
+      haptic.warning();
       toast.error('Please sign in to favorite brands');
       navigate('/auth');
       return;
@@ -129,6 +131,7 @@ const GlobalIndex = () => {
 
       if (error) {
         console.error('Error removing favorite:', error);
+        haptic.error();
         toast.error('Failed to remove favorite');
       } else {
         setFavoriteBrands(prev => {
@@ -136,6 +139,7 @@ const GlobalIndex = () => {
           newSet.delete(brandId);
           return newSet;
         });
+        haptic.light();
         toast.success('Removed from favorites');
       }
     } else {
@@ -149,9 +153,11 @@ const GlobalIndex = () => {
 
       if (error) {
         console.error('Error adding favorite:', error);
+        haptic.error();
         toast.error('Failed to add favorite');
       } else {
         setFavoriteBrands(prev => new Set(prev).add(brandId));
+        haptic.success();
         toast.success('Added to favorites');
       }
     }

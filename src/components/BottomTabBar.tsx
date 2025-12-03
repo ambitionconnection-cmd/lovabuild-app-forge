@@ -2,6 +2,7 @@ import { Home, MapPin, Zap, Globe, Heart } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import haptic from "@/lib/haptics";
 
 interface TabItem {
   icon: typeof Home;
@@ -38,10 +39,14 @@ export const BottomTabBar = () => {
           return (
             <button
               key={tab.path}
-              onClick={() => navigate(tab.path)}
+              onClick={() => {
+                haptic.selection();
+                navigate(tab.path);
+              }}
+              onTouchStart={() => haptic.light()}
               className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors",
-                "active:scale-95 touch-manipulation",
+                "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all",
+                "active:scale-90 active:opacity-70 touch-manipulation",
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"

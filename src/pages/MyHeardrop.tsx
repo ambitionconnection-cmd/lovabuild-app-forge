@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import haptic from "@/lib/haptics";
 
 interface FavoriteBrand extends Tables<'brands'> {
   favoriteId: string;
@@ -137,8 +138,10 @@ const MyHeardrop = () => {
       .eq('id', favoriteId);
 
     if (error) {
+      haptic.error();
       toast.error('Failed to remove favorite');
     } else {
+      haptic.light();
       setFavoriteBrands(prev => prev.filter(b => b.favoriteId !== favoriteId));
       toast.success('Removed from favorites');
       fetchUserData(); // Refresh recommendations
@@ -152,8 +155,10 @@ const MyHeardrop = () => {
       .eq('id', favoriteId);
 
     if (error) {
+      haptic.error();
       toast.error('Failed to remove favorite');
     } else {
+      haptic.light();
       setFavoriteShops(prev => prev.filter(s => s.favoriteId !== favoriteId));
       toast.success('Removed from favorites');
     }
@@ -166,8 +171,10 @@ const MyHeardrop = () => {
       .eq('id', reminderId);
 
     if (error) {
+      haptic.error();
       toast.error('Failed to remove reminder');
     } else {
+      haptic.light();
       setDropReminders(prev => prev.filter(r => r.reminderId !== reminderId));
       toast.success('Reminder removed');
       fetchUserData(); // Refresh recommendations
