@@ -174,14 +174,14 @@ export const ShopEditModal = ({ shop, brands, isOpen, onClose, onSuccess }: Shop
           <div className="space-y-2">
             <Label htmlFor="brand_id">Brand</Label>
             <Select
-              value={formData.brand_id || ""}
-              onValueChange={(value) => setFormData({ ...formData, brand_id: value })}
+              value={formData.brand_id || "__none__"}
+              onValueChange={(value) => setFormData({ ...formData, brand_id: value === "__none__" ? null : value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select brand" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No brand</SelectItem>
+                <SelectItem value="__none__">No brand</SelectItem>
                 {brands.map((brand) => (
                   <SelectItem key={brand.id} value={brand.id}>
                     {brand.name}
@@ -279,13 +279,14 @@ export const ShopEditModal = ({ shop, brands, isOpen, onClose, onSuccess }: Shop
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select
-              value={formData.category || ""}
-              onValueChange={(value) => setFormData({ ...formData, category: value as any })}
+              value={formData.category || "__none__"}
+              onValueChange={(value) => setFormData({ ...formData, category: value === "__none__" ? null : value as any })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="__none__">No category</SelectItem>
                 {CATEGORIES.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
