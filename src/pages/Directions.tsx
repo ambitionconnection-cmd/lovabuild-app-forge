@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import Map from "@/components/Map";
 import { ShopDetailsModal } from "@/components/ShopDetailsModal";
-import { NearbyShopsSheet } from "@/components/NearbyShopsSheet";
+import { ShopsBottomSheet } from "@/components/ShopsBottomSheet";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import haptic from "@/lib/haptics";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useShopsCache } from "@/hooks/useShopsCache";
 import {
   DndContext,
   closestCenter,
@@ -104,13 +106,19 @@ const Directions = () => {
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedShopForDetails, setSelectedShopForDetails] = useState<ShopType | null>(null);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
-  const [isShopsSheetOpen, setIsShopsSheetOpen] = useState(false);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [mapZoom, setMapZoom] = useState<number>(12);
   const [highlightedShopId, setHighlightedShopId] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [sortByDistance, setSortByDistance] = useState(false);
+  const [visibleShops, setVisibleShops] = useState<ShopType[]>([]);
+
+  // Debounce search query for optimized geocoding
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // Cache for shops and routes
+  const { getCachedShops, setCachedShops, getCachedRoute, setCachedRoute } = useShopsCache();
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -223,16 +231,16 @@ const Directions = () => {
     }
   }, [shops, searchParams]);
 
-  // Filter and sort shops
+  // Filter and sort shops (using debounced search query for optimization)
   useEffect(() => {
     let filtered = shops;
 
-    if (searchQuery) {
+    if (debouncedSearchQuery) {
       filtered = filtered.filter(shop =>
-        shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        shop.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        shop.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        shop.country.toLowerCase().includes(searchQuery.toLowerCase())
+        shop.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        shop.address?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        shop.city?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        shop.country?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
       );
     }
 
@@ -259,7 +267,22 @@ const Directions = () => {
     }
 
     setFilteredShops(filtered);
-  }, [searchQuery, selectedCategory, selectedCountry, selectedCity, shops, sortByDistance, userLocation]);
+  }, [debouncedSearchQuery, selectedCategory, selectedCountry, selectedCity, shops, sortByDistance, userLocation]);
+
+  // Handle visible shops change from map
+  const handleVisibleShopsChange = useCallback((shops: ShopType[]) => {
+    setVisibleShops(shops);
+  }, []);
+
+  // Center map on a shop when clicked from bottom sheet
+  const handleShopClickFromSheet = useCallback((shop: ShopType) => {
+    if (shop.latitude && shop.longitude) {
+      // Dispatch custom event to center the map
+      window.dispatchEvent(new CustomEvent('map:centerOnShop', { detail: shop.id }));
+      setHighlightedShopId(shop.id);
+      setSelectedShop(shop);
+    }
+  }, []);
 
   // Get unique countries and cities
   const countries = Array.from(new Set(shops.map(shop => shop.country))).sort();
@@ -567,7 +590,7 @@ const Directions = () => {
 
           {/* Map - Full height on mobile, fixed height on desktop */}
           <div className={`lg:col-span-7 relative flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
-            <Card className={`border border-primary/20 shadow-lg overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-180px)] lg:h-[500px] rounded-none lg:rounded-xl'}`}>
+            <Card className={`border border-primary/20 shadow-lg overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-180px-15vh)] lg:h-[500px] rounded-none lg:rounded-xl'}`}>
               <CardContent className="p-0 h-full relative">
                 <div className="w-full h-full">
                   <Map 
@@ -580,10 +603,12 @@ const Directions = () => {
                     selectedShop={selectedShop}
                     journeyStops={journeyStops}
                     onRouteUpdate={setRouteInfo}
+                    onVisibleShopsChange={handleVisibleShopsChange}
                     initialCenter={mapCenter}
                     initialZoom={mapZoom}
                     highlightedShopId={highlightedShopId}
                     isFullscreen={isMapFullscreen}
+                    deferRouteCalculation={true}
                   />
                 </div>
                 
@@ -650,15 +675,7 @@ const Directions = () => {
                   </div>
                 )}
 
-                {/* Mobile Shops Toggle Button */}
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="lg:hidden absolute bottom-2 right-2 z-10 bg-directions/90 backdrop-blur-md shadow-lg hover:bg-directions border border-directions text-directions-foreground h-8 w-8"
-                  onClick={() => setIsShopsSheetOpen(true)}
-                >
-                  <MapPin className="w-4 h-4" />
-                </Button>
+                {/* Removed mobile shops toggle button - bottom sheet is always visible */}
 
                 {/* Fullscreen Toggle Button */}
                 <Button
@@ -903,22 +920,15 @@ const Directions = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Mobile Nearby Shops Sheet */}
-      <NearbyShopsSheet
+      {/* Mobile Bottom Sheet for Shops */}
+      <ShopsBottomSheet
         shops={filteredShops}
-        isOpen={isShopsSheetOpen}
-        onOpenChange={setIsShopsSheetOpen}
-        onShopClick={(shop) => {
-          setSelectedShop(shop);
-          setIsShopsSheetOpen(false);
-        }}
+        visibleShops={visibleShops}
+        onShopClick={handleShopClickFromSheet}
         onAddToJourney={addToJourney}
-        onRemoveFromJourney={removeFromJourney}
         onOpenDetails={openShopDetails}
         isInJourney={isInJourney}
-        journeyStops={journeyStops}
-        selectedShop={selectedShop}
-        highlightedShopId={highlightedShopId}
+        selectedShopId={selectedShop?.id}
         userLocation={userLocation}
         calculateDistance={calculateDistance}
       />
