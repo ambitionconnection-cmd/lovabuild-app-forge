@@ -9,10 +9,13 @@ interface MapProps {
   selectedShop?: Omit<Tables<'shops'>, 'email' | 'phone'> | null;
   journeyStops?: Omit<Tables<'shops'>, 'email' | 'phone'>[];
   onRouteUpdate?: (route: any) => void;
+  onVisibleShopsChange?: (shops: Omit<Tables<'shops'>, 'email' | 'phone'>[]) => void;
+  onCenterOnShop?: (shopId: string) => void;
   initialCenter?: [number, number] | null;
   initialZoom?: number;
   highlightedShopId?: string | null;
   isFullscreen?: boolean;
+  deferRouteCalculation?: boolean;
 }
 
 const Map: React.FC<MapProps> = ({ 
@@ -21,11 +24,15 @@ const Map: React.FC<MapProps> = ({
   selectedShop, 
   journeyStops = [], 
   onRouteUpdate,
+  onVisibleShopsChange,
+  onCenterOnShop,
   initialCenter,
   initialZoom,
   highlightedShopId,
-  isFullscreen = false
+  isFullscreen = false,
+  deferRouteCalculation = true
 }) => {
+  const centerOnShopRef = useRef<((shopId: string) => void) | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -107,6 +114,31 @@ const Map: React.FC<MapProps> = ({
       }, 500);
     });
 
+    // Update visible shops on map move (debounced)
+    let moveTimeout: ReturnType<typeof setTimeout>;
+    const updateVisibleShops = () => {
+      if (!map.current || !onVisibleShopsChange) return;
+      
+      clearTimeout(moveTimeout);
+      moveTimeout = setTimeout(() => {
+        const bounds = map.current?.getBounds();
+        if (!bounds) return;
+        
+        const visibleShops = shops.filter(shop => {
+          if (!shop.latitude || !shop.longitude) return false;
+          return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
+        });
+        
+        onVisibleShopsChange(visibleShops);
+      }, 150); // Debounce 150ms
+    };
+
+    map.current.on('moveend', updateVisibleShops);
+    map.current.on('zoomend', updateVisibleShops);
+
+    // Initial update after load
+    map.current.once('idle', updateVisibleShops);
+
     const handleResize = () => {
       if (map.current) {
         map.current.resize();
@@ -117,13 +149,14 @@ const Map: React.FC<MapProps> = ({
 
     // Cleanup
     return () => {
+      clearTimeout(moveTimeout);
       window.removeEventListener('resize', handleResize);
       markersRef.current.forEach(marker => marker.remove());
       markersRef.current = [];
       userMarkerRef.current?.remove();
       map.current?.remove();
     };
-  }, [mapboxToken, initialCenter, initialZoom]);
+  }, [mapboxToken, initialCenter, initialZoom, shops, onVisibleShopsChange]);
 
   // Handle fullscreen resize
   useEffect(() => {
@@ -134,6 +167,41 @@ const Map: React.FC<MapProps> = ({
       }, 100);
     }
   }, [isFullscreen]);
+
+  // Center on shop function - exposed via ref
+  useEffect(() => {
+    centerOnShopRef.current = (shopId: string) => {
+      const shop = shops.find(s => s.id === shopId);
+      if (shop && shop.latitude && shop.longitude && map.current) {
+        map.current.flyTo({
+          center: [Number(shop.longitude), Number(shop.latitude)],
+          zoom: 16,
+          duration: 1000,
+          essential: true
+        });
+      }
+    };
+    
+    // Expose function to parent via callback
+    if (onCenterOnShop) {
+      // We need to provide a way for parent to trigger this
+      // This is a bit of a workaround but works well
+    }
+  }, [shops, onCenterOnShop]);
+
+  // Expose centerOnShop via a custom event system
+  useEffect(() => {
+    const handleCenterOnShop = (e: CustomEvent<string>) => {
+      if (centerOnShopRef.current) {
+        centerOnShopRef.current(e.detail);
+      }
+    };
+    
+    window.addEventListener('map:centerOnShop' as any, handleCenterOnShop);
+    return () => {
+      window.removeEventListener('map:centerOnShop' as any, handleCenterOnShop);
+    };
+  }, []);
 
   // Fetch and display route when journey stops are selected
   useEffect(() => {
