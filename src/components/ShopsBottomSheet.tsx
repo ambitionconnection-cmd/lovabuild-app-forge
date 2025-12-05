@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tables } from '@/integrations/supabase/types';
 import haptic from '@/lib/haptics';
 
@@ -223,52 +224,77 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                         )}
                       </div>
                       
-                      <div className="flex gap-1.5 flex-shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 w-7 p-0 hover:bg-primary/10"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onOpenDetails(shop);
-                          }}
-                        >
-                          <Info className="w-3.5 h-3.5" />
-                        </Button>
-                        {shop.latitude && shop.longitude && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 hover:bg-green-500/10 hover:text-green-600"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              haptic.light();
-                              // Detect iOS vs Android/other and open appropriate maps app
-                              const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-                              const destination = `${shop.latitude},${shop.longitude}`;
-                              const url = isIOS
-                                ? `maps://maps.apple.com/?daddr=${destination}&dirflg=d`
-                                : `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
-                              window.open(url, '_blank');
-                            }}
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                        {!inJourney && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 hover:bg-directions/10 hover:text-directions"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onAddToJourney(shop);
-                            }}
-                          >
-                            <Navigation className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                      </div>
+                      <TooltipProvider delayDuration={300}>
+                        <div className="flex gap-1.5 flex-shrink-0">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0 hover:bg-primary/10"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onOpenDetails(shop);
+                                }}
+                              >
+                                <Info className="w-3.5 h-3.5" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="text-xs">
+                              View Details
+                            </TooltipContent>
+                          </Tooltip>
+                          
+                          {shop.latitude && shop.longitude && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0 hover:bg-green-500/10 hover:text-green-600"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    haptic.light();
+                                    // Detect iOS vs Android/other and open appropriate maps app
+                                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                                    const destination = `${shop.latitude},${shop.longitude}`;
+                                    const url = isIOS
+                                      ? `maps://maps.apple.com/?daddr=${destination}&dirflg=d`
+                                      : `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
+                                    window.open(url, '_blank');
+                                  }}
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="text-xs">
+                                Get Directions
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                          
+                          {!inJourney && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0 hover:bg-directions/10 hover:text-directions"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onAddToJourney(shop);
+                                  }}
+                                >
+                                  <Navigation className="w-3.5 h-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="text-xs">
+                                Add to Journey
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </TooltipProvider>
                     </div>
                   </div>
                 );
