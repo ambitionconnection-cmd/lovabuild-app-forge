@@ -12,7 +12,15 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Brand = Tables<"brands">;
 
-const COUNTRIES = ["USA", "UK", "France", "Italy", "Japan", "South Korea", "China", "Brazil", "Chile", "UAE", "Kenya"];
+const COUNTRIES = [
+  "Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile", "China", "Denmark", 
+  "Egypt", "Finland", "France", "Germany", "Greece", "Guam", "Hong Kong", "India", 
+  "Indonesia", "Ireland", "Israel", "Italy", "Japan", "Kenya", "Malaysia", "Mexico", 
+  "Morocco", "Netherlands", "New Zealand", "Nigeria", "Norway", "Philippines", "Poland", 
+  "Portugal", "Qatar", "Russia", "Saudi Arabia", "Senegal", "Singapore", "South Africa", 
+  "South Korea", "Spain", "Sweden", "Switzerland", "Taiwan", "Thailand", "Turkey", 
+  "UAE", "UK", "USA", "Vietnam"
+].sort();
 const CATEGORIES = ["streetwear", "sneakers", "accessories", "luxury", "vintage", "sportswear"];
 
 interface BrandEditModalProps {
