@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapPin, Navigation, Info, ChevronUp, GripHorizontal } from 'lucide-react';
+import { MapPin, Navigation, Info, ChevronUp, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -235,6 +235,26 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                         >
                           <Info className="w-3.5 h-3.5" />
                         </Button>
+                        {shop.latitude && shop.longitude && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 hover:bg-green-500/10 hover:text-green-600"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              haptic.light();
+                              // Detect iOS vs Android/other and open appropriate maps app
+                              const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                              const destination = `${shop.latitude},${shop.longitude}`;
+                              const url = isIOS
+                                ? `maps://maps.apple.com/?daddr=${destination}&dirflg=d`
+                                : `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
+                              window.open(url, '_blank');
+                            }}
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
                         {!inJourney && (
                           <Button
                             variant="ghost"
