@@ -334,63 +334,63 @@ const GlobalIndex = () => {
                   </div>
 
                   {/* Links - 4 buttons in 2 rows */}
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     {/* Top row: Web and Insta */}
-                    <div className="grid grid-cols-2 gap-1">
+                    <div className="grid grid-cols-2 gap-1.5">
                       {brand.official_website ? (
                         <Button
-                          variant="outline"
+                          variant="secondary"
                           size="sm"
-                          className="h-6 text-[10px] px-1"
+                          className="h-8 text-xs px-2 font-medium"
                           onClick={() => window.open(brand.official_website!, '_blank')}
                         >
-                          <ExternalLink className="w-2.5 h-2.5 mr-0.5" />
+                          <ExternalLink className="w-3.5 h-3.5 mr-1" />
                           Web
                         </Button>
                       ) : (
-                        <div className="h-6" />
+                        <div className="h-8" />
                       )}
                       {brand.instagram_url ? (
                         <Button
-                          variant="outline"
+                          variant="secondary"
                           size="sm"
-                          className="h-6 text-[10px] px-1"
+                          className="h-8 text-xs px-2 font-medium"
                           onClick={() => window.open(brand.instagram_url!, '_blank')}
                         >
-                          <Instagram className="w-2.5 h-2.5 mr-0.5" />
+                          <Instagram className="w-3.5 h-3.5 mr-1" />
                           Insta
                         </Button>
                       ) : (
-                        <div className="h-6" />
+                        <div className="h-8" />
                       )}
                     </div>
                     
                     {/* Bottom row: Shops and TikTok */}
-                    <div className="grid grid-cols-2 gap-1">
+                    <div className="grid grid-cols-2 gap-1.5">
                       <Button
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
-                        className="h-6 text-[10px] px-1"
+                        className="h-8 text-xs px-2 font-medium"
                         onClick={() => {
                           setSelectedBrandForShops({ id: brand.id, name: brand.name });
                           setShopModalOpen(true);
                         }}
                       >
-                        <Store className="w-2.5 h-2.5 mr-0.5" />
+                        <Store className="w-3.5 h-3.5 mr-1" />
                         Shops
                       </Button>
                       {brand.tiktok_url ? (
                         <Button
-                          variant="outline"
+                          variant="secondary"
                           size="sm"
-                          className="h-6 text-[10px] px-1"
+                          className="h-8 text-xs px-2 font-medium"
                           onClick={() => window.open(brand.tiktok_url!, '_blank')}
                         >
-                          <TikTokIcon className="w-2.5 h-2.5 mr-0.5" />
+                          <TikTokIcon className="w-3.5 h-3.5 mr-1" />
                           TikTok
                         </Button>
                       ) : (
-                        <div className="h-6" />
+                        <div className="h-8" />
                       )}
                     </div>
                   </div>
