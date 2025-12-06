@@ -772,6 +772,7 @@ export type Database = {
     Functions: {
       cleanup_old_ip_attempts: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
+      get_current_user_email: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
