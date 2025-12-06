@@ -189,11 +189,11 @@ const GlobalIndex = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 animate-fade-in">
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-3 py-2 flex items-center gap-3">
           <Link to="/">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-8 w-8 hover:scale-110 active:scale-95 transition-transform">
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
@@ -280,10 +280,11 @@ const GlobalIndex = () => {
           </Card>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filteredBrands.map((brand) => (
+            {filteredBrands.map((brand, index) => (
               <Card 
                 key={brand.id} 
-                className="overflow-hidden hover:scale-[1.02] transition-transform bg-gradient-to-br from-muted/50 via-card to-muted/30 cursor-pointer"
+                className="overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 bg-gradient-to-br from-muted/50 via-card to-muted/30 cursor-pointer animate-scale-in"
+                style={{ animationDelay: `${Math.min(index * 50, 300)}ms`, animationFillMode: 'backwards' }}
                 onClick={() => navigate(`/brand/${brand.slug}`)}
               >
                 {/* Favorite Button - Positioned top right */}
