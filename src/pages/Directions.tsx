@@ -588,9 +588,9 @@ const Directions = () => {
             </div>
           </div>
 
-          {/* Map - Full height on mobile, fixed height on desktop */}
+          {/* Map - Full height on mobile minus header, tab bar, and peek sheet */}
           <div className={`lg:col-span-7 relative flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
-            <Card className={`border border-primary/20 shadow-lg overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-56px-15vh)] lg:h-[500px] rounded-none lg:rounded-xl'}`}>
+            <Card className={`border border-primary/20 shadow-lg overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-44px-64px-15vh)] lg:h-[500px] rounded-none lg:rounded-xl'}`}>
               <CardContent className="p-0 h-full relative">
                 <div className="w-full h-full">
                   <Map 
