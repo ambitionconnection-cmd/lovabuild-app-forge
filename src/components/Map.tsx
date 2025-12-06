@@ -119,13 +119,11 @@ const Map: React.FC<MapProps> = ({
         .addTo(map.current!);
     });
 
-    // Track user interaction to prevent auto-animations
+    // Track user interaction to prevent auto-animations - stays true until explicitly reset
     map.current.on('mousedown', () => { isUserInteracting.current = true; });
     map.current.on('touchstart', () => { isUserInteracting.current = true; });
     map.current.on('dragstart', () => { isUserInteracting.current = true; });
-    map.current.on('zoomstart', () => { 
-      isUserInteracting.current = true; 
-    });
+    map.current.on('wheel', () => { isUserInteracting.current = true; });
 
     // Update visible shops on map move (debounced)
     let moveTimeout: ReturnType<typeof setTimeout>;
@@ -314,20 +312,8 @@ const Map: React.FC<MapProps> = ({
               }
             });
 
-            // Only fit bounds if user is NOT currently interacting with the map
-            if (!isUserInteracting.current) {
-              const coordinates = route.geometry.coordinates;
-              const bounds = coordinates.reduce(
-                (bounds: mapboxgl.LngLatBounds, coord: [number, number]) => bounds.extend(coord),
-                new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
-              );
-
-              map.current.fitBounds(bounds, {
-                padding: 80,
-                maxZoom: 15,
-                duration: 0 // Instant, no animation
-              });
-            }
+            // Never auto-fit bounds - let user control the map position
+            // User can use the recenter button if needed
           }
         } catch (error) {
           console.error('Error fetching route:', error);

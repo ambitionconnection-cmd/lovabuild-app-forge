@@ -129,9 +129,11 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   return (
     <div
       ref={sheetRef}
-      className="lg:hidden fixed bottom-16 left-0 right-0 z-40 transition-all duration-300 ease-out"
+      className="lg:hidden fixed left-0 right-0 z-40"
       style={{
-        height: `${heightPercent}vh`,
+        height: `calc(${heightPercent}vh + 64px)`,
+        bottom: 0,
+        paddingBottom: '64px', // Space for tab bar
         transform: 'translateY(0)',
         touchAction: isDragging ? 'none' : 'auto',
       }}
