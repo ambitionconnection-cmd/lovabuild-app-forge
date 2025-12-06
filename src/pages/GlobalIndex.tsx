@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Globe as GlobeIcon, Video, Store, ChevronDown } from "lucide-react";
+import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Globe as GlobeIcon, Store, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
@@ -16,6 +15,13 @@ import { toast } from "sonner";
 import { getCountryFlag } from "@/lib/countryFlags";
 import haptic from "@/lib/haptics";
 
+// TikTok icon component
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+  </svg>
+);
+
 const GlobalIndex = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -24,7 +30,6 @@ const GlobalIndex = () => {
   const [favoriteBrands, setFavoriteBrands] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name-asc");
   const [shopModalOpen, setShopModalOpen] = useState(false);
@@ -83,10 +88,6 @@ const GlobalIndex = () => {
       );
     }
 
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(brand => brand.category === selectedCategory);
-    }
-
     if (selectedCountry !== "all") {
       filtered = filtered.filter(brand => brand.country === selectedCountry);
     }
@@ -106,7 +107,7 @@ const GlobalIndex = () => {
     });
 
     setFilteredBrands(sorted);
-  }, [searchQuery, selectedCategory, selectedCountry, sortBy, brands]);
+  }, [searchQuery, selectedCountry, sortBy, brands]);
 
   // Get unique countries from brands
   const countries = Array.from(new Set(brands.map(brand => brand.country).filter(Boolean))).sort();
@@ -179,7 +180,7 @@ const GlobalIndex = () => {
         <main className="container mx-auto px-3 py-4">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Skeleton key={i} className="h-[200px] rounded-xl" />
+              <Skeleton key={i} className="h-[220px] rounded-xl" />
             ))}
           </div>
         </main>
@@ -242,21 +243,6 @@ const GlobalIndex = () => {
                           {country}
                         </SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-full sm:w-[200px]">
-                      <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="streetwear">Streetwear</SelectItem>
-                      <SelectItem value="sneakers">Sneakers</SelectItem>
-                      <SelectItem value="accessories">Accessories</SelectItem>
-                      <SelectItem value="luxury">Luxury</SelectItem>
-                      <SelectItem value="vintage">Vintage</SelectItem>
-                      <SelectItem value="sportswear">Sportswear</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -330,9 +316,9 @@ const GlobalIndex = () => {
                   </Button>
                 </div>
 
-                {/* Brand Logo */}
-                <div className="px-2 -mt-6 mb-1 flex justify-center">
-                  <div className="w-10 h-10 rounded-lg bg-card border border-background flex items-center justify-center overflow-hidden shadow-md">
+                {/* Brand Logo - Bigger size */}
+                <div className="px-2 -mt-8 mb-2 flex justify-center">
+                  <div className="w-16 h-16 rounded-xl bg-card border-2 border-background flex items-center justify-center overflow-hidden shadow-lg">
                     {brand.logo_url ? (
                       <img 
                         src={brand.logo_url} 
@@ -340,56 +326,86 @@ const GlobalIndex = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-sm font-bold text-muted-foreground">
+                      <span className="text-xl font-bold text-muted-foreground">
                         {brand.name.charAt(0)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <CardContent className="pt-0 space-y-1.5 px-2 pb-2">
-                  {/* Brand Name & Category */}
+                <CardContent className="pt-0 space-y-2 px-2 pb-2">
+                  {/* Brand Name with Country Flag */}
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-0.5">
+                    <div className="flex items-center justify-center gap-1">
                       {brand.country && (
-                        <span className="text-xs" title={brand.country}>
+                        <span className="text-sm" title={brand.country}>
                           {getCountryFlag(brand.country)}
                         </span>
                       )}
                       <h3 className="text-xs font-bold uppercase tracking-wide line-clamp-1">{brand.name}</h3>
                     </div>
-                    {brand.category && (
-                      <Badge variant="outline" className="capitalize text-[10px] py-0 h-4">
-                        {brand.category}
-                      </Badge>
-                    )}
                   </div>
 
-                  {/* Links */}
-                  <div className="grid grid-cols-2 gap-1 pt-1">
-                    {brand.official_website && (
+                  {/* Links - 4 buttons in 2 rows */}
+                  <div className="space-y-1">
+                    {/* Top row: Web and Insta */}
+                    <div className="grid grid-cols-2 gap-1">
+                      {brand.official_website ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 text-[10px] px-1"
+                          onClick={() => window.open(brand.official_website!, '_blank')}
+                        >
+                          <ExternalLink className="w-2.5 h-2.5 mr-0.5" />
+                          Web
+                        </Button>
+                      ) : (
+                        <div className="h-6" />
+                      )}
+                      {brand.instagram_url ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 text-[10px] px-1"
+                          onClick={() => window.open(brand.instagram_url!, '_blank')}
+                        >
+                          <Instagram className="w-2.5 h-2.5 mr-0.5" />
+                          Insta
+                        </Button>
+                      ) : (
+                        <div className="h-6" />
+                      )}
+                    </div>
+                    
+                    {/* Bottom row: Shops and TikTok */}
+                    <div className="grid grid-cols-2 gap-1">
                       <Button
                         variant="outline"
                         size="sm"
                         className="h-6 text-[10px] px-1"
-                        onClick={() => window.open(brand.official_website!, '_blank')}
+                        onClick={() => {
+                          setSelectedBrandForShops({ id: brand.id, name: brand.name });
+                          setShopModalOpen(true);
+                        }}
                       >
-                        <ExternalLink className="w-2.5 h-2.5 mr-0.5" />
-                        Web
+                        <Store className="w-2.5 h-2.5 mr-0.5" />
+                        Shops
                       </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-6 text-[10px] px-1"
-                      onClick={() => {
-                        setSelectedBrandForShops({ id: brand.id, name: brand.name });
-                        setShopModalOpen(true);
-                      }}
-                    >
-                      <Store className="w-2.5 h-2.5 mr-0.5" />
-                      Shops
-                    </Button>
+                      {brand.tiktok_url ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 text-[10px] px-1"
+                          onClick={() => window.open(brand.tiktok_url!, '_blank')}
+                        >
+                          <TikTokIcon className="w-2.5 h-2.5 mr-0.5" />
+                          TikTok
+                        </Button>
+                      ) : (
+                        <div className="h-6" />
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
