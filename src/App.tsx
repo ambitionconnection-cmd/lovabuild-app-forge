@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Directions from "./pages/Directions";
 import GlobalIndex from "./pages/GlobalIndex";
+import BrandDetail from "./pages/BrandDetail";
 import ShopMap from "./pages/ShopMap";
 import Drops from "./pages/Drops";
 import MyHeardrop from "./pages/MyHeardrop";
@@ -35,6 +36,7 @@ function App() {
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/directions" element={<ProtectedRoute><Directions /></ProtectedRoute>} />
               <Route path="/global-index" element={<ProtectedRoute><GlobalIndex /></ProtectedRoute>} />
+              <Route path="/brand/:slug" element={<ProtectedRoute><BrandDetail /></ProtectedRoute>} />
               <Route path="/shop-map" element={<ProtectedRoute><ShopMap /></ProtectedRoute>} />
               <Route path="/drops" element={<ProtectedRoute><Drops /></ProtectedRoute>} />
               <Route path="/my-heardrop" element={<ProtectedRoute><MyHeardrop /></ProtectedRoute>} />

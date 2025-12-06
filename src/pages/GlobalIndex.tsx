@@ -281,7 +281,11 @@ const GlobalIndex = () => {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredBrands.map((brand) => (
-              <Card key={brand.id} className="overflow-hidden hover:scale-[1.02] transition-transform bg-gradient-to-br from-muted/50 via-card to-muted/30">
+              <Card 
+                key={brand.id} 
+                className="overflow-hidden hover:scale-[1.02] transition-transform bg-gradient-to-br from-muted/50 via-card to-muted/30 cursor-pointer"
+                onClick={() => navigate(`/brand/${brand.slug}`)}
+              >
                 {/* Favorite Button - Positioned top right */}
                 <div className="relative">
                   <Button
