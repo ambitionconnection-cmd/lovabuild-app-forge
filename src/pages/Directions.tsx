@@ -97,7 +97,6 @@ const Directions = () => {
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedShop, setSelectedShop] = useState<ShopType | null>(null);
@@ -244,10 +243,6 @@ const Directions = () => {
       );
     }
 
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(shop => shop.category === selectedCategory);
-    }
-
     if (selectedCountry !== "all") {
       filtered = filtered.filter(shop => shop.country === selectedCountry);
     }
@@ -267,7 +262,7 @@ const Directions = () => {
     }
 
     setFilteredShops(filtered);
-  }, [debouncedSearchQuery, selectedCategory, selectedCountry, selectedCity, shops, sortByDistance, userLocation]);
+  }, [debouncedSearchQuery, selectedCountry, selectedCity, shops, sortByDistance, userLocation]);
 
   // Handle visible shops change from map
   const handleVisibleShopsChange = useCallback((shops: ShopType[]) => {
@@ -325,7 +320,6 @@ const Directions = () => {
 
   const activeFilterCount = [
     searchQuery,
-    selectedCategory !== "all",
     selectedCountry !== "all", 
     selectedCity !== "all"
   ].filter(Boolean).length;
@@ -399,15 +393,14 @@ const Directions = () => {
                       📍 {filteredShops.length} shop{filteredShops.length !== 1 ? 's' : ''} found
                     </CardDescription>
                   </div>
-                  {activeFilterCount > 0 && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => {
-                        setSearchQuery("");
-                        setSelectedCategory("all");
-                        setSelectedCountry("all");
-                        setSelectedCity("all");
+                    {activeFilterCount > 0 && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSelectedCountry("all");
+                          setSelectedCity("all");
                       }}
                       className="h-7 text-xs hover:bg-destructive/10 hover:text-destructive"
                     >
@@ -440,21 +433,6 @@ const Directions = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="border-directions/20 focus:ring-directions"
                 />
-                
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="streetwear">Streetwear</SelectItem>
-                    <SelectItem value="sneakers">Sneakers</SelectItem>
-                    <SelectItem value="accessories">Accessories</SelectItem>
-                    <SelectItem value="luxury">Luxury</SelectItem>
-                    <SelectItem value="vintage">Vintage</SelectItem>
-                    <SelectItem value="sportswear">Sportswear</SelectItem>
-                  </SelectContent>
-                </Select>
 
                 <Select value={selectedCountry} onValueChange={(value) => {
                   setSelectedCountry(value);
@@ -855,20 +833,6 @@ const Directions = () => {
               className="border-directions/20 focus:ring-directions"
             />
             
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="streetwear">Streetwear</SelectItem>
-                <SelectItem value="sneakers">Sneakers</SelectItem>
-                <SelectItem value="accessories">Accessories</SelectItem>
-                <SelectItem value="luxury">Luxury</SelectItem>
-                <SelectItem value="vintage">Vintage</SelectItem>
-                <SelectItem value="sportswear">Sportswear</SelectItem>
-              </SelectContent>
-            </Select>
 
             <Select value={selectedCountry} onValueChange={(value) => {
               setSelectedCountry(value);
@@ -905,9 +869,8 @@ const Directions = () => {
               <Button 
                 variant="outline"
                 className="w-full border-destructive/50 text-destructive hover:bg-destructive/10"
-                onClick={() => {
+              onClick={() => {
                   setSearchQuery("");
-                  setSelectedCategory("all");
                   setSelectedCountry("all");
                   setSelectedCity("all");
                 }}

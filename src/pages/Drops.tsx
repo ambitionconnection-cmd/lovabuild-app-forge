@@ -30,7 +30,6 @@ interface Drop {
 interface Brand {
   id: string;
   name: string;
-  category: string;
 }
 
 const Drops = () => {
@@ -43,7 +42,6 @@ const Drops = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [brandFilter, setBrandFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [copiedCodes, setCopiedCodes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -59,7 +57,7 @@ const Drops = () => {
           .order('release_date', { ascending: true }),
         supabase
           .from('brands')
-          .select('id, name, category')
+          .select('id, name')
           .eq('is_active', true),
         user
           ? supabase
@@ -187,26 +185,17 @@ const Drops = () => {
                          drop.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || drop.status === statusFilter;
     const matchesBrand = brandFilter === 'all' || drop.brand_id === brandFilter;
-    
-    let matchesCategory = true;
-    if (categoryFilter !== 'all') {
-      const brand = brands.find(b => b.id === drop.brand_id);
-      matchesCategory = brand?.category === categoryFilter;
-    }
 
-    return matchesSearch && matchesStatus && matchesBrand && matchesCategory;
+    return matchesSearch && matchesStatus && matchesBrand;
   });
-
-  const categories = Array.from(new Set(brands.map(b => b.category).filter(Boolean)));
 
   const clearFilters = () => {
     setSearchQuery("");
     setStatusFilter("all");
     setBrandFilter("all");
-    setCategoryFilter("all");
   };
 
-  const hasActiveFilters = searchQuery || statusFilter !== "all" || brandFilter !== "all" || categoryFilter !== "all";
+  const hasActiveFilters = searchQuery || statusFilter !== "all" || brandFilter !== "all";
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -289,23 +278,6 @@ const Drops = () => {
                         {brands.map(brand => (
                           <SelectItem key={brand.id} value={brand.id}>
                             {brand.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Category</label>
-                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Categories</SelectItem>
-                        {categories.map(category => (
-                          <SelectItem key={category} value={category}>
-                            <span className="capitalize">{category}</span>
                           </SelectItem>
                         ))}
                       </SelectContent>
