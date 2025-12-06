@@ -151,16 +151,16 @@ const BrandDetail = () => {
   if (!brand) return null;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 animate-fade-in">
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-3 py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/global-index">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8 hover:scale-110 active:scale-95 transition-transform">
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-base font-bold uppercase tracking-wider line-clamp-1">{brand.name}</h1>
+            <h1 className="text-base font-bold uppercase tracking-wider line-clamp-1 animate-fade-in">{brand.name}</h1>
           </div>
           <Button
             variant="ghost"
@@ -175,11 +175,11 @@ const BrandDetail = () => {
 
       <main className="container mx-auto px-3 py-4 space-y-4">
         {/* Brand Hero Card */}
-        <Card className="overflow-hidden bg-gradient-to-br from-muted/50 via-card to-muted/30">
+        <Card className="overflow-hidden bg-gradient-to-br from-muted/50 via-card to-muted/30 animate-scale-in">
           <CardContent className="p-4">
             <div className="flex flex-col items-center gap-4">
               {/* Logo */}
-              <div className="w-32 h-32 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden shadow-lg">
+              <div className="w-32 h-32 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden shadow-lg animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
                 {brand.logo_url ? (
                   <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
                 ) : (
@@ -242,7 +242,7 @@ const BrandDetail = () => {
 
         {/* Brand History */}
         {brand.history && (
-          <Card>
+          <Card className="animate-fade-in" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm uppercase tracking-wide">About</CardTitle>
             </CardHeader>
@@ -253,7 +253,7 @@ const BrandDetail = () => {
         )}
 
         {/* Upcoming Drops */}
-        <Card>
+        <Card className="animate-fade-in" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm uppercase tracking-wide">Upcoming Drops</CardTitle>
@@ -298,7 +298,7 @@ const BrandDetail = () => {
         </Card>
 
         {/* Shops */}
-        <Card>
+        <Card className="animate-fade-in" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm uppercase tracking-wide">Stores</CardTitle>
