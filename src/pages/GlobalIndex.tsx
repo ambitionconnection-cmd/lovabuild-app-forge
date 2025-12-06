@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Globe as GlobeIcon, Store, ChevronDown } from "lucide-react";
+import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
@@ -281,33 +281,20 @@ const GlobalIndex = () => {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredBrands.map((brand) => (
-              <Card key={brand.id} className="overflow-hidden hover:scale-[1.02] transition-transform">
-                {/* Brand Banner */}
-                <div className="relative h-14 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20">
-                  {brand.banner_url ? (
-                    <img 
-                      src={brand.banner_url} 
-                      alt={`${brand.name} banner`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <GlobeIcon className="h-8 w-8 text-muted-foreground opacity-30" />
-                    </div>
-                  )}
-                  
-                  {/* Favorite Button */}
+              <Card key={brand.id} className="overflow-hidden hover:scale-[1.02] transition-transform bg-gradient-to-br from-muted/50 via-card to-muted/30">
+                {/* Favorite Button - Positioned top right */}
+                <div className="relative">
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="absolute top-1.5 right-1.5 rounded-full h-7 w-7"
+                    className="absolute top-2 right-2 rounded-full h-8 w-8 z-10 bg-muted/80 backdrop-blur-sm"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleFavorite(brand.id);
                     }}
                   >
                     <Heart 
-                      className={`w-3.5 h-3.5 ${
+                      className={`w-4 h-4 ${
                         favoriteBrands.has(brand.id) 
                           ? 'fill-primary text-primary' 
                           : ''
@@ -316,9 +303,9 @@ const GlobalIndex = () => {
                   </Button>
                 </div>
 
-                {/* Brand Logo - Bigger size */}
-                <div className="px-2 -mt-8 mb-2 flex justify-center">
-                  <div className="w-16 h-16 rounded-xl bg-card border-2 border-background flex items-center justify-center overflow-hidden shadow-lg">
+                {/* Brand Logo - Much bigger and centered */}
+                <div className="pt-3 pb-2 flex justify-center">
+                  <div className="w-28 h-28 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden shadow-lg">
                     {brand.logo_url ? (
                       <img 
                         src={brand.logo_url} 
@@ -326,7 +313,7 @@ const GlobalIndex = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-xl font-bold text-muted-foreground">
+                      <span className="text-3xl font-bold text-muted-foreground">
                         {brand.name.charAt(0)}
                       </span>
                     )}
