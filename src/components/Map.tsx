@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tables } from '@/integrations/supabase/types';
@@ -32,29 +32,45 @@ const Map: React.FC<MapProps> = ({
   isFullscreen = false,
   deferRouteCalculation = true
 }) => {
-  const centerOnShopRef = useRef<((shopId: string) => void) | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const shopsRef = useRef(shops);
+  const onShopClickRef = useRef(onShopClick);
+  const onVisibleShopsChangeRef = useRef(onVisibleShopsChange);
+  const isUserInteracting = useRef(false);
+  const lastRouteKey = useRef<string>('');
+  const routeAnimationRef = useRef<number | null>(null);
+
+  // Keep refs updated
+  useEffect(() => {
+    shopsRef.current = shops;
+  }, [shops]);
 
   useEffect(() => {
-    // Set Mapbox token
+    onShopClickRef.current = onShopClick;
+  }, [onShopClick]);
+
+  useEffect(() => {
+    onVisibleShopsChangeRef.current = onVisibleShopsChange;
+  }, [onVisibleShopsChange]);
+
+  useEffect(() => {
     setMapboxToken('pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ');
   }, []);
 
+  // Initialize map once
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
+    if (!mapContainer.current || !mapboxToken || map.current) return;
 
-    // Initialize map
     mapboxgl.accessToken = mapboxToken;
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/dark-v11',
-      center: initialCenter || [2.3522, 48.8566], // Use provided center or default to Paris
+      center: initialCenter || [2.3522, 48.8566],
       zoom: initialZoom || 12,
     });
 
@@ -82,7 +98,6 @@ const Map: React.FC<MapProps> = ({
     geolocateControl.on('geolocate', (e: any) => {
       setUserLocation([e.coords.longitude, e.coords.latitude]);
       
-      // Add custom user location marker
       if (userMarkerRef.current) {
         userMarkerRef.current.remove();
       }
@@ -96,7 +111,6 @@ const Map: React.FC<MapProps> = ({
           border: 4px solid white;
           border-radius: 50%;
           box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         "></div>
       `;
       
@@ -105,95 +119,80 @@ const Map: React.FC<MapProps> = ({
         .addTo(map.current!);
     });
 
-    // Wait for map to load, then trigger geolocation
-    map.current.on('load', () => {
-      setTimeout(() => {
-        geolocateControl.trigger();
-        // Ensure map resizes correctly after initial layout on all devices
-        map.current?.resize();
-      }, 500);
+    // Track user interaction to prevent auto-animations
+    map.current.on('mousedown', () => { isUserInteracting.current = true; });
+    map.current.on('touchstart', () => { isUserInteracting.current = true; });
+    map.current.on('dragstart', () => { isUserInteracting.current = true; });
+    map.current.on('zoomstart', () => { 
+      isUserInteracting.current = true; 
     });
 
     // Update visible shops on map move (debounced)
     let moveTimeout: ReturnType<typeof setTimeout>;
     const updateVisibleShops = () => {
-      if (!map.current || !onVisibleShopsChange) return;
+      if (!map.current) return;
       
       clearTimeout(moveTimeout);
       moveTimeout = setTimeout(() => {
         const bounds = map.current?.getBounds();
-        if (!bounds) return;
+        if (!bounds || !onVisibleShopsChangeRef.current) return;
         
-        const visibleShops = shops.filter(shop => {
+        const visibleShops = shopsRef.current.filter(shop => {
           if (!shop.latitude || !shop.longitude) return false;
           return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
         });
         
-        onVisibleShopsChange(visibleShops);
-      }, 150); // Debounce 150ms
+        onVisibleShopsChangeRef.current(visibleShops);
+      }, 200);
     };
 
     map.current.on('moveend', updateVisibleShops);
-    map.current.on('zoomend', updateVisibleShops);
 
-    // Initial update after load
-    map.current.once('idle', updateVisibleShops);
+    // Wait for map to load, then trigger geolocation
+    map.current.on('load', () => {
+      setTimeout(() => {
+        geolocateControl.trigger();
+        map.current?.resize();
+      }, 500);
+    });
 
     const handleResize = () => {
-      if (map.current) {
-        map.current.resize();
-      }
+      map.current?.resize();
     };
 
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
     return () => {
       clearTimeout(moveTimeout);
       window.removeEventListener('resize', handleResize);
-      markersRef.current.forEach(marker => marker.remove());
-      markersRef.current = [];
+      if (routeAnimationRef.current) {
+        cancelAnimationFrame(routeAnimationRef.current);
+      }
       userMarkerRef.current?.remove();
       map.current?.remove();
+      map.current = null;
     };
-  }, [mapboxToken, initialCenter, initialZoom, shops, onVisibleShopsChange]);
+  }, [mapboxToken, initialCenter, initialZoom]);
 
   // Handle fullscreen resize
   useEffect(() => {
     if (map.current) {
-      // Small delay to ensure DOM has updated
       setTimeout(() => {
         map.current?.resize();
       }, 100);
     }
   }, [isFullscreen]);
 
-  // Center on shop function - exposed via ref
-  useEffect(() => {
-    centerOnShopRef.current = (shopId: string) => {
-      const shop = shops.find(s => s.id === shopId);
-      if (shop && shop.latitude && shop.longitude && map.current) {
-        map.current.flyTo({
-          center: [Number(shop.longitude), Number(shop.latitude)],
-          zoom: 16,
-          duration: 1000,
-          essential: true
-        });
-      }
-    };
-    
-    // Expose function to parent via callback
-    if (onCenterOnShop) {
-      // We need to provide a way for parent to trigger this
-      // This is a bit of a workaround but works well
-    }
-  }, [shops, onCenterOnShop]);
-
-  // Expose centerOnShop via a custom event system
+  // Center on shop via custom event - NO animation loops
   useEffect(() => {
     const handleCenterOnShop = (e: CustomEvent<string>) => {
-      if (centerOnShopRef.current) {
-        centerOnShopRef.current(e.detail);
+      const shop = shopsRef.current.find(s => s.id === e.detail);
+      if (shop && shop.latitude && shop.longitude && map.current) {
+        isUserInteracting.current = false;
+        map.current.jumpTo({
+          center: [Number(shop.longitude), Number(shop.latitude)],
+          zoom: 16,
+        });
       }
     };
     
@@ -209,8 +208,23 @@ const Map: React.FC<MapProps> = ({
 
     const stopsToUse = journeyStops.length > 0 ? journeyStops : (selectedShop ? [selectedShop] : []);
 
+    // Create a key to check if route actually changed
+    const routeKey = stopsToUse.map(s => s.id).join(',') + '|' + (userLocation?.join(',') || '');
+    
+    // Skip if route hasn't changed
+    if (routeKey === lastRouteKey.current && routeKey !== '|') {
+      return;
+    }
+    lastRouteKey.current = routeKey;
+
     const updateRoute = () => {
       if (!map.current) return;
+
+      // Cancel any ongoing animation
+      if (routeAnimationRef.current) {
+        cancelAnimationFrame(routeAnimationRef.current);
+        routeAnimationRef.current = null;
+      }
 
       if (!userLocation || stopsToUse.length === 0) {
         // Clear route if no stops selected
@@ -219,11 +233,11 @@ const Map: React.FC<MapProps> = ({
           if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
           if (map.current.getSource('route')) map.current.removeSource('route');
         }
+        if (onRouteUpdate) onRouteUpdate(null);
         return;
       }
 
       const fetchRoute = async () => {
-        // Build waypoints: user location + all journey stops
         const waypoints = [
           `${userLocation[0]},${userLocation[1]}`,
           ...stopsToUse
@@ -237,13 +251,11 @@ const Map: React.FC<MapProps> = ({
           const response = await fetch(url);
           const data = await response.json();
 
-          if (data.routes && data.routes.length > 0) {
+          if (data.routes && data.routes.length > 0 && map.current) {
             const route = data.routes[0];
 
-            // Combine all steps from all legs for multi-stop journey
             const allSteps = route.legs.flatMap((leg: any) => leg.steps);
 
-            // Notify parent component about route
             if (onRouteUpdate) {
               onRouteUpdate({
                 distance: route.distance,
@@ -254,14 +266,14 @@ const Map: React.FC<MapProps> = ({
             }
 
             // Remove existing route layers
-            if (map.current?.getSource('route')) {
+            if (map.current.getSource('route')) {
               if (map.current.getLayer('route-line')) map.current.removeLayer('route-line');
               if (map.current.getLayer('route-line-casing')) map.current.removeLayer('route-line-casing');
               map.current.removeSource('route');
             }
 
             // Add route source
-            map.current?.addSource('route', {
+            map.current.addSource('route', {
               type: 'geojson',
               data: {
                 type: 'Feature',
@@ -271,7 +283,7 @@ const Map: React.FC<MapProps> = ({
             });
 
             // Add casing (outline) layer
-            map.current?.addLayer({
+            map.current.addLayer({
               id: 'route-line-casing',
               type: 'line',
               source: 'route',
@@ -286,8 +298,8 @@ const Map: React.FC<MapProps> = ({
               }
             });
 
-            // Add main route line with animation
-            map.current?.addLayer({
+            // Add main route line - NO animation
+            map.current.addLayer({
               id: 'route-line',
               type: 'line',
               source: 'route',
@@ -302,39 +314,20 @@ const Map: React.FC<MapProps> = ({
               }
             });
 
-            // Animate route drawing
-            let animationFrame = 0;
-            const totalFrames = 60;
+            // Only fit bounds if user is NOT currently interacting with the map
+            if (!isUserInteracting.current) {
+              const coordinates = route.geometry.coordinates;
+              const bounds = coordinates.reduce(
+                (bounds: mapboxgl.LngLatBounds, coord: [number, number]) => bounds.extend(coord),
+                new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
+              );
 
-            const animateRoute = () => {
-              if (animationFrame <= totalFrames) {
-                const progress = animationFrame / totalFrames;
-                map.current?.setPaintProperty('route-line', 'line-dasharray', [
-                  progress * route.geometry.coordinates.length,
-                  (1 - progress) * route.geometry.coordinates.length
-                ]);
-                animationFrame++;
-                requestAnimationFrame(animateRoute);
-              } else {
-                // Remove dash array after animation completes
-                map.current?.setPaintProperty('route-line', 'line-dasharray', null);
-              }
-            };
-
-            animateRoute();
-
-            // Fit map to show route
-            const coordinates = route.geometry.coordinates;
-            const bounds = coordinates.reduce(
-              (bounds: mapboxgl.LngLatBounds, coord: [number, number]) => bounds.extend(coord),
-              new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
-            );
-
-            map.current?.fitBounds(bounds, {
-              padding: 80,
-              maxZoom: 15,
-              duration: 1000
-            });
+              map.current.fitBounds(bounds, {
+                padding: 80,
+                maxZoom: 15,
+                duration: 0 // Instant, no animation
+              });
+            }
           }
         } catch (error) {
           console.error('Error fetching route:', error);
@@ -351,17 +344,13 @@ const Map: React.FC<MapProps> = ({
     }
   }, [journeyStops, selectedShop, userLocation, mapboxToken, onRouteUpdate]);
 
+  // Update shop markers when shops change
   useEffect(() => {
     if (!map.current || shops.length === 0) return;
-
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
 
     const addShopsToMap = () => {
       if (!map.current) return;
 
-      // Create GeoJSON from shops
       const geojson: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
         features: shops
@@ -399,155 +388,150 @@ const Map: React.FC<MapProps> = ({
         clusterRadius: 50
       });
 
-    // Add cluster circles layer
-    map.current.addLayer({
-      id: 'clusters',
-      type: 'circle',
-      source: 'shops',
-      filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': [
-          'step',
-          ['get', 'point_count'],
-          'hsl(186, 95%, 55%)', // directions color
-          10,
-          'hsl(271, 85%, 65%)', // drops color
-          30,
-          'hsl(45, 93%, 58%)' // pro-gold color
-        ],
-        'circle-radius': [
-          'step',
-          ['get', 'point_count'],
-          20,
-          10,
-          30,
-          30,
-          40
-        ],
-        'circle-stroke-width': 3,
-        'circle-stroke-color': 'hsl(209, 40%, 96%)',
-        'circle-opacity': 0.9
-      }
-    });
-
-    // Add cluster count labels
-    map.current.addLayer({
-      id: 'cluster-count',
-      type: 'symbol',
-      source: 'shops',
-      filter: ['has', 'point_count'],
-      layout: {
-        'text-field': '{point_count_abbreviated}',
-        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-        'text-size': 14
-      },
-      paint: {
-        'text-color': '#ffffff'
-      }
-    });
-
-    // Add unclustered points layer
-    map.current.addLayer({
-      id: 'unclustered-point',
-      type: 'circle',
-      source: 'shops',
-      filter: ['!', ['has', 'point_count']],
-      paint: {
-        'circle-color': [
-          'match',
-          ['get', 'category'],
-          'streetwear', 'hsl(271, 85%, 65%)',
-          'luxury', 'hsl(45, 93%, 58%)',
-          'sneakers', 'hsl(186, 95%, 55%)',
-          'accessories', 'hsl(25, 95%, 53%)',
-          'vintage', 'hsl(142, 90%, 60%)',
-          'sportswear', 'hsl(200, 98%, 39%)',
-          'hsl(200, 98%, 39%)' // default
-        ],
-        'circle-radius': [
-          'case',
-          ['==', ['get', 'id'], highlightedShopId || ''],
-          22, // Larger size for highlighted shop
-          16  // Normal size
-        ],
-        'circle-stroke-width': [
-          'case',
-          ['==', ['get', 'id'], highlightedShopId || ''],
-          5,  // Thicker stroke for highlighted shop
-          3   // Normal stroke
-        ],
-        'circle-stroke-color': [
-          'case',
-          ['==', ['get', 'id'], highlightedShopId || ''],
-          'hsl(0, 0%, 100%)', // White stroke for highlighted shop
-          'hsl(209, 40%, 96%)' // Normal stroke color
-        ],
-        'circle-opacity': 0.9
-      }
-    });
-
-    // Click handler for clusters - zoom in
-    map.current.on('click', 'clusters', (e) => {
-      if (!map.current) return;
-      const features = map.current.queryRenderedFeatures(e.point, {
-        layers: ['clusters']
+      // Add cluster circles layer
+      map.current.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'shops',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': [
+            'step',
+            ['get', 'point_count'],
+            'hsl(186, 95%, 55%)',
+            10,
+            'hsl(271, 85%, 65%)',
+            30,
+            'hsl(45, 93%, 58%)'
+          ],
+          'circle-radius': [
+            'step',
+            ['get', 'point_count'],
+            20,
+            10,
+            30,
+            30,
+            40
+          ],
+          'circle-stroke-width': 3,
+          'circle-stroke-color': 'hsl(209, 40%, 96%)',
+          'circle-opacity': 0.9
+        }
       });
-      const clusterId = features[0].properties.cluster_id;
-      const source = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
-      
-      source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-        if (err || !map.current) return;
-        map.current.easeTo({
-          center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
-          zoom: zoom
+
+      // Add cluster count labels
+      map.current.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'shops',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+          'text-size': 14
+        },
+        paint: {
+          'text-color': '#ffffff'
+        }
+      });
+
+      // Add unclustered points layer
+      map.current.addLayer({
+        id: 'unclustered-point',
+        type: 'circle',
+        source: 'shops',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': [
+            'match',
+            ['get', 'category'],
+            'streetwear', 'hsl(271, 85%, 65%)',
+            'luxury', 'hsl(45, 93%, 58%)',
+            'sneakers', 'hsl(186, 95%, 55%)',
+            'accessories', 'hsl(25, 95%, 53%)',
+            'vintage', 'hsl(142, 90%, 60%)',
+            'sportswear', 'hsl(200, 98%, 39%)',
+            'hsl(200, 98%, 39%)'
+          ],
+          'circle-radius': 16,
+          'circle-stroke-width': 3,
+          'circle-stroke-color': 'hsl(209, 40%, 96%)',
+          'circle-opacity': 0.9
+        }
+      });
+
+      // Click handler for clusters - zoom in, no animation
+      map.current.on('click', 'clusters', (e) => {
+        if (!map.current) return;
+        isUserInteracting.current = true;
+        const features = map.current.queryRenderedFeatures(e.point, {
+          layers: ['clusters']
+        });
+        const clusterId = features[0].properties.cluster_id;
+        const source = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
+        
+        source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+          if (err || !map.current) return;
+          map.current.jumpTo({
+            center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
+            zoom: zoom
+          });
         });
       });
-    });
 
-    // Click handler for unclustered points - show popup
-    map.current.on('click', 'unclustered-point', (e) => {
-      if (!map.current || !e.features?.[0]) return;
-      
-      const coordinates = (e.features[0].geometry as GeoJSON.Point).coordinates.slice() as [number, number];
-      const properties = e.features[0].properties;
-      
-      // Find the shop by ID
-      const shop = shops.find(s => s.id === properties.id);
-      if (!shop) return;
+      // Click handler for unclustered points - show popup, center without animation
+      map.current.on('click', 'unclustered-point', (e) => {
+        if (!map.current || !e.features?.[0]) return;
+        
+        isUserInteracting.current = true;
+        const coordinates = (e.features[0].geometry as GeoJSON.Point).coordinates.slice() as [number, number];
+        const properties = e.features[0].properties;
+        
+        const shop = shopsRef.current.find(s => s.id === properties.id);
+        if (!shop) return;
 
-      // Create popup (contact info hidden for security)
-      new mapboxgl.Popup({ offset: 25 })
-        .setLngLat(coordinates)
-        .setHTML(
-          `<div class="p-3 bg-card rounded-lg">
-            <h3 class="font-bold text-base mb-2">${properties.name}</h3>
-            <p class="text-sm text-muted-foreground mb-1">📍 ${properties.address}, ${properties.city}</p>
-          </div>`
-        )
-        .addTo(map.current);
+        // Close any existing popups
+        const existingPopups = document.querySelectorAll('.mapboxgl-popup');
+        existingPopups.forEach(popup => popup.remove());
 
-      // Trigger onShopClick callback
-      if (onShopClick) {
-        onShopClick(shop);
-      }
-    });
+        // Create popup
+        new mapboxgl.Popup({ offset: 25, closeOnClick: true })
+          .setLngLat(coordinates)
+          .setHTML(
+            `<div class="p-3 bg-card rounded-lg">
+              <h3 class="font-bold text-base mb-2">${properties.name}</h3>
+              <p class="text-sm text-muted-foreground mb-1">📍 ${properties.address}, ${properties.city}</p>
+            </div>`
+          )
+          .addTo(map.current);
 
-    // Change cursor on hover
-    map.current.on('mouseenter', 'clusters', () => {
-      if (map.current) map.current.getCanvas().style.cursor = 'pointer';
-    });
-    map.current.on('mouseleave', 'clusters', () => {
-      if (map.current) map.current.getCanvas().style.cursor = '';
-    });
-    map.current.on('mouseenter', 'unclustered-point', () => {
-      if (map.current) map.current.getCanvas().style.cursor = 'pointer';
-    });
-    map.current.on('mouseleave', 'unclustered-point', () => {
-      if (map.current) map.current.getCanvas().style.cursor = '';
-    });
+        // Center on shop without animation
+        map.current.jumpTo({
+          center: coordinates,
+          zoom: Math.max(map.current.getZoom(), 14)
+        });
+
+        if (onShopClickRef.current) {
+          onShopClickRef.current(shop);
+        }
+      });
+
+      // Change cursor on hover
+      map.current.on('mouseenter', 'clusters', () => {
+        if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+      });
+      map.current.on('mouseleave', 'clusters', () => {
+        if (map.current) map.current.getCanvas().style.cursor = '';
+      });
+      map.current.on('mouseenter', 'unclustered-point', () => {
+        if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+      });
+      map.current.on('mouseleave', 'unclustered-point', () => {
+        if (map.current) map.current.getCanvas().style.cursor = '';
+      });
 
       // Fit map to bounds if there are shops and no initial center provided
-      if (shops.length > 0 && !initialCenter) {
+      if (shops.length > 0 && !initialCenter && !isUserInteracting.current) {
         const bounds = new mapboxgl.LngLatBounds();
         shops.forEach(shop => {
           if (shop.latitude && shop.longitude) {
@@ -559,18 +543,44 @@ const Map: React.FC<MapProps> = ({
           map.current?.fitBounds(bounds, {
             padding: 50,
             maxZoom: 15,
+            duration: 0
           });
         }
       }
     };
 
-    // Wait for style to load before adding sources/layers
     if (map.current.isStyleLoaded()) {
       addShopsToMap();
     } else {
       map.current.once('style.load', addShopsToMap);
     }
-  }, [shops, onShopClick, highlightedShopId, initialCenter]);
+  }, [shops, initialCenter]);
+
+  // Update highlighted shop styling
+  useEffect(() => {
+    if (!map.current || !map.current.isStyleLoaded()) return;
+    
+    if (map.current.getLayer('unclustered-point')) {
+      map.current.setPaintProperty('unclustered-point', 'circle-radius', [
+        'case',
+        ['==', ['get', 'id'], highlightedShopId || ''],
+        22,
+        16
+      ]);
+      map.current.setPaintProperty('unclustered-point', 'circle-stroke-width', [
+        'case',
+        ['==', ['get', 'id'], highlightedShopId || ''],
+        5,
+        3
+      ]);
+      map.current.setPaintProperty('unclustered-point', 'circle-stroke-color', [
+        'case',
+        ['==', ['get', 'id'], highlightedShopId || ''],
+        'hsl(0, 0%, 100%)',
+        'hsl(209, 40%, 96%)'
+      ]);
+    }
+  }, [highlightedShopId]);
 
   if (!mapboxToken) {
     return (
