@@ -110,6 +110,7 @@ const Directions = () => {
   const [mapZoom, setMapZoom] = useState<number>(12);
   const [highlightedShopId, setHighlightedShopId] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapCenterLocation, setMapCenterLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [sortByDistance, setSortByDistance] = useState(false);
   const [visibleShops, setVisibleShops] = useState<ShopType[]>([]);
 
@@ -267,6 +268,11 @@ const Directions = () => {
   // Handle visible shops change from map
   const handleVisibleShopsChange = useCallback((shops: ShopType[]) => {
     setVisibleShops(shops);
+  }, []);
+
+  // Handle map center change for distance calculations
+  const handleMapCenterChange = useCallback((center: { lat: number; lng: number }) => {
+    setMapCenterLocation(center);
   }, []);
 
   // Center map on a shop when clicked from bottom sheet
@@ -582,6 +588,7 @@ const Directions = () => {
                     journeyStops={journeyStops}
                     onRouteUpdate={setRouteInfo}
                     onVisibleShopsChange={handleVisibleShopsChange}
+                    onMapCenterChange={handleMapCenterChange}
                     initialCenter={mapCenter}
                     initialZoom={mapZoom}
                     highlightedShopId={highlightedShopId}
@@ -733,56 +740,80 @@ const Directions = () => {
               <Card className="hidden lg:block mt-2 border border-directions/20 shadow-md rounded-xl">
                 <CardHeader className="border-b border-directions/10 py-2 px-3">
                   <CardTitle className="text-xs uppercase tracking-wider text-directions font-bold">
-                    📍 Nearby ({filteredShops.length})
+                    📍 {visibleShops.length > 0 ? `Nearby (${visibleShops.length})` : 'Closest Shops'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-2">
                   <ScrollArea className="h-[100px]">
-                    {filteredShops.length === 0 ? (
-                      <div className="flex items-center justify-center h-[80px] text-muted-foreground text-xs">
-                        No shops found
-                      </div>
-                    ) : (
-                      <div className="space-y-1 pr-2">
-                        {filteredShops.slice(0, 10).map((shop) => {
-                          const distance = userLocation && shop.latitude && shop.longitude
-                            ? calculateDistance(userLocation.lat, userLocation.lng, Number(shop.latitude), Number(shop.longitude))
-                            : null;
-                          
-                          return (
-                            <div 
-                              key={shop.id}
-                              className="flex items-center gap-2 p-1.5 rounded bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
-                              onClick={() => {
-                                setMapCenter([Number(shop.longitude), Number(shop.latitude)]);
-                                setMapZoom(15);
-                                setHighlightedShopId(shop.id);
-                              }}
-                            >
-                              <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-xs truncate">{shop.name}</p>
-                                <p className="text-[10px] text-muted-foreground truncate">
-                                  {shop.city}
-                                  {distance !== null && ` • ${distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`}`}
-                                </p>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addToJourney(shop);
+                    {(() => {
+                      // Use visible shops if available, otherwise find closest shops to map center
+                      const referenceLocation = mapCenterLocation || userLocation;
+                      let shopsToShow = visibleShops.length > 0 ? visibleShops : [];
+                      
+                      // If no visible shops, find closest ones based on map center or user location
+                      if (shopsToShow.length === 0 && referenceLocation && filteredShops.length > 0) {
+                        shopsToShow = [...filteredShops]
+                          .filter(shop => shop.latitude && shop.longitude)
+                          .sort((a, b) => {
+                            const distA = calculateDistance(referenceLocation.lat, referenceLocation.lng, Number(a.latitude), Number(a.longitude));
+                            const distB = calculateDistance(referenceLocation.lat, referenceLocation.lng, Number(b.latitude), Number(b.longitude));
+                            return distA - distB;
+                          })
+                          .slice(0, 5);
+                      }
+                      
+                      if (shopsToShow.length === 0) {
+                        return (
+                          <div className="flex items-center justify-center h-[80px] text-muted-foreground text-xs">
+                            Loading shops...
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <div className="space-y-1 pr-2">
+                          {shopsToShow.slice(0, 10).map((shop) => {
+                            // Calculate distance from map center (not just user location)
+                            const refLoc = mapCenterLocation || userLocation;
+                            const distance = refLoc && shop.latitude && shop.longitude
+                              ? calculateDistance(refLoc.lat, refLoc.lng, Number(shop.latitude), Number(shop.longitude))
+                              : null;
+                            
+                            return (
+                              <div 
+                                key={shop.id}
+                                className="flex items-center gap-2 p-1.5 rounded bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                                onClick={() => {
+                                  setMapCenter([Number(shop.longitude), Number(shop.latitude)]);
+                                  setMapZoom(15);
+                                  setHighlightedShopId(shop.id);
                                 }}
-                                className="flex-shrink-0 h-6 w-6 p-0 hover:bg-directions/10 hover:text-directions"
-                                disabled={isInJourney(shop.id)}
                               >
-                                {isInJourney(shop.id) ? <Check className="w-3 h-3 text-directions" /> : <Plus className="w-3 h-3" />}
-                              </Button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-semibold text-xs truncate">{shop.name}</p>
+                                  <p className="text-[10px] text-muted-foreground truncate">
+                                    {shop.city}
+                                    {distance !== null && ` • ${distance < 1 ? `${Math.round(distance * 1000)}m` : distance < 10 ? `${distance.toFixed(1)}km` : `${Math.round(distance)}km`}`}
+                                  </p>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addToJourney(shop);
+                                  }}
+                                  className="flex-shrink-0 h-6 w-6 p-0 hover:bg-directions/10 hover:text-directions"
+                                  disabled={isInJourney(shop.id)}
+                                >
+                                  {isInJourney(shop.id) ? <Check className="w-3 h-3 text-directions" /> : <Plus className="w-3 h-3" />}
+                                </Button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                   </ScrollArea>
                 </CardContent>
               </Card>
@@ -894,6 +925,7 @@ const Directions = () => {
         selectedShopId={selectedShop?.id}
         userLocation={userLocation}
         calculateDistance={calculateDistance}
+        mapCenterLocation={mapCenterLocation}
       />
 
       {/* Shop Details Modal */}

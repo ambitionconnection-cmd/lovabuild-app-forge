@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { MapPin, Navigation, Info, ChevronUp, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -22,6 +22,7 @@ interface ShopsBottomSheetProps {
   selectedShopId?: string | null;
   userLocation?: { lat: number; lng: number } | null;
   calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
+  mapCenterLocation?: { lat: number; lng: number } | null;
 }
 
 const SHEET_HEIGHTS = {
@@ -42,6 +43,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   selectedShopId,
   userLocation,
   calculateDistance,
+  mapCenterLocation,
 }) => {
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const [isDragging, setIsDragging] = useState(false);
@@ -50,7 +52,66 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   const startYRef = useRef(0);
   const currentHeightRef = useRef(SHEET_HEIGHTS.peek);
 
-  const shopsToDisplay = sheetState === 'full' ? shops : visibleShops;
+  // Calculate shops to display based on map center or visible shops
+  // CRITICAL FIX #1: Always show at least the closest shop, never show empty
+  const shopsToDisplay = useMemo(() => {
+    if (sheetState === 'full') {
+      return shops;
+    }
+    
+    // Use visible shops if available
+    if (visibleShops.length > 0) {
+      return visibleShops;
+    }
+    
+    // FALLBACK: If no visible shops, find the closest shop to map center or user location
+    const referenceLocation = mapCenterLocation || userLocation;
+    if (!referenceLocation || shops.length === 0) {
+      return [];
+    }
+    
+    // Sort all shops by distance to reference location and return at least the closest ones
+    const shopsWithDistance = shops
+      .filter(shop => shop.latitude && shop.longitude)
+      .map(shop => ({
+        shop,
+        distance: calculateDistance(
+          referenceLocation.lat,
+          referenceLocation.lng,
+          Number(shop.latitude),
+          Number(shop.longitude)
+        )
+      }))
+      .sort((a, b) => a.distance - b.distance);
+    
+    // Return at least the 5 closest shops
+    return shopsWithDistance.slice(0, 5).map(item => item.shop);
+  }, [sheetState, shops, visibleShops, mapCenterLocation, userLocation, calculateDistance]);
+
+  // Get the closest shop for the header display
+  const closestShop = useMemo(() => {
+    const referenceLocation = mapCenterLocation || userLocation;
+    if (!referenceLocation || shopsToDisplay.length === 0) return null;
+    
+    let closest = shopsToDisplay[0];
+    let closestDistance = Infinity;
+    
+    for (const shop of shopsToDisplay) {
+      if (!shop.latitude || !shop.longitude) continue;
+      const distance = calculateDistance(
+        referenceLocation.lat,
+        referenceLocation.lng,
+        Number(shop.latitude),
+        Number(shop.longitude)
+      );
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closest = shop;
+      }
+    }
+    
+    return { shop: closest, distance: closestDistance };
+  }, [shopsToDisplay, mapCenterLocation, userLocation, calculateDistance]);
 
   const getHeightPercent = () => {
     const baseHeight = SHEET_HEIGHTS[sheetState];
@@ -126,6 +187,17 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
 
   const heightPercent = getHeightPercent();
 
+  // Format distance for display
+  const formatDistance = (distance: number) => {
+    if (distance < 1) {
+      return `${Math.round(distance * 1000)}m`;
+    } else if (distance < 10) {
+      return `${distance.toFixed(1)}km`;
+    } else {
+      return `${Math.round(distance)}km`;
+    }
+  };
+
   return (
     <div
       ref={sheetRef}
@@ -151,19 +223,32 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
             <div className="w-12 h-1.5 rounded-full bg-muted-foreground/30" />
           </div>
           
-          {/* Header */}
+          {/* Header - CRITICAL FIX #1: Show closest shop info when peek state */}
           <div className="px-4 pb-3 flex items-center justify-between border-b border-directions/10">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-directions" />
-              <span className="font-bold text-sm uppercase tracking-wider text-directions">
-                {sheetState === 'full' ? 'All Shops' : 'Nearby'}
-              </span>
-              <Badge variant="secondary" className="text-xs bg-directions/10 text-directions border-directions/20">
-                {shopsToDisplay.length}
-              </Badge>
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <MapPin className="w-4 h-4 text-directions flex-shrink-0" />
+              {sheetState === 'peek' && closestShop ? (
+                <div className="flex-1 min-w-0">
+                  <span className="font-bold text-sm uppercase tracking-wider text-directions">
+                    Closest Shop
+                  </span>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {closestShop.shop.name} ({formatDistance(closestShop.distance)})
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <span className="font-bold text-sm uppercase tracking-wider text-directions">
+                    {sheetState === 'full' ? 'All Shops' : 'Nearby'}
+                  </span>
+                  <Badge variant="secondary" className="text-xs bg-directions/10 text-directions border-directions/20">
+                    {shopsToDisplay.length}
+                  </Badge>
+                </>
+              )}
             </div>
             
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
               <ChevronUp className={`w-4 h-4 transition-transform ${sheetState === 'full' ? 'rotate-180' : ''}`} />
               <span className="hidden xs:inline">
                 {sheetState === 'peek' ? 'Swipe up' : sheetState === 'expanded' ? 'More' : 'Swipe down'}
@@ -178,17 +263,19 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
             {shopsToDisplay.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                 <MapPin className="w-8 h-8 mb-2 opacity-50" />
-                <p className="text-sm">No shops visible on map</p>
-                <p className="text-xs mt-1">Zoom out or pan to see more</p>
+                <p className="text-sm">Loading shops...</p>
+                <p className="text-xs mt-1">Getting your location</p>
               </div>
             ) : (
               shopsToDisplay.map((shop) => {
                 const inJourney = isInJourney(shop.id);
                 const isSelected = selectedShopId === shop.id;
-                const distance = userLocation && shop.latitude && shop.longitude
+                // Calculate distance from map center (for viewport-based) or user location
+                const referenceLocation = mapCenterLocation || userLocation;
+                const distance = referenceLocation && shop.latitude && shop.longitude
                   ? calculateDistance(
-                      userLocation.lat,
-                      userLocation.lng,
+                      referenceLocation.lat,
+                      referenceLocation.lng,
                       Number(shop.latitude),
                       Number(shop.longitude)
                     )
@@ -221,7 +308,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                         </p>
                         {distance !== null && (
                           <p className="text-xs font-medium text-primary mt-1">
-                            {distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`} away
+                            {formatDistance(distance)} away
                           </p>
                         )}
                       </div>
