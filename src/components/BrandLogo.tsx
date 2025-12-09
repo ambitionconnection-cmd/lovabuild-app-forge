@@ -9,7 +9,7 @@ interface BrandLogoProps {
   className?: string;
 }
 
-export const BrandLogo = ({ brand, className = "w-full h-full object-cover" }: BrandLogoProps) => {
+export const BrandLogo = ({ brand, className = "max-w-full max-h-full object-contain" }: BrandLogoProps) => {
   if (brand.logo_url) {
     return (
       <img 

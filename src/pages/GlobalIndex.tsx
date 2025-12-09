@@ -310,12 +310,12 @@ const GlobalIndex = () => {
 
                 {/* Brand Logo - Much bigger and centered */}
                 <div className="pt-3 pb-2 flex justify-center">
-                  <div className="w-28 h-28 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden shadow-lg">
+                  <div className="w-28 h-28 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden shadow-lg p-3">
                     {brand.logo_url ? (
                       <img 
                         src={brand.logo_url} 
                         alt={brand.name}
-                        className="w-full h-full object-cover"
+                        className="max-w-full max-h-full object-contain"
                       />
                     ) : (
                       <span className="text-3xl font-bold text-muted-foreground">
