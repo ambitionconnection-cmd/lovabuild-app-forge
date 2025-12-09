@@ -764,8 +764,17 @@ const Directions = () => {
                       
                       if (shopsToShow.length === 0) {
                         return (
-                          <div className="flex items-center justify-center h-[80px] text-muted-foreground text-xs">
-                            Loading shops...
+                          <div className="space-y-2 pr-2">
+                            {[1, 2, 3].map((i) => (
+                              <div key={i} className="flex items-center gap-2 p-1.5 rounded bg-muted/50">
+                                <div className="flex-1 space-y-1">
+                                  <Skeleton className="h-3 w-3/4" />
+                                  <Skeleton className="h-2 w-1/2" />
+                                </div>
+                                <Skeleton className="h-6 w-6 rounded" />
+                              </div>
+                            ))}
+                            <p className="text-[10px] text-center text-muted-foreground">Getting your location...</p>
                           </div>
                         );
                       }
@@ -926,6 +935,7 @@ const Directions = () => {
         userLocation={userLocation}
         calculateDistance={calculateDistance}
         mapCenterLocation={mapCenterLocation}
+        isLoadingLocation={!userLocation && loading}
       />
 
       {/* Shop Details Modal */}

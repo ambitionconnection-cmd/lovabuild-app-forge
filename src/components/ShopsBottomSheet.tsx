@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tables } from '@/integrations/supabase/types';
 import haptic from '@/lib/haptics';
@@ -23,6 +24,7 @@ interface ShopsBottomSheetProps {
   userLocation?: { lat: number; lng: number } | null;
   calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
   mapCenterLocation?: { lat: number; lng: number } | null;
+  isLoadingLocation?: boolean;
 }
 
 const SHEET_HEIGHTS = {
@@ -44,6 +46,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   userLocation,
   calculateDistance,
   mapCenterLocation,
+  isLoadingLocation = false,
 }) => {
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const [isDragging, setIsDragging] = useState(false);
@@ -260,11 +263,30 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
         {/* Shop List */}
         <ScrollArea className="flex-1 px-3">
           <div className="py-2 space-y-2">
-            {shopsToDisplay.length === 0 ? (
+            {isLoadingLocation ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="p-3 rounded-lg border bg-card border-border">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-full" />
+                        <Skeleton className="h-3 w-1/3" />
+                      </div>
+                      <div className="flex gap-1.5">
+                        <Skeleton className="h-7 w-7 rounded" />
+                        <Skeleton className="h-7 w-7 rounded" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <p className="text-xs text-center text-muted-foreground mt-2">Getting your location...</p>
+              </div>
+            ) : shopsToDisplay.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                 <MapPin className="w-8 h-8 mb-2 opacity-50" />
-                <p className="text-sm">Loading shops...</p>
-                <p className="text-xs mt-1">Getting your location</p>
+                <p className="text-sm">No shops found nearby</p>
+                <p className="text-xs mt-1">Try panning the map</p>
               </div>
             ) : (
               shopsToDisplay.map((shop) => {
