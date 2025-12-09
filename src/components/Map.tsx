@@ -361,12 +361,20 @@ const Map: React.FC<MapProps> = ({
     }
   }, [journeyStops, selectedShop, userLocation, mapboxToken, onRouteUpdate]);
 
-  // Update shop markers when shops change
+  // Update shop markers when shops change - CRITICAL FIX: Ensure markers always render
   useEffect(() => {
-    if (!map.current || shops.length === 0) return;
+    if (!map.current) return;
+    
+    // Wait for shops data
+    if (shops.length === 0) {
+      console.log('[Map] No shops to display');
+      return;
+    }
 
     const addShopsToMap = () => {
       if (!map.current) return;
+      
+      console.log('[Map] Adding', shops.length, 'shops to map');
 
       const geojson: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
@@ -376,7 +384,7 @@ const Map: React.FC<MapProps> = ({
             type: 'Feature' as const,
             geometry: {
               type: 'Point' as const,
-              coordinates: [shop.longitude!, shop.latitude!]
+              coordinates: [Number(shop.longitude), Number(shop.latitude)]
             },
             properties: {
               id: shop.id,
@@ -384,9 +392,12 @@ const Map: React.FC<MapProps> = ({
               address: shop.address,
               city: shop.city,
               category: shop.category || 'streetwear',
+              brand_id: shop.brand_id || null,
             }
           }))
       };
+      
+      console.log('[Map] Created GeoJSON with', geojson.features.length, 'features');
 
       // Remove existing source and layers if they exist
       if (map.current.getSource('shops')) {
@@ -484,7 +495,9 @@ const Map: React.FC<MapProps> = ({
         const features = map.current.queryRenderedFeatures(e.point, {
           layers: ['clusters']
         });
-        const clusterId = features[0].properties.cluster_id;
+        if (!features.length) return;
+        const clusterId = features[0].properties?.cluster_id;
+        if (!clusterId) return;
         const source = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
         
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
@@ -504,6 +517,8 @@ const Map: React.FC<MapProps> = ({
         const coordinates = (e.features[0].geometry as GeoJSON.Point).coordinates.slice() as [number, number];
         const properties = e.features[0].properties;
         
+        if (!properties) return;
+        
         const shop = shopsRef.current.find(s => s.id === properties.id);
         if (!shop) return;
 
@@ -511,7 +526,7 @@ const Map: React.FC<MapProps> = ({
         const existingPopups = document.querySelectorAll('.mapboxgl-popup');
         existingPopups.forEach(popup => popup.remove());
 
-        // Create improved popup with action buttons - dispatch events for React to handle
+        // Create improved popup with action buttons
         const popupId = `popup-${shop.id}`;
         const popup = new mapboxgl.Popup({ 
           offset: 25, 
@@ -526,9 +541,9 @@ const Map: React.FC<MapProps> = ({
               <h3 class="shop-popup-name">${properties.name}</h3>
               <p class="shop-popup-address">📍 ${properties.address}, ${properties.city}</p>
               <div class="shop-popup-actions">
-                <button class="shop-popup-btn shop-popup-btn-brand" data-action="brand" data-shop-id="${shop.id}">
+                ${shop.brand_id ? `<button class="shop-popup-btn shop-popup-btn-brand" data-action="brand" data-shop-id="${shop.id}">
                   <span>🏷️</span> BRAND
-                </button>
+                </button>` : ''}
                 <button class="shop-popup-btn shop-popup-btn-shop" data-action="shop" data-shop-id="${shop.id}">
                   <span>🏪</span> SHOP
                 </button>
@@ -594,12 +609,23 @@ const Map: React.FC<MapProps> = ({
         if (map.current) map.current.getCanvas().style.cursor = '';
       });
 
+      // CRITICAL: Update visible shops immediately after adding markers
+      const bounds = map.current.getBounds();
+      if (bounds && onVisibleShopsChangeRef.current) {
+        const visibleShops = shops.filter(shop => {
+          if (!shop.latitude || !shop.longitude) return false;
+          return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
+        });
+        console.log('[Map] Initial visible shops:', visibleShops.length);
+        onVisibleShopsChangeRef.current(visibleShops);
+      }
+
       // Fit map to bounds if there are shops and no initial center provided
       if (shops.length > 0 && !initialCenter && !isUserInteracting.current) {
         const bounds = new mapboxgl.LngLatBounds();
         shops.forEach(shop => {
           if (shop.latitude && shop.longitude) {
-            bounds.extend([shop.longitude, shop.latitude]);
+            bounds.extend([Number(shop.longitude), Number(shop.latitude)]);
           }
         });
         
@@ -611,12 +637,19 @@ const Map: React.FC<MapProps> = ({
           });
         }
       }
+      
+      console.log('[Map] Shops added successfully');
     };
 
+    // CRITICAL FIX: Ensure we properly wait for style to load
     if (map.current.isStyleLoaded()) {
       addShopsToMap();
     } else {
-      map.current.once('style.load', addShopsToMap);
+      console.log('[Map] Waiting for style to load...');
+      map.current.once('style.load', () => {
+        console.log('[Map] Style loaded, adding shops');
+        addShopsToMap();
+      });
     }
   }, [shops, initialCenter]);
 
