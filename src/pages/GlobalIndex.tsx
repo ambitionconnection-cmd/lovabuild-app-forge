@@ -346,8 +346,11 @@ const GlobalIndex = () => {
                         <Button
                           variant="secondary"
                           size="sm"
-                          className="h-8 text-xs px-2 font-medium"
-                          onClick={() => window.open(brand.official_website!, '_blank')}
+                          className="h-8 text-xs px-2 font-medium bg-secondary/40 hover:bg-secondary/60"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(brand.official_website!, '_blank');
+                          }}
                         >
                           <ExternalLink className="w-3.5 h-3.5 mr-1" />
                           Web
@@ -359,8 +362,11 @@ const GlobalIndex = () => {
                         <Button
                           variant="secondary"
                           size="sm"
-                          className="h-8 text-xs px-2 font-medium"
-                          onClick={() => window.open(brand.instagram_url!, '_blank')}
+                          className="h-8 text-xs px-2 font-medium bg-secondary/40 hover:bg-secondary/60"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(brand.instagram_url!, '_blank');
+                          }}
                         >
                           <Instagram className="w-3.5 h-3.5 mr-1" />
                           Insta
@@ -375,8 +381,9 @@ const GlobalIndex = () => {
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="h-8 text-xs px-2 font-medium"
-                        onClick={() => {
+                        className="h-8 text-xs px-2 font-medium bg-secondary/40 hover:bg-secondary/60"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedBrandForShops({ id: brand.id, name: brand.name });
                           setShopModalOpen(true);
                         }}
@@ -388,8 +395,11 @@ const GlobalIndex = () => {
                         <Button
                           variant="secondary"
                           size="sm"
-                          className="h-8 text-xs px-2 font-medium"
-                          onClick={() => window.open(brand.tiktok_url!, '_blank')}
+                          className="h-8 text-xs px-2 font-medium bg-secondary/40 hover:bg-secondary/60"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(brand.tiktok_url!, '_blank');
+                          }}
                         >
                           <TikTokIcon className="w-3.5 h-3.5 mr-1" />
                           TikTok
