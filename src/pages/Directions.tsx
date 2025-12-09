@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -193,6 +194,16 @@ const Directions = () => {
       if (shop && !journeyStops.find(s => s.id === shop.id)) {
         haptic.success();
         setJourneyStops(prev => [...prev, shop]);
+        toast({
+          title: "Added to journey",
+          description: `${shop.name} has been added to your route.`,
+        });
+      } else if (shop && journeyStops.find(s => s.id === shop.id)) {
+        toast({
+          title: "Already in journey",
+          description: `${shop.name} is already in your route.`,
+          variant: "destructive",
+        });
       }
     };
     
