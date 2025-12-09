@@ -511,16 +511,63 @@ const Map: React.FC<MapProps> = ({
         const existingPopups = document.querySelectorAll('.mapboxgl-popup');
         existingPopups.forEach(popup => popup.remove());
 
-        // Create popup
-        new mapboxgl.Popup({ offset: 25, closeOnClick: true })
+        // Create improved popup with action buttons - dispatch events for React to handle
+        const popupId = `popup-${shop.id}`;
+        const popup = new mapboxgl.Popup({ 
+          offset: 25, 
+          closeOnClick: false,
+          closeButton: false,
+          className: 'shop-popup-custom',
+          maxWidth: '280px'
+        })
           .setLngLat(coordinates)
           .setHTML(
-            `<div class="p-3 bg-card rounded-lg">
-              <h3 class="font-bold text-base mb-2">${properties.name}</h3>
-              <p class="text-sm text-muted-foreground mb-1">📍 ${properties.address}, ${properties.city}</p>
+            `<div id="${popupId}" class="shop-popup-card">
+              <h3 class="shop-popup-name">${properties.name}</h3>
+              <p class="shop-popup-address">📍 ${properties.address}, ${properties.city}</p>
+              <div class="shop-popup-actions">
+                <button class="shop-popup-btn shop-popup-btn-brand" data-action="brand" data-shop-id="${shop.id}">
+                  <span>🏷️</span> BRAND
+                </button>
+                <button class="shop-popup-btn shop-popup-btn-shop" data-action="shop" data-shop-id="${shop.id}">
+                  <span>🏪</span> SHOP
+                </button>
+                <button class="shop-popup-btn shop-popup-btn-add" data-action="add" data-shop-id="${shop.id}">
+                  <span>➕</span> ADD TO DIRECTION
+                </button>
+                <button class="shop-popup-btn shop-popup-btn-close" data-action="close" data-shop-id="${shop.id}">
+                  <span>✕</span> CLOSE
+                </button>
+              </div>
             </div>`
           )
           .addTo(map.current);
+
+        // Add event listeners to popup buttons
+        setTimeout(() => {
+          const popupEl = document.getElementById(popupId);
+          if (popupEl) {
+            popupEl.addEventListener('click', (e) => {
+              const target = e.target as HTMLElement;
+              const button = target.closest('button');
+              if (!button) return;
+              
+              const action = button.dataset.action;
+              const shopId = button.dataset.shopId;
+              
+              if (action === 'close') {
+                popup.remove();
+              } else if (action === 'brand' && shop.brand_id) {
+                window.dispatchEvent(new CustomEvent('map:brandClick', { detail: { brandId: shop.brand_id } }));
+              } else if (action === 'shop') {
+                window.dispatchEvent(new CustomEvent('map:shopDetails', { detail: { shopId } }));
+              } else if (action === 'add') {
+                window.dispatchEvent(new CustomEvent('map:addToJourney', { detail: { shopId } }));
+                popup.remove();
+              }
+            });
+          }
+        }, 50);
 
         // Center on shop without animation
         map.current.jumpTo({

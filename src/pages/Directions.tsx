@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move } from "lucide-react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -93,6 +93,7 @@ const SortableStop = ({ stop, index, onRemove }: SortableStopProps) => {
 
 const Directions = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [shops, setShops] = useState<ShopType[]>([]);
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,6 +114,13 @@ const Directions = () => {
   const [mapCenterLocation, setMapCenterLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [sortByDistance, setSortByDistance] = useState(false);
   const [visibleShops, setVisibleShops] = useState<ShopType[]>([]);
+  const [brands, setBrands] = useState<{ id: string; slug: string; name: string }[]>([]);
+  
+  // Draggable journey panel state
+  const [journeyPanelPosition, setJourneyPanelPosition] = useState({ x: 8, y: 0 });
+  const [isDraggingPanel, setIsDraggingPanel] = useState(false);
+  const dragStartPos = useRef({ x: 0, y: 0 });
+  const panelStartPos = useRef({ x: 0, y: 0 });
 
   // Debounce search query for optimized geocoding
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -163,6 +171,85 @@ const Directions = () => {
     }
   }, []);
 
+  // Handle map popup events
+  useEffect(() => {
+    const handleBrandClick = (e: CustomEvent<{ brandId: string }>) => {
+      const brand = brands.find(b => b.id === e.detail.brandId);
+      if (brand) {
+        navigate(`/brands/${brand.slug}`);
+      }
+    };
+    
+    const handleShopDetails = (e: CustomEvent<{ shopId: string }>) => {
+      const shop = shops.find(s => s.id === e.detail.shopId);
+      if (shop) {
+        setSelectedShopForDetails(shop);
+        setDetailsModalOpen(true);
+      }
+    };
+    
+    const handleAddToJourney = (e: CustomEvent<{ shopId: string }>) => {
+      const shop = shops.find(s => s.id === e.detail.shopId);
+      if (shop && !journeyStops.find(s => s.id === shop.id)) {
+        haptic.success();
+        setJourneyStops(prev => [...prev, shop]);
+      }
+    };
+    
+    window.addEventListener('map:brandClick' as any, handleBrandClick);
+    window.addEventListener('map:shopDetails' as any, handleShopDetails);
+    window.addEventListener('map:addToJourney' as any, handleAddToJourney);
+    
+    return () => {
+      window.removeEventListener('map:brandClick' as any, handleBrandClick);
+      window.removeEventListener('map:shopDetails' as any, handleShopDetails);
+      window.removeEventListener('map:addToJourney' as any, handleAddToJourney);
+    };
+  }, [shops, journeyStops, navigate, brands]);
+
+  // Draggable panel handlers
+  const handlePanelDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    setIsDraggingPanel(true);
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    dragStartPos.current = { x: clientX, y: clientY };
+    panelStartPos.current = { ...journeyPanelPosition };
+  }, [journeyPanelPosition]);
+
+  const handlePanelDragMove = useCallback((e: MouseEvent | TouchEvent) => {
+    if (!isDraggingPanel) return;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const deltaX = clientX - dragStartPos.current.x;
+    const deltaY = clientY - dragStartPos.current.y;
+    
+    setJourneyPanelPosition({
+      x: Math.max(8, Math.min(window.innerWidth - 220, panelStartPos.current.x + deltaX)),
+      y: Math.max(-300, Math.min(0, panelStartPos.current.y + deltaY))
+    });
+  }, [isDraggingPanel]);
+
+  const handlePanelDragEnd = useCallback(() => {
+    setIsDraggingPanel(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isDraggingPanel) return;
+    
+    window.addEventListener('mousemove', handlePanelDragMove);
+    window.addEventListener('mouseup', handlePanelDragEnd);
+    window.addEventListener('touchmove', handlePanelDragMove as any);
+    window.addEventListener('touchend', handlePanelDragEnd);
+    
+    return () => {
+      window.removeEventListener('mousemove', handlePanelDragMove);
+      window.removeEventListener('mouseup', handlePanelDragEnd);
+      window.removeEventListener('touchmove', handlePanelDragMove as any);
+      window.removeEventListener('touchend', handlePanelDragEnd);
+    };
+  }, [isDraggingPanel, handlePanelDragMove, handlePanelDragEnd]);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -175,24 +262,32 @@ const Directions = () => {
     }
   };
 
-  // Fetch shops
+  // Fetch shops and brands
   useEffect(() => {
-    const fetchShops = async () => {
-      const { data, error } = await supabase
-        .from('shops_public')
-        .select('*')
-        .order('name');
+    const fetchData = async () => {
+      // Fetch shops and brands in parallel
+      const [shopsResult, brandsResult] = await Promise.all([
+        supabase.from('shops_public').select('*').order('name'),
+        supabase.from('brands').select('id, slug, name').eq('is_active', true)
+      ]);
 
-      if (error) {
-        console.error('Error fetching shops:', error);
+      if (shopsResult.error) {
+        console.error('Error fetching shops:', shopsResult.error);
       } else {
-        setShops(data || []);
-        setFilteredShops(data || []);
+        setShops(shopsResult.data || []);
+        setFilteredShops(shopsResult.data || []);
       }
+      
+      if (brandsResult.error) {
+        console.error('Error fetching brands:', brandsResult.error);
+      } else {
+        setBrands(brandsResult.data || []);
+      }
+      
       setLoading(false);
     };
 
-    fetchShops();
+    fetchData();
   }, []);
 
   // Handle URL parameters for centering map on specific shop
@@ -597,11 +692,26 @@ const Directions = () => {
                   />
                 </div>
                 
-                {/* Journey Stops Overlay - Bottom left on mobile */}
+                {/* Journey Stops Overlay - Draggable floating panel */}
                 {journeyStops.length > 0 && (
-                  <div className="absolute bottom-16 lg:top-2 left-2 right-2 lg:right-auto lg:max-w-[200px] z-10">
+                  <div 
+                    className="absolute z-10 lg:max-w-[200px] select-none"
+                    style={{
+                      left: `${journeyPanelPosition.x}px`,
+                      bottom: `${80 - journeyPanelPosition.y}px`,
+                      cursor: isDraggingPanel ? 'grabbing' : 'auto',
+                    }}
+                  >
                     <Card className="glass-card border border-directions/20 bg-background/95 backdrop-blur-md shadow-lg">
-                      <CardHeader className="py-1.5 px-2">
+                      {/* Drag handle */}
+                      <div 
+                        className="flex items-center justify-center py-1 cursor-grab active:cursor-grabbing hover:bg-directions/5 transition-colors rounded-t-lg"
+                        onMouseDown={handlePanelDragStart}
+                        onTouchStart={handlePanelDragStart}
+                      >
+                        <Move className="w-3 h-3 text-muted-foreground" />
+                      </div>
+                      <CardHeader className="py-1 px-2 border-t border-directions/10">
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-[10px] uppercase tracking-wider text-directions font-bold flex items-center gap-1">
                             🗺️ Journey ({journeyStops.length})
@@ -652,7 +762,7 @@ const Directions = () => {
                             }}
                           >
                             <Navigation className="w-2.5 h-2.5 mr-0.5" />
-                            Navigate
+                            Start Navigation
                           </Button>
                         )}
                       </CardContent>
@@ -759,6 +869,13 @@ const Directions = () => {
                             const distB = calculateDistance(referenceLocation.lat, referenceLocation.lng, Number(b.latitude), Number(b.longitude));
                             return distA - distB;
                           })
+                          .slice(0, 5);
+                      }
+                      
+                      // ULTIMATE FALLBACK: If still no shops and no location, show first 5 shops alphabetically
+                      if (shopsToShow.length === 0 && filteredShops.length > 0) {
+                        shopsToShow = filteredShops
+                          .filter(shop => shop.latitude && shop.longitude)
                           .slice(0, 5);
                       }
                       
