@@ -56,7 +56,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   const currentHeightRef = useRef(SHEET_HEIGHTS.peek);
 
   // Calculate shops to display based on map center or visible shops
-  // CRITICAL FIX #1: Always show at least the closest shop, never show empty
+  // CRITICAL FIX #1: Always show at least the closest shops, never show empty
   const shopsToDisplay = useMemo(() => {
     if (sheetState === 'full') {
       return shops;
@@ -67,28 +67,36 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
       return visibleShops;
     }
     
-    // FALLBACK: If no visible shops, find the closest shop to map center or user location
+    // FALLBACK: If no visible shops, find the closest shops to map center or user location
     const referenceLocation = mapCenterLocation || userLocation;
-    if (!referenceLocation || shops.length === 0) {
-      return [];
+    
+    // If we have a reference location, sort by distance
+    if (referenceLocation && shops.length > 0) {
+      const shopsWithDistance = shops
+        .filter(shop => shop.latitude && shop.longitude)
+        .map(shop => ({
+          shop,
+          distance: calculateDistance(
+            referenceLocation.lat,
+            referenceLocation.lng,
+            Number(shop.latitude),
+            Number(shop.longitude)
+          )
+        }))
+        .sort((a, b) => a.distance - b.distance);
+      
+      // Return at least the 5 closest shops
+      return shopsWithDistance.slice(0, 5).map(item => item.shop);
     }
     
-    // Sort all shops by distance to reference location and return at least the closest ones
-    const shopsWithDistance = shops
-      .filter(shop => shop.latitude && shop.longitude)
-      .map(shop => ({
-        shop,
-        distance: calculateDistance(
-          referenceLocation.lat,
-          referenceLocation.lng,
-          Number(shop.latitude),
-          Number(shop.longitude)
-        )
-      }))
-      .sort((a, b) => a.distance - b.distance);
+    // ULTIMATE FALLBACK: If no location available, just show the first 5 shops alphabetically
+    if (shops.length > 0) {
+      return shops
+        .filter(shop => shop.latitude && shop.longitude)
+        .slice(0, 5);
+    }
     
-    // Return at least the 5 closest shops
-    return shopsWithDistance.slice(0, 5).map(item => item.shop);
+    return [];
   }, [sheetState, shops, visibleShops, mapCenterLocation, userLocation, calculateDistance]);
 
   // Get the closest shop for the header display
@@ -285,8 +293,8 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
             ) : shopsToDisplay.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                 <MapPin className="w-8 h-8 mb-2 opacity-50" />
-                <p className="text-sm">No shops found nearby</p>
-                <p className="text-xs mt-1">Try panning the map</p>
+                <p className="text-sm">Pan the map to discover shops</p>
+                <p className="text-xs mt-1">Shops will appear as you explore</p>
               </div>
             ) : (
               shopsToDisplay.map((shop) => {

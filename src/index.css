@@ -293,3 +293,112 @@ button, [role="button"], a {
 .pull-indicator.pulling {
   animation: pull-rotate 0.5s ease-out;
 }
+
+/* Map Popup Styles - Improved design without white outline */
+.shop-popup-custom .mapboxgl-popup-content {
+  background: hsl(var(--card));
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border: none !important;
+  overflow: hidden;
+}
+
+.shop-popup-custom .mapboxgl-popup-tip {
+  border-top-color: hsl(var(--card));
+}
+
+.shop-popup-card {
+  padding: 12px 14px;
+  min-width: 240px;
+}
+
+.shop-popup-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: hsl(var(--foreground));
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.shop-popup-address {
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.shop-popup-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.shop-popup-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.shop-popup-btn span {
+  font-size: 10px;
+}
+
+.shop-popup-btn-brand {
+  background: hsl(var(--drops) / 0.15);
+  color: hsl(var(--drops));
+}
+
+.shop-popup-btn-brand:hover {
+  background: hsl(var(--drops) / 0.25);
+}
+
+.shop-popup-btn-shop {
+  background: hsl(var(--primary) / 0.15);
+  color: hsl(var(--primary));
+}
+
+.shop-popup-btn-shop:hover {
+  background: hsl(var(--primary) / 0.25);
+}
+
+.shop-popup-btn-add {
+  background: hsl(var(--directions));
+  color: hsl(var(--directions-foreground));
+  grid-column: span 2;
+}
+
+.shop-popup-btn-add:hover {
+  filter: brightness(1.1);
+}
+
+.shop-popup-btn-close {
+  background: hsl(var(--muted) / 0.2);
+  color: hsl(var(--muted-foreground));
+  grid-column: span 2;
+}
+
+.shop-popup-btn-close:hover {
+  background: hsl(var(--destructive) / 0.15);
+  color: hsl(var(--destructive));
+}
+
+/* Dark mode popup styles */
+.dark .shop-popup-custom .mapboxgl-popup-content {
+  background: hsl(var(--card));
+}
+
+.dark .shop-popup-custom .mapboxgl-popup-tip {
+  border-top-color: hsl(var(--card));
+}
