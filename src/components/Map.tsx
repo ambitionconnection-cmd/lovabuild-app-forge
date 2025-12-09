@@ -10,6 +10,7 @@ interface MapProps {
   journeyStops?: Omit<Tables<'shops'>, 'email' | 'phone'>[];
   onRouteUpdate?: (route: any) => void;
   onVisibleShopsChange?: (shops: Omit<Tables<'shops'>, 'email' | 'phone'>[]) => void;
+  onMapCenterChange?: (center: { lat: number; lng: number }) => void;
   onCenterOnShop?: (shopId: string) => void;
   initialCenter?: [number, number] | null;
   initialZoom?: number;
@@ -25,6 +26,7 @@ const Map: React.FC<MapProps> = ({
   journeyStops = [], 
   onRouteUpdate,
   onVisibleShopsChange,
+  onMapCenterChange,
   onCenterOnShop,
   initialCenter,
   initialZoom,
@@ -40,9 +42,11 @@ const Map: React.FC<MapProps> = ({
   const shopsRef = useRef(shops);
   const onShopClickRef = useRef(onShopClick);
   const onVisibleShopsChangeRef = useRef(onVisibleShopsChange);
+  const onMapCenterChangeRef = useRef(onMapCenterChange);
   const isUserInteracting = useRef(false);
   const lastRouteKey = useRef<string>('');
   const routeAnimationRef = useRef<number | null>(null);
+  const hasInitializedLocation = useRef(false);
 
   // Keep refs updated
   useEffect(() => {
@@ -56,6 +60,10 @@ const Map: React.FC<MapProps> = ({
   useEffect(() => {
     onVisibleShopsChangeRef.current = onVisibleShopsChange;
   }, [onVisibleShopsChange]);
+
+  useEffect(() => {
+    onMapCenterChangeRef.current = onMapCenterChange;
+  }, [onMapCenterChange]);
 
   useEffect(() => {
     setMapboxToken('pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ');
@@ -94,9 +102,20 @@ const Map: React.FC<MapProps> = ({
     
     map.current.addControl(geolocateControl, 'top-right');
 
-    // Listen for user location
+    // Listen for user location - CRITICAL FIX #3: Center map on user location
     geolocateControl.on('geolocate', (e: any) => {
-      setUserLocation([e.coords.longitude, e.coords.latitude]);
+      const newLocation: [number, number] = [e.coords.longitude, e.coords.latitude];
+      setUserLocation(newLocation);
+      
+      // CRITICAL FIX #3: Center on user location on first geolocation
+      if (!hasInitializedLocation.current && map.current && !initialCenter) {
+        hasInitializedLocation.current = true;
+        map.current.flyTo({
+          center: newLocation,
+          zoom: 14,
+          duration: 1000,
+        });
+      }
       
       if (userMarkerRef.current) {
         userMarkerRef.current.remove();
@@ -115,7 +134,7 @@ const Map: React.FC<MapProps> = ({
       `;
       
       userMarkerRef.current = new mapboxgl.Marker(el)
-        .setLngLat([e.coords.longitude, e.coords.latitude])
+        .setLngLat(newLocation)
         .addTo(map.current!);
     });
 
@@ -125,33 +144,45 @@ const Map: React.FC<MapProps> = ({
     map.current.on('dragstart', () => { isUserInteracting.current = true; });
     map.current.on('wheel', () => { isUserInteracting.current = true; });
 
-    // Update visible shops on map move (debounced)
+    // CRITICAL FIX #2: Update visible shops and map center on map move (debounced)
     let moveTimeout: ReturnType<typeof setTimeout>;
-    const updateVisibleShops = () => {
+    const updateVisibleShopsAndCenter = () => {
       if (!map.current) return;
       
       clearTimeout(moveTimeout);
       moveTimeout = setTimeout(() => {
         const bounds = map.current?.getBounds();
-        if (!bounds || !onVisibleShopsChangeRef.current) return;
+        const center = map.current?.getCenter();
         
-        const visibleShops = shopsRef.current.filter(shop => {
-          if (!shop.latitude || !shop.longitude) return false;
-          return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
-        });
+        // Update map center for distance calculations
+        if (center && onMapCenterChangeRef.current) {
+          onMapCenterChangeRef.current({ lat: center.lat, lng: center.lng });
+        }
         
-        onVisibleShopsChangeRef.current(visibleShops);
-      }, 200);
+        // CRITICAL FIX #2: Update visible shops based on viewport, not GPS
+        if (bounds && onVisibleShopsChangeRef.current) {
+          const visibleShops = shopsRef.current.filter(shop => {
+            if (!shop.latitude || !shop.longitude) return false;
+            return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
+          });
+          
+          onVisibleShopsChangeRef.current(visibleShops);
+        }
+      }, 150); // Reduced debounce for more responsive updates
     };
 
-    map.current.on('moveend', updateVisibleShops);
+    map.current.on('moveend', updateVisibleShopsAndCenter);
+    map.current.on('zoomend', updateVisibleShopsAndCenter);
 
     // Wait for map to load, then trigger geolocation
     map.current.on('load', () => {
+      // Immediately update visible shops on load
+      updateVisibleShopsAndCenter();
+      
       setTimeout(() => {
         geolocateControl.trigger();
         map.current?.resize();
-      }, 500);
+      }, 300);
     });
 
     const handleResize = () => {
