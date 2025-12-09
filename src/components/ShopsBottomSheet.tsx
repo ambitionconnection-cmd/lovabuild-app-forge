@@ -58,42 +58,58 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   // Calculate shops to display based on map center or visible shops
   // CRITICAL FIX #1: Always show at least the closest shops, never show empty
   const shopsToDisplay = useMemo(() => {
+    // Full mode shows all shops
     if (sheetState === 'full') {
       return shops;
     }
     
-    // Use visible shops if available
-    if (visibleShops.length > 0) {
+    const referenceLocation = mapCenterLocation || userLocation;
+    const validShops = shops.filter(shop => shop.latitude && shop.longitude);
+    
+    // If we have visible shops from the map viewport, prioritize them
+    if (visibleShops && visibleShops.length > 0) {
+      // Sort visible shops by distance from reference location if available
+      if (referenceLocation) {
+        return [...visibleShops].sort((a, b) => {
+          if (!a.latitude || !a.longitude || !b.latitude || !b.longitude) return 0;
+          const distA = calculateDistance(
+            referenceLocation.lat,
+            referenceLocation.lng,
+            Number(a.latitude),
+            Number(a.longitude)
+          );
+          const distB = calculateDistance(
+            referenceLocation.lat,
+            referenceLocation.lng,
+            Number(b.latitude),
+            Number(b.longitude)
+          );
+          return distA - distB;
+        });
+      }
       return visibleShops;
     }
     
-    // FALLBACK: If no visible shops, find the closest shops to map center or user location
-    const referenceLocation = mapCenterLocation || userLocation;
-    
-    // If we have a reference location, sort by distance
-    if (referenceLocation && shops.length > 0) {
-      const shopsWithDistance = shops
-        .filter(shop => shop.latitude && shop.longitude)
-        .map(shop => ({
-          shop,
-          distance: calculateDistance(
-            referenceLocation.lat,
-            referenceLocation.lng,
-            Number(shop.latitude),
-            Number(shop.longitude)
-          )
-        }))
-        .sort((a, b) => a.distance - b.distance);
+    // FALLBACK: If no visible shops (e.g., user is far from any shops), 
+    // find the closest shops to map center or user location
+    if (referenceLocation && validShops.length > 0) {
+      const shopsWithDistance = validShops.map(shop => ({
+        shop,
+        distance: calculateDistance(
+          referenceLocation.lat,
+          referenceLocation.lng,
+          Number(shop.latitude),
+          Number(shop.longitude)
+        )
+      })).sort((a, b) => a.distance - b.distance);
       
-      // Return at least the 5 closest shops
-      return shopsWithDistance.slice(0, 5).map(item => item.shop);
+      // Return at least the 10 closest shops when no visible shops in viewport
+      return shopsWithDistance.slice(0, 10).map(item => item.shop);
     }
     
-    // ULTIMATE FALLBACK: If no location available, just show the first 5 shops alphabetically
-    if (shops.length > 0) {
-      return shops
-        .filter(shop => shop.latitude && shop.longitude)
-        .slice(0, 5);
+    // ULTIMATE FALLBACK: If no location available at all, show first 10 shops
+    if (validShops.length > 0) {
+      return validShops.slice(0, 10);
     }
     
     return [];
