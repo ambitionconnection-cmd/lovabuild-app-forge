@@ -3,6 +3,31 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tables } from '@/integrations/supabase/types';
 
+// Debug mode - enable via URL param ?mapDebug=true or localStorage
+const getDebugMode = () => {
+  if (typeof window === 'undefined') return false;
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('mapDebug') === 'true') {
+    localStorage.setItem('mapDebug', 'true');
+    return true;
+  }
+  return localStorage.getItem('mapDebug') === 'true';
+};
+
+const DEBUG_MAP = getDebugMode();
+
+// Debug logger with emoji prefixes
+const mapLog = {
+  init: (...args: any[]) => DEBUG_MAP && console.log('🗺️ [Init]', ...args),
+  shops: (...args: any[]) => DEBUG_MAP && console.log('🏪 [Shops]', ...args),
+  location: (...args: any[]) => DEBUG_MAP && console.log('📍 [Location]', ...args),
+  layers: (...args: any[]) => DEBUG_MAP && console.log('🎨 [Layers]', ...args),
+  events: (...args: any[]) => DEBUG_MAP && console.log('👆 [Events]', ...args),
+  route: (...args: any[]) => DEBUG_MAP && console.log('🛤️ [Route]', ...args),
+  warn: (...args: any[]) => DEBUG_MAP && console.warn('⚠️ [Map]', ...args),
+  error: (...args: any[]) => console.error('❌ [Map]', ...args),
+};
+
 interface MapProps {
   shops: Omit<Tables<'shops'>, 'email' | 'phone'>[];
   onShopClick?: (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => void;
@@ -41,6 +66,7 @@ const Map: React.FC<MapProps> = ({
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [debugStats, setDebugStats] = useState({ shopsTotal: 0, shopsVisible: 0, sourceReady: false });
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const shopsRef = useRef(shops);
   const onShopClickRef = useRef(onShopClick);
@@ -70,6 +96,7 @@ const Map: React.FC<MapProps> = ({
   }, [onMapCenterChange]);
 
   useEffect(() => {
+    mapLog.init('Debug mode enabled:', DEBUG_MAP);
     setMapboxToken('pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ');
   }, []);
 
@@ -77,12 +104,17 @@ const Map: React.FC<MapProps> = ({
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken || map.current) return;
 
+    mapLog.init('Starting map initialization');
+    mapLog.init('Initial center:', initialCenter, 'Initial zoom:', initialZoom);
+    
     mapboxgl.accessToken = mapboxToken;
     
     // CRITICAL FIX #2: If initialCenter is provided (from Global Index), use it
     // Otherwise use a world-view fallback that will be replaced by user GPS when available
     const startCenter = initialCenter || [0, 20]; // World view fallback
     const startZoom = initialCenter ? (initialZoom || 15) : 2; // Zoomed in for target, zoomed out for world
+    
+    mapLog.init('Using startCenter:', startCenter, 'startZoom:', startZoom);
     
     // Mark as initialized if we have a specific target location
     // Also show tooltip to remind user they can return to their location
@@ -103,6 +135,8 @@ const Map: React.FC<MapProps> = ({
       center: startCenter,
       zoom: startZoom,
     });
+    
+    mapLog.init('Map instance created');
 
     // Add navigation controls
     map.current.addControl(
@@ -127,16 +161,21 @@ const Map: React.FC<MapProps> = ({
     // Listen for user location - Only center on first load if no initialCenter provided
     geolocateControl.on('geolocate', (e: any) => {
       const newLocation: [number, number] = [e.coords.longitude, e.coords.latitude];
+      mapLog.location('Geolocate success:', newLocation);
+      mapLog.location('hasInitializedLocation:', hasInitializedLocation.current, 'initialCenter:', !!initialCenter);
       setUserLocation(newLocation);
       
       // CRITICAL FIX #2: Only center on user location on FIRST geolocation AND only if no specific shop target
       if (!hasInitializedLocation.current && map.current && !initialCenter) {
         hasInitializedLocation.current = true;
+        mapLog.location('Flying to user location (first geolocate)');
         map.current.flyTo({
           center: newLocation,
           zoom: 14,
           duration: 1000,
         });
+      } else {
+        mapLog.location('NOT flying to user location (already initialized or has initialCenter)');
       }
       
       // Update user marker (blue dot)
@@ -159,6 +198,11 @@ const Map: React.FC<MapProps> = ({
       userMarkerRef.current = new mapboxgl.Marker(el)
         .setLngLat(newLocation)
         .addTo(map.current!);
+      mapLog.location('User marker added');
+    });
+    
+    geolocateControl.on('error', (e: any) => {
+      mapLog.warn('Geolocate error:', e.message || e);
     });
 
     // Track user interaction and show tooltip when user navigates away
@@ -210,13 +254,19 @@ const Map: React.FC<MapProps> = ({
 
     // Wait for map to load, then trigger geolocation
     map.current.on('load', () => {
+      mapLog.init('Map load event fired');
       // Immediately update visible shops on load
       updateVisibleShopsAndCenter();
       
       setTimeout(() => {
+        mapLog.location('Triggering geolocate control');
         geolocateControl.trigger();
         map.current?.resize();
       }, 300);
+    });
+    
+    map.current.on('style.load', () => {
+      mapLog.init('Style load event fired');
     });
 
     const handleResize = () => {
@@ -403,20 +453,33 @@ const Map: React.FC<MapProps> = ({
     const setupEventListeners = () => {
       if (!map.current) return;
       
+      mapLog.events('Setting up event listeners');
+      
       // Click handler for clusters - zoom in, no animation
       map.current.on('click', 'clusters', (e) => {
         if (!map.current) return;
+        mapLog.events('Cluster clicked');
         isUserInteracting.current = true;
         const features = map.current.queryRenderedFeatures(e.point, {
           layers: ['clusters']
         });
-        if (!features.length) return;
+        if (!features.length) {
+          mapLog.warn('Cluster click: no features found');
+          return;
+        }
         const clusterId = features[0].properties?.cluster_id;
-        if (!clusterId) return;
+        if (!clusterId) {
+          mapLog.warn('Cluster click: no cluster_id');
+          return;
+        }
         const source = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
         
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-          if (err || !map.current) return;
+          if (err || !map.current) {
+            mapLog.error('Cluster expansion error:', err);
+            return;
+          }
+          mapLog.events('Expanding cluster to zoom:', zoom);
           map.current.jumpTo({
             center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
             zoom: zoom
@@ -427,6 +490,7 @@ const Map: React.FC<MapProps> = ({
       // Click handler for unclustered points - show popup, center without animation
       map.current.on('click', 'unclustered-point', (e) => {
         if (!map.current || !e.features?.[0]) return;
+        mapLog.events('Unclustered point clicked');
         
         isUserInteracting.current = true;
         const coordinates = (e.features[0].geometry as GeoJSON.Point).coordinates.slice() as [number, number];
@@ -524,7 +588,7 @@ const Map: React.FC<MapProps> = ({
         if (map.current) map.current.getCanvas().style.cursor = '';
       });
       
-      console.log('[Map] Event listeners set up');
+      mapLog.events('All event listeners set up successfully');
     };
     
     // Wait for map to be fully loaded
@@ -537,24 +601,38 @@ const Map: React.FC<MapProps> = ({
 
   // Update shop markers when shops change - CRITICAL FIX: Separate data updates from event setup
   useEffect(() => {
-    if (!map.current) return;
+    if (!map.current) {
+      mapLog.shops('Map not ready, skipping shops update');
+      return;
+    }
+    
+    mapLog.shops('Shops effect triggered, count:', shops.length);
+    setDebugStats(prev => ({ ...prev, shopsTotal: shops.length }));
     
     // Wait for shops data
     if (shops.length === 0) {
-      console.log('[Map] No shops to display');
+      mapLog.warn('No shops to display');
       return;
     }
 
     const updateShopsData = () => {
-      if (!map.current) return;
+      if (!map.current) {
+        mapLog.warn('Map disappeared during updateShopsData');
+        return;
+      }
       
-      console.log('[Map] Updating shops data:', shops.length, 'shops');
+      mapLog.shops('Updating shops data:', shops.length, 'shops');
+
+      const shopsWithCoords = shops.filter(shop => shop.latitude && shop.longitude);
+      mapLog.shops('Shops with coordinates:', shopsWithCoords.length, '/', shops.length);
+      
+      if (shopsWithCoords.length === 0) {
+        mapLog.warn('No shops have valid coordinates!');
+      }
 
       const geojson: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
-        features: shops
-          .filter(shop => shop.latitude && shop.longitude)
-          .map(shop => ({
+        features: shopsWithCoords.map(shop => ({
             type: 'Feature' as const,
             geometry: {
               type: 'Point' as const,
@@ -571,15 +649,23 @@ const Map: React.FC<MapProps> = ({
           }))
       };
       
-      console.log('[Map] Created GeoJSON with', geojson.features.length, 'features');
+      mapLog.shops('Created GeoJSON with', geojson.features.length, 'features');
+      
+      // Log sample coordinates for debugging
+      if (geojson.features.length > 0) {
+        const sample = geojson.features[0];
+        const coords = (sample.geometry as GeoJSON.Point).coordinates;
+        mapLog.shops('Sample feature:', sample.properties?.name, 'at', coords);
+      }
 
       // Check if source already exists - just update data
       const existingSource = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
       if (existingSource) {
-        console.log('[Map] Updating existing source');
+        mapLog.layers('Source exists, updating data');
         existingSource.setData(geojson);
+        setDebugStats(prev => ({ ...prev, sourceReady: true }));
       } else {
-        console.log('[Map] Creating new source and layers');
+        mapLog.layers('Creating new source and layers');
         // Add source with clustering
         map.current.addSource('shops', {
           type: 'geojson',
@@ -588,6 +674,7 @@ const Map: React.FC<MapProps> = ({
           clusterMaxZoom: 14,
           clusterRadius: 50
         });
+        mapLog.layers('Source "shops" added');
 
         // Add cluster circles layer
         map.current.addLayer({
@@ -619,6 +706,7 @@ const Map: React.FC<MapProps> = ({
             'circle-opacity': 0.9
           }
         });
+        mapLog.layers('Layer "clusters" added');
 
         // Add cluster count labels
         map.current.addLayer({
@@ -635,6 +723,7 @@ const Map: React.FC<MapProps> = ({
             'text-color': '#ffffff'
           }
         });
+        mapLog.layers('Layer "cluster-count" added');
 
         // Add unclustered points layer
         map.current.addLayer({
@@ -660,6 +749,8 @@ const Map: React.FC<MapProps> = ({
             'circle-opacity': 0.9
           }
         });
+        mapLog.layers('Layer "unclustered-point" added');
+        setDebugStats(prev => ({ ...prev, sourceReady: true }));
       }
 
       // CRITICAL: Update visible shops immediately after adding/updating markers
@@ -669,23 +760,32 @@ const Map: React.FC<MapProps> = ({
           if (!shop.latitude || !shop.longitude) return false;
           return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
         });
-        console.log('[Map] Visible shops after update:', visibleShops.length);
+        mapLog.shops('Visible shops in viewport:', visibleShops.length);
+        setDebugStats(prev => ({ ...prev, shopsVisible: visibleShops.length }));
         onVisibleShopsChangeRef.current(visibleShops);
+      } else {
+        mapLog.warn('Could not update visible shops - bounds:', !!bounds, 'callback:', !!onVisibleShopsChangeRef.current);
       }
       
-      console.log('[Map] Shops data updated successfully');
+      mapLog.shops('✅ Shops data updated successfully');
     };
 
     // CRITICAL FIX: Use idle event for more reliable timing on mobile
     const waitForMapReady = () => {
-      if (!map.current) return;
+      if (!map.current) {
+        mapLog.warn('Map disappeared in waitForMapReady');
+        return;
+      }
       
-      if (map.current.isStyleLoaded()) {
+      const isStyleLoaded = map.current.isStyleLoaded();
+      mapLog.layers('isStyleLoaded:', isStyleLoaded);
+      
+      if (isStyleLoaded) {
         updateShopsData();
       } else {
-        console.log('[Map] Waiting for style to load...');
+        mapLog.layers('Waiting for style to load...');
         map.current.once('style.load', () => {
-          console.log('[Map] Style loaded, updating shops');
+          mapLog.layers('Style loaded event received, updating shops');
           // Small delay to ensure style is fully applied on mobile
           setTimeout(updateShopsData, 100);
         });
@@ -732,6 +832,19 @@ const Map: React.FC<MapProps> = ({
   return (
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="w-full h-full rounded-lg shadow-lg" />
+      {/* Debug overlay - only shown when debug mode is enabled */}
+      {DEBUG_MAP && (
+        <div className="absolute top-2 left-2 z-20 bg-background/90 backdrop-blur-sm border border-border rounded-md px-2 py-1 text-xs font-mono">
+          <div className="flex items-center gap-2">
+            <span>🗺️</span>
+            <span>Shops: {debugStats.shopsTotal}</span>
+            <span className="text-muted-foreground">|</span>
+            <span>Visible: {debugStats.shopsVisible}</span>
+            <span className="text-muted-foreground">|</span>
+            <span>Source: {debugStats.sourceReady ? '✓' : '✗'}</span>
+          </div>
+        </div>
+      )}
       {/* Geolocate tooltip */}
       {showTooltip && (
         <div 
