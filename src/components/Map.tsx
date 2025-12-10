@@ -85,8 +85,16 @@ const Map: React.FC<MapProps> = ({
     const startZoom = initialCenter ? (initialZoom || 15) : 2; // Zoomed in for target, zoomed out for world
     
     // Mark as initialized if we have a specific target location
+    // Also show tooltip to remind user they can return to their location
     if (initialCenter) {
       hasInitializedLocation.current = true;
+      tooltipShownRef.current = true;
+      // Show tooltip after a brief delay so map renders first
+      setTimeout(() => {
+        setShowTooltip(true);
+        // Auto-hide after 5 seconds
+        setTimeout(() => setShowTooltip(false), 5000);
+      }, 1000);
     }
     
     map.current = new mapboxgl.Map({
