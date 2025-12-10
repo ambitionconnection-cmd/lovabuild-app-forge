@@ -17,6 +17,7 @@ interface MapProps {
   highlightedShopId?: string | null;
   isFullscreen?: boolean;
   deferRouteCalculation?: boolean;
+  showGeolocateTooltip?: boolean;
 }
 
 const Map: React.FC<MapProps> = ({ 
@@ -32,12 +33,14 @@ const Map: React.FC<MapProps> = ({
   initialZoom,
   highlightedShopId,
   isFullscreen = false,
-  deferRouteCalculation = true
+  deferRouteCalculation = true,
+  showGeolocateTooltip = false
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const shopsRef = useRef(shops);
   const onShopClickRef = useRef(onShopClick);
@@ -47,6 +50,7 @@ const Map: React.FC<MapProps> = ({
   const lastRouteKey = useRef<string>('');
   const routeAnimationRef = useRef<number | null>(null);
   const hasInitializedLocation = useRef(false);
+  const tooltipShownRef = useRef(false);
 
   // Keep refs updated
   useEffect(() => {
@@ -149,11 +153,22 @@ const Map: React.FC<MapProps> = ({
         .addTo(map.current!);
     });
 
-    // Track user interaction to prevent auto-animations - stays true until explicitly reset
-    map.current.on('mousedown', () => { isUserInteracting.current = true; });
-    map.current.on('touchstart', () => { isUserInteracting.current = true; });
-    map.current.on('dragstart', () => { isUserInteracting.current = true; });
-    map.current.on('wheel', () => { isUserInteracting.current = true; });
+    // Track user interaction and show tooltip when user navigates away
+    const handleUserInteraction = () => {
+      isUserInteracting.current = true;
+      // Show tooltip once when user first navigates away (after location acquired)
+      if (hasInitializedLocation.current && !tooltipShownRef.current) {
+        tooltipShownRef.current = true;
+        setShowTooltip(true);
+        // Auto-hide after 4 seconds
+        setTimeout(() => setShowTooltip(false), 4000);
+      }
+    };
+    
+    map.current.on('mousedown', handleUserInteraction);
+    map.current.on('touchstart', handleUserInteraction);
+    map.current.on('dragstart', handleUserInteraction);
+    map.current.on('wheel', handleUserInteraction);
 
     // CRITICAL FIX #2: Update visible shops and map center on map move (debounced)
     let moveTimeout: ReturnType<typeof setTimeout>;
@@ -684,7 +699,25 @@ const Map: React.FC<MapProps> = ({
   }
 
   return (
-    <div ref={mapContainer} className="w-full h-full rounded-lg shadow-lg" />
+    <div className="relative w-full h-full">
+      <div ref={mapContainer} className="w-full h-full rounded-lg shadow-lg" />
+      {/* Geolocate tooltip */}
+      {showTooltip && (
+        <div 
+          className="absolute top-[140px] right-2 z-10 animate-in fade-in slide-in-from-right-2 duration-300"
+          onClick={() => setShowTooltip(false)}
+        >
+          <div className="bg-background/95 backdrop-blur-sm border border-directions/30 rounded-lg px-3 py-2 shadow-lg max-w-[180px]">
+            <div className="flex items-start gap-2">
+              <span className="text-directions text-lg">↑</span>
+              <p className="text-xs text-foreground/90">
+                Tap the location button to return to your current position
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
