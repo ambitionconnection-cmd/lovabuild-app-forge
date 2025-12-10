@@ -172,12 +172,23 @@ const Directions = () => {
     }
   }, []);
 
+  // Save map position before navigating away
+  const saveMapPosition = useCallback(() => {
+    if (mapCenter) {
+      sessionStorage.setItem('heardrop_map_position', JSON.stringify({
+        center: mapCenter,
+        zoom: mapZoom
+      }));
+    }
+  }, [mapCenter, mapZoom]);
+
   // Handle map popup events
   useEffect(() => {
     const handleBrandClick = (e: CustomEvent<{ brandId: string }>) => {
       const brand = brands.find(b => b.id === e.detail.brandId);
       if (brand) {
-        navigate(`/brands/${brand.slug}`);
+        saveMapPosition();
+        navigate(`/brand/${brand.slug}`);
       }
     };
     
@@ -216,7 +227,25 @@ const Directions = () => {
       window.removeEventListener('map:shopDetails' as any, handleShopDetails);
       window.removeEventListener('map:addToJourney' as any, handleAddToJourney);
     };
-  }, [shops, journeyStops, navigate, brands]);
+  }, [shops, journeyStops, navigate, brands, saveMapPosition]);
+
+  // Restore map position on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem('heardrop_map_position');
+    if (saved && !searchParams.get('shopId')) {
+      try {
+        const { center, zoom } = JSON.parse(saved);
+        if (center && !mapCenter) {
+          setMapCenter(center);
+          setMapZoom(zoom || 12);
+        }
+        // Clear saved position after restoring
+        sessionStorage.removeItem('heardrop_map_position');
+      } catch (e) {
+        console.error('Error restoring map position:', e);
+      }
+    }
+  }, []);
 
   // Draggable panel handlers
   const handlePanelDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
@@ -376,9 +405,12 @@ const Directions = () => {
     setVisibleShops(shops);
   }, []);
 
-  // Handle map center change for distance calculations
-  const handleMapCenterChange = useCallback((center: { lat: number; lng: number }) => {
+  // Handle map center change for distance calculations and position persistence
+  const handleMapCenterChange = useCallback((center: { lat: number; lng: number; zoom: number }) => {
     setMapCenterLocation(center);
+    // Update mapCenter and mapZoom for persistence
+    setMapCenter([center.lng, center.lat]);
+    setMapZoom(center.zoom);
   }, []);
 
   // Center map on a shop when clicked from bottom sheet
