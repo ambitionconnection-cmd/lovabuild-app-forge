@@ -69,10 +69,38 @@ const Index = () => {
   }, []);
   const fetchHomeData = async () => {
     try {
-      const [dropsRes, brandsRes, shopsRes] = await Promise.all([supabase.from('drops').select('*').eq('is_featured', true).eq('status', 'upcoming').order('release_date', {
-        ascending: true
-      }).limit(12), supabase.from('brands').select('*').eq('is_active', true).limit(6), supabase.from('shops').select('*').eq('is_active', true).limit(4)]);
-      if (dropsRes.data) setFeaturedDrops(dropsRes.data);
+      // Fetch upcoming drops first (sorted by release date)
+      const upcomingRes = await supabase
+        .from('drops')
+        .select('*')
+        .in('status', ['upcoming', 'live'])
+        .gte('release_date', new Date().toISOString())
+        .order('release_date', { ascending: true })
+        .limit(4);
+      
+      let displayDrops = upcomingRes.data || [];
+      
+      // If we don't have 4 upcoming drops, fill with recent ended drops
+      if (displayDrops.length < 4) {
+        const needed = 4 - displayDrops.length;
+        const endedRes = await supabase
+          .from('drops')
+          .select('*')
+          .eq('status', 'ended')
+          .order('release_date', { ascending: false })
+          .limit(needed);
+        
+        if (endedRes.data) {
+          displayDrops = [...displayDrops, ...endedRes.data];
+        }
+      }
+      
+      const [brandsRes, shopsRes] = await Promise.all([
+        supabase.from('brands').select('*').eq('is_active', true).limit(6),
+        supabase.from('shops').select('*').eq('is_active', true).limit(4)
+      ]);
+      
+      setFeaturedDrops(displayDrops);
       if (brandsRes.data) setPopularBrands(brandsRes.data);
       if (shopsRes.data) setNearbyShops(shopsRes.data);
     } catch (error) {
@@ -164,9 +192,9 @@ const Index = () => {
             </div>
           </div>
           
-          {loading ? <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {[1, 2, 3].map(i => <Card key={i} className="overflow-hidden animate-pulse">
-                  <div className="h-32 bg-muted" />
+          {loading ? <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map(i => <Card key={i} className="overflow-hidden animate-pulse">
+                  <div className="h-28 bg-muted" />
                   <CardContent className="p-2">
                     <div className="h-3 bg-muted rounded mb-1" />
                     <div className="h-2 bg-muted rounded w-2/3" />
@@ -176,13 +204,20 @@ const Index = () => {
               <CardContent className="py-8 text-center text-muted-foreground text-sm">
                 {dropSearchQuery ? `No drops found matching "${dropSearchQuery}"` : t('home.noFeaturedDrops')}
               </CardContent>
-            </Card> : <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {filteredDrops.slice(0, 6).map(drop => <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/drops')}>
+            </Card> : <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {filteredDrops.slice(0, 4).map(drop => <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/drops')}>
                   <div className="relative h-28 bg-muted overflow-hidden">
                     {drop.image_url ? <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
                         <Zap className="h-8 w-8 text-muted-foreground" />
                       </div>}
-                    <Badge className="absolute top-1 right-1 text-[10px] px-1.5 py-0.5">{t('drops.featured')}</Badge>
+                    <Badge 
+                      className={`absolute top-1 right-1 text-[10px] px-1.5 py-0.5 ${
+                        drop.status === 'ended' ? 'bg-muted text-muted-foreground' : 
+                        drop.status === 'live' ? 'bg-green-500 text-white' : ''
+                      }`}
+                    >
+                      {drop.status === 'ended' ? 'Ended' : drop.status === 'live' ? 'Live' : 'Upcoming'}
+                    </Badge>
                   </div>
                   <CardContent className="p-2">
                     <h4 className="font-semibold text-xs mb-0.5 line-clamp-1">{drop.title}</h4>
