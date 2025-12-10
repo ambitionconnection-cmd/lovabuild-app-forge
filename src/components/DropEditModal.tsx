@@ -279,14 +279,14 @@ export function DropEditModal({ drop, open, onOpenChange, onSuccess }: DropEditM
             <div className="space-y-2">
               <Label htmlFor="brand">Brand</Label>
               <Select
-                value={formData.brand_id}
-                onValueChange={(value) => setFormData({ ...formData, brand_id: value })}
+                value={formData.brand_id || "none"}
+                onValueChange={(value) => setFormData({ ...formData, brand_id: value === "none" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select brand" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {brands.map((brand) => (
                     <SelectItem key={brand.id} value={brand.id}>
                       {brand.name}
@@ -298,14 +298,14 @@ export function DropEditModal({ drop, open, onOpenChange, onSuccess }: DropEditM
             <div className="space-y-2">
               <Label htmlFor="shop">Shop</Label>
               <Select
-                value={formData.shop_id}
-                onValueChange={(value) => setFormData({ ...formData, shop_id: value })}
+                value={formData.shop_id || "none"}
+                onValueChange={(value) => setFormData({ ...formData, shop_id: value === "none" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select shop" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {shops.map((shop) => (
                     <SelectItem key={shop.id} value={shop.id}>
                       {shop.name}
