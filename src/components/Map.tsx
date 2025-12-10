@@ -395,133 +395,14 @@ const Map: React.FC<MapProps> = ({
     }
   }, [journeyStops, selectedShop, userLocation, mapboxToken, onRouteUpdate]);
 
-  // Update shop markers when shops change - CRITICAL FIX: Ensure markers always render
+  // CRITICAL FIX: Set up map event listeners ONCE when map is ready
+  // This prevents duplicate handlers on mobile
   useEffect(() => {
     if (!map.current) return;
     
-    // Wait for shops data
-    if (shops.length === 0) {
-      console.log('[Map] No shops to display');
-      return;
-    }
-
-    const addShopsToMap = () => {
+    const setupEventListeners = () => {
       if (!map.current) return;
       
-      console.log('[Map] Adding', shops.length, 'shops to map');
-
-      const geojson: GeoJSON.FeatureCollection = {
-        type: 'FeatureCollection',
-        features: shops
-          .filter(shop => shop.latitude && shop.longitude)
-          .map(shop => ({
-            type: 'Feature' as const,
-            geometry: {
-              type: 'Point' as const,
-              coordinates: [Number(shop.longitude), Number(shop.latitude)]
-            },
-            properties: {
-              id: shop.id,
-              name: shop.name,
-              address: shop.address,
-              city: shop.city,
-              category: shop.category || 'streetwear',
-              brand_id: shop.brand_id || null,
-            }
-          }))
-      };
-      
-      console.log('[Map] Created GeoJSON with', geojson.features.length, 'features');
-
-      // Remove existing source and layers if they exist
-      if (map.current.getSource('shops')) {
-        if (map.current.getLayer('clusters')) map.current.removeLayer('clusters');
-        if (map.current.getLayer('cluster-count')) map.current.removeLayer('cluster-count');
-        if (map.current.getLayer('unclustered-point')) map.current.removeLayer('unclustered-point');
-        map.current.removeSource('shops');
-      }
-
-      // Add source with clustering
-      map.current.addSource('shops', {
-        type: 'geojson',
-        data: geojson,
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 50
-      });
-
-      // Add cluster circles layer
-      map.current.addLayer({
-        id: 'clusters',
-        type: 'circle',
-        source: 'shops',
-        filter: ['has', 'point_count'],
-        paint: {
-          'circle-color': [
-            'step',
-            ['get', 'point_count'],
-            'hsl(186, 95%, 55%)',
-            10,
-            'hsl(271, 85%, 65%)',
-            30,
-            'hsl(45, 93%, 58%)'
-          ],
-          'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            20,
-            10,
-            30,
-            30,
-            40
-          ],
-          'circle-stroke-width': 3,
-          'circle-stroke-color': 'hsl(209, 40%, 96%)',
-          'circle-opacity': 0.9
-        }
-      });
-
-      // Add cluster count labels
-      map.current.addLayer({
-        id: 'cluster-count',
-        type: 'symbol',
-        source: 'shops',
-        filter: ['has', 'point_count'],
-        layout: {
-          'text-field': '{point_count_abbreviated}',
-          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-          'text-size': 14
-        },
-        paint: {
-          'text-color': '#ffffff'
-        }
-      });
-
-      // Add unclustered points layer
-      map.current.addLayer({
-        id: 'unclustered-point',
-        type: 'circle',
-        source: 'shops',
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-          'circle-color': [
-            'match',
-            ['get', 'category'],
-            'streetwear', 'hsl(271, 85%, 65%)',
-            'luxury', 'hsl(45, 93%, 58%)',
-            'sneakers', 'hsl(186, 95%, 55%)',
-            'accessories', 'hsl(25, 95%, 53%)',
-            'vintage', 'hsl(142, 90%, 60%)',
-            'sportswear', 'hsl(200, 98%, 39%)',
-            'hsl(200, 98%, 39%)'
-          ],
-          'circle-radius': 16,
-          'circle-stroke-width': 3,
-          'circle-stroke-color': 'hsl(209, 40%, 96%)',
-          'circle-opacity': 0.9
-        }
-      });
-
       // Click handler for clusters - zoom in, no animation
       map.current.on('click', 'clusters', (e) => {
         if (!map.current) return;
@@ -642,35 +523,177 @@ const Map: React.FC<MapProps> = ({
       map.current.on('mouseleave', 'unclustered-point', () => {
         if (map.current) map.current.getCanvas().style.cursor = '';
       });
+      
+      console.log('[Map] Event listeners set up');
+    };
+    
+    // Wait for map to be fully loaded
+    if (map.current.loaded()) {
+      setupEventListeners();
+    } else {
+      map.current.on('load', setupEventListeners);
+    }
+  }, [mapboxToken]); // Only run once when map is created
 
-      // CRITICAL: Update visible shops immediately after adding markers
+  // Update shop markers when shops change - CRITICAL FIX: Separate data updates from event setup
+  useEffect(() => {
+    if (!map.current) return;
+    
+    // Wait for shops data
+    if (shops.length === 0) {
+      console.log('[Map] No shops to display');
+      return;
+    }
+
+    const updateShopsData = () => {
+      if (!map.current) return;
+      
+      console.log('[Map] Updating shops data:', shops.length, 'shops');
+
+      const geojson: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: shops
+          .filter(shop => shop.latitude && shop.longitude)
+          .map(shop => ({
+            type: 'Feature' as const,
+            geometry: {
+              type: 'Point' as const,
+              coordinates: [Number(shop.longitude), Number(shop.latitude)]
+            },
+            properties: {
+              id: shop.id,
+              name: shop.name,
+              address: shop.address,
+              city: shop.city,
+              category: shop.category || 'streetwear',
+              brand_id: shop.brand_id || null,
+            }
+          }))
+      };
+      
+      console.log('[Map] Created GeoJSON with', geojson.features.length, 'features');
+
+      // Check if source already exists - just update data
+      const existingSource = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
+      if (existingSource) {
+        console.log('[Map] Updating existing source');
+        existingSource.setData(geojson);
+      } else {
+        console.log('[Map] Creating new source and layers');
+        // Add source with clustering
+        map.current.addSource('shops', {
+          type: 'geojson',
+          data: geojson,
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: 50
+        });
+
+        // Add cluster circles layer
+        map.current.addLayer({
+          id: 'clusters',
+          type: 'circle',
+          source: 'shops',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': [
+              'step',
+              ['get', 'point_count'],
+              'hsl(186, 95%, 55%)',
+              10,
+              'hsl(271, 85%, 65%)',
+              30,
+              'hsl(45, 93%, 58%)'
+            ],
+            'circle-radius': [
+              'step',
+              ['get', 'point_count'],
+              20,
+              10,
+              30,
+              30,
+              40
+            ],
+            'circle-stroke-width': 3,
+            'circle-stroke-color': 'hsl(209, 40%, 96%)',
+            'circle-opacity': 0.9
+          }
+        });
+
+        // Add cluster count labels
+        map.current.addLayer({
+          id: 'cluster-count',
+          type: 'symbol',
+          source: 'shops',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': '{point_count_abbreviated}',
+            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+            'text-size': 14
+          },
+          paint: {
+            'text-color': '#ffffff'
+          }
+        });
+
+        // Add unclustered points layer
+        map.current.addLayer({
+          id: 'unclustered-point',
+          type: 'circle',
+          source: 'shops',
+          filter: ['!', ['has', 'point_count']],
+          paint: {
+            'circle-color': [
+              'match',
+              ['get', 'category'],
+              'streetwear', 'hsl(271, 85%, 65%)',
+              'luxury', 'hsl(45, 93%, 58%)',
+              'sneakers', 'hsl(186, 95%, 55%)',
+              'accessories', 'hsl(25, 95%, 53%)',
+              'vintage', 'hsl(142, 90%, 60%)',
+              'sportswear', 'hsl(200, 98%, 39%)',
+              'hsl(200, 98%, 39%)'
+            ],
+            'circle-radius': 16,
+            'circle-stroke-width': 3,
+            'circle-stroke-color': 'hsl(209, 40%, 96%)',
+            'circle-opacity': 0.9
+          }
+        });
+      }
+
+      // CRITICAL: Update visible shops immediately after adding/updating markers
       const bounds = map.current.getBounds();
       if (bounds && onVisibleShopsChangeRef.current) {
         const visibleShops = shops.filter(shop => {
           if (!shop.latitude || !shop.longitude) return false;
           return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
         });
-        console.log('[Map] Initial visible shops:', visibleShops.length);
+        console.log('[Map] Visible shops after update:', visibleShops.length);
         onVisibleShopsChangeRef.current(visibleShops);
       }
-
-      // CRITICAL FIX #2: Do NOT auto-fit bounds - let geolocation or initialCenter control position
-      // This prevents the map from jumping away from user's location or target shop
       
-      console.log('[Map] Shops added successfully');
+      console.log('[Map] Shops data updated successfully');
     };
 
-    // CRITICAL FIX: Ensure we properly wait for style to load
-    if (map.current.isStyleLoaded()) {
-      addShopsToMap();
-    } else {
-      console.log('[Map] Waiting for style to load...');
-      map.current.once('style.load', () => {
-        console.log('[Map] Style loaded, adding shops');
-        addShopsToMap();
-      });
-    }
-  }, [shops, initialCenter]);
+    // CRITICAL FIX: Use idle event for more reliable timing on mobile
+    const waitForMapReady = () => {
+      if (!map.current) return;
+      
+      if (map.current.isStyleLoaded()) {
+        updateShopsData();
+      } else {
+        console.log('[Map] Waiting for style to load...');
+        map.current.once('style.load', () => {
+          console.log('[Map] Style loaded, updating shops');
+          // Small delay to ensure style is fully applied on mobile
+          setTimeout(updateShopsData, 100);
+        });
+      }
+    };
+    
+    waitForMapReady();
+  }, [shops]);
 
   // Update highlighted shop styling
   useEffect(() => {
