@@ -35,7 +35,7 @@ interface MapProps {
   journeyStops?: Omit<Tables<'shops'>, 'email' | 'phone'>[];
   onRouteUpdate?: (route: any) => void;
   onVisibleShopsChange?: (shops: Omit<Tables<'shops'>, 'email' | 'phone'>[]) => void;
-  onMapCenterChange?: (center: { lat: number; lng: number }) => void;
+  onMapCenterChange?: (center: { lat: number; lng: number; zoom: number }) => void;
   onCenterOnShop?: (shopId: string) => void;
   initialCenter?: [number, number] | null;
   initialZoom?: number;
@@ -232,9 +232,10 @@ const Map: React.FC<MapProps> = ({
         const bounds = map.current?.getBounds();
         const center = map.current?.getCenter();
         
-        // Update map center for distance calculations
+        // Update map center and zoom for distance calculations and persistence
         if (center && onMapCenterChangeRef.current) {
-          onMapCenterChangeRef.current({ lat: center.lat, lng: center.lng });
+          const zoom = map.current?.getZoom() || 12;
+          onMapCenterChangeRef.current({ lat: center.lat, lng: center.lng, zoom });
         }
         
         // CRITICAL FIX #2: Update visible shops based on viewport, not GPS
