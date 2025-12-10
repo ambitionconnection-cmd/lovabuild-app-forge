@@ -75,11 +75,21 @@ const Map: React.FC<MapProps> = ({
 
     mapboxgl.accessToken = mapboxToken;
     
+    // CRITICAL FIX #2: If initialCenter is provided (from Global Index), use it
+    // Otherwise use a world-view fallback that will be replaced by user GPS when available
+    const startCenter = initialCenter || [0, 20]; // World view fallback
+    const startZoom = initialCenter ? (initialZoom || 15) : 2; // Zoomed in for target, zoomed out for world
+    
+    // Mark as initialized if we have a specific target location
+    if (initialCenter) {
+      hasInitializedLocation.current = true;
+    }
+    
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/dark-v11',
-      center: initialCenter || [2.3522, 48.8566],
-      zoom: initialZoom || 12,
+      center: startCenter,
+      zoom: startZoom,
     });
 
     // Add navigation controls
@@ -90,24 +100,24 @@ const Map: React.FC<MapProps> = ({
       'top-right'
     );
 
-    // Add geolocate control
+    // Add geolocate control - CRITICAL FIX #3: Disable trackUserLocation to prevent snap-back
     const geolocateControl = new mapboxgl.GeolocateControl({
       positionOptions: {
         enableHighAccuracy: true
       },
-      trackUserLocation: true,
-      showUserHeading: true,
-      showAccuracyCircle: true,
+      trackUserLocation: false, // DISABLED: Prevents map from snapping back to user location
+      showUserHeading: false,
+      showAccuracyCircle: false,
     });
     
     map.current.addControl(geolocateControl, 'top-right');
 
-    // Listen for user location - CRITICAL FIX #3: Center map on user location
+    // Listen for user location - Only center on first load if no initialCenter provided
     geolocateControl.on('geolocate', (e: any) => {
       const newLocation: [number, number] = [e.coords.longitude, e.coords.latitude];
       setUserLocation(newLocation);
       
-      // CRITICAL FIX #3: Center on user location on first geolocation
+      // CRITICAL FIX #2: Only center on user location on FIRST geolocation AND only if no specific shop target
       if (!hasInitializedLocation.current && map.current && !initialCenter) {
         hasInitializedLocation.current = true;
         map.current.flyTo({
@@ -117,6 +127,7 @@ const Map: React.FC<MapProps> = ({
         });
       }
       
+      // Update user marker (blue dot)
       if (userMarkerRef.current) {
         userMarkerRef.current.remove();
       }
@@ -620,23 +631,8 @@ const Map: React.FC<MapProps> = ({
         onVisibleShopsChangeRef.current(visibleShops);
       }
 
-      // Fit map to bounds if there are shops and no initial center provided
-      if (shops.length > 0 && !initialCenter && !isUserInteracting.current) {
-        const bounds = new mapboxgl.LngLatBounds();
-        shops.forEach(shop => {
-          if (shop.latitude && shop.longitude) {
-            bounds.extend([Number(shop.longitude), Number(shop.latitude)]);
-          }
-        });
-        
-        if (!bounds.isEmpty()) {
-          map.current?.fitBounds(bounds, {
-            padding: 50,
-            maxZoom: 15,
-            duration: 0
-          });
-        }
-      }
+      // CRITICAL FIX #2: Do NOT auto-fit bounds - let geolocation or initialCenter control position
+      // This prevents the map from jumping away from user's location or target shop
       
       console.log('[Map] Shops added successfully');
     };
