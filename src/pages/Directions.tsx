@@ -795,11 +795,21 @@ const Directions = () => {
                             size="sm"
                             className="w-full bg-directions hover:bg-directions/90 text-directions-foreground font-bold uppercase tracking-wider text-[10px] py-0.5 h-6"
                             onClick={() => {
-                              const waypoints = journeyStops
-                                .map(stop => `${stop.latitude},${stop.longitude}`)
-                                .join('/');
+                              // Build waypoints array starting with user's current location
+                              const allWaypoints: string[] = [];
+                              
+                              // Add user's current location as starting point if available
+                              if (userLocation) {
+                                allWaypoints.push(`${userLocation.lat},${userLocation.lng}`);
+                              }
+                              
+                              // Add all journey stops
+                              journeyStops.forEach(stop => {
+                                allWaypoints.push(`${stop.latitude},${stop.longitude}`);
+                              });
+                              
                               window.open(
-                                `https://www.google.com/maps/dir/${waypoints}`,
+                                `https://www.google.com/maps/dir/${allWaypoints.join('/')}`,
                                 '_blank'
                               );
                             }}
