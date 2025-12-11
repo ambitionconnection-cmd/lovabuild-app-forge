@@ -193,6 +193,7 @@ const ShopMap = () => {
               official_site: shop.official_site,
               category: shop.category || 'streetwear',
               brand_name: brand?.name || null,
+              brand_slug: brand?.slug || null,
             }
           };
         })
@@ -318,18 +319,20 @@ const ShopMap = () => {
           <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold;">
             ${props.name}
           </h3>
-          ${props.brand_name ? `
+          ${props.brand_name && props.brand_slug ? `
             <div style="margin-bottom: 8px;">
-              <span style="
+              <a href="/brand/${props.brand_slug}" style="
                 display: inline-block;
-                padding: 2px 8px;
-                background: hsl(var(--primary) / 0.1);
+                padding: 4px 12px;
+                background: hsl(var(--primary));
                 border-radius: 4px;
                 font-size: 12px;
-                color: hsl(var(--primary));
+                color: white;
+                text-decoration: none;
+                font-weight: 500;
               ">
-                ${props.brand_name}
-              </span>
+                🏷️ ${props.brand_name}
+              </a>
             </div>
           ` : ''}
           <p style="margin: 4px 0; font-size: 14px; color: #666;">
@@ -351,22 +354,22 @@ const ShopMap = () => {
               </span>
             </p>
           ` : ''}
-          ${/* Contact info hidden for security */ ''}
-          ${props.official_site ? `
-            <a href="${props.official_site}" target="_blank" rel="noopener noreferrer" 
-               style="
-                 display: inline-block;
-                 margin-top: 8px;
-                 padding: 4px 12px;
-                 background: hsl(var(--primary));
-                 color: white;
-                 text-decoration: none;
-                 border-radius: 4px;
-                 font-size: 12px;
-               ">
-              Visit Website →
-            </a>
-          ` : ''}
+          <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+            ${props.official_site ? `
+              <a href="${props.official_site}" target="_blank" rel="noopener noreferrer" 
+                 style="
+                   display: inline-block;
+                   padding: 4px 12px;
+                   background: hsl(var(--secondary));
+                   color: hsl(var(--secondary-foreground));
+                   text-decoration: none;
+                   border-radius: 4px;
+                   font-size: 12px;
+                 ">
+                Visit Website →
+              </a>
+            ` : ''}
+          </div>
         </div>
       `;
 
