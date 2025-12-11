@@ -9,10 +9,21 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 const resendApiKey = Deno.env.get('RESEND_API_KEY')!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const resend = new Resend(resendApiKey);
+
+// Validate authorization for cron jobs
+function validateCronAuthorization(req: Request): boolean {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) return false;
+  
+  const token = authHeader.replace('Bearer ', '');
+  // Accept either service role key or anon key (for cron jobs)
+  return token === supabaseServiceKey || token === supabaseAnonKey;
+}
 
 interface NotificationLog {
   user_id: string;
@@ -322,9 +333,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Validate authorization for cron jobs
+  if (!validateCronAuthorization(req)) {
+    console.error('Unauthorized request to send-drop-notifications');
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const { notification_type } = await req.json().catch(() => ({ notification_type: 'all' }));
-
     console.log('Starting notification job...', { notification_type });
 
     const results: Record<string, { processed: number; errors: number }> = {};
