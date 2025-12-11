@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,8 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 const GlobalIndex = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get('highlight');
   const [brands, setBrands] = useState<Tables<'brands'>[]>([]);
   const [filteredBrands, setFilteredBrands] = useState<Tables<'brands'>[]>([]);
   const [favoriteBrands, setFavoriteBrands] = useState<Set<string>>(new Set());
@@ -35,6 +37,7 @@ const GlobalIndex = () => {
   const [shopModalOpen, setShopModalOpen] = useState(false);
   const [selectedBrandForShops, setSelectedBrandForShops] = useState<{ id: string; name: string } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [highlightedBrand, setHighlightedBrand] = useState<string | null>(highlightId);
 
   // Fetch brands and user favorites
   useEffect(() => {
@@ -43,6 +46,21 @@ const GlobalIndex = () => {
       fetchFavorites();
     }
   }, [user]);
+
+  // Scroll to highlighted brand after loading
+  useEffect(() => {
+    if (!loading && highlightId) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        const element = document.querySelector(`[data-brand-id="${highlightId}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Clear highlight after animation
+          setTimeout(() => setHighlightedBrand(null), 2000);
+        }
+      }, 100);
+    }
+  }, [loading, highlightId]);
 
   const fetchBrands = async () => {
     const { data, error } = await supabase
@@ -282,8 +300,11 @@ const GlobalIndex = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredBrands.map((brand, index) => (
               <Card 
-                key={brand.id} 
-                className="overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 bg-gradient-to-br from-muted/50 via-card to-muted/30 cursor-pointer animate-scale-in"
+                key={brand.id}
+                data-brand-id={brand.id}
+                className={`overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 bg-gradient-to-br from-muted/50 via-card to-muted/30 cursor-pointer animate-scale-in ${
+                  highlightedBrand === brand.id ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''
+                }`}
                 style={{ animationDelay: `${Math.min(index * 50, 300)}ms`, animationFillMode: 'backwards' }}
                 onClick={() => navigate(`/brand/${brand.slug}`)}
               >
