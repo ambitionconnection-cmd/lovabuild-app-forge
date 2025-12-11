@@ -100,25 +100,29 @@ const Map: React.FC<MapProps> = ({
     setMapboxToken('pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ');
   }, []);
 
-  // Initialize map once
+  // Store initial values in refs so they don't cause re-renders
+  const initialCenterRef = useRef(initialCenter);
+  const initialZoomRef = useRef(initialZoom);
+
+  // Initialize map once - CRITICAL: Only depend on mapboxToken to prevent re-initialization
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken || map.current) return;
 
     mapLog.init('Starting map initialization');
-    mapLog.init('Initial center:', initialCenter, 'Initial zoom:', initialZoom);
+    mapLog.init('Initial center:', initialCenterRef.current, 'Initial zoom:', initialZoomRef.current);
     
     mapboxgl.accessToken = mapboxToken;
     
     // CRITICAL FIX #2: If initialCenter is provided (from Global Index), use it
     // Otherwise use a world-view fallback that will be replaced by user GPS when available
-    const startCenter = initialCenter || [0, 20]; // World view fallback
-    const startZoom = initialCenter ? (initialZoom || 15) : 2; // Zoomed in for target, zoomed out for world
+    const startCenter = initialCenterRef.current || [0, 20]; // World view fallback
+    const startZoom = initialCenterRef.current ? (initialZoomRef.current || 15) : 2; // Zoomed in for target, zoomed out for world
     
     mapLog.init('Using startCenter:', startCenter, 'startZoom:', startZoom);
     
     // Mark as initialized if we have a specific target location
     // Also show tooltip to remind user they can return to their location
-    if (initialCenter) {
+    if (initialCenterRef.current) {
       hasInitializedLocation.current = true;
       tooltipShownRef.current = true;
       // Show tooltip after a brief delay so map renders first
@@ -162,11 +166,11 @@ const Map: React.FC<MapProps> = ({
     geolocateControl.on('geolocate', (e: any) => {
       const newLocation: [number, number] = [e.coords.longitude, e.coords.latitude];
       mapLog.location('Geolocate success:', newLocation);
-      mapLog.location('hasInitializedLocation:', hasInitializedLocation.current, 'initialCenter:', !!initialCenter);
+      mapLog.location('hasInitializedLocation:', hasInitializedLocation.current, 'initialCenter:', !!initialCenterRef.current);
       setUserLocation(newLocation);
       
       // CRITICAL FIX #2: Only center on user location on FIRST geolocation AND only if no specific shop target
-      if (!hasInitializedLocation.current && map.current && !initialCenter) {
+      if (!hasInitializedLocation.current && map.current && !initialCenterRef.current) {
         hasInitializedLocation.current = true;
         mapLog.location('Flying to user location (first geolocate)');
         map.current.flyTo({
@@ -286,7 +290,7 @@ const Map: React.FC<MapProps> = ({
       map.current?.remove();
       map.current = null;
     };
-  }, [mapboxToken, initialCenter, initialZoom]);
+  }, [mapboxToken]); // CRITICAL: Only depend on mapboxToken - initialCenter/initialZoom are captured in refs
 
   // Handle fullscreen resize
   useEffect(() => {
