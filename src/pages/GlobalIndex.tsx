@@ -37,6 +37,7 @@ const GlobalIndex = () => {
   const [shopModalOpen, setShopModalOpen] = useState(false);
   const [selectedBrandForShops, setSelectedBrandForShops] = useState<{ id: string; name: string } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [highlightedBrand, setHighlightedBrand] = useState<string | null>(highlightId);
 
   // Fetch brands and user favorites
@@ -98,6 +99,11 @@ const GlobalIndex = () => {
   useEffect(() => {
     let filtered = brands;
 
+    // Filter by favorites first if enabled
+    if (showFavoritesOnly) {
+      filtered = filtered.filter(brand => favoriteBrands.has(brand.id));
+    }
+
     if (searchQuery) {
       filtered = filtered.filter(brand =>
         brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -125,7 +131,7 @@ const GlobalIndex = () => {
     });
 
     setFilteredBrands(sorted);
-  }, [searchQuery, selectedCountry, sortBy, brands]);
+  }, [searchQuery, selectedCountry, sortBy, brands, showFavoritesOnly, favoriteBrands]);
 
   // Get unique countries from brands
   const countries = Array.from(new Set(brands.map(brand => brand.country).filter(Boolean))).sort();
@@ -265,12 +271,25 @@ const GlobalIndex = () => {
                   </Select>
                 </div>
 
+                {/* Favorites Toggle */}
+                {user && (
+                  <Button
+                    variant={showFavoritesOnly ? "default" : "outline"}
+                    size="sm"
+                    className="h-8 gap-1.5"
+                    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  >
+                    <Heart className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                    {showFavoritesOnly ? 'Showing Favorites' : 'Show Favorites Only'}
+                  </Button>
+                )}
+
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground font-medium">
                       {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
                     </p>
-                    {(searchQuery || selectedCountry !== "all" || sortBy !== "name-asc") && (
+                    {(searchQuery || selectedCountry !== "all" || sortBy !== "name-asc" || showFavoritesOnly) && (
                       <Button
                         variant="ghost"
                         size="sm"
@@ -279,6 +298,7 @@ const GlobalIndex = () => {
                           setSearchQuery("");
                           setSelectedCountry("all");
                           setSortBy("name-asc");
+                          setShowFavoritesOnly(false);
                         }}
                       >
                         <X className="w-3 h-3 mr-1" />
