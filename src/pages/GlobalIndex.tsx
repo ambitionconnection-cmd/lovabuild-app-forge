@@ -219,10 +219,10 @@ const GlobalIndex = () => {
         </div>
       </header>
       
-      <main className="container mx-auto px-3 py-4">
-        {/* Search and Filter */}
+      {/* Sticky Filter Section */}
+      <div className="sticky top-[49px] z-40 bg-background/95 backdrop-blur-sm border-b border-border/30 pb-3 pt-3 px-3">
         <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
-          <Card className="mb-4 glass-card border">
+          <Card className="glass-card border">
             <CardHeader className="py-2 px-3">
               <div className="flex items-center justify-between">
                 <div>
@@ -285,7 +285,9 @@ const GlobalIndex = () => {
             </CollapsibleContent>
           </Card>
         </Collapsible>
+      </div>
 
+      <main className="container mx-auto px-3 py-4">
         {/* Brands Grid */}
         {filteredBrands.length === 0 ? (
           <Card>
