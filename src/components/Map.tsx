@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tables } from '@/integrations/supabase/types';
+import { Crosshair } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 // Debug mode - enable via URL param ?mapDebug=true or localStorage
 const getDebugMode = () => {
@@ -826,6 +828,17 @@ const Map: React.FC<MapProps> = ({
     }
   }, [highlightedShopId]);
 
+  // Recenter on user location
+  const handleRecenter = useCallback(() => {
+    if (userLocation && map.current) {
+      map.current.flyTo({
+        center: userLocation,
+        zoom: 14,
+        duration: 1000,
+      });
+    }
+  }, [userLocation]);
+
   if (!mapboxToken) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-muted rounded-lg">
@@ -837,6 +850,20 @@ const Map: React.FC<MapProps> = ({
   return (
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="w-full h-full rounded-lg shadow-lg" />
+      
+      {/* Recenter button */}
+      {userLocation && (
+        <Button
+          onClick={handleRecenter}
+          size="icon"
+          variant="secondary"
+          className="absolute bottom-4 right-4 z-10 h-10 w-10 rounded-full shadow-lg bg-background/95 backdrop-blur-sm border border-directions/30 hover:bg-directions/20 hover:border-directions"
+          title="Recenter on my location"
+        >
+          <Crosshair className="h-5 w-5 text-directions" />
+        </Button>
+      )}
+      
       {/* Debug overlay - only shown when debug mode is enabled */}
       {DEBUG_MAP && (
         <div className="absolute top-2 left-2 z-20 bg-background/90 backdrop-blur-sm border border-border rounded-md px-2 py-1 text-xs font-mono">
