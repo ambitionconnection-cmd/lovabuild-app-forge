@@ -97,7 +97,7 @@ const Index = () => {
       
       const [brandsRes, shopsRes] = await Promise.all([
         supabase.from('brands').select('*').eq('is_active', true).limit(6),
-        supabase.from('shops').select('*').eq('is_active', true).limit(4)
+        supabase.from('shops_public').select('*').eq('is_active', true).limit(4)
       ]);
       
       setFeaturedDrops(displayDrops);
