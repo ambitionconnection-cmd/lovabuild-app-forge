@@ -772,6 +772,37 @@ export type Database = {
     Functions: {
       cleanup_old_ip_attempts: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
+      get_active_shops_for_view: {
+        Args: never
+        Returns: {
+          address: string
+          brand_id: string | null
+          category: Database["public"]["Enums"]["category_type"] | null
+          city: string
+          country: string
+          created_at: string | null
+          description: string | null
+          email: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_unique_shop: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          official_site: string | null
+          opening_hours: Json | null
+          phone: string | null
+          slug: string
+          updated_at: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "shops"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_current_user_email: { Args: never; Returns: string }
       has_role: {
         Args: {
