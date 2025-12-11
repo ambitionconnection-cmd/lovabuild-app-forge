@@ -9,10 +9,21 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 const resendApiKey = Deno.env.get('RESEND_API_KEY')!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const resend = new Resend(resendApiKey);
+
+// Validate authorization for cron jobs
+function validateCronAuthorization(req: Request): boolean {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) return false;
+  
+  const token = authHeader.replace('Bearer ', '');
+  // Accept either service role key or anon key (for cron jobs)
+  return token === supabaseServiceKey || token === supabaseAnonKey;
+}
 
 // Helper function to create trackable links
 function createTrackableLink(userId: string, targetUrl: string, emailType: string): string {
@@ -591,6 +602,15 @@ async function sendWeeklyDigests() {
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Validate authorization for cron jobs
+  if (!validateCronAuthorization(req)) {
+    console.error('Unauthorized request to send-weekly-digest');
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 
   try {
