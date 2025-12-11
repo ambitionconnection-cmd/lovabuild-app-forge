@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, ExternalLink, Instagram, Store, MapPin, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,11 +131,14 @@ const BrandDetail = () => {
       <div className="min-h-screen bg-background pb-20">
         <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
           <div className="container mx-auto px-3 py-2 flex items-center gap-3">
-            <Link to="/global-index">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
             <Skeleton className="h-6 w-32" />
           </div>
         </header>
@@ -155,11 +158,14 @@ const BrandDetail = () => {
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-3 py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/global-index">
-              <Button variant="ghost" size="icon" className="h-8 w-8 hover:scale-110 active:scale-95 transition-transform">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 hover:scale-110 active:scale-95 transition-transform"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
             <h1 className="text-base font-bold uppercase tracking-wider line-clamp-1 animate-fade-in">{brand.name}</h1>
           </div>
           <Button
