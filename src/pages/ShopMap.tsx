@@ -178,6 +178,7 @@ const ShopMap = () => {
         .filter(shop => shop.latitude && shop.longitude)
         .map(shop => {
           const brand = shop.brand_id ? brands[shop.brand_id] : null;
+          const isMultiBrand = shop.is_unique_shop === false;
           return {
             type: 'Feature' as const,
             geometry: {
@@ -194,6 +195,7 @@ const ShopMap = () => {
               category: shop.category || 'streetwear',
               brand_name: brand?.name || null,
               brand_slug: brand?.slug || null,
+              is_multi_brand: isMultiBrand,
             }
           };
         })
@@ -314,17 +316,31 @@ const ShopMap = () => {
       const props = e.features[0].properties;
 
       // Create popup content with styling
+      const isMultiBrand = props.is_multi_brand === true || props.is_multi_brand === 'true';
       const popupContent = `
         <div style="font-family: system-ui; max-width: 300px;">
           <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold;">
             ${props.name}
           </h3>
-          ${props.brand_name && props.brand_slug ? `
-            <div style="margin-bottom: 8px;">
+          <div style="margin-bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+            ${isMultiBrand ? `
+              <span style="
+                display: inline-block;
+                padding: 2px 8px;
+                background: #6b7280;
+                border-radius: 4px;
+                font-size: 11px;
+                color: white;
+                font-weight: 500;
+              ">
+                🏬 Multi-Brand Retailer
+              </span>
+            ` : ''}
+            ${props.brand_name && props.brand_slug ? `
               <a href="/brand/${props.brand_slug}" style="
                 display: inline-block;
                 padding: 4px 12px;
-                background: hsl(var(--primary));
+                background: hsl(271, 85%, 65%);
                 border-radius: 4px;
                 font-size: 12px;
                 color: white;
@@ -333,8 +349,8 @@ const ShopMap = () => {
               ">
                 🏷️ ${props.brand_name}
               </a>
-            </div>
-          ` : ''}
+            ` : ''}
+          </div>
           <p style="margin: 4px 0; font-size: 14px; color: #666;">
             📍 ${props.address}
           </p>
@@ -360,8 +376,8 @@ const ShopMap = () => {
                  style="
                    display: inline-block;
                    padding: 4px 12px;
-                   background: hsl(var(--secondary));
-                   color: hsl(var(--secondary-foreground));
+                   background: #374151;
+                   color: white;
                    text-decoration: none;
                    border-radius: 4px;
                    font-size: 12px;
@@ -447,23 +463,36 @@ const ShopMap = () => {
               {/* Color Legend */}
               <div className="mt-4 pt-4 border-t border-primary/10">
                 <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">
+                  Shop Types
+                </p>
+                <div className="grid grid-cols-1 gap-2 mb-3">
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3 h-3 rounded-full border-2 border-primary bg-primary/20"></div>
+                    <span>Brand Store</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3 h-3 rounded-full border-2 border-muted-foreground bg-muted"></div>
+                    <span>Multi-Brand Retailer</span>
+                  </div>
+                </div>
+                <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">
                   Categories
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center gap-2 text-xs">
-                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(var(--drops))'}}></div>
+                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(271, 85%, 65%)'}}></div>
                     <span>Streetwear</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(var(--pro-gold))'}}></div>
+                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(45, 93%, 58%)'}}></div>
                     <span>Luxury</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(var(--directions))'}}></div>
+                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(186, 95%, 55%)'}}></div>
                     <span>Sneakers</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(var(--heardrop))'}}></div>
+                    <div className="w-3 h-3 rounded-full" style={{background: 'hsl(25, 95%, 53%)'}}></div>
                     <span>Accessories</span>
                   </div>
                 </div>
