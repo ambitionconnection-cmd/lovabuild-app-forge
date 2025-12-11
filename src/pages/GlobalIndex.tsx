@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown } from "lucide-react";
+import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
@@ -266,9 +266,26 @@ const GlobalIndex = () => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <p className="text-sm text-muted-foreground font-medium">
-                    {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground font-medium">
+                      {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
+                    </p>
+                    {(searchQuery || selectedCountry !== "all" || sortBy !== "name-asc") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSelectedCountry("all");
+                          setSortBy("name-asc");
+                        }}
+                      >
+                        <X className="w-3 h-3 mr-1" />
+                        Clear filters
+                      </Button>
+                    )}
+                  </div>
                   
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger className="w-full sm:w-[200px]">
