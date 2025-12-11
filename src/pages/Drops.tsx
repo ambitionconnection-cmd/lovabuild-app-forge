@@ -1,5 +1,5 @@
 import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X, Copy, Check } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,6 +35,8 @@ interface Brand {
 const Drops = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get('highlight');
   const [drops, setDrops] = useState<Drop[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [reminders, setReminders] = useState<Set<string>>(new Set());
@@ -43,10 +45,24 @@ const Drops = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [brandFilter, setBrandFilter] = useState<string>("all");
   const [copiedCodes, setCopiedCodes] = useState<Set<string>>(new Set());
+  const [highlightedDrop, setHighlightedDrop] = useState<string | null>(highlightId);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Scroll to highlighted drop after loading
+  useEffect(() => {
+    if (!loading && highlightId) {
+      setTimeout(() => {
+        const element = document.querySelector(`[data-drop-id="${highlightId}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => setHighlightedDrop(null), 2000);
+        }
+      }, 100);
+    }
+  }, [loading, highlightId]);
 
   const fetchData = async () => {
     try {
@@ -334,7 +350,13 @@ const Drops = () => {
               const hasReminder = reminders.has(drop.id);
 
               return (
-                <Card key={drop.id} className="overflow-hidden hover:shadow-lg transition-all group">
+                <Card 
+                  key={drop.id} 
+                  data-drop-id={drop.id}
+                  className={`overflow-hidden hover:shadow-lg transition-all group ${
+                    highlightedDrop === drop.id ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''
+                  }`}
+                >
                   <div className="relative h-36 bg-muted overflow-hidden">
                     {drop.image_url ? (
                       <img 

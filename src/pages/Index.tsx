@@ -205,7 +205,7 @@ const Index = () => {
                 {dropSearchQuery ? `No drops found matching "${dropSearchQuery}"` : t('home.noFeaturedDrops')}
               </CardContent>
             </Card> : <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {filteredDrops.slice(0, 4).map(drop => <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate('/drops')}>
+              {filteredDrops.slice(0, 4).map(drop => <Card key={drop.id} className="overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => navigate(`/drops?highlight=${drop.id}`)}>
                   <div className="relative h-28 bg-muted overflow-hidden">
                     {drop.image_url ? <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
                         <Zap className="h-8 w-8 text-muted-foreground" />
@@ -254,7 +254,7 @@ const Index = () => {
                 {t('home.noBrands')}
               </CardContent>
             </Card> : <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-              {popularBrands.map(brand => <Card key={brand.id} className="hover:scale-[1.02] transition-transform cursor-pointer bg-card/80" onClick={() => navigate('/global-index')}>
+              {popularBrands.map(brand => <Card key={brand.id} className="hover:scale-[1.02] transition-transform cursor-pointer bg-card/80" onClick={() => navigate(`/global-index?highlight=${brand.id}`)}>
                   <CardContent className="p-2">
                     <div className="aspect-square bg-foreground/5 rounded-md mb-1 flex items-center justify-center overflow-hidden border border-border">
                       <BrandLogo brand={brand} />
