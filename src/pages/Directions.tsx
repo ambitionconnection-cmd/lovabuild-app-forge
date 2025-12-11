@@ -769,7 +769,19 @@ const Directions = () => {
                           </Button>
                         </div>
                       </CardHeader>
-                      <CardContent className="p-1.5 space-y-1 max-h-[120px] overflow-y-auto">
+                      <CardContent className="p-1.5 space-y-1 max-h-[140px] overflow-y-auto">
+                        {/* Your Location indicator */}
+                        {userLocation && (
+                          <div className="flex items-center gap-1 p-1 bg-primary/10 rounded border border-primary/20">
+                            <div className="flex-shrink-0 w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                              <Navigation className="w-2.5 h-2.5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[10px] font-semibold text-primary">Your Location</p>
+                            </div>
+                          </div>
+                        )}
+                        
                         <DndContext
                           sensors={sensors}
                           collisionDetection={closestCenter}
@@ -783,7 +795,7 @@ const Directions = () => {
                               <SortableStop
                                 key={stop.id}
                                 stop={stop}
-                                index={index}
+                                index={userLocation ? index + 1 : index}
                                 onRemove={removeFromJourney}
                               />
                             ))}
