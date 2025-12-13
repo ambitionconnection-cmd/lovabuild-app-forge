@@ -19,6 +19,7 @@ import { ShopManagement } from '@/components/ShopManagement';
 import { DropManagement } from '@/components/DropManagement';
 import { DropsCalendar } from '@/components/DropsCalendar';
 import { MediaManagement } from '@/components/MediaManagement';
+import { DataExports } from '@/components/DataExports';
 import { Tables } from '@/integrations/supabase/types';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/AdminSidebar';
@@ -678,6 +679,10 @@ export default function Admin() {
 
             {activeTab === "media" && (
               <MediaManagement />
+            )}
+
+            {activeTab === "data-exports" && (
+              <DataExports />
             )}
           </main>
         </div>
