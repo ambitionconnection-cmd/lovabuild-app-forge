@@ -115,10 +115,25 @@ const Map: React.FC<MapProps> = ({
     
     mapboxgl.accessToken = mapboxToken;
     
-    // CRITICAL FIX #2: If initialCenter is provided (from Global Index), use it
-    // Otherwise use a world-view fallback that will be replaced by user GPS when available
-    const startCenter = initialCenterRef.current || [0, 20]; // World view fallback
-    const startZoom = initialCenterRef.current ? (initialZoomRef.current || 15) : 2; // Zoomed in for target, zoomed out for world
+    // CRITICAL FIX #1: Calculate smart default center from shops data
+    // If we have shops, center on their centroid; otherwise use Europe as default (more populated)
+    const calculateSmartCenter = (): [number, number] => {
+      if (initialCenterRef.current) return initialCenterRef.current;
+      
+      const shopsWithCoords = shopsRef.current.filter(s => s.latitude && s.longitude);
+      if (shopsWithCoords.length > 0) {
+        const avgLng = shopsWithCoords.reduce((sum, s) => sum + Number(s.longitude), 0) / shopsWithCoords.length;
+        const avgLat = shopsWithCoords.reduce((sum, s) => sum + Number(s.latitude), 0) / shopsWithCoords.length;
+        mapLog.init('Smart center calculated from', shopsWithCoords.length, 'shops:', [avgLng, avgLat]);
+        return [avgLng, avgLat];
+      }
+      
+      // Default to Europe (London) instead of Africa - more likely user location
+      return [-0.1276, 51.5074];
+    };
+    
+    const startCenter = calculateSmartCenter();
+    const startZoom = initialCenterRef.current ? (initialZoomRef.current || 15) : 4; // Higher default zoom
     
     mapLog.init('Using startCenter:', startCenter, 'startZoom:', startZoom);
     
@@ -598,12 +613,44 @@ const Map: React.FC<MapProps> = ({
       mapLog.events('All event listeners set up successfully');
     };
     
-    // Wait for map to be fully loaded
-    if (map.current.loaded()) {
-      setupEventListeners();
-    } else {
-      map.current.on('load', setupEventListeners);
-    }
+    // CRITICAL FIX: More robust map ready detection with multiple fallbacks
+    const attemptSetup = () => {
+      if (!map.current) return;
+      
+      // Check multiple conditions for map readiness
+      const isLoaded = map.current.loaded();
+      const isStyleLoaded = map.current.isStyleLoaded();
+      
+      mapLog.events('Map ready check - loaded:', isLoaded, 'styleLoaded:', isStyleLoaded);
+      
+      if (isLoaded && isStyleLoaded) {
+        setupEventListeners();
+      } else if (isLoaded) {
+        // Map loaded but style not ready - wait for style
+        map.current.once('style.load', setupEventListeners);
+      } else {
+        // Map not loaded - wait for load, then check style
+        map.current.once('load', () => {
+          if (map.current?.isStyleLoaded()) {
+            setupEventListeners();
+          } else {
+            map.current?.once('style.load', setupEventListeners);
+          }
+        });
+      }
+    };
+    
+    // Also use idle event as ultimate fallback
+    const idleFallback = () => {
+      if (!map.current) return;
+      if (!map.current.getSource('shops')) {
+        mapLog.warn('Idle fallback triggered - source missing, retrying setup');
+        attemptSetup();
+      }
+    };
+    
+    map.current.once('idle', idleFallback);
+    attemptSetup();
   }, [mapboxToken]); // Only run once when map is created
 
   // Update shop markers when shops change - CRITICAL FIX: Separate data updates from event setup
@@ -777,27 +824,56 @@ const Map: React.FC<MapProps> = ({
       mapLog.shops('✅ Shops data updated successfully');
     };
 
-    // CRITICAL FIX: Use idle event for more reliable timing on mobile
+    // CRITICAL FIX: More robust map ready detection with retry mechanism
+    let retryCount = 0;
+    const maxRetries = 5;
+    const retryDelay = 200;
+    
     const waitForMapReady = () => {
       if (!map.current) {
         mapLog.warn('Map disappeared in waitForMapReady');
         return;
       }
       
+      const isLoaded = map.current.loaded();
       const isStyleLoaded = map.current.isStyleLoaded();
-      mapLog.layers('isStyleLoaded:', isStyleLoaded);
+      mapLog.layers('Map ready check - loaded:', isLoaded, 'styleLoaded:', isStyleLoaded, 'retry:', retryCount);
       
-      if (isStyleLoaded) {
+      if (isLoaded && isStyleLoaded) {
         updateShopsData();
+      } else if (retryCount < maxRetries) {
+        retryCount++;
+        mapLog.layers('Map not ready, scheduling retry', retryCount, 'of', maxRetries);
+        
+        // Try multiple approaches simultaneously
+        const timeoutId = setTimeout(waitForMapReady, retryDelay * retryCount);
+        
+        // Also listen for the appropriate event
+        if (!isLoaded) {
+          map.current.once('load', () => {
+            clearTimeout(timeoutId);
+            waitForMapReady();
+          });
+        } else if (!isStyleLoaded) {
+          map.current.once('style.load', () => {
+            clearTimeout(timeoutId);
+            waitForMapReady();
+          });
+        }
       } else {
-        mapLog.layers('Waiting for style to load...');
-        map.current.once('style.load', () => {
-          mapLog.layers('Style loaded event received, updating shops');
-          // Small delay to ensure style is fully applied on mobile
-          setTimeout(updateShopsData, 100);
-        });
+        mapLog.error('Max retries reached, forcing shops update');
+        // Force update anyway - better to show pins late than never
+        setTimeout(updateShopsData, 500);
       }
     };
+    
+    // Use idle event as additional fallback
+    map.current.once('idle', () => {
+      if (!map.current?.getSource('shops')) {
+        mapLog.warn('Idle event: shops source still missing, forcing update');
+        updateShopsData();
+      }
+    });
     
     waitForMapReady();
   }, [shops]);

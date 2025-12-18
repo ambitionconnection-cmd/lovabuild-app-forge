@@ -154,11 +154,12 @@ const Directions = () => {
     return R * c; // Distance in km
   };
 
-  // Get user's location
+  // Get user's location with HIGH ACCURACY
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('📍 Geolocation success - accuracy:', position.coords.accuracy, 'meters');
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
@@ -166,7 +167,29 @@ const Directions = () => {
           setSortByDistance(true); // Auto-enable distance sorting when location is available
         },
         (error) => {
-          console.error('Error getting location:', error);
+          console.error('📍 Geolocation error:', error.code, error.message);
+          // Fallback: try again without high accuracy if it fails
+          if (error.code === error.TIMEOUT) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                console.log('📍 Geolocation fallback success - accuracy:', position.coords.accuracy, 'meters');
+                setUserLocation({
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                });
+                setSortByDistance(true);
+              },
+              (fallbackError) => {
+                console.error('📍 Geolocation fallback also failed:', fallbackError.message);
+              },
+              { enableHighAccuracy: false, timeout: 10000 }
+            );
+          }
+        },
+        {
+          enableHighAccuracy: true,  // CRITICAL: Request GPS-level accuracy
+          timeout: 15000,            // Wait up to 15 seconds for GPS fix
+          maximumAge: 30000          // Accept cached position up to 30 seconds old
         }
       );
     }
