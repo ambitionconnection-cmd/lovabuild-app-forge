@@ -101,33 +101,34 @@ export function DropsCalendar() {
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Drops Calendar</span>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={previousMonth}>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <span className="text-base sm:text-lg">Drops Calendar</span>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Button variant="outline" size="icon" className="h-9 w-9 touch-manipulation active:scale-95" onClick={previousMonth}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-lg font-semibold min-w-[200px] text-center">
-                {format(currentMonth, 'MMMM yyyy')}
+              <span className="text-sm sm:text-lg font-semibold min-w-[120px] sm:min-w-[200px] text-center">
+                {format(currentMonth, 'MMM yyyy')}
               </span>
-              <Button variant="outline" size="sm" onClick={nextMonth}>
+              <Button variant="outline" size="icon" className="h-9 w-9 touch-manipulation active:scale-95" onClick={nextMonth}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-2 sm:p-6">
           {loading ? (
             <div className="flex justify-center p-8">
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : (
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-0.5 sm:gap-2">
               {/* Week day headers */}
               {weekDays.map(day => (
-                <div key={day} className="text-center font-semibold text-sm text-muted-foreground py-2">
-                  {day}
+                <div key={day} className="text-center font-semibold text-[10px] sm:text-sm text-muted-foreground py-1 sm:py-2">
+                  <span className="hidden sm:inline">{day}</span>
+                  <span className="sm:hidden">{day.charAt(0)}</span>
                 </div>
               ))}
 
@@ -140,29 +141,30 @@ export function DropsCalendar() {
                 return (
                   <div
                     key={idx}
-                    className={`min-h-[100px] p-2 border rounded-lg transition-colors ${
+                    className={`min-h-[50px] sm:min-h-[100px] p-0.5 sm:p-2 border rounded-md sm:rounded-lg transition-colors touch-manipulation active:scale-[0.98] ${
                       isCurrentMonth 
                         ? 'bg-background hover:bg-muted/50 cursor-pointer' 
                         : 'bg-muted/30 text-muted-foreground'
                     } ${isToday ? 'ring-2 ring-primary' : ''}`}
                     onClick={() => isCurrentMonth && handleDateClick(day)}
                   >
-                    <div className={`text-sm font-medium mb-1 ${isToday ? 'text-primary' : ''}`}>
+                    <div className={`text-[10px] sm:text-sm font-medium mb-0.5 sm:mb-1 ${isToday ? 'text-primary' : ''}`}>
                       {format(day, 'd')}
                     </div>
-                    <div className="space-y-1">
-                      {dropsOnDay.slice(0, 3).map((drop) => (
+                    <div className="space-y-0.5 sm:space-y-1">
+                      {dropsOnDay.slice(0, 2).map((drop) => (
                         <div
                           key={drop.id}
-                          className={`text-xs px-2 py-1 rounded border ${getStatusColor(drop.status || 'upcoming')} truncate`}
+                          className={`text-[8px] sm:text-xs px-0.5 sm:px-2 py-0.5 sm:py-1 rounded border ${getStatusColor(drop.status || 'upcoming')} truncate`}
                           title={drop.title}
                         >
-                          {drop.title}
+                          <span className="hidden sm:inline">{drop.title}</span>
+                          <span className="sm:hidden">•</span>
                         </div>
                       ))}
-                      {dropsOnDay.length > 3 && (
-                        <div className="text-xs text-muted-foreground text-center">
-                          +{dropsOnDay.length - 3} more
+                      {dropsOnDay.length > 2 && (
+                        <div className="text-[8px] sm:text-xs text-muted-foreground text-center">
+                          +{dropsOnDay.length - 2}
                         </div>
                       )}
                     </div>
@@ -173,19 +175,19 @@ export function DropsCalendar() {
           )}
 
           {/* Legend */}
-          <div className="flex items-center gap-4 mt-4 pt-4 border-t">
-            <span className="text-sm text-muted-foreground">Status:</span>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-primary/10 border border-primary/20"></div>
-              <span className="text-xs">Upcoming</span>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
+            <span className="text-xs sm:text-sm text-muted-foreground">Status:</span>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-primary/10 border border-primary/20"></div>
+              <span className="text-[10px] sm:text-xs">Upcoming</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-green-500/10 border border-green-500/20"></div>
-              <span className="text-xs">Live</span>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-500/10 border border-green-500/20"></div>
+              <span className="text-[10px] sm:text-xs">Live</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-muted border border-border"></div>
-              <span className="text-xs">Ended</span>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-muted border border-border"></div>
+              <span className="text-[10px] sm:text-xs">Ended</span>
             </div>
           </div>
         </CardContent>

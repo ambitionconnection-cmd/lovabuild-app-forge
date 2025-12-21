@@ -384,9 +384,9 @@ const Auth = () => {
         </div>
 
         <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 h-11">
+            <TabsTrigger value="signin" className="min-h-[40px] touch-manipulation">Sign In</TabsTrigger>
+            <TabsTrigger value="signup" className="min-h-[40px] touch-manipulation">Sign Up</TabsTrigger>
           </TabsList>
 
           <TabsContent value="signin">
@@ -405,7 +405,14 @@ const Auth = () => {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input placeholder="you@example.com" type="email" {...field} />
+                            <Input 
+                              placeholder="you@example.com" 
+                              type="email" 
+                              inputMode="email"
+                              autoComplete="email"
+                              className="min-h-[44px]"
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -418,7 +425,13 @@ const Auth = () => {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input placeholder="••••••••" type="password" {...field} />
+                            <Input 
+                              placeholder="••••••••" 
+                              type="password"
+                              autoComplete="current-password"
+                              className="min-h-[44px]"
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

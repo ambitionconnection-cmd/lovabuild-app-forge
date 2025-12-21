@@ -31,7 +31,7 @@ export const BottomTabBar = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border safe-area-bottom">
-      <div className="flex items-center justify-around h-14 max-w-lg mx-auto">
+      <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-1">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
           const Icon = tab.icon;
@@ -45,8 +45,8 @@ export const BottomTabBar = () => {
               }}
               onTouchStart={() => haptic.light()}
               className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all",
-                "active:scale-90 active:opacity-70 touch-manipulation",
+                "flex flex-col items-center justify-center flex-1 h-full min-h-[48px] gap-0.5 transition-all",
+                "active:scale-90 active:opacity-70 touch-manipulation select-none",
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"

@@ -220,8 +220,8 @@ const Drops = () => {
         <div className="container mx-auto px-3 py-2">
           <div className="flex items-center gap-3 mb-2">
             <Link to="/">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ArrowLeft className="w-4 h-4" />
+              <Button variant="ghost" size="icon" className="h-10 w-10 touch-manipulation active:scale-95">
+                <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
             <h1 className="text-base font-bold">Drops</h1>
@@ -235,16 +235,19 @@ const Drops = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
                 placeholder="Search drops..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 min-h-[44px]"
               />
               {searchQuery && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 touch-manipulation"
                   onClick={() => setSearchQuery("")}
                 >
                   <X className="h-4 w-4" />
@@ -255,7 +258,7 @@ const Drops = () => {
             {/* Filters Sheet */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" className="h-11 w-11 touch-manipulation active:scale-95">
                   <Filter className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
@@ -361,7 +364,9 @@ const Drops = () => {
                     {drop.image_url ? (
                       <img 
                         src={drop.image_url} 
-                        alt={drop.title} 
+                        alt={drop.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                       />
                     ) : (
@@ -380,7 +385,7 @@ const Drops = () => {
                       <Button
                         size="icon"
                         variant={hasReminder ? "default" : "secondary"}
-                        className="h-8 w-8 shadow-lg"
+                        className="h-10 w-10 shadow-lg touch-manipulation active:scale-95"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleReminder(drop.id);
