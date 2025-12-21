@@ -82,8 +82,8 @@ const Index = () => {
             <h1 className="text-lg font-bold tracking-tight">{t("app.name")}</h1>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon">
+          <div className="flex items-center gap-1 sm:gap-3">
+            <Button variant="ghost" size="icon" className="h-10 w-10 touch-manipulation active:scale-95">
               <Search className="w-5 h-5" />
             </Button>
             <LanguageSwitcher />
@@ -91,13 +91,19 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="icon"
+                className="h-10 w-10 touch-manipulation active:scale-95"
                 onClick={() => navigate("/admin")}
                 title={t("nav.admin")}
               >
                 <Shield className="w-5 h-5" />
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={() => navigate("/profile")}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-10 w-10 touch-manipulation active:scale-95"
+              onClick={() => navigate("/profile")}
+            >
               <User className="w-5 h-5" />
             </Button>
           </div>
@@ -156,11 +162,13 @@ const Index = () => {
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
-                type="text"
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
                 placeholder="Search drops..."
                 value={dropSearchQuery}
                 onChange={(e) => setDropSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-sm rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>
           </div>
@@ -198,6 +206,8 @@ const Index = () => {
                       <img
                         src={drop.image_url}
                         alt={drop.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -379,7 +389,7 @@ const Index = () => {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-20 right-4 z-40 p-2 rounded-full bg-primary text-primary-foreground shadow-lg hover:scale-110 transition-all duration-300"
+          className="fixed bottom-24 right-4 z-40 p-3 min-h-[44px] min-w-[44px] rounded-full bg-primary text-primary-foreground shadow-lg hover:scale-110 active:scale-95 transition-all duration-300 touch-manipulation"
           aria-label="Back to top"
         >
           <ChevronUp className="w-5 h-5" />

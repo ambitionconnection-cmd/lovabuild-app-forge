@@ -223,17 +223,18 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+        <div className="container mx-auto px-3 py-3 sm:px-4 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button variant="ghost" size="icon" className="h-10 w-10 touch-manipulation active:scale-95" onClick={() => navigate("/")}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-2xl font-bold tracking-tight">Profile Settings</h1>
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight">Profile Settings</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <LanguageSwitcher />
-            <Button variant="destructive" onClick={signOut}>
-              Sign Out
+            <Button variant="destructive" size="sm" className="touch-manipulation active:scale-95" onClick={signOut}>
+              <span className="hidden sm:inline">Sign Out</span>
+              <span className="sm:hidden">Exit</span>
             </Button>
           </div>
         </div>
@@ -275,22 +276,22 @@ const Profile = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile">
-              <User className="w-4 h-4 mr-2" />
-              Profile
+          <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+            <TabsTrigger value="profile" className="flex flex-col sm:flex-row items-center gap-1 py-2 px-1 sm:px-3 text-xs sm:text-sm touch-manipulation">
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="notifications">
-              <Bell className="w-4 h-4 mr-2" />
-              Notifications
+            <TabsTrigger value="notifications" className="flex flex-col sm:flex-row items-center gap-1 py-2 px-1 sm:px-3 text-xs sm:text-sm touch-manipulation">
+              <Bell className="w-4 h-4" />
+              <span className="hidden sm:inline">Notifications</span>
             </TabsTrigger>
-            <TabsTrigger value="security">
-              <Lock className="w-4 h-4 mr-2" />
-              Security
+            <TabsTrigger value="security" className="flex flex-col sm:flex-row items-center gap-1 py-2 px-1 sm:px-3 text-xs sm:text-sm touch-manipulation">
+              <Lock className="w-4 h-4" />
+              <span className="hidden sm:inline">Security</span>
             </TabsTrigger>
-            <TabsTrigger value="subscription">
-              <CreditCard className="w-4 h-4 mr-2" />
-              Subscription
+            <TabsTrigger value="subscription" className="flex flex-col sm:flex-row items-center gap-1 py-2 px-1 sm:px-3 text-xs sm:text-sm touch-manipulation">
+              <CreditCard className="w-4 h-4" />
+              <span className="hidden sm:inline">Subscription</span>
             </TabsTrigger>
           </TabsList>
 

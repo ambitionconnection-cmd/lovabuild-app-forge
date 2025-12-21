@@ -378,7 +378,7 @@ const MyHeardrop = () => {
           {/* Reminders Tab */}
           <TabsContent value="reminders">
             <section>
-              <h2 className="text-2xl font-bold mb-4">Drop Reminders</h2>
+              <h2 className="text-sm font-bold mb-2">Drop Reminders</h2>
               {dropReminders.length === 0 ? (
                 <Card>
                   <CardContent className="py-12 text-center">
@@ -397,32 +397,32 @@ const MyHeardrop = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {dropReminders.map((drop) => (
                     <Card key={drop.id} className="overflow-hidden">
-                      <div className="relative h-32 bg-muted">
+                      <div className="relative h-24 bg-muted">
                         {drop.image_url ? (
-                          <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" />
+                          <img src={drop.image_url} alt={drop.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Zap className="h-8 w-8 text-muted-foreground" />
+                            <Zap className="h-6 w-6 text-muted-foreground" />
                           </div>
                         )}
                         <Button
                           variant="destructive"
                           size="icon"
-                          className="absolute top-2 right-2"
+                          className="absolute top-1 right-1 h-7 w-7 touch-manipulation active:scale-95"
                           onClick={() => removeReminder(drop.reminderId)}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3 h-3" />
                         </Button>
                       </div>
-                      <CardContent className="p-4">
-                        <h3 className="font-semibold mb-2 line-clamp-1">{drop.title}</h3>
-                        <div className="flex items-center text-sm text-muted-foreground mb-2">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          {format(new Date(drop.release_date), 'MMM d, yyyy')}
+                      <CardContent className="p-2">
+                        <h3 className="font-semibold text-xs mb-1 line-clamp-1">{drop.title}</h3>
+                        <div className="flex items-center text-[10px] text-muted-foreground">
+                          <Calendar className="h-3 w-3 mr-0.5" />
+                          {format(new Date(drop.release_date), 'MMM d')}
                         </div>
                         {drop.isNotified && (
-                          <Badge variant="secondary" className="text-xs">
-                            <Bell className="w-3 h-3 mr-1" />
+                          <Badge variant="secondary" className="text-[10px] mt-1 py-0">
+                            <Bell className="w-2.5 h-2.5 mr-0.5" />
                             Notified
                           </Badge>
                         )}
@@ -435,21 +435,22 @@ const MyHeardrop = () => {
           </TabsContent>
 
           {/* Recommendations Tab */}
-          <TabsContent value="recommendations" className="space-y-6">
+          <TabsContent value="recommendations" className="space-y-4">
             {/* Recommended Brands */}
             <section>
-              <h2 className="text-2xl font-bold mb-4">Recommended Brands</h2>
+              <h2 className="text-sm font-bold mb-2">Recommended Brands</h2>
               {recommendedBrands.length === 0 ? (
                 <Card>
-                  <CardContent className="py-12 text-center">
-                    <TrendingUp className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">
+                  <CardContent className="py-6 text-center">
+                    <TrendingUp className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-xs text-muted-foreground">
                       Start favoriting brands to get personalized recommendations
                     </p>
                     <Button 
-                      variant="link" 
+                      variant="link"
+                      size="sm"
                       onClick={() => navigate('/global-index')}
-                      className="mt-2"
+                      className="mt-1 text-xs"
                     >
                       Browse brands
                     </Button>
