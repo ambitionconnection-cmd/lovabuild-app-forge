@@ -115,37 +115,19 @@ const Map: React.FC<MapProps> = ({
     
     mapboxgl.accessToken = mapboxToken;
     
-    // CRITICAL FIX #1: Calculate smart default center from shops data
-    // If we have shops, center on their centroid; otherwise use Europe as default (more populated)
-    const calculateSmartCenter = (): [number, number] => {
-      if (initialCenterRef.current) return initialCenterRef.current;
-      
-      const shopsWithCoords = shopsRef.current.filter(s => s.latitude && s.longitude);
-      if (shopsWithCoords.length > 0) {
-        const avgLng = shopsWithCoords.reduce((sum, s) => sum + Number(s.longitude), 0) / shopsWithCoords.length;
-        const avgLat = shopsWithCoords.reduce((sum, s) => sum + Number(s.latitude), 0) / shopsWithCoords.length;
-        mapLog.init('Smart center calculated from', shopsWithCoords.length, 'shops:', [avgLng, avgLat]);
-        return [avgLng, avgLat];
-      }
-      
-      // Default to Europe (London) instead of Africa - more likely user location
-      return [-0.1276, 51.5074];
-    };
-    
-    const startCenter = calculateSmartCenter();
-    const startZoom = initialCenterRef.current ? (initialZoomRef.current || 15) : 4; // Higher default zoom
+    // FIXED: Default to London (popular shop area) - shops data may not be loaded yet
+    // The map will re-center when shops load via the separate useEffect below
+    const startCenter: [number, number] = initialCenterRef.current || [-0.1276, 51.5074];
+    const startZoom = initialCenterRef.current ? (initialZoomRef.current || 15) : 10;
     
     mapLog.init('Using startCenter:', startCenter, 'startZoom:', startZoom);
     
     // Mark as initialized if we have a specific target location
-    // Also show tooltip to remind user they can return to their location
     if (initialCenterRef.current) {
       hasInitializedLocation.current = true;
       tooltipShownRef.current = true;
-      // Show tooltip after a brief delay so map renders first
       setTimeout(() => {
         setShowTooltip(true);
-        // Auto-hide after 5 seconds
         setTimeout(() => setShowTooltip(false), 5000);
       }, 1000);
     }
@@ -653,7 +635,34 @@ const Map: React.FC<MapProps> = ({
     attemptSetup();
   }, [mapboxToken]); // Only run once when map is created
 
-  // Update shop markers when shops change - CRITICAL FIX: Separate data updates from event setup
+  // CRITICAL FIX: Re-center map on shops centroid when shops first load
+  const hasRecenteredOnShops = useRef(false);
+  
+  useEffect(() => {
+    if (!map.current || shops.length === 0 || hasRecenteredOnShops.current) return;
+    if (initialCenterRef.current) return; // Don't recenter if we have a specific target
+    
+    const shopsWithCoords = shops.filter(s => s.latitude && s.longitude);
+    if (shopsWithCoords.length === 0) return;
+    
+    // Calculate centroid of all shops
+    const avgLng = shopsWithCoords.reduce((sum, s) => sum + Number(s.longitude), 0) / shopsWithCoords.length;
+    const avgLat = shopsWithCoords.reduce((sum, s) => sum + Number(s.latitude), 0) / shopsWithCoords.length;
+    
+    mapLog.init('Re-centering map on shops centroid:', [avgLng, avgLat], 'from', shopsWithCoords.length, 'shops');
+    hasRecenteredOnShops.current = true;
+    
+    // Fly to shops area (only if user hasn't interacted yet)
+    if (!hasInitializedLocation.current && !isUserInteracting.current) {
+      map.current.flyTo({
+        center: [avgLng, avgLat],
+        zoom: 5, // Overview zoom to show multiple shops
+        duration: 1500
+      });
+    }
+  }, [shops]);
+
+  // Update shop markers when shops change - CRITICAL FIX: Robust layer creation with retries
   useEffect(() => {
     if (!map.current) {
       mapLog.shops('Map not ready, skipping shops update');
@@ -663,15 +672,25 @@ const Map: React.FC<MapProps> = ({
     mapLog.shops('Shops effect triggered, count:', shops.length);
     setDebugStats(prev => ({ ...prev, shopsTotal: shops.length }));
     
-    // Wait for shops data
     if (shops.length === 0) {
       mapLog.warn('No shops to display');
       return;
     }
 
-    const updateShopsData = () => {
+    const updateShopsData = (retryCount = 0) => {
       if (!map.current) {
         mapLog.warn('Map disappeared during updateShopsData');
+        return;
+      }
+      
+      // CRITICAL: Check if map style is loaded before adding layers
+      if (!map.current.isStyleLoaded()) {
+        if (retryCount < 10) {
+          mapLog.warn('Style not loaded, retrying in 200ms (attempt', retryCount + 1, ')');
+          setTimeout(() => updateShopsData(retryCount + 1), 200);
+        } else {
+          mapLog.error('Style never loaded after 10 retries!');
+        }
         return;
       }
       
@@ -682,6 +701,7 @@ const Map: React.FC<MapProps> = ({
       
       if (shopsWithCoords.length === 0) {
         mapLog.warn('No shops have valid coordinates!');
+        return;
       }
 
       const geojson: GeoJSON.FeatureCollection = {
@@ -704,22 +724,16 @@ const Map: React.FC<MapProps> = ({
       };
       
       mapLog.shops('Created GeoJSON with', geojson.features.length, 'features');
-      
-      // Log sample coordinates for debugging
-      if (geojson.features.length > 0) {
-        const sample = geojson.features[0];
-        const coords = (sample.geometry as GeoJSON.Point).coordinates;
-        mapLog.shops('Sample feature:', sample.properties?.name, 'at', coords);
-      }
 
-      // Check if source already exists - just update data
-      const existingSource = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
-      if (existingSource) {
-        mapLog.layers('Source exists, updating data');
-        existingSource.setData(geojson);
-        setDebugStats(prev => ({ ...prev, sourceReady: true }));
-      } else {
-        mapLog.layers('Creating new source and layers');
+      try {
+        // Check if source already exists - just update data
+        const existingSource = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
+        if (existingSource) {
+          mapLog.layers('Source exists, updating data');
+          existingSource.setData(geojson);
+          setDebugStats(prev => ({ ...prev, sourceReady: true }));
+        } else {
+          mapLog.layers('Creating new source and layers');
         // Add source with clustering
         map.current.addSource('shops', {
           type: 'geojson',
@@ -805,23 +819,30 @@ const Map: React.FC<MapProps> = ({
         });
         mapLog.layers('Layer "unclustered-point" added');
         setDebugStats(prev => ({ ...prev, sourceReady: true }));
-      }
+        }
 
-      // CRITICAL: Update visible shops immediately after adding/updating markers
-      const bounds = map.current.getBounds();
-      if (bounds && onVisibleShopsChangeRef.current) {
-        const visibleShops = shops.filter(shop => {
-          if (!shop.latitude || !shop.longitude) return false;
-          return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
-        });
-        mapLog.shops('Visible shops in viewport:', visibleShops.length);
-        setDebugStats(prev => ({ ...prev, shopsVisible: visibleShops.length }));
-        onVisibleShopsChangeRef.current(visibleShops);
-      } else {
-        mapLog.warn('Could not update visible shops - bounds:', !!bounds, 'callback:', !!onVisibleShopsChangeRef.current);
+        // CRITICAL: Update visible shops immediately after adding/updating markers
+        const bounds = map.current.getBounds();
+        if (bounds && onVisibleShopsChangeRef.current) {
+          const visibleShops = shops.filter(shop => {
+            if (!shop.latitude || !shop.longitude) return false;
+            return bounds.contains([Number(shop.longitude), Number(shop.latitude)]);
+          });
+          mapLog.shops('Visible shops in viewport:', visibleShops.length);
+          setDebugStats(prev => ({ ...prev, shopsVisible: visibleShops.length }));
+          onVisibleShopsChangeRef.current(visibleShops);
+        } else {
+          mapLog.warn('Could not update visible shops - bounds:', !!bounds, 'callback:', !!onVisibleShopsChangeRef.current);
+        }
+        
+        mapLog.shops('✅ Shops data updated successfully');
+      } catch (error) {
+        mapLog.error('Error adding map layers:', error);
+        // Retry after a delay
+        if (retryCount < 5) {
+          setTimeout(() => updateShopsData(retryCount + 1), 300);
+        }
       }
-      
-      mapLog.shops('✅ Shops data updated successfully');
     };
 
     // CRITICAL FIX: More robust map ready detection with retry mechanism
