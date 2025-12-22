@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tables } from '@/integrations/supabase/types';
 import { Crosshair } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
+import MapLoadingOverlay from '@/components/MapLoadingOverlay';
 // Debug mode - enable via URL param ?mapDebug=true or localStorage
 const getDebugMode = () => {
   if (typeof window === 'undefined') return false;
@@ -67,6 +67,8 @@ const Map: React.FC<MapProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [isLoadingShops, setIsLoadingShops] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState('Initializing map...');
   const [showTooltip, setShowTooltip] = useState(false);
   const [debugStats, setDebugStats] = useState({ shopsTotal: 0, shopsVisible: 0, sourceReady: false });
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -674,8 +676,11 @@ const Map: React.FC<MapProps> = ({
     
     if (shops.length === 0) {
       mapLog.warn('No shops to display');
+      setLoadingMessage('Fetching shop data...');
       return;
     }
+
+    setLoadingMessage('Placing pins on map...');
 
     const updateShopsData = (retryCount = 0) => {
       if (!map.current) {
@@ -732,6 +737,7 @@ const Map: React.FC<MapProps> = ({
           mapLog.layers('Source exists, updating data');
           existingSource.setData(geojson);
           setDebugStats(prev => ({ ...prev, sourceReady: true }));
+          setIsLoadingShops(false);
         } else {
           mapLog.layers('Creating new source and layers');
         // Add source with clustering
@@ -819,6 +825,7 @@ const Map: React.FC<MapProps> = ({
         });
         mapLog.layers('Layer "unclustered-point" added');
         setDebugStats(prev => ({ ...prev, sourceReady: true }));
+        setIsLoadingShops(false);
         }
 
         // CRITICAL: Update visible shops immediately after adding/updating markers
@@ -835,6 +842,7 @@ const Map: React.FC<MapProps> = ({
           mapLog.warn('Could not update visible shops - bounds:', !!bounds, 'callback:', !!onVisibleShopsChangeRef.current);
         }
         
+        setIsLoadingShops(false);
         mapLog.shops('✅ Shops data updated successfully');
       } catch (error) {
         mapLog.error('Error adding map layers:', error);
@@ -947,6 +955,13 @@ const Map: React.FC<MapProps> = ({
   return (
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="w-full h-full rounded-lg shadow-lg" />
+      
+      {/* Loading overlay */}
+      <MapLoadingOverlay 
+        isLoading={isLoadingShops} 
+        shopsCount={shops.length}
+        message={loadingMessage}
+      />
       
       {/* Recenter button */}
       {userLocation && (
