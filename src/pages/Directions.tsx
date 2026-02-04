@@ -195,7 +195,9 @@ const Directions = () => {
     }
   }, []);
 
-  // Save map position before navigating away
+  // Save map position AUTOMATICALLY whenever it changes
+  // This way, no matter how the user leaves (back button, link, browser back),
+  // their position is always saved
   const saveMapPosition = useCallback(() => {
     if (mapCenter) {
       sessionStorage.setItem('heardrop_map_position', JSON.stringify({
@@ -205,6 +207,10 @@ const Directions = () => {
     }
   }, [mapCenter, mapZoom]);
 
+  // Auto-save position whenever map moves
+  useEffect(() => {
+    saveMapPosition();
+  }, [saveMapPosition]);
   // Handle map popup events
   useEffect(() => {
     const handleBrandClick = (e: CustomEvent<{ brandId: string }>) => {
