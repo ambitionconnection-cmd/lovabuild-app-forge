@@ -624,16 +624,7 @@ const Map: React.FC<MapProps> = ({
       }
     };
     
-    // Also use idle event as ultimate fallback
-    const idleFallback = () => {
-      if (!map.current) return;
-      if (!map.current.getSource('shops')) {
-        mapLog.warn('Idle fallback triggered - source missing, retrying setup');
-        attemptSetup();
-      }
-    };
     
-    map.current.once('idle', idleFallback);
     attemptSetup();
   }, [mapboxToken]); // Only run once when map is created
 
