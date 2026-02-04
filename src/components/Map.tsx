@@ -680,30 +680,19 @@ const Map: React.FC<MapProps> = ({
       return;
     }
 
-    setLoadingMessage('Placing pins on map...');
+  setLoadingMessage('Placing pins on map...');
 
-    const updateShopsData = (retryCount = 0) => {
+    const updateShopsData = () => {
       if (!map.current) {
         mapLog.warn('Map disappeared during updateShopsData');
         return;
       }
-      
-      // CRITICAL: Check if map style is loaded before adding layers
-      if (!map.current.isStyleLoaded()) {
-        if (retryCount < 10) {
-          mapLog.warn('Style not loaded, retrying in 200ms (attempt', retryCount + 1, ')');
-          setTimeout(() => updateShopsData(retryCount + 1), 200);
-        } else {
-          mapLog.error('Style never loaded after 10 retries!');
-        }
-        return;
-      }
-      
+
       mapLog.shops('Updating shops data:', shops.length, 'shops');
 
       const shopsWithCoords = shops.filter(shop => shop.latitude && shop.longitude);
       mapLog.shops('Shops with coordinates:', shopsWithCoords.length, '/', shops.length);
-      
+
       if (shopsWithCoords.length === 0) {
         mapLog.warn('No shops have valid coordinates!');
         return;
@@ -712,22 +701,22 @@ const Map: React.FC<MapProps> = ({
       const geojson: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
         features: shopsWithCoords.map(shop => ({
-            type: 'Feature' as const,
-            geometry: {
-              type: 'Point' as const,
-              coordinates: [Number(shop.longitude), Number(shop.latitude)]
-            },
-            properties: {
-              id: shop.id,
-              name: shop.name,
-              address: shop.address,
-              city: shop.city,
-              category: shop.category || 'streetwear',
-              brand_id: shop.brand_id || null,
-            }
-          }))
+          type: 'Feature' as const,
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [Number(shop.longitude), Number(shop.latitude)]
+          },
+          properties: {
+            id: shop.id,
+            name: shop.name,
+            address: shop.address,
+            city: shop.city,
+            category: shop.category || 'streetwear',
+            brand_id: shop.brand_id || null,
+          }
+        }))
       };
-      
+
       mapLog.shops('Created GeoJSON with', geojson.features.length, 'features');
 
       try {
@@ -736,99 +725,98 @@ const Map: React.FC<MapProps> = ({
         if (existingSource) {
           mapLog.layers('Source exists, updating data');
           existingSource.setData(geojson);
-          setDebugStats(prev => ({ ...prev, sourceReady: true }));
-          setIsLoadingShops(false);
         } else {
           mapLog.layers('Creating new source and layers');
-        // Add source with clustering
-        map.current.addSource('shops', {
-          type: 'geojson',
-          data: geojson,
-          cluster: true,
-          clusterMaxZoom: 14,
-          clusterRadius: 50
-        });
-        mapLog.layers('Source "shops" added');
 
-        // Add cluster circles layer
-        map.current.addLayer({
-          id: 'clusters',
-          type: 'circle',
-          source: 'shops',
-          filter: ['has', 'point_count'],
-          paint: {
-            'circle-color': [
-              'step',
-              ['get', 'point_count'],
-              'hsl(186, 95%, 55%)',
-              10,
-              'hsl(271, 85%, 65%)',
-              30,
-              'hsl(45, 93%, 58%)'
-            ],
-            'circle-radius': [
-              'step',
-              ['get', 'point_count'],
-              20,
-              10,
-              30,
-              30,
-              40
-            ],
-            'circle-stroke-width': 3,
-            'circle-stroke-color': 'hsl(209, 40%, 96%)',
-            'circle-opacity': 0.9
-          }
-        });
-        mapLog.layers('Layer "clusters" added');
+          // Add source with clustering
+          map.current.addSource('shops', {
+            type: 'geojson',
+            data: geojson,
+            cluster: true,
+            clusterMaxZoom: 14,
+            clusterRadius: 50
+          });
+          mapLog.layers('Source "shops" added');
 
-        // Add cluster count labels
-        map.current.addLayer({
-          id: 'cluster-count',
-          type: 'symbol',
-          source: 'shops',
-          filter: ['has', 'point_count'],
-          layout: {
-            'text-field': '{point_count_abbreviated}',
-            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-            'text-size': 14
-          },
-          paint: {
-            'text-color': '#ffffff'
-          }
-        });
-        mapLog.layers('Layer "cluster-count" added');
+          // Add cluster circles layer
+          map.current.addLayer({
+            id: 'clusters',
+            type: 'circle',
+            source: 'shops',
+            filter: ['has', 'point_count'],
+            paint: {
+              'circle-color': [
+                'step',
+                ['get', 'point_count'],
+                'hsl(186, 95%, 55%)',
+                10,
+                'hsl(271, 85%, 65%)',
+                30,
+                'hsl(45, 93%, 58%)'
+              ],
+              'circle-radius': [
+                'step',
+                ['get', 'point_count'],
+                20,
+                10,
+                30,
+                30,
+                40
+              ],
+              'circle-stroke-width': 3,
+              'circle-stroke-color': 'hsl(209, 40%, 96%)',
+              'circle-opacity': 0.9
+            }
+          });
+          mapLog.layers('Layer "clusters" added');
 
-        // Add unclustered points layer
-        map.current.addLayer({
-          id: 'unclustered-point',
-          type: 'circle',
-          source: 'shops',
-          filter: ['!', ['has', 'point_count']],
-          paint: {
-            'circle-color': [
-              'match',
-              ['get', 'category'],
-              'streetwear', 'hsl(271, 85%, 65%)',
-              'luxury', 'hsl(45, 93%, 58%)',
-              'sneakers', 'hsl(186, 95%, 55%)',
-              'accessories', 'hsl(25, 95%, 53%)',
-              'vintage', 'hsl(142, 90%, 60%)',
-              'sportswear', 'hsl(200, 98%, 39%)',
-              'hsl(200, 98%, 39%)'
-            ],
-            'circle-radius': 16,
-            'circle-stroke-width': 3,
-            'circle-stroke-color': 'hsl(209, 40%, 96%)',
-            'circle-opacity': 0.9
-          }
-        });
-        mapLog.layers('Layer "unclustered-point" added');
-        setDebugStats(prev => ({ ...prev, sourceReady: true }));
-        setIsLoadingShops(false);
+          // Add cluster count labels
+          map.current.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'shops',
+            filter: ['has', 'point_count'],
+            layout: {
+              'text-field': '{point_count_abbreviated}',
+              'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+              'text-size': 14
+            },
+            paint: {
+              'text-color': '#ffffff'
+            }
+          });
+          mapLog.layers('Layer "cluster-count" added');
+
+          // Add unclustered points layer
+          map.current.addLayer({
+            id: 'unclustered-point',
+            type: 'circle',
+            source: 'shops',
+            filter: ['!', ['has', 'point_count']],
+            paint: {
+              'circle-color': [
+                'match',
+                ['get', 'category'],
+                'streetwear', 'hsl(271, 85%, 65%)',
+                'luxury', 'hsl(45, 93%, 58%)',
+                'sneakers', 'hsl(186, 95%, 55%)',
+                'accessories', 'hsl(25, 95%, 53%)',
+                'vintage', 'hsl(142, 90%, 60%)',
+                'sportswear', 'hsl(200, 98%, 39%)',
+                'hsl(200, 98%, 39%)'
+              ],
+              'circle-radius': 16,
+              'circle-stroke-width': 3,
+              'circle-stroke-color': 'hsl(209, 40%, 96%)',
+              'circle-opacity': 0.9
+            }
+          });
+          mapLog.layers('Layer "unclustered-point" added');
         }
 
-        // CRITICAL: Update visible shops immediately after adding/updating markers
+        setDebugStats(prev => ({ ...prev, sourceReady: true }));
+
+        // Update visible shops immediately after adding/updating markers
         const bounds = map.current.getBounds();
         if (bounds && onVisibleShopsChangeRef.current) {
           const visibleShops = shops.filter(shop => {
@@ -838,73 +826,67 @@ const Map: React.FC<MapProps> = ({
           mapLog.shops('Visible shops in viewport:', visibleShops.length);
           setDebugStats(prev => ({ ...prev, shopsVisible: visibleShops.length }));
           onVisibleShopsChangeRef.current(visibleShops);
-        } else {
-          mapLog.warn('Could not update visible shops - bounds:', !!bounds, 'callback:', !!onVisibleShopsChangeRef.current);
         }
-        
+
         setIsLoadingShops(false);
         mapLog.shops('✅ Shops data updated successfully');
       } catch (error) {
         mapLog.error('Error adding map layers:', error);
-        // Retry after a delay
-        if (retryCount < 5) {
-          setTimeout(() => updateShopsData(retryCount + 1), 300);
-        }
+        setIsLoadingShops(false);
       }
     };
 
-    // CRITICAL FIX: More robust map ready detection with retry mechanism
-    let retryCount = 0;
-    const maxRetries = 5;
-    const retryDelay = 200;
-    
-    const waitForMapReady = () => {
+    // BULLETPROOF MAP READY CHECK
+    // Single, clear strategy: check if ready now, if not, wait for the right event
+    const ensureMapReadyThenUpdate = () => {
       if (!map.current) {
-        mapLog.warn('Map disappeared in waitForMapReady');
+        mapLog.warn('Map not available yet');
         return;
       }
-      
+
       const isLoaded = map.current.loaded();
       const isStyleLoaded = map.current.isStyleLoaded();
-      mapLog.layers('Map ready check - loaded:', isLoaded, 'styleLoaded:', isStyleLoaded, 'retry:', retryCount);
-      
+      mapLog.layers('Map ready check - loaded:', isLoaded, 'styleLoaded:', isStyleLoaded);
+
       if (isLoaded && isStyleLoaded) {
+        // Map is fully ready - add pins immediately
+        mapLog.layers('Map is ready, adding pins now');
         updateShopsData();
-      } else if (retryCount < maxRetries) {
-        retryCount++;
-        mapLog.layers('Map not ready, scheduling retry', retryCount, 'of', maxRetries);
-        
-        // Try multiple approaches simultaneously
-        const timeoutId = setTimeout(waitForMapReady, retryDelay * retryCount);
-        
-        // Also listen for the appropriate event
-        if (!isLoaded) {
-          map.current.once('load', () => {
-            clearTimeout(timeoutId);
-            waitForMapReady();
-          });
-        } else if (!isStyleLoaded) {
-          map.current.once('style.load', () => {
-            clearTimeout(timeoutId);
-            waitForMapReady();
-          });
-        }
-      } else {
-        mapLog.error('Max retries reached, forcing shops update');
-        // Force update anyway - better to show pins late than never
-        setTimeout(updateShopsData, 500);
+        return;
       }
+
+      // Map is NOT ready - set up a single listener and wait
+      mapLog.layers('Map not ready, waiting for idle event...');
+
+      const onIdle = () => {
+        mapLog.layers('Map idle event fired, adding pins now');
+        updateShopsData();
+      };
+
+      // 'idle' fires after the map has finished loading AND rendering
+      // This is the most reliable single event to wait for
+      map.current.once('idle', onIdle);
+
+      // Safety net: if idle never fires within 5 seconds, force the update
+      const safetyTimeout = setTimeout(() => {
+        if (!map.current) return;
+        // Remove the idle listener to prevent double-firing
+        map.current.off('idle', onIdle);
+        mapLog.warn('Safety timeout reached (5s), forcing pin update');
+        updateShopsData();
+      }, 5000);
+
+      // Clean up timeout if idle fires first
+      const originalOnIdle = onIdle;
+      const wrappedOnIdle = () => {
+        clearTimeout(safetyTimeout);
+        originalOnIdle();
+      };
+      map.current.off('idle', onIdle);
+      map.current.once('idle', wrappedOnIdle);
     };
-    
-    // Use idle event as additional fallback
-    map.current.once('idle', () => {
-      if (!map.current?.getSource('shops')) {
-        mapLog.warn('Idle event: shops source still missing, forcing update');
-        updateShopsData();
-      }
-    });
-    
-    waitForMapReady();
+
+    ensureMapReadyThenUpdate();
   }, [shops]);
 
   // Update highlighted shop styling
