@@ -31,19 +31,29 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
+              {/* Auth page - always public */}
               <Route path="/auth" element={<Auth />} />
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+
+              {/* PUBLIC PAGES - No login required */}
+              <Route path="/" element={<Directions />} />
+              <Route path="/directions" element={<Directions />} />
+              <Route path="/global-index" element={<GlobalIndex />} />
+              <Route path="/brand/:slug" element={<BrandDetail />} />
+              <Route path="/shop-map" element={<ShopMap />} />
+              <Route path="/drops" element={<Drops />} />
+
+
+              {/* PROTECTED PAGES - Login required */}
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-              <Route path="/directions" element={<ProtectedRoute><Directions /></ProtectedRoute>} />
-              <Route path="/global-index" element={<ProtectedRoute><GlobalIndex /></ProtectedRoute>} />
-              <Route path="/brand/:slug" element={<ProtectedRoute><BrandDetail /></ProtectedRoute>} />
-              <Route path="/shop-map" element={<ProtectedRoute><ShopMap /></ProtectedRoute>} />
-              <Route path="/drops" element={<ProtectedRoute><Drops /></ProtectedRoute>} />
               <Route path="/my-heardrop" element={<ProtectedRoute><MyHeardrop /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute><NotificationHistory /></ProtectedRoute>} />
               <Route path="/contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
+
+              {/* Legacy route - redirect old home to map */}
+              <Route path="/index" element={<Directions />} />
+
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
