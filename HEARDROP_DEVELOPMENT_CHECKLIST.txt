@@ -1,0 +1,208 @@
+================================================================================
+HEARDROP DEVELOPMENT STATUS & CHECKLIST
+================================================================================
+Last Updated: 2026-02-08
+Project: https://github.com/ambitionconnection-cmd/lovabuild-app-forge
+Live URL: https://lovabuild-app-forge.vercel.app
+Lovable Project: https://lovable.dev/projects/4fd56a29-74d0-434b-9c18-5e2cfb4d2f7c
+
+================================================================================
+DEVELOPER CONTEXT
+================================================================================
+- User: Marti, 50+, full-time worker, dad, limited time but committed
+- Experience: Computer savvy but not a developer
+- Learning: Completed Anthropic AI Fluency course, learning React on Scrimba
+- System: Windows 11 PC (NOT Mac)
+- Coding Style: Needs step-by-step instructions with explanations of WHY
+- Time: Weeknights 30min, Weekends 3-4 hours
+
+================================================================================
+TECH STACK
+================================================================================
+- Frontend: React, TypeScript, Vite, Tailwind CSS, shadcn-ui
+- Backend: Supabase (managed via Lovable Cloud - no separate Supabase login)
+- Maps: Mapbox GL JS
+- Deployment: Vercel (auto-deploys on GitHub push)
+- Repository: https://github.com/ambitionconnection-cmd/lovabuild-app-forge
+
+================================================================================
+ENVIRONMENT VARIABLES (for Vercel)
+================================================================================
+VITE_SUPABASE_URL=https://wgeelknadpxnmeomuenc.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZWVsa25hZHB4bm1lb211ZW5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NzA0NjgsImV4cCI6MjA3OTM0NjQ2OH0.kPN7W2ZSm2V35Cf3u955ueYSwpp7bF_iSF565tFmWXU
+VITE_MAPBOX_PUBLIC_TOKEN=pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ
+
+================================================================================
+PHASE 1: BUG FIXES - COMPLETED 2026-02-08
+================================================================================
+
+[✅] BUG #1: Pin rendering inconsistent (HIGHEST PRIORITY)
+     - Problem: Race condition - shops data arrived before map was ready
+     - Solution: Replaced competing retry mechanisms with single bulletproof strategy
+     - File: src/components/Map.tsx (lines 683-908)
+     - Fix: Use map.once('idle') as primary ready signal + 5-second safety timeout
+     - Commit: "Fix: bulletproof pin rendering - use idle event instead of competing retries"
+
+[✅] BUG #2: Geolocation inaccurate
+     - Problem: Desktop showed 173m accuracy (Wi-Fi/IP-based)
+     - Solution: Code already had enableHighAccuracy: true
+     - Result: Mobile GPS in Soho showed PERFECT accuracy (user standing at exact location)
+     - Status: WORKING - no code changes needed
+
+[✅] BUG #3: Map defaults to Africa instead of user location
+     - Problem: Map was centering on wrong coordinates
+     - Solution: Default coordinates already set to London [-0.1276, 51.5074]
+     - Status: WORKING - centers on London correctly
+
+[✅] BUG #4: Back button doesn't preserve map state
+     - Problem: Only saved position when clicking brand links, not on Back button
+     - Solution: Added useEffect that auto-saves position whenever mapCenter/mapZoom changes
+     - File: src/pages/Directions.tsx (around line 199)
+     - Commit: "Fix: auto-save map position so back button preserves state"
+
+[✅] CLEANUP: Console spam removed
+     - Removed old idleFallback code that caused requestAnimationFrame spam
+     - File: src/components/Map.tsx (lines 627-636 deleted)
+     - Commit: "Cleanup: remove old idle fallback that caused console spam"
+
+================================================================================
+PHASE 2: FEATURES COMPLETED - 2026-02-08
+================================================================================
+
+[✅] Contact Page Rebuild with NEW BRAND / NEW RELEASE forms
+     - Replaced generic "New Submission" with two structured forms
+     - NEW BRAND form fields: Brand Name, Category, Country, Short Description (280 char),
+       Full Description, Website URL, Instagram, TikTok, Stockists, Submitter info
+     - NEW RELEASE form fields: Brand Name, Product Name, Release Date/Time,
+       Retail Price, Drop Location, Source Link, Notes, Submitter info
+     - Kept: Report Issue, Partnership, Other (generic forms)
+     - Stores in contact_submissions table with inquiry_type "new-brand" or "new-release"
+     - File: src/pages/Contact.tsx (complete rewrite)
+     - Commit: "Feature: NEW BRAND and NEW RELEASE submission forms on Contact page"
+
+[✅] Shop Coordinates Bulk Fix
+     - Problem: 82% of 228 shops had wrong lat/lng coordinates
+     - Solution: Built Node.js geocoding script using Mapbox API
+     - Script: geocode-shops.js (reads CSV, calls Mapbox, generates SQL)
+     - Result: 187 shops updated with correct coordinates
+     - Remaining issues: A few shops still need manual fixes (OVO London, etc.)
+     - User has local knowledge of Soho to verify/fix remaining errors
+     - Files saved: geocoding-report.json in project folder
+
+================================================================================
+DEPLOYMENT STATUS
+================================================================================
+
+[✅] Vercel Deployment
+     - Connected to GitHub (auto-deploys on push)
+     - Environment variables configured
+     - Live at: https://lovabuild-app-forge.vercel.app
+     - PWA functionality enabled
+
+[✅] Local Development
+     - Node.js installed (v24.13.0)
+     - npm install completed (731 packages)
+     - Dev server: npm run dev (runs on localhost:8080)
+     - Git configured with user credentials
+
+================================================================================
+STRATEGIC DECISIONS MADE
+================================================================================
+
+1. FEATURE PRIORITY (from Strategic Implementation Plan):
+   - Map/Route Planner → HIGHEST PRIORITY (killer feature)
+   - Brand Directory → ELEVATED (retention engine, B2B revenue)
+   - Drop Calendar → DOWNGRADED (community-driven only, not comprehensive)
+
+2. LOGIN GATE REMOVAL (Decided, NOT YET IMPLEMENTED):
+   - Current: App requires sign-in before accessing any features
+   - Decision: Remove login requirement for main pages (Directions, Index, Drops)
+   - Rationale: 70-80% of users abandon apps requiring registration before value
+   - Keep login for: Submit forms, Admin pages, Favourites
+   - Show soft prompts when users try to favourite something
+   - Status: TO BE IMPLEMENTED
+
+3. REVENUE MODEL (Future):
+   - No display ads until 50,000+ users
+   - Focus on B2B revenue first (brand listings, sponsorships)
+   - Brand submissions = warm leads for Enhanced Listings
+   - See HEARDROP-Strategic-Implementation-Plan.docx for full details
+
+4. DATABASE APPROACH:
+   - Stay with Lovable Cloud for now (working, simple)
+   - Consider migration to own Supabase account in Phase 5+ for full independence
+
+================================================================================
+NEXT STEPS - IMMEDIATE PRIORITIES
+================================================================================
+
+[ ] Remove login gate from main pages (Directions, Global Index, Drops)
+    - Modify ProtectedRoute wrapper
+    - Keep login for: Contact/Submit forms, Admin pages
+    - Add "Sign in" button in header for users who want to
+
+[ ] UI/UX Overhaul
+    - User has 50 reference images from similar app
+    - Will define new visual direction
+    - Screens to redesign: Home, Directions/Map, Brand Directory, Drops
+
+[ ] Manual coordinate fixes for remaining incorrect shops
+    - OVO London (currently showing in wrong location)
+    - Use SQL: UPDATE shops SET latitude = X, longitude = Y WHERE name = 'Shop Name';
+    - Get correct coords from Google Maps (right-click → "What's here?")
+
+================================================================================
+KEY FILES REFERENCE
+================================================================================
+
+Map Component:        src/components/Map.tsx
+Directions Page:      src/pages/Directions.tsx
+Contact Page:         src/pages/Contact.tsx
+Supabase Client:      src/integrations/supabase/client.ts
+Supabase Types:       src/integrations/supabase/types.ts
+
+Database Tables:
+- shops (228 rows) - Store locations with lat/lng
+- brands (139 rows) - Brand information
+- contact_submissions - Form submissions including new-brand, new-release
+
+================================================================================
+DEBUG MODE
+================================================================================
+
+Add ?mapDebug=true to URL for console logs:
+- 🗺️ [Init] - Map initialization
+- 🏪 [Shops] - Shop data loading
+- 🎨 [Layers] - Layer creation
+- 📍 [Location] - Geolocation
+- 👆 [Events] - Event listeners
+
+Example: https://lovabuild-app-forge.vercel.app/directions?mapDebug=true
+
+================================================================================
+GIT WORKFLOW
+================================================================================
+
+# Make changes in VS Code, then:
+cd ~/lovabuild-app-forge
+git add <filename>
+git commit -m "Description of change"
+git push
+
+# Vercel auto-deploys after push (1-2 minutes)
+
+================================================================================
+NOTES FOR FUTURE SESSIONS
+================================================================================
+
+- User prefers explanations of WHY, not just WHAT
+- Break complex tasks into numbered steps
+- Always specify which file to edit and show line numbers
+- User can follow instructions carefully but can't write code from scratch
+- User has worked in Soho streetwear shops for 10 years (local knowledge)
+- Test on mobile after significant changes
+- Budget is limited - use free tools where possible
+
+================================================================================
+END OF STATUS DOCUMENT
+================================================================================
