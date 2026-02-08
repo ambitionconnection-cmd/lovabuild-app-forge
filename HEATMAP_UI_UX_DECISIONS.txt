@@ -1,0 +1,543 @@
+================================================================================
+HEATMAP (formerly HEARDROP) - UI/UX DESIGN DECISIONS
+================================================================================
+Last Updated: 2026-02-08
+Reference App: Tripomatic (maps.tripomatic.com)
+Status: PLANNING PHASE - Ready for Implementation
+
+================================================================================
+REBRAND DECISION
+================================================================================
+
+OLD NAME: HEARDROP ("Never miss a drop again")
+NEW NAME: HEATMAP ("Find the heat" / "Map the hype")
+
+RATIONALE:
+- "Heat" is streetwear slang for hyped/desired items
+- "Heatmap" describes exactly what the app does — a map showing where the heat is
+- Removes dependency on "drops" as core feature (which is being downgraded)
+- More memorable and searchable
+- Works globally (not just English speakers understand "heat" in fashion context)
+
+TAGLINE OPTIONS:
+- "Find the heat"
+- "Map the hype"
+- "Your streetwear compass"
+- "Navigate the culture"
+
+================================================================================
+APP STRUCTURE & HIERARCHY
+================================================================================
+
+CORE PHILOSOPHY: Map-First, Trip Planning Focus
+
+PRIMARY FEATURE (80% of value):
+→ Interactive Map with streetwear shop pins
+→ Route planning for shopping trips
+→ Real-time navigation to shops
+
+SECONDARY FEATURE (15% of value):
+→ Brand/Shop Directory for browsing
+→ Discovery during downtime
+
+TERTIARY FEATURE (5% of value):
+→ Community Drops (user-submitted, curated releases)
+→ NOT a comprehensive calendar — just highlights
+
+--------------------------------------------------------------------------------
+NAVIGATION STRUCTURE
+--------------------------------------------------------------------------------
+
+MOBILE (Bottom Navigation - 5 items):
+┌─────────┬─────────┬─────────┬─────────┬─────────┐
+│  Search │   Map   │  Drops  │ Directory│  More   │
+│    🔍   │    🗺️   │    ⚡   │    📖   │   •••   │
+└─────────┴─────────┴─────────┴─────────┴─────────┘
+
+- Map is DEFAULT/HOME (app opens directly to map)
+- Search opens filter panel over map
+- Drops shows community-curated releases (simplified)
+- Directory is the brand/shop browser
+- More contains: Settings, Saved Routes, Favorites, Account, Contact
+
+DESKTOP (Top Navigation + Side Panels):
+┌────────────────────────────────────────────────────────────────┐
+│  Search  │  Trip  │  Directory  │  Drops  │  More  │  [London] │
+└────────────────────────────────────────────────────────────────┘
+│                                                                │
+│  [Side Panel]              [FULL MAP]              [Controls]  │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+
+================================================================================
+MAP DESIGN DECISIONS
+================================================================================
+
+CURRENT PROBLEMS (from HEARDROP):
+❌ Dull grey/dark map lacks vibrancy
+❌ Plain colored dot pins — not recognizable
+❌ Header wastes screen space ("DIRECTIONS" title)
+❌ Bottom sheet doesn't collapse — blocks map
+❌ "CLOSEST SHOP" always visible even when not needed
+
+NEW DESIGN (Tripomatic-inspired):
+
+1. MAP STYLE
+   - Richer colors with visible green parks
+   - Dark mode default BUT with better contrast
+   - Street names visible at zoom levels
+   - Consider light mode option for daytime use
+
+2. PIN DESIGN
+   - Circular pins with LOGO or PHOTO inside
+   - White border around circle for visibility
+   - Size varies by zoom level (larger when zoomed in)
+   - Clustered pins when zoomed out (show count)
+   - Selected pin gets highlight ring (pulsing or glowing)
+
+3. SCREEN REAL ESTATE
+   - NO permanent header on map view
+   - City selector chip at top center ("London" with 3D icon)
+   - Map controls on right edge (zoom +/-, layers, location)
+   - Everything else in collapsible panels/sheets
+
+4. CITY SELECTOR (Top Center)
+   ┌─────────────────────┐
+   │  🏙️  London    ▼   │
+   └─────────────────────┘
+   - Tapping opens city picker
+   - Shows 3D isometric city icon (like Tripomatic)
+   - Future: Multiple cities (Paris, NYC, Tokyo, etc.)
+
+================================================================================
+BOTTOM SHEET / SIDE PANEL PATTERN
+================================================================================
+
+MOBILE: Bottom Sheet (slides up from bottom)
+- Drag handle at top for resize
+- Three states: Collapsed (peek), Half, Full
+- X button to dismiss completely
+- Content scrolls within sheet
+
+DESKTOP: Side Panel (slides in from left)
+- Fixed width (~320px)
+- X button to close
+- Map remains fully visible
+- Content scrolls within panel
+
+--------------------------------------------------------------------------------
+SHOP DETAIL CARD (When pin is tapped)
+--------------------------------------------------------------------------------
+
+MOBILE BOTTOM SHEET:
+┌────────────────────────────────────────┐
+│  ═══════  (drag handle)           ✕    │
+├────────────────────────────────────────┤
+│  [SHOP PHOTO - Full Width]             │
+│                                        │
+│  🏷️ Supreme London                     │
+├────────────────────────────────────────┤
+│  ♡ Add to Favorites  │  + Add to Route │
+├────────────────────────────────────────┤
+│  🔄  ◆  ⬚  ↗                          │
+│  (refresh, directions, expand, share)  │
+├────────────────────────────────────────┤
+│  📍 2-3 Peter Street, London W1F 0AA   │
+│  🕐 Open until 7pm                     │
+│  🌐 supremenewyork.com                 │
+├────────────────────────────────────────┤
+│  Tags: streetwear • skateboarding      │
+└────────────────────────────────────────┘
+
+DESKTOP SIDE PANEL:
+┌──────────────────────────────┐
+│  [Purple Header Bar]     ✕   │
+│   🏷️ Supreme                 │
+├──────────────────────────────┤
+│  ♡ Add to Favorites          │
+│  + Add to Trip               │
+├──────────────────────────────┤
+│  🔄 ◆ ⬚ ↗                    │
+├──────────────────────────────┤
+│  Contact                     │
+│  2-3 Peter Street            │
+│  London, W1F 0AA             │
+│  United Kingdom              │
+├──────────────────────────────┤
+│  [Shop Photo]                │
+│                              │
+│  About this shop...          │
+│  (description text)          │
+└──────────────────────────────┘
+
+================================================================================
+SEARCH & FILTER DESIGN
+================================================================================
+
+SEARCH PANEL (Mobile: Bottom Sheet / Desktop: Side Panel):
+
+┌────────────────────────────────────────┐
+│  Search                            ✕   │
+│  Search and filter places              │
+├────────────────────────────────────────┤
+│  🔍 Search shops, brands...            │
+├────────────────────────────────────────┤
+│  QUICK FILTERS (Icon Grid):            │
+│  ♡  🏠  👟  👕  🎒  ⌚                  │
+│  Fav Home Snkrs Strtwear Bags  Accs    │
+│                                        │
+│  🏷️  🔥  💎  🛹                        │
+│  Sale  Hype  Lux  Skate                │
+├────────────────────────────────────────┤
+│  NEARBY PLACES:                        │
+│  ┌──────────────────────────────────┐  │
+│  │ 🖼️ │ Supreme London        🇬🇧   │  │
+│  │    │ streetwear, skateboard      │  │
+│  └──────────────────────────────────┘  │
+│  ┌──────────────────────────────────┐  │
+│  │ 🖼️ │ Palace Skateboards    🇬🇧   │  │
+│  │    │ streetwear, skateboard      │  │
+│  └──────────────────────────────────┘  │
+│  (scrollable list...)                  │
+└────────────────────────────────────────┘
+
+CATEGORY FILTERS FOR HEATMAP:
+- Sneakers (👟)
+- Streetwear (👕)
+- Techwear (🧥)
+- Luxury/Designer (💎)
+- Vintage/Consignment (♻️)
+- Skateboarding (🛹)
+- Accessories (🎒)
+- Sale/Outlet (🏷️)
+
+================================================================================
+TRIP PLANNING FEATURE
+================================================================================
+
+TRIP PANEL (Desktop Side Panel / Mobile: Full Screen):
+
+┌────────────────────────────────────────┐
+│  No Plans                          ✕   │
+│  February 8, 2026                      │
+├────────────────────────────────────────┤
+│  < FEB 1-7 >                     📌 ⋮  │
+│  SUN MON TUE WED THU FRI SAT          │
+│   1   2   3   4   5  [6]  7           │
+├────────────────────────────────────────┤
+│  ┌──────────────────────────────────┐  │
+│  │  + Plan a New Route          →  │  │
+│  │    Set custom dates              │  │
+│  └──────────────────────────────────┘  │
+│  ┌──────────────────────────────────┐  │
+│  │  📋 My Routes                →  │  │
+│  │    Browse your saved routes      │  │
+│  └──────────────────────────────────┘  │
+├────────────────────────────────────────┤
+│  [Illustration: Empty state]           │
+│  "No trip selected"                    │
+└────────────────────────────────────────┘
+
+ROUTE BUILDER (After adding shops):
+
+┌────────────────────────────────────────┐
+│  Soho Saturday                     ✕   │
+│  3 stops • ~2.1km walking              │
+├────────────────────────────────────────┤
+│  1. 🏠 Start: Current Location         │
+│     │                                  │
+│     │ 🚶 5 min walk                    │
+│     ▼                                  │
+│  2. Supreme London                     │
+│     2-3 Peter Street                   │
+│     │                                  │
+│     │ 🚶 3 min walk                    │
+│     ▼                                  │
+│  3. Palace Skateboards                 │
+│     27 Brewer Street                   │
+│     │                                  │
+│     │ 🚶 4 min walk                    │
+│     ▼                                  │
+│  4. END. Clothing                      │
+│     59 Broadwick Street                │
+├────────────────────────────────────────┤
+│  [  START NAVIGATION  ]                │
+│  [  Save Route  ] [  Export PDF  ]     │
+└────────────────────────────────────────┘
+
+================================================================================
+LOGIN & AUTHENTICATION FLOW
+================================================================================
+
+PHILOSOPHY: "Try Before You Buy"
+
+FEATURES THAT DON'T REQUIRE LOGIN:
+✅ View map and all shops
+✅ View brand/shop details
+✅ View drop calendar
+✅ Get directions (opens Google/Apple Maps)
+✅ Search and filter
+✅ Browse directory
+
+FEATURES THAT REQUIRE LOGIN (Soft Prompt):
+🔐 Save favorite shops/brands
+🔐 Save routes for later
+🔐 Submit new brand/release
+🔐 Push notifications for drops
+
+FEATURES THAT REQUIRE PRO SUBSCRIPTION:
+💎 Export route to PDF
+💎 Unlimited saved routes (free = 3 routes)
+💎 Early drop notifications (5 min before free users)
+💎 Ad-free experience
+💎 Offline map access (future)
+
+--------------------------------------------------------------------------------
+LOGIN PROMPT PATTERN
+--------------------------------------------------------------------------------
+
+When user taps "Add to Favorites" without being logged in:
+
+┌────────────────────────────────────────┐
+│                                    ✕   │
+│        Save your favorites             │
+│                                        │
+│  Sign in to save shops and brands      │
+│  you love, and access them anywhere.   │
+│                                        │
+│  ┌──────────────────────────────────┐  │
+│  │      Continue with Google        │  │
+│  └──────────────────────────────────┘  │
+│  ┌──────────────────────────────────┐  │
+│  │      Continue with Apple         │  │
+│  └──────────────────────────────────┘  │
+│                                        │
+│         or continue with email         │
+│                                        │
+│  [ Maybe later ]                       │
+└────────────────────────────────────────┘
+
+- "Maybe later" dismisses and continues without saving
+- No nagging — only prompt once per session
+- User can still use full app without account
+
+================================================================================
+PREMIUM/SUBSCRIPTION MODEL
+================================================================================
+
+PRICING (Revised from original plan):
+
+OPTION A (Conservative):
+- Monthly: £2.99/month
+- Annual: £19.99/year (44% savings)
+
+OPTION B (Recommended - Higher Value Positioning):
+- Monthly: £4.99/month  
+- Annual: £29.99/year (50% savings)
+
+RATIONALE FOR HIGHER PRICING:
+- Streetwear audience spends £200+ on single items
+- Niche tool with no real competition
+- Tripomatic charges £29.99/year for generic travel
+- Higher price signals higher value
+- Can always discount, hard to raise prices later
+
+--------------------------------------------------------------------------------
+PRO FEATURES BREAKDOWN
+--------------------------------------------------------------------------------
+
+FREE TIER:
+- Full map access
+- View all shops and brands
+- Basic route planning (max 5 stops)
+- Save up to 3 routes
+- Community drops calendar
+- Standard notifications
+
+PRO TIER (£4.99/mo or £29.99/year):
+- Unlimited saved routes
+- PDF export with custom branding
+- Early drop notifications (+5 min)
+- Priority shop data (opening hours, stock info)
+- No ads anywhere in app
+- Exclusive curated collections
+- Future: Offline maps
+
+================================================================================
+DROPS FEATURE (DOWNGRADED)
+================================================================================
+
+OLD APPROACH: Comprehensive release calendar
+NEW APPROACH: "Community Drops" — curated highlights only
+
+WHAT IT IS:
+- User-submitted releases (using NEW RELEASE form)
+- Admin-approved before publishing
+- Focus on MAJOR releases only (Nike SNKRS, big collabs)
+- NOT trying to track every Instagram surprise drop
+
+WHAT IT ISN'T:
+- Not competing with Sole Retriever or Sneaker News
+- Not a comprehensive calendar
+- Not the core feature anymore
+
+UI TREATMENT:
+- Moved from main nav to secondary position
+- Simple list view, not complex calendar
+- "Add to Calendar" button for individual drops
+- Filter by brand (from favorites)
+
+================================================================================
+DIRECTORY FEATURE
+================================================================================
+
+PURPOSE: Browsing and discovery during downtime
+
+DESIGN:
+- Grid view with brand logos/photos
+- Alphabetical scroller on right edge (A-Z)
+- Filter by category, location, style
+- Search bar at top
+- "In view" badge for items visible on current map
+
+BRAND CARD:
+┌─────────────────────────────────────┐
+│  [BRAND LOGO]                       │
+│                                     │
+│  Supreme                            │
+│  New York, USA 🇺🇸                  │
+│  32 locations worldwide             │
+│  ───────────────────                │
+│  streetwear • skateboarding • hype  │
+└─────────────────────────────────────┘
+
+TAPPING A BRAND:
+- Opens Brand Detail page
+- Shows brand story, all locations
+- "View on Map" button filters map to only that brand's shops
+
+================================================================================
+VISUAL DESIGN SYSTEM
+================================================================================
+
+COLOR PALETTE (to be finalized):
+
+Primary:     #00D4AA (Teal/Cyan - from current HEARDROP)
+Secondary:   #FF6B35 (Orange - energy, hype)
+Accent:      #8B5CF6 (Purple - for drops/releases)
+Background:  #0F172A (Dark navy - premium feel)
+Surface:     #1E293B (Slightly lighter for cards)
+Text:        #F8FAFC (Off-white)
+Muted:       #64748B (Grey for secondary text)
+
+MAP SPECIFIC:
+Pin Default: #00D4AA (Teal)
+Pin Selected: #FF6B35 (Orange glow)
+Route Line:  #00D4AA (Teal, dashed)
+User Location: #3B82F6 (Blue dot with pulse)
+
+--------------------------------------------------------------------------------
+TYPOGRAPHY
+--------------------------------------------------------------------------------
+
+Headings: Inter (Bold/Semibold)
+Body: Inter (Regular)
+Monospace: JetBrains Mono (for addresses, codes)
+
+Size Scale:
+- H1: 32px (Page titles)
+- H2: 24px (Section titles)
+- H3: 18px (Card titles)
+- Body: 16px
+- Small: 14px
+- Caption: 12px
+
+--------------------------------------------------------------------------------
+ICONOGRAPHY
+--------------------------------------------------------------------------------
+
+Style: Lucide icons (already in project)
+Weight: 1.5px stroke
+Size: 24px default, 20px in nav, 16px inline
+
+================================================================================
+IMPLEMENTATION PRIORITY
+================================================================================
+
+PHASE 1: Core Map Overhaul (Week 1-2)
+□ Remove login gate from main pages
+□ Change map to open by default (no home page)
+□ Implement bottom sheet pattern for shop details
+□ Add city selector chip
+□ Improve map style (richer colors)
+□ Replace dot pins with logo/photo pins
+
+PHASE 2: Route Planning (Week 3-4)
+□ "Add to Route" functionality
+□ Route builder UI
+□ Walking time calculations
+□ "Start Navigation" (open in Google/Apple Maps)
+□ Save route to account
+
+PHASE 3: Directory Polish (Week 5)
+□ Grid view for brands
+□ Alphabetical scroller
+□ Category filters
+□ Search improvements
+
+PHASE 4: Premium Features (Week 6-7)
+□ PDF export functionality
+□ Subscription paywall
+□ Payment integration (Stripe)
+□ Pro feature gates
+
+PHASE 5: Drops Simplification (Week 8)
+□ Rename to "Community Drops"
+□ Simplify UI to list view
+□ Move to secondary navigation position
+□ Remove complex calendar view
+
+================================================================================
+APP STORE ASSETS (Future Reference)
+================================================================================
+
+Based on Tripomatic's Play Store listing:
+
+SCREENSHOT THEMES (5 required):
+1. "PLAN Your Perfect Route" - Trip planner interface
+2. "DISCOVER 200+ Streetwear Shops" - Directory view
+3. "EXPLORE London's Best" - Map with photo pins
+4. "NAVIGATE Like a Local" - Directions/route view
+5. "SAVE Your Favorites" - Favorites/saved routes
+
+APP STORE DESCRIPTION DRAFT:
+"HEATMAP - Find the heat. The only map built for streetwear lovers.
+
+Discover 200+ streetwear shops in London. Plan your route. Never miss 
+a drop.
+
+• Browse the world's best streetwear shops on an interactive map
+• Plan multi-stop shopping routes with walking directions
+• Save your favorite brands and shops
+• Get notified about upcoming releases
+• Export routes to PDF for offline access
+
+From Supreme to Palace, END. to Dover Street Market — find every 
+shop worth visiting in one app.
+
+Free to explore. Pro for serious collectors."
+
+================================================================================
+NOTES FOR FUTURE SESSIONS
+================================================================================
+
+- Reference app: Tripomatic (maps.tripomatic.com)
+- Key patterns: Bottom sheet, side panel, photo pins, city selector
+- Pricing decision: Recommend £4.99/mo or £29.99/year
+- Drops strategy: Downgrade to "Community Drops", not comprehensive
+- Name change: HEARDROP → HEATMAP (pending final decision)
+- Desktop vs Mobile: Desktop for planning, Mobile for navigation
+
+================================================================================
+END OF UI/UX DECISIONS DOCUMENT
+================================================================================
