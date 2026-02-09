@@ -874,6 +874,33 @@ const Map: React.FC<MapProps> = ({
             }
           });
           mapLog.layers('Layer "shop-labels" added');
+
+          // Hide the circle layer - we'll use logo markers instead
+          map.current.setLayoutProperty('unclustered-point', 'visibility', 'none');
+          map.current.setLayoutProperty('shop-labels', 'visibility', 'none');
+          
+          // Create logo markers for each shop
+          shopsWithCoords.forEach(shop => {
+            const brand = shop.brand_id ? brandsRef.current.find(b => b.id === shop.brand_id) : null;
+            const logoUrl = brand?.logo_url || null;
+            
+            const el = createLogoMarkerElement(shop, logoUrl);
+            
+            el.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (onShopClickRef.current) {
+                onShopClickRef.current(shop);
+              }
+            });
+            
+            const marker = new mapboxgl.Marker({ element: el })
+              .setLngLat([Number(shop.longitude), Number(shop.latitude)])
+              .addTo(map.current!);
+            
+            logoMarkersRef.current[shop.id] = marker;
+          });
+          
+          mapLog.layers('Logo markers added:', Object.keys(logoMarkersRef.current).length);
         }
 
         setDebugStats(prev => ({ ...prev, sourceReady: true }));
