@@ -74,7 +74,9 @@ const Map: React.FC<MapProps> = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const [debugStats, setDebugStats] = useState({ shopsTotal: 0, shopsVisible: 0, sourceReady: false });
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const logoMarkersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
   const shopsRef = useRef(shops);
+  const brandsRef = useRef(brands);
   const onShopClickRef = useRef(onShopClick);
   const onVisibleShopsChangeRef = useRef(onVisibleShopsChange);
   const onMapCenterChangeRef = useRef(onMapCenterChange);
@@ -93,6 +95,9 @@ const Map: React.FC<MapProps> = ({
     onShopClickRef.current = onShopClick;
   }, [onShopClick]);
 
+  useEffect(() => {
+  brandsRef.current = brands;
+  }, [brands]);
   useEffect(() => {
     onVisibleShopsChangeRef.current = onVisibleShopsChange;
   }, [onVisibleShopsChange]);
@@ -672,6 +677,45 @@ const Map: React.FC<MapProps> = ({
       setLoadingMessage('Fetching shop data...');
       return;
     }
+    // Helper function to create a logo marker element
+    const createLogoMarkerElement = (shop: typeof shops[0], logoUrl: string | null) => {
+      const el = document.createElement('div');
+      el.className = 'logo-marker';
+      el.style.cssText = `
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        cursor: pointer;
+        overflow: hidden;
+        background-color: hsl(271, 85%, 65%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      `;
+      
+      if (logoUrl) {
+        const img = document.createElement('img');
+        img.src = logoUrl;
+        img.alt = shop.name;
+        img.style.cssText = `
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        `;
+        img.onerror = () => {
+          // Fallback to letter if image fails
+          el.innerHTML = `<span style="color: white; font-weight: bold; font-size: 14px;">${shop.name.charAt(0)}</span>`;
+        };
+        el.appendChild(img);
+      } else {
+        // No logo - show first letter
+        el.innerHTML = `<span style="color: white; font-weight: bold; font-size: 14px;">${shop.name.charAt(0)}</span>`;
+      }
+      
+      return el;
+    };
 
   setLoadingMessage('Placing pins on map...');
 
@@ -693,7 +737,12 @@ const Map: React.FC<MapProps> = ({
 
       const geojson: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
-        features: shopsWithCoords.map(shop => ({
+        features: shopsWithCoords.map(shop => {
+          // Find the brand to get logo_url
+        const brand = shop.brand_id ? brandsRef.current.find(b => b.id === shop.brand_id) : null;
+        const logoUrl = brand?.logo_url || shop.image_url || null;
+    
+        return {
           type: 'Feature' as const,
           geometry: {
             type: 'Point' as const,
@@ -706,9 +755,11 @@ const Map: React.FC<MapProps> = ({
             city: shop.city,
             category: shop.category || 'streetwear',
             brand_id: shop.brand_id || null,
+            logo_url: logoUrl,
           }
-        }))
-      };
+        };
+      })
+    };
 
       mapLog.shops('Created GeoJSON with', geojson.features.length, 'features');
 
@@ -805,6 +856,24 @@ const Map: React.FC<MapProps> = ({
             }
           });
           mapLog.layers('Layer "unclustered-point" added');
+
+          // Add shop name initials on top of pins
+          map.current.addLayer({
+            id: 'shop-labels',
+            type: 'symbol',
+            source: 'shops',
+            filter: ['!', ['has', 'point_count']],
+            layout: {
+              'text-field': ['slice', ['get', 'name'], 0, 1],
+              'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+              'text-size': 12,
+              'text-allow-overlap': true,
+            },
+            paint: {
+              'text-color': '#ffffff',
+            }
+          });
+          mapLog.layers('Layer "shop-labels" added');
         }
 
         setDebugStats(prev => ({ ...prev, sourceReady: true }));
