@@ -115,7 +115,7 @@ const Directions = () => {
   const [mapCenterLocation, setMapCenterLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [sortByDistance, setSortByDistance] = useState(false);
   const [visibleShops, setVisibleShops] = useState<ShopType[]>([]);
-  const [brands, setBrands] = useState<{ id: string; slug: string; name: string }[]>([]);
+  const [brands, setBrands] = useState<{ id: string; slug: string; name: string; logo_url: string | null }[]>([]);
   
   // Draggable journey panel state
   const [journeyPanelPosition, setJourneyPanelPosition] = useState({ x: 8, y: 0 });
@@ -337,7 +337,7 @@ const Directions = () => {
       // Fetch shops and brands in parallel
       const [shopsResult, brandsResult] = await Promise.all([
         supabase.from('shops_public').select('*').order('name'),
-        supabase.from('brands').select('id, slug, name').eq('is_active', true)
+        supabase.from('brands').select('id, slug, name, logo_url').eq('is_active', true)
       ]);
 
       if (shopsResult.error) {
@@ -744,12 +744,11 @@ const Directions = () => {
             <Card className={`border border-primary/20 shadow-lg overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-44px-64px-15vh)] lg:h-[500px] rounded-none lg:rounded-xl'}`}>
               <CardContent className="p-0 h-full relative">
                 <div className="w-full h-full">
-                  <Map 
-                    shops={filteredShops} 
+                  <Map
+                    shops={filteredShops}
+                    brands={brands}
                     onShopClick={(shop) => {
-                      if (!isInJourney(shop.id)) {
-                        setSelectedShop(shop);
-                      }
+                      setSelectedShop(shop);
                     }}
                     selectedShop={selectedShop}
                     journeyStops={journeyStops}

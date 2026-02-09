@@ -32,6 +32,7 @@ const mapLog = {
 
 interface MapProps {
   shops: Omit<Tables<'shops'>, 'email' | 'phone'>[];
+  brands?: { id: string; slug: string; name: string; logo_url: string | null }[];
   onShopClick?: (shop: Omit<Tables<'shops'>, 'email' | 'phone'>) => void;
   selectedShop?: Omit<Tables<'shops'>, 'email' | 'phone'> | null;
   journeyStops?: Omit<Tables<'shops'>, 'email' | 'phone'>[];
@@ -48,7 +49,8 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ 
-  shops, 
+  shops,
+  brands = [], 
   onShopClick, 
   selectedShop, 
   journeyStops = [], 
