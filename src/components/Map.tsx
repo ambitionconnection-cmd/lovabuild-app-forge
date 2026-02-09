@@ -115,6 +115,20 @@ const Map: React.FC<MapProps> = ({
   const initialCenterRef = useRef(initialCenter);
   const initialZoomRef = useRef(initialZoom);
 
+  // Update refs when props change
+    useEffect(() => {
+      if (initialCenter) {
+        initialCenterRef.current = initialCenter;
+        // Fly to new center if map exists
+        if (map.current) {
+          map.current.flyTo({
+            center: initialCenter,
+            zoom: initialZoom || 15,
+            duration: 1000
+          });
+        }
+      }
+    }, [initialCenter, initialZoom]);
   // Initialize map once - CRITICAL: Only depend on mapboxToken to prevent re-initialization
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken || map.current) return;
@@ -687,7 +701,7 @@ const Map: React.FC<MapProps> = ({
         border-radius: 50%;
         border: 3px solid white;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        cursor: pointer;
+        pointer-events: none;
         overflow: hidden;
         background-color: hsl(271, 85%, 65%);
         display: flex;
@@ -876,23 +890,18 @@ const Map: React.FC<MapProps> = ({
           mapLog.layers('Layer "shop-labels" added');
 
           // Hide the circle layer - we'll use logo markers instead
-          map.current.setLayoutProperty('unclustered-point', 'visibility', 'none');
+          // Make circles transparent but keep them clickable for popup functionality
+          map.current.setPaintProperty('unclustered-point', 'circle-opacity', 0);
+          map.current.setPaintProperty('unclustered-point', 'circle-stroke-opacity', 0);
           map.current.setLayoutProperty('shop-labels', 'visibility', 'none');
-          
-          // Create logo markers for each shop
+                    // Create logo markers for each shop
           shopsWithCoords.forEach(shop => {
             const brand = shop.brand_id ? brandsRef.current.find(b => b.id === shop.brand_id) : null;
             const logoUrl = brand?.logo_url || null;
             
             const el = createLogoMarkerElement(shop, logoUrl);
             
-            el.addEventListener('click', (e) => {
-              e.stopPropagation();
-              if (onShopClickRef.current) {
-                onShopClickRef.current(shop);
-              }
-            });
-            
+                        
             const marker = new mapboxgl.Marker({ element: el })
               .setLngLat([Number(shop.longitude), Number(shop.latitude)])
               .addTo(map.current!);

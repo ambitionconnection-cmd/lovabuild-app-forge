@@ -1,0 +1,3006 @@
+{
+  "generated": "2026-02-08T20:07:31.710Z",
+  "summary": {
+    "total": 228,
+    "updated": 187,
+    "unchanged": 41,
+    "failed": 0,
+    "noAddress": 0
+  },
+  "updates": [
+    {
+      "id": "f8653e17-6202-4b31-93d4-5d89d5333a6a",
+      "name": "BAPE Store London",
+      "address": "24-26 Maddox St, London W1S 1PP",
+      "oldCoords": {
+        "lat": 51.5134,
+        "lng": -0.1426
+      },
+      "newCoords": {
+        "lat": 51.51312,
+        "lng": -0.14229
+      },
+      "distanceMeters": 38,
+      "confidence": 0.757778,
+      "matchedAddress": "24-26 Maddox Street, Westminster, London, W1S 1QH, United Kingdom"
+    },
+    {
+      "id": "fb6d671d-efeb-4110-8783-85eab20a9c75",
+      "name": "Carhartt WIP Soho",
+      "address": "104-106 Berwick St, London W1F 0QH",
+      "oldCoords": {
+        "lat": 51.5131,
+        "lng": -0.1343
+      },
+      "newCoords": {
+        "lat": 51.470371,
+        "lng": -0.147222
+      },
+      "distanceMeters": 4835,
+      "confidence": 0.649246,
+      "matchedAddress": "Bewick Street, Wandsworth, London, SW8 3TA, United Kingdom"
+    },
+    {
+      "id": "8bf2c68e-7ff2-4e5d-86d3-2e386347b44d",
+      "name": "Palace Skateboards London",
+      "address": "26 Brewer St, London W1F 0SW",
+      "oldCoords": {
+        "lat": 51.5108,
+        "lng": -0.1369
+      },
+      "newCoords": {
+        "lat": 51.51222,
+        "lng": -0.13453
+      },
+      "distanceMeters": 228,
+      "confidence": 0.757778,
+      "matchedAddress": "26 Brewer Street, Westminster, London, W1F 0SW, United Kingdom"
+    },
+    {
+      "id": "c55cced6-32ad-47c5-bb0c-9d2d1894ed6a",
+      "name": "Palace Paris",
+      "address": "272 Rue Saint-Honoré, 75001 Paris",
+      "oldCoords": {
+        "lat": 48.8675,
+        "lng": 2.3267
+      },
+      "newCoords": {
+        "lat": 48.861834,
+        "lng": 2.34442
+      },
+      "distanceMeters": 1441,
+      "confidence": 0.583333,
+      "matchedAddress": "75001, Paris, Île-de-France, France"
+    },
+    {
+      "id": "bba85b35-36f4-45b4-bd29-d870d949499e",
+      "name": "Aimé Leon Dore London",
+      "address": "32 Broadwick St, London W1F 8JB",
+      "oldCoords": {
+        "lat": 51.5134,
+        "lng": -0.1371
+      },
+      "newCoords": {
+        "lat": 51.51363,
+        "lng": -0.1362
+      },
+      "distanceMeters": 67,
+      "confidence": 0.890714,
+      "matchedAddress": "32 Broadwick Street, Westminster, London, W1F 8JB, United Kingdom"
+    },
+    {
+      "id": "74797486-d6ac-4b64-a241-cebd5f7e8552",
+      "name": "END. Clothing London",
+      "address": "59 Broadwick St, London W1F 9QS",
+      "oldCoords": {
+        "lat": 51.5134,
+        "lng": -0.1364
+      },
+      "newCoords": {
+        "lat": 51.51305,
+        "lng": -0.13719
+      },
+      "distanceMeters": 67,
+      "confidence": 0.890714,
+      "matchedAddress": "59 Broadwick Street, Westminster, London, W1F 9QS, United Kingdom"
+    },
+    {
+      "id": "66441a44-6f93-4d9d-a923-f73b09949f99",
+      "name": "Supreme London",
+      "address": "2-3 Peter St, London W1F 0AA",
+      "oldCoords": {
+        "lat": 51.5134,
+        "lng": -0.1355
+      },
+      "newCoords": {
+        "lat": 51.51297,
+        "lng": -0.13393
+      },
+      "distanceMeters": 119,
+      "confidence": 0.991905,
+      "matchedAddress": "2-3 Peter Street, Westminster, London, W1F 0AA, United Kingdom"
+    },
+    {
+      "id": "2a80db5a-8b08-4693-8a34-8b20d43ecc6a",
+      "name": "Supreme Paris",
+      "address": "20 Rue Barbette, 75003 Paris",
+      "oldCoords": {
+        "lat": 48.8579,
+        "lng": 2.3625
+      },
+      "newCoords": {
+        "lat": 48.85926,
+        "lng": 2.359979
+      },
+      "distanceMeters": 239,
+      "confidence": 0.825397,
+      "matchedAddress": "20 Rue Barbette, 75003 Paris, France"
+    },
+    {
+      "id": "5ce835b2-dec4-482a-9b1c-b087fd68d332",
+      "name": "Footpatrol Soho",
+      "address": "80 Berwick St, London W1F 8RY",
+      "oldCoords": {
+        "lat": 51.5129,
+        "lng": -0.1344
+      },
+      "newCoords": {
+        "lat": 51.4703,
+        "lng": -0.146811
+      },
+      "distanceMeters": 4814,
+      "confidence": 0.713364,
+      "matchedAddress": "80 Bewick Street, Wandsworth, London, SW8 3TA, United Kingdom"
+    },
+    {
+      "id": "53f5b18f-3555-4774-8f47-fd9a77508fea",
+      "name": "Ader Error Store",
+      "address": "Sinsa-dong, Gangnam-gu, Seoul",
+      "oldCoords": {
+        "lat": 37.5206,
+        "lng": 127.0207
+      },
+      "newCoords": {
+        "lat": 37.52398,
+        "lng": 127.02838
+      },
+      "distanceMeters": 775,
+      "confidence": 0.833333,
+      "matchedAddress": "Sinsa-dong, 06025, Gangnam-gu, Seoul, South Korea"
+    },
+    {
+      "id": "326e5ec5-3174-4190-9715-0c0d11fa3223",
+      "name": "Supreme Harajuku",
+      "address": "5-6-14 Jingumae, Shibuya, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.664,
+        "lng": 139.7089
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 718,
+      "confidence": 0.784444,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "44fc0356-b74e-4405-b357-89a378f7cb71",
+      "name": "Stadium Goods",
+      "address": "47 Howard St, New York, NY 10013",
+      "oldCoords": {
+        "lat": 40.7196,
+        "lng": -74.0014
+      },
+      "newCoords": {
+        "lat": 40.720095,
+        "lng": -74.001959
+      },
+      "distanceMeters": 72,
+      "confidence": 1,
+      "matchedAddress": "47 Howard Street, New York, New York 10013, United States"
+    },
+    {
+      "id": "a8e6dfe8-0e92-40cf-a350-c341c93cda37",
+      "name": "Union Los Angeles",
+      "address": "110 S La Brea Ave, Los Angeles, CA 90036",
+      "oldCoords": {
+        "lat": 34.0739,
+        "lng": -118.3445
+      },
+      "newCoords": {
+        "lat": 34.07318,
+        "lng": -118.343775
+      },
+      "distanceMeters": 104,
+      "confidence": 1,
+      "matchedAddress": "110 South La Brea Avenue, Los Angeles, California 90036, United States"
+    },
+    {
+      "id": "98875363-207b-4498-beb9-fcf95e72ebb1",
+      "name": "Undefeated La Brea",
+      "address": "112 S La Brea Ave, Los Angeles, CA 90036",
+      "oldCoords": {
+        "lat": 34.0739,
+        "lng": -118.3445
+      },
+      "newCoords": {
+        "lat": 34.07314,
+        "lng": -118.343787
+      },
+      "distanceMeters": 107,
+      "confidence": 1,
+      "matchedAddress": "112 South La Brea Avenue, Los Angeles, California 90036, United States"
+    },
+    {
+      "id": "89ddfc91-3d0c-4d39-8634-55a75200beef",
+      "name": "BAPE New York",
+      "address": "91 Greene St, New York, NY 10012",
+      "oldCoords": {
+        "lat": 40.7241,
+        "lng": -74.0025
+      },
+      "newCoords": {
+        "lat": 40.724211,
+        "lng": -74.000272
+      },
+      "distanceMeters": 188,
+      "confidence": 1,
+      "matchedAddress": "91 Greene Street, New York, New York 10012, United States"
+    },
+    {
+      "id": "9c36e588-0937-4b3d-bfea-8ce24d40a40c",
+      "name": "SLAM JAM Milan",
+      "address": "Via Padova 34, 20127 Milan",
+      "oldCoords": {
+        "lat": 45.4898,
+        "lng": 9.2191
+      },
+      "newCoords": {
+        "lat": 45.488727,
+        "lng": 9.220291
+      },
+      "distanceMeters": 151,
+      "confidence": 0.912698,
+      "matchedAddress": "Via Padova 34, 20131 Milano Milan, Italy"
+    },
+    {
+      "id": "b11225ac-08a3-45cd-9927-91ba800bd325",
+      "name": "Andreas Murkudis",
+      "address": "Potsdamer Str. 81E, 10785 Berlin",
+      "oldCoords": {
+        "lat": 52.5062,
+        "lng": 13.3709
+      },
+      "newCoords": {
+        "lat": 52.501674,
+        "lng": 13.364446
+      },
+      "distanceMeters": 666,
+      "confidence": 1,
+      "matchedAddress": "Potsdamer Straße 81e, 10785 Berlin, Germany"
+    },
+    {
+      "id": "43f03957-c122-49b5-9144-0036052c3a7f",
+      "name": "Daily Paper Amsterdam",
+      "address": "Bilderdijkstraat 163, 1053 KN",
+      "oldCoords": {
+        "lat": 52.3676,
+        "lng": 4.8787
+      },
+      "newCoords": {
+        "lat": 52.367926,
+        "lng": 4.871986
+      },
+      "distanceMeters": 457,
+      "confidence": 1,
+      "matchedAddress": "Bilderdijkstraat 163, 1053 KP Amsterdam, Netherlands"
+    },
+    {
+      "id": "63368a4b-ff9b-456b-ac25-cfb03ac63cfc",
+      "name": "Maha Amsterdam",
+      "address": "Vijzelstraat 129",
+      "oldCoords": {
+        "lat": 52.3602,
+        "lng": 4.8922
+      },
+      "newCoords": {
+        "lat": 52.362546,
+        "lng": 4.89209
+      },
+      "distanceMeters": 261,
+      "confidence": 1,
+      "matchedAddress": "Vijzelstraat 129, 1017 HJ Amsterdam, Netherlands"
+    },
+    {
+      "id": "c394532a-b43c-4c4f-9b36-d905f156e596",
+      "name": "Collect the Label Amsterdam",
+      "address": "Heiligeweg 39, Centrum",
+      "oldCoords": {
+        "lat": 52.3702,
+        "lng": 4.8952
+      },
+      "newCoords": {
+        "lat": 52.367591,
+        "lng": 4.890668
+      },
+      "distanceMeters": 423,
+      "confidence": 1,
+      "matchedAddress": "Heiligeweg 39-1, 1012 XP Amsterdam, Netherlands"
+    },
+    {
+      "id": "f8d51882-c9ab-47dc-b8ad-ac15f0b00d3f",
+      "name": "Veld Amsterdam",
+      "address": "Utrechtsestraat",
+      "oldCoords": {
+        "lat": 52.3638,
+        "lng": 4.8963
+      },
+      "newCoords": {
+        "lat": 52.363521,
+        "lng": 4.898427
+      },
+      "distanceMeters": 148,
+      "confidence": 1,
+      "matchedAddress": "Utrechtsestraat, 1017 VJ Amsterdam, Netherlands"
+    },
+    {
+      "id": "a60eb70f-3743-49c6-bf54-dda35a4c9b87",
+      "name": "Lazy Oaf London",
+      "address": "2 Ganton St, W1F 7QL",
+      "oldCoords": {
+        "lat": 51.5136,
+        "lng": -0.1397
+      },
+      "newCoords": {
+        "lat": 51.51346,
+        "lng": -0.13819
+      },
+      "distanceMeters": 106,
+      "confidence": 1,
+      "matchedAddress": "2 Ganton Street, Westminster, London, W1F 7QL, United Kingdom"
+    },
+    {
+      "id": "8aca7375-52eb-4a21-8df8-2c542452d020",
+      "name": "Corteiz London",
+      "address": "71-75 Shelton Street, WC2H 9JQ",
+      "oldCoords": {
+        "lat": 51.5145,
+        "lng": -0.1245
+      },
+      "newCoords": {
+        "lat": 51.51477,
+        "lng": -0.12376
+      },
+      "distanceMeters": 59,
+      "confidence": 1,
+      "matchedAddress": "71-75 Shelton Street, Camden, London, WC2H 9JQ, United Kingdom"
+    },
+    {
+      "id": "86ce78d4-a7e9-4a01-bbcf-3701eabf1f8c",
+      "name": "Norse Projects Copenhagen",
+      "address": "Pilestræde 41A, 1112",
+      "oldCoords": {
+        "lat": 55.6805,
+        "lng": 12.5788
+      },
+      "newCoords": {
+        "lat": 55.681097,
+        "lng": 12.579369
+      },
+      "distanceMeters": 75,
+      "confidence": 1,
+      "matchedAddress": "Pilestræde 41, 1112 København, Denmark"
+    },
+    {
+      "id": "a270e5ff-7d15-418a-8538-ab8c3eeb3378",
+      "name": "WOOD WOOD Berlin",
+      "address": "Torstrasse 100, 10119",
+      "oldCoords": {
+        "lat": 52.5289,
+        "lng": 13.4022
+      },
+      "newCoords": {
+        "lat": 52.529488,
+        "lng": 13.404102
+      },
+      "distanceMeters": 144,
+      "confidence": 1,
+      "matchedAddress": "Torstraße 100, 10119 Berlin, Germany"
+    },
+    {
+      "id": "4e4d822b-75ba-4f1f-ab2b-65287dac4daf",
+      "name": "Wasted Paris",
+      "address": "37 Rue des Rosiers, 75004",
+      "oldCoords": {
+        "lat": 48.8574,
+        "lng": 2.3598
+      },
+      "newCoords": {
+        "lat": 48.857453,
+        "lng": 2.358906
+      },
+      "distanceMeters": 66,
+      "confidence": 1,
+      "matchedAddress": "37 Rue Des Rosiers, 75004 Paris, France"
+    },
+    {
+      "id": "5d33830b-2586-4673-9a2c-a87b695ac1d3",
+      "name": "M+RC NOIR Paris",
+      "address": "15 Rue d'Aboukir, 75002",
+      "oldCoords": {
+        "lat": 48.8675,
+        "lng": 2.3464
+      },
+      "newCoords": {
+        "lat": 48.866469,
+        "lng": 2.342921
+      },
+      "distanceMeters": 279,
+      "confidence": 1,
+      "matchedAddress": "15 Rue D'aboukir, 75002 Paris, France"
+    },
+    {
+      "id": "8c3d7fee-28b5-4f2a-ad33-baeacc01dc99",
+      "name": "RETERNITY Delmenhorst",
+      "address": "Brendelweg 167, 27755",
+      "oldCoords": {
+        "lat": 53.0502,
+        "lng": 8.6336
+      },
+      "newCoords": {
+        "lat": 53.022113,
+        "lng": 8.641476
+      },
+      "distanceMeters": 3167,
+      "confidence": 1,
+      "matchedAddress": "Brendelweg 167, 27755 Delmenhorst, Germany"
+    },
+    {
+      "id": "016f7988-7d38-4fe3-bccb-e2bc18bc1a07",
+      "name": "Only NY New York",
+      "address": "176 Stanton St, NY 10002",
+      "oldCoords": {
+        "lat": 40.7213,
+        "lng": -73.9858
+      },
+      "newCoords": {
+        "lat": 40.720253,
+        "lng": -73.98404
+      },
+      "distanceMeters": 189,
+      "confidence": 1,
+      "matchedAddress": "176 Stanton Street, New York, New York 10002, United States"
+    },
+    {
+      "id": "9cd8f0e6-dbbe-4666-b299-4d0d15339fe7",
+      "name": "BAPE Store Harajuku",
+      "address": "4-21-5 Jingumae, Shibuya, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.669,
+        "lng": 139.7089
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 239,
+      "confidence": 0.784444,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "c8b8c493-be43-4d83-a668-8678cb27d877",
+      "name": "Billionaire Boys Club NYC",
+      "address": "7 Mercer St, NY 10013",
+      "oldCoords": {
+        "lat": 40.7199,
+        "lng": -74.0013
+      },
+      "newCoords": {
+        "lat": 40.72042,
+        "lng": -74.00228
+      },
+      "distanceMeters": 101,
+      "confidence": 1,
+      "matchedAddress": "7 Mercer Street, New York, New York 10013, United States"
+    },
+    {
+      "id": "cce12e36-0631-4b17-88b6-21d0daab1129",
+      "name": "Brain Dead LA",
+      "address": "619 N La Brea Ave, CA 90036",
+      "oldCoords": {
+        "lat": 34.0831,
+        "lng": -118.3442
+      },
+      "newCoords": {
+        "lat": 34.08248,
+        "lng": -118.344245
+      },
+      "distanceMeters": 69,
+      "confidence": 1,
+      "matchedAddress": "619 North La Brea Avenue, Los Angeles, California 90036, United States"
+    },
+    {
+      "id": "094f5a59-7d38-45bb-9d00-8fb0659970ef",
+      "name": "Born x Raised LA",
+      "address": "3206 W Jefferson Blvd, CA 90018",
+      "oldCoords": {
+        "lat": 34.0247,
+        "lng": -118.3263
+      },
+      "newCoords": {
+        "lat": 34.02547,
+        "lng": -118.33077
+      },
+      "distanceMeters": 421,
+      "confidence": 1,
+      "matchedAddress": "3206 West Jefferson Boulevard, Los Angeles, California 90018, United States"
+    },
+    {
+      "id": "3b5dcf60-db31-404b-a338-5346ef7bc941",
+      "name": "CLSC LA",
+      "address": "420 N Fairfax Ave, CA 90036",
+      "oldCoords": {
+        "lat": 34.0739,
+        "lng": -118.3609
+      },
+      "newCoords": {
+        "lat": 34.07886,
+        "lng": -118.36128
+      },
+      "distanceMeters": 553,
+      "confidence": 1,
+      "matchedAddress": "420 North Fairfax Avenue, Los Angeles, California 90036, United States"
+    },
+    {
+      "id": "3acba657-0455-4736-9b87-b7119c045014",
+      "name": "Pleasures LA",
+      "address": "4851 Fountain Ave, CA 90029",
+      "oldCoords": {
+        "lat": 34.0926,
+        "lng": -118.2919
+      },
+      "newCoords": {
+        "lat": 34.095554,
+        "lng": -118.295353
+      },
+      "distanceMeters": 457,
+      "confidence": 1,
+      "matchedAddress": "4851 Fountain Avenue, Los Angeles, California 90029, United States"
+    },
+    {
+      "id": "e715ab7d-7ef1-4d22-a4c5-87b576c645be",
+      "name": "The Quiet Life LA",
+      "address": "5604 York Blvd, CA 90042",
+      "oldCoords": {
+        "lat": 34.1231,
+        "lng": -118.1859
+      },
+      "newCoords": {
+        "lat": 34.119367,
+        "lng": -118.196555
+      },
+      "distanceMeters": 1065,
+      "confidence": 1,
+      "matchedAddress": "5604 York Boulevard, Los Angeles, California 90042, United States"
+    },
+    {
+      "id": "a7f7a47b-e14f-40e0-910e-534eb4394ec6",
+      "name": "Felt Miami",
+      "address": "167 NW 25th St, FL 33127",
+      "oldCoords": {
+        "lat": 25.7989,
+        "lng": -80.1981
+      },
+      "newCoords": {
+        "lat": 25.800742,
+        "lng": -80.198595
+      },
+      "distanceMeters": 211,
+      "confidence": 1,
+      "matchedAddress": "167 Northwest 25th Street, Miami, Florida 33127, United States"
+    },
+    {
+      "id": "a7b143c4-b989-4f9e-862a-a95f2c4d51d7",
+      "name": "SWE Ho Chi Minh",
+      "address": "44A Tran Quang Dieu",
+      "oldCoords": {
+        "lat": 10.7914,
+        "lng": 106.6958
+      },
+      "newCoords": {
+        "lat": 10.479293,
+        "lng": 107.276374
+      },
+      "distanceMeters": 72319,
+      "confidence": 0.811728,
+      "matchedAddress": "Trần Quang Diệu, 78300, Đất Đỏ, Ho Chi Minh City, Vietnam"
+    },
+    {
+      "id": "415ec41f-1ca9-4001-b9a5-57112d177ae4",
+      "name": "Pestle & Mortar Kuala Lumpur",
+      "address": "11 Jalan Telawi 5, 59100",
+      "oldCoords": {
+        "lat": 3.1319,
+        "lng": 101.6841
+      },
+      "newCoords": {
+        "lat": 3.131238,
+        "lng": 101.672461
+      },
+      "distanceMeters": 1294,
+      "confidence": 0.638889,
+      "matchedAddress": "59100, Kuala Lumpur, Malaysia"
+    },
+    {
+      "id": "0dc6c5d7-f34d-4c7b-87df-d335c5a41af8",
+      "name": "Anaabu Petaling Jaya",
+      "address": "34-1, Jalan PJU 8/5G, Bandar Damansara Perdana",
+      "oldCoords": {
+        "lat": 3.1739,
+        "lng": 101.5992
+      },
+      "newCoords": {
+        "lat": 3.099973,
+        "lng": 101.64656
+      },
+      "distanceMeters": 9758,
+      "confidence": 0.518519,
+      "matchedAddress": "Petaling Jaya, Selangor, Malaysia"
+    },
+    {
+      "id": "5c618d40-f53d-435d-9ad8-44d3ed327e7a",
+      "name": "Public Culture Jakarta",
+      "address": "Jl. Kemang Selatan VIII, No. 63",
+      "oldCoords": {
+        "lat": -6.2676,
+        "lng": 106.8169
+      },
+      "newCoords": {
+        "lat": 1.324163,
+        "lng": 103.955202
+      },
+      "distanceMeters": 901961,
+      "confidence": 0.407407,
+      "matchedAddress": "63 Jalan Greja, Bedok, Singapore 488926"
+    },
+    {
+      "id": "ea66acc5-558b-4b1e-a5cf-eee759d44a7c",
+      "name": "Union Los Angeles NYC",
+      "address": "176 Spring St, New York, NY 10012",
+      "oldCoords": {
+        "lat": 40.7248,
+        "lng": -73.9982
+      },
+      "newCoords": {
+        "lat": 40.724681,
+        "lng": -74.002464
+      },
+      "distanceMeters": 360,
+      "confidence": 1,
+      "matchedAddress": "176 Spring Street, New York, New York 10012, United States"
+    },
+    {
+      "id": "36c896d6-2f2d-45d8-9166-b21e4e9d0737",
+      "name": "POST ARCHIVE FACTION Seoul",
+      "address": "413-1, Seogyo-dong, Mapo-gu, 04041",
+      "oldCoords": {
+        "lat": 37.5547,
+        "lng": 126.9225
+      },
+      "newCoords": {
+        "lat": 37.552402,
+        "lng": 126.921646
+      },
+      "distanceMeters": 266,
+      "confidence": 0.762346,
+      "matchedAddress": "Seogyo-dong, 04041, Mapo-gu, Seoul, South Korea"
+    },
+    {
+      "id": "ed4f139b-3e96-4ffd-8761-b1ecdc39be9d",
+      "name": "Mardi Mercredi Seoul",
+      "address": "Hongdae",
+      "oldCoords": {
+        "lat": 37.5563,
+        "lng": 126.9239
+      },
+      "newCoords": {
+        "lat": 37.566679,
+        "lng": 126.978291
+      },
+      "distanceMeters": 4931,
+      "confidence": 0.703704,
+      "matchedAddress": "Seoul, South Korea"
+    },
+    {
+      "id": "83055225-a2cd-40de-8092-7ad0baaefa68",
+      "name": "FRUITION Taipei",
+      "address": "No. 20, Lane 290, Guangfu S. Rd., Da'an Dist.",
+      "oldCoords": {
+        "lat": 25.033,
+        "lng": 121.5654
+      },
+      "newCoords": {
+        "lat": 25.026127,
+        "lng": 121.534805
+      },
+      "distanceMeters": 3176,
+      "confidence": 0.64037,
+      "matchedAddress": "大安區, 臺北市, Taipei, Taiwan"
+    },
+    {
+      "id": "2594f9bf-722c-40f7-9986-d2168cc5e620",
+      "name": "JUICE Guangzhou",
+      "address": "Shop L130, 1/F, Parc Central, 218 Tianhe Rd",
+      "oldCoords": {
+        "lat": 23.1291,
+        "lng": 113.2644
+      },
+      "newCoords": {
+        "lat": 23.12598,
+        "lng": 113.3566
+      },
+      "distanceMeters": 9435,
+      "confidence": 0.683333,
+      "matchedAddress": "Tianhe Qu, Guangzhou Shi, Guangdong, China"
+    },
+    {
+      "id": "917df0b0-61ea-4ab8-9cd4-981bbb377c65",
+      "name": "FOSS Guangzhou",
+      "address": "Parc Central, 218 Tianhe Rd",
+      "oldCoords": {
+        "lat": 23.1291,
+        "lng": 113.2644
+      },
+      "newCoords": {
+        "lat": 23.12598,
+        "lng": 113.3566
+      },
+      "distanceMeters": 9435,
+      "confidence": 0.683333,
+      "matchedAddress": "Tianhe Qu, Guangzhou Shi, Guangdong, China"
+    },
+    {
+      "id": "453a3bff-aeb8-484b-abd2-d56af8c2b2c7",
+      "name": "Alien DNA Prague",
+      "address": "Seifertova 16, Praha 3 – Žižkov",
+      "oldCoords": {
+        "lat": 50.0825,
+        "lng": 14.4502
+      },
+      "newCoords": {
+        "lat": 50.085576,
+        "lng": 14.439981
+      },
+      "distanceMeters": 805,
+      "confidence": 0.777778,
+      "matchedAddress": "Seifertova 16, 13000 Praha, Prague, Czech Republic"
+    },
+    {
+      "id": "21c91632-e59c-4e47-b5f8-6694be07a036",
+      "name": "NeverEnough Prague",
+      "address": "Žižkov",
+      "oldCoords": {
+        "lat": 50.0825,
+        "lng": 14.4502
+      },
+      "newCoords": {
+        "lat": 50.080568,
+        "lng": 14.455285
+      },
+      "distanceMeters": 422,
+      "confidence": 1,
+      "matchedAddress": "Žižkovo Náměstí, 13000 Praha, Prague, Czech Republic"
+    },
+    {
+      "id": "e05e7a97-e47d-4c71-adc9-72377742eb26",
+      "name": "The Hive Clothing Kraków",
+      "address": "ul. Gazowa 11, 31-060",
+      "oldCoords": {
+        "lat": 50.0647,
+        "lng": 19.945
+      },
+      "newCoords": {
+        "lat": 50.048673,
+        "lng": 19.946676
+      },
+      "distanceMeters": 1786,
+      "confidence": 1,
+      "matchedAddress": "Gazowa 11, 31-060 Kraków, Lesser Poland Voivodeship, Poland"
+    },
+    {
+      "id": "348b930a-664b-4d65-82ce-0d443142fe0d",
+      "name": "Atipici Milan",
+      "address": "Corso di Porta Ticinese",
+      "oldCoords": {
+        "lat": 45.4536,
+        "lng": 9.1774
+      },
+      "newCoords": {
+        "lat": 45.45649,
+        "lng": 9.180791
+      },
+      "distanceMeters": 416,
+      "confidence": 1,
+      "matchedAddress": "Corso Di Porta Ticinese, 20123 Milano Milan, Italy"
+    },
+    {
+      "id": "448a2dbb-85a8-4ec4-a734-4a5ba92f46ed",
+      "name": "Slam Jam Rome",
+      "address": "Via Francesco Crispi 86, 00187",
+      "oldCoords": {
+        "lat": 41.9028,
+        "lng": 12.4964
+      },
+      "newCoords": {
+        "lat": 41.905392,
+        "lng": 12.485842
+      },
+      "distanceMeters": 920,
+      "confidence": 1,
+      "matchedAddress": "Via Francesco Crispi 86, 00187 Roma Rome, Italy"
+    },
+    {
+      "id": "b792a143-daf4-4fa0-a33a-3f27ad232d0c",
+      "name": "Sacrifice Mexico City",
+      "address": "Luis Moya 22-B, Centro Histórico 06000",
+      "oldCoords": {
+        "lat": 19.4326,
+        "lng": -99.1332
+      },
+      "newCoords": {
+        "lat": 19.433613,
+        "lng": -99.13729
+      },
+      "distanceMeters": 443,
+      "confidence": 0.614198,
+      "matchedAddress": "Mexico City, 06000, Mexico"
+    },
+    {
+      "id": "e5773945-dd8f-40ed-a1df-7592c5dfb2da",
+      "name": "DESTRUCTIBLE Mexico City",
+      "address": "Colima 244, Roma Nte.",
+      "oldCoords": {
+        "lat": 19.4195,
+        "lng": -99.1676
+      },
+      "newCoords": {
+        "lat": 19.419032,
+        "lng": -99.163291
+      },
+      "distanceMeters": 455,
+      "confidence": 1,
+      "matchedAddress": "Calle Colima 244, 06700 Mexico City, Mexico"
+    },
+    {
+      "id": "4284d7ba-d590-4b4c-8e56-a3f0510e2370",
+      "name": "PIET Flagship Jardins",
+      "address": "Rua Oscar Freire, Jardins",
+      "oldCoords": {
+        "lat": -23.5613,
+        "lng": -46.6719
+      },
+      "newCoords": {
+        "lat": -23.559759,
+        "lng": -46.672433
+      },
+      "distanceMeters": 180,
+      "confidence": 0.807619,
+      "matchedAddress": "Rua Oscar Freire, São Paulo - São Paulo, 05409-011, Brazil"
+    },
+    {
+      "id": "ed3cbc02-3123-49ed-8de7-e4a9b76f3f9d",
+      "name": "KituKali Nairobi",
+      "address": "Nairobi Central",
+      "oldCoords": {
+        "lat": -1.2864,
+        "lng": 36.8172
+      },
+      "newCoords": {
+        "lat": -1.283253,
+        "lng": 36.817245
+      },
+      "distanceMeters": 350,
+      "confidence": 1,
+      "matchedAddress": "Nairobi, Kenya"
+    },
+    {
+      "id": "2e46ea88-77e8-4a38-a105-97b0def77dfb",
+      "name": "Billionaire Studios LA",
+      "address": "1501 S Santee St #108",
+      "oldCoords": {
+        "lat": 34.0387,
+        "lng": -118.2519
+      },
+      "newCoords": {
+        "lat": 34.033037,
+        "lng": -118.260287
+      },
+      "distanceMeters": 997,
+      "confidence": 1,
+      "matchedAddress": "1501 Santee Street, Los Angeles, California 90015, United States"
+    },
+    {
+      "id": "cefe917b-1258-4c90-99c0-6410c128b73f",
+      "name": "Golf Wang LA",
+      "address": "350 N Fairfax Ave",
+      "oldCoords": {
+        "lat": 34.0768,
+        "lng": -118.3617
+      },
+      "newCoords": {
+        "lat": 34.077607,
+        "lng": -118.361203
+      },
+      "distanceMeters": 101,
+      "confidence": 1,
+      "matchedAddress": "350 North Fairfax Avenue, Los Angeles, California 90036, United States"
+    },
+    {
+      "id": "5cc390e1-6dc4-4ee8-8d14-70ad55a6d789",
+      "name": "Wacko Maria Paradise Tokyo",
+      "address": "2-3-2 Higashiyama, Meguro-ku",
+      "oldCoords": {
+        "lat": 35.6479,
+        "lng": 139.7006
+      },
+      "newCoords": {
+        "lat": 35.646867,
+        "lng": 139.692999
+      },
+      "distanceMeters": 696,
+      "confidence": 0.878519,
+      "matchedAddress": "東山, 153-0043, 目黒区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "2078f783-0b1f-46ec-819c-4ce7092e4b2f",
+      "name": "Amiri Beverly Hills",
+      "address": "461 N Rodeo Dr",
+      "oldCoords": {
+        "lat": 34.0726,
+        "lng": -118.4015
+      },
+      "newCoords": {
+        "lat": 34.070078,
+        "lng": -118.404323
+      },
+      "distanceMeters": 382,
+      "confidence": 1,
+      "matchedAddress": "461 North Rodeo Drive, Beverly Hills, California 90210, United States"
+    },
+    {
+      "id": "d6b6270c-bd88-4d65-9081-2fd795988e9b",
+      "name": "XLARGE Los Angeles",
+      "address": "1766 N Vermont Ave",
+      "oldCoords": {
+        "lat": 34.1041,
+        "lng": -118.2916
+      },
+      "newCoords": {
+        "lat": 34.103206,
+        "lng": -118.291521
+      },
+      "distanceMeters": 100,
+      "confidence": 1,
+      "matchedAddress": "1766 North Vermont Avenue, Los Angeles, California 90027, United States"
+    },
+    {
+      "id": "23591430-da29-4d63-810a-28c3dd7c5525",
+      "name": "Cole Buxton Flagship",
+      "address": "52 Marshall St, Carnaby",
+      "oldCoords": {
+        "lat": 51.5131,
+        "lng": -0.1392
+      },
+      "newCoords": {
+        "lat": 51.51271,
+        "lng": -0.13752
+      },
+      "distanceMeters": 124,
+      "confidence": 1,
+      "matchedAddress": "52 Marshall Street, Westminster, London, W1F 9BQ, United Kingdom"
+    },
+    {
+      "id": "c79264d4-02e7-45f4-a855-1664f1927ebf",
+      "name": "Chrome Hearts West Hollywood",
+      "address": "600 N Robertson Blvd",
+      "oldCoords": {
+        "lat": 34.0842,
+        "lng": -118.3848
+      },
+      "newCoords": {
+        "lat": 34.080982,
+        "lng": -118.385281
+      },
+      "distanceMeters": 361,
+      "confidence": 1,
+      "matchedAddress": "600 North Robertson Boulevard, Los Angeles, California 90069, United States"
+    },
+    {
+      "id": "0d5bfe32-2108-4b9f-a02c-2645ff3e4b87",
+      "name": "UNDERCOVER Aoyama",
+      "address": "Blue Cinq Point, Aoyama",
+      "oldCoords": {
+        "lat": 35.6654,
+        "lng": 139.7152
+      },
+      "newCoords": {
+        "lat": 35.68882,
+        "lng": 139.692526
+      },
+      "distanceMeters": 3313,
+      "confidence": 1,
+      "matchedAddress": "Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "76823d31-e687-4690-981b-7ac776dbe4d0",
+      "name": "The Real McCoys Harajuku",
+      "address": "Harajuku",
+      "oldCoords": {
+        "lat": 35.6702,
+        "lng": 139.7026
+      },
+      "newCoords": {
+        "lat": 35.377915,
+        "lng": 139.504973
+      },
+      "distanceMeters": 37097,
+      "confidence": 1,
+      "matchedAddress": "原宿, 245-0063, 戸塚区, 横浜市, Kanagawa, Japan"
+    },
+    {
+      "id": "70315bef-d2fc-4bee-8adc-1dfbd9cc933a",
+      "name": "Ader Error Sinsa",
+      "address": "Sinsa-dong, Gangnam-gu",
+      "oldCoords": {
+        "lat": 37.5172,
+        "lng": 127.0286
+      },
+      "newCoords": {
+        "lat": 37.52398,
+        "lng": 127.02838
+      },
+      "distanceMeters": 754,
+      "confidence": 1,
+      "matchedAddress": "Sinsa-dong, 06025, Gangnam-gu, Seoul, South Korea"
+    },
+    {
+      "id": "8abeb97a-a78a-4ae3-8d90-855ef360e430",
+      "name": "Percival Berwick Street",
+      "address": "Berwick Street, Soho",
+      "oldCoords": {
+        "lat": 51.5136,
+        "lng": -0.1355
+      },
+      "newCoords": {
+        "lat": 51.514267,
+        "lng": -0.135475
+      },
+      "distanceMeters": 74,
+      "confidence": 1,
+      "matchedAddress": "Berwick Street, Westminster, London, W1F 0QB, United Kingdom"
+    },
+    {
+      "id": "fd467671-f857-4272-928f-667fc63c1eba",
+      "name": "Wax London Covent Garden",
+      "address": "45 Neal Street",
+      "oldCoords": {
+        "lat": 51.5143,
+        "lng": -0.1267
+      },
+      "newCoords": {
+        "lat": 51.51446,
+        "lng": -0.12605
+      },
+      "distanceMeters": 48,
+      "confidence": 1,
+      "matchedAddress": "45 Neal Street, Camden, London, WC2H 9QF, United Kingdom"
+    },
+    {
+      "id": "08044932-88c4-4af6-8f91-6babc3ef913d",
+      "name": "Highsnobiety Berlin",
+      "address": "Genthiner Strasse 32-34",
+      "oldCoords": {
+        "lat": 52.5045,
+        "lng": 13.3595
+      },
+      "newCoords": {
+        "lat": 52.502499,
+        "lng": 13.358906
+      },
+      "distanceMeters": 226,
+      "confidence": 1,
+      "matchedAddress": "Genthiner Straße 32-34, 10785 Berlin, Germany"
+    },
+    {
+      "id": "1e4b40dc-4093-4ce6-ac98-1871dcb83e3b",
+      "name": "Worst Behaviour Outlet Metzingen",
+      "address": "Outletcity",
+      "oldCoords": {
+        "lat": 48.5379,
+        "lng": 9.2836
+      },
+      "newCoords": {
+        "lat": 48.53921,
+        "lng": 9.283487
+      },
+      "distanceMeters": 146,
+      "confidence": 1,
+      "matchedAddress": "Metzingen, Kreis Reutlingen, Baden-Württemberg, Germany"
+    },
+    {
+      "id": "ed19bacc-c2b5-40fb-abb0-3623c3929827",
+      "name": "Kith London",
+      "address": "130 Long Acre, London WC2E 9PE",
+      "oldCoords": {
+        "lat": 51.5136,
+        "lng": -0.1255
+      },
+      "newCoords": {
+        "lat": 51.5126,
+        "lng": -0.12603
+      },
+      "distanceMeters": 117,
+      "confidence": 0.757778,
+      "matchedAddress": "130 Long Acre, Westminster, London, WC2E 9AA, United Kingdom"
+    },
+    {
+      "id": "5c754841-fa54-4e85-80d0-a82a72a93a35",
+      "name": "Kith SoHo",
+      "address": "337 Lafayette St, New York, NY 10012",
+      "oldCoords": {
+        "lat": 40.7258,
+        "lng": -73.9956
+      },
+      "newCoords": {
+        "lat": 40.72602,
+        "lng": -73.994365
+      },
+      "distanceMeters": 107,
+      "confidence": 1,
+      "matchedAddress": "337 Lafayette Street, New York, New York 10012, United States"
+    },
+    {
+      "id": "69007ffe-ded5-4e67-9f53-99c1803fed6c",
+      "name": "Kith Brooklyn",
+      "address": "233 Flatbush Ave, Brooklyn, NY 11217",
+      "oldCoords": {
+        "lat": 40.6853,
+        "lng": -73.9775
+      },
+      "newCoords": {
+        "lat": 40.681193,
+        "lng": -73.975079
+      },
+      "distanceMeters": 500,
+      "confidence": 1,
+      "matchedAddress": "233 Flatbush Avenue, Brooklyn, New York 11217, United States"
+    },
+    {
+      "id": "3f05943d-de75-4e08-b19f-96643163b4a6",
+      "name": "Kith Miami",
+      "address": "3201 NE 1st Ave, Miami, FL 33137",
+      "oldCoords": {
+        "lat": 25.8079,
+        "lng": -80.1918
+      },
+      "newCoords": {
+        "lat": 25.807073,
+        "lng": -80.192453
+      },
+      "distanceMeters": 113,
+      "confidence": 1,
+      "matchedAddress": "3201 Northeast 1st Avenue, Miami, Florida 33137, United States"
+    },
+    {
+      "id": "f8f4430f-0e98-41ee-9ba1-75a6e3381275",
+      "name": "Off-White London",
+      "address": "28 Savile Row, London W1S 2ER",
+      "oldCoords": {
+        "lat": 51.5105,
+        "lng": -0.1411
+      },
+      "newCoords": {
+        "lat": 51.51136,
+        "lng": -0.14116
+      },
+      "distanceMeters": 96,
+      "confidence": 0.757778,
+      "matchedAddress": "28 Savile Row, Westminster, London, W1S 2EU, United Kingdom"
+    },
+    {
+      "id": "ab6d668c-2a66-420d-8193-7af97462d267",
+      "name": "OVO London",
+      "address": "33 Broadwick St, London W1F 0BU",
+      "oldCoords": {
+        "lat": 51.5134,
+        "lng": -0.1368
+      },
+      "newCoords": {
+        "lat": 51.51332,
+        "lng": -0.13613
+      },
+      "distanceMeters": 47,
+      "confidence": 0.64381,
+      "matchedAddress": "33 Broadwick Street, Westminster, London, W1F 0DQ, United Kingdom"
+    },
+    {
+      "id": "b13389ec-2c6b-4c5d-a734-ef8c668e5b9f",
+      "name": "OVO Flagship Toronto",
+      "address": "899 Queen St W, Toronto, ON M6J 1G5",
+      "oldCoords": {
+        "lat": 43.6444,
+        "lng": -79.4184
+      },
+      "newCoords": {
+        "lat": 43.645416,
+        "lng": -79.412008
+      },
+      "distanceMeters": 527,
+      "confidence": 1,
+      "matchedAddress": "899 Queen Street West, Toronto, Ontario M6J 1G5, Canada"
+    },
+    {
+      "id": "8f43a30c-f18e-4d7f-9cb7-267eb036407f",
+      "name": "Extra Butter",
+      "address": "125 Orchard St, New York, NY 10002",
+      "oldCoords": {
+        "lat": 40.7191,
+        "lng": -73.9884
+      },
+      "newCoords": {
+        "lat": 40.719585,
+        "lng": -73.989732
+      },
+      "distanceMeters": 125,
+      "confidence": 1,
+      "matchedAddress": "125 Orchard Street, New York, New York 10002, United States"
+    },
+    {
+      "id": "768b8b09-c807-4019-b88c-676ff08e6822",
+      "name": "BAIT Los Angeles",
+      "address": "2nd St, Los Angeles, CA 90012",
+      "oldCoords": {
+        "lat": 34.0492,
+        "lng": -118.2408
+      },
+      "newCoords": {
+        "lat": 34.048589,
+        "lng": -118.240654
+      },
+      "distanceMeters": 69,
+      "confidence": 0.988889,
+      "matchedAddress": "East 2nd Street, Los Angeles, California 90012, United States"
+    },
+    {
+      "id": "18b71656-2881-4519-9a54-41dc90716065",
+      "name": "Fred Segal",
+      "address": "8500 Sunset Blvd, West Hollywood, CA 90069",
+      "oldCoords": {
+        "lat": 34.0934,
+        "lng": -118.3771
+      },
+      "newCoords": {
+        "lat": 34.093854,
+        "lng": -118.376596
+      },
+      "distanceMeters": 69,
+      "confidence": 0.977778,
+      "matchedAddress": "8500 West Sunset Boulevard, West Hollywood, California 90069, United States"
+    },
+    {
+      "id": "a04be2c9-808b-4653-801f-88aedccf547c",
+      "name": "RSVP Gallery LA",
+      "address": "8899 Beverly Blvd, West Hollywood, CA 90048",
+      "oldCoords": {
+        "lat": 34.0757,
+        "lng": -118.3856
+      },
+      "newCoords": {
+        "lat": 34.077399,
+        "lng": -118.386416
+      },
+      "distanceMeters": 203,
+      "confidence": 0.820988,
+      "matchedAddress": "8899 Beverly Boulevard, West Hollywood, California 90048, United States"
+    },
+    {
+      "id": "d0aefd81-f8a6-43b8-8703-a6f8d5225f7a",
+      "name": "Maxfield LA",
+      "address": "8825 Melrose Ave, West Hollywood, CA 90069",
+      "oldCoords": {
+        "lat": 34.0836,
+        "lng": -118.3877
+      },
+      "newCoords": {
+        "lat": 34.08105,
+        "lng": -118.38629
+      },
+      "distanceMeters": 312,
+      "confidence": 1,
+      "matchedAddress": "8825 Melrose Avenue, West Hollywood, California 90069, United States"
+    },
+    {
+      "id": "9d09b692-7b34-4d1d-9df8-455b9a7f163d",
+      "name": "Atmos Tokyo",
+      "address": "1-26-5 Jingumae, Shibuya, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.6717,
+        "lng": 139.7047
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 246,
+      "confidence": 0.784444,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "84ad3121-ef84-4a45-aa17-2c934a8a9a7c",
+      "name": "United Arrows & Sons",
+      "address": "3-28-1 Jingumae, Shibuya, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.67,
+        "lng": 139.7081
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 128,
+      "confidence": 0.784444,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "a603fc07-5230-4b44-abae-5c2c26e19670",
+      "name": "WTAPS Harajuku",
+      "address": "5-10-1 Jingumae, Shibuya, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.6658,
+        "lng": 139.708
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 504,
+      "confidence": 0.784444,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "afbd7ae1-81cd-44fb-b512-4c0cba358c9d",
+      "name": "Kasina Seoul",
+      "address": "79 Apgujeong-ro, Gangnam-gu, Seoul",
+      "oldCoords": {
+        "lat": 37.5262,
+        "lng": 127.0389
+      },
+      "newCoords": {
+        "lat": 37.528672,
+        "lng": 127.037164
+      },
+      "distanceMeters": 315,
+      "confidence": 0.839506,
+      "matchedAddress": "79 압구정로 Gangnam-gu, Seoul, South Korea"
+    },
+    {
+      "id": "7295197e-4ee0-48be-a478-a05c5f5546b4",
+      "name": "Musinsa Standard Hongdae",
+      "address": "Hongdae, Mapo-gu, Seoul",
+      "oldCoords": {
+        "lat": 37.5563,
+        "lng": 126.9229
+      },
+      "newCoords": {
+        "lat": 37.565453,
+        "lng": 126.90134
+      },
+      "distanceMeters": 2156,
+      "confidence": 0.787037,
+      "matchedAddress": "Mapo-gu, Seoul, South Korea"
+    },
+    {
+      "id": "69db2252-8294-49cc-ae8a-666cab0f42e0",
+      "name": "LMC Store Seoul",
+      "address": "Apgujeong-dong, Gangnam-gu, Seoul",
+      "oldCoords": {
+        "lat": 37.5273,
+        "lng": 127.0383
+      },
+      "newCoords": {
+        "lat": 37.528286,
+        "lng": 127.02828
+      },
+      "distanceMeters": 890,
+      "confidence": 0.833333,
+      "matchedAddress": "Apgujeong-dong, 06004, Gangnam-gu, Seoul, South Korea"
+    },
+    {
+      "id": "a626e2c6-5b12-400f-b262-78a1d8c623bb",
+      "name": "Thisisneverthat Seoul",
+      "address": "Itaewon-dong, Yongsan-gu, Seoul",
+      "oldCoords": {
+        "lat": 37.5346,
+        "lng": 127.0022
+      },
+      "newCoords": {
+        "lat": 37.534454,
+        "lng": 126.99387
+      },
+      "distanceMeters": 735,
+      "confidence": 0.833333,
+      "matchedAddress": "Itaewon-dong, 04391, Yongsan-gu, Seoul, South Korea"
+    },
+    {
+      "id": "a8156c01-7f7f-485c-9e61-b81771b5b389",
+      "name": "I.T Hysan One",
+      "address": "500 Hennessy Rd, Causeway Bay, Hong Kong",
+      "oldCoords": {
+        "lat": 22.2793,
+        "lng": 114.1831
+      },
+      "newCoords": {
+        "lat": 22.279356,
+        "lng": 114.16255
+      },
+      "distanceMeters": 2114,
+      "confidence": 0.404762,
+      "matchedAddress": "Hong Kong"
+    },
+    {
+      "id": "6c7d5618-90c6-403a-bedc-180760917311",
+      "name": "Supply HK",
+      "address": "Tsim Sha Tsui, Kowloon, Hong Kong",
+      "oldCoords": {
+        "lat": 22.2978,
+        "lng": 114.1722
+      },
+      "newCoords": {
+        "lat": 22.279356,
+        "lng": 114.16255
+      },
+      "distanceMeters": 2279,
+      "confidence": 0.366667,
+      "matchedAddress": "Hong Kong"
+    },
+    {
+      "id": "c4242187-75c4-45e3-991d-11472d3febdd",
+      "name": "Homeless HK",
+      "address": "Causeway Bay, Hong Kong",
+      "oldCoords": {
+        "lat": 22.2798,
+        "lng": 114.1831
+      },
+      "newCoords": {
+        "lat": 22.279356,
+        "lng": 114.16255
+      },
+      "distanceMeters": 2115,
+      "confidence": 0.388889,
+      "matchedAddress": "Hong Kong"
+    },
+    {
+      "id": "df4f5e88-4a04-494d-a0e3-b9a52beb6dfc",
+      "name": "Voo Store Berlin",
+      "address": "Oranienstraße 24, 10999 Berlin",
+      "oldCoords": {
+        "lat": 52.5011,
+        "lng": 13.4244
+      },
+      "newCoords": {
+        "lat": 52.50092,
+        "lng": 13.421018
+      },
+      "distanceMeters": 230,
+      "confidence": 0.814815,
+      "matchedAddress": "Oranienstraße 24, 10999 Berlin, Germany"
+    },
+    {
+      "id": "e16edade-1eb2-4e89-84c0-6d3ed3019aa1",
+      "name": "Firmament Berlin",
+      "address": "Köpenicker Str. 195, 10997 Berlin",
+      "oldCoords": {
+        "lat": 52.4978,
+        "lng": 13.4393
+      },
+      "newCoords": {
+        "lat": 52.501346,
+        "lng": 13.44106
+      },
+      "distanceMeters": 412,
+      "confidence": 0.825397,
+      "matchedAddress": "Köpenicker Straße 195, 10997 Berlin, Germany"
+    },
+    {
+      "id": "15e5c78c-152b-4ac8-b1ad-2db8c3829118",
+      "name": "BEAMS Harajuku",
+      "address": "3-25-15 Jingumae, Shibuya, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.6702,
+        "lng": 139.7091
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 216,
+      "confidence": 0.784444,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "2b19520d-cb09-4fc8-94bc-3b807174bcea",
+      "name": "Human Made Shibuya",
+      "address": "1-14-11 Jinnan, Shibuya, Tokyo 150-0041",
+      "oldCoords": {
+        "lat": 35.6627,
+        "lng": 139.6983
+      },
+      "newCoords": {
+        "lat": 35.662205,
+        "lng": 139.700829
+      },
+      "distanceMeters": 235,
+      "confidence": 0.828889,
+      "matchedAddress": "神南, 150-0041, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "b87d8c1c-7a3b-402d-8d8d-18de99af81e1",
+      "name": "Neighborhood Harajuku",
+      "address": "4-32-7 Jingumae, Shibuya, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.668,
+        "lng": 139.707
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 247,
+      "confidence": 0.784444,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "35936229-f735-429f-ac81-e3cb092c5288",
+      "name": "Juice Hong Kong",
+      "address": "Shop B, Lyndhurst Terrace, Central, Hong Kong",
+      "oldCoords": {
+        "lat": 22.2833,
+        "lng": 114.1543
+      },
+      "newCoords": {
+        "lat": 22.279356,
+        "lng": 114.16255
+      },
+      "distanceMeters": 955,
+      "confidence": 0.404762,
+      "matchedAddress": "Hong Kong"
+    },
+    {
+      "id": "28da05c2-4f87-4211-839d-fcfe7c40a2fd",
+      "name": "CLOT Juice Flagship",
+      "address": "Lee Garden Two, Causeway Bay, Hong Kong",
+      "oldCoords": {
+        "lat": 22.2794,
+        "lng": 114.1843
+      },
+      "newCoords": {
+        "lat": 22.279356,
+        "lng": 114.16255
+      },
+      "distanceMeters": 2238,
+      "confidence": 0.358586,
+      "matchedAddress": "Hong Kong"
+    },
+    {
+      "id": "5bc4e973-0404-477c-a4b2-625f14bb55a3",
+      "name": "Juice Shanghai",
+      "address": "Xintiandi, Huangpu, Shanghai",
+      "oldCoords": {
+        "lat": 31.2196,
+        "lng": 121.4741
+      },
+      "newCoords": {
+        "lat": 31.232746,
+        "lng": 121.47883
+      },
+      "distanceMeters": 1529,
+      "confidence": 0.683333,
+      "matchedAddress": "Huangpu Qu, Shanghai, China"
+    },
+    {
+      "id": "560e40d6-6a6d-4676-ab07-db3dcda4bad8",
+      "name": "Juice Beijing",
+      "address": "Sanlitun Village, Chaoyang, Beijing",
+      "oldCoords": {
+        "lat": 39.9368,
+        "lng": 116.4556
+      },
+      "newCoords": {
+        "lat": 39.92109,
+        "lng": 116.43639
+      },
+      "distanceMeters": 2395,
+      "confidence": 0.638889,
+      "matchedAddress": "Chaoyang Qu, Beijing, China"
+    },
+    {
+      "id": "859a8251-273f-487a-be70-4948a746884b",
+      "name": "Patta Amsterdam",
+      "address": "Zeedijk 67, 1012 AS Amsterdam",
+      "oldCoords": {
+        "lat": 52.3752,
+        "lng": 4.8984
+      },
+      "newCoords": {
+        "lat": 52.374734,
+        "lng": 4.900941
+      },
+      "distanceMeters": 180,
+      "confidence": 0.85619,
+      "matchedAddress": "Zeedijk 67, 1012 AS Amsterdam, Netherlands"
+    },
+    {
+      "id": "d2e323d1-3665-4b02-b51f-e187abe93076",
+      "name": "Norse Store Copenhagen",
+      "address": "Pilestræde 41, 1112 Copenhagen",
+      "oldCoords": {
+        "lat": 55.6795,
+        "lng": 12.5766
+      },
+      "newCoords": {
+        "lat": 55.681097,
+        "lng": 12.579369
+      },
+      "distanceMeters": 248,
+      "confidence": 1,
+      "matchedAddress": "Pilestræde 41, 1112 København, Denmark"
+    },
+    {
+      "id": "3bc0a104-091c-4d1d-845d-5864015cff66",
+      "name": "Pigalle Paris",
+      "address": "7 Rue Froment, 75011 Paris",
+      "oldCoords": {
+        "lat": 48.8587,
+        "lng": 2.3716
+      },
+      "newCoords": {
+        "lat": 48.856931,
+        "lng": 2.372925
+      },
+      "distanceMeters": 219,
+      "confidence": 0.825397,
+      "matchedAddress": "7 Rue Froment, 75011 Paris, France"
+    },
+    {
+      "id": "23609bd5-7531-4f31-81aa-da060f6b48d5",
+      "name": "Pigalle Amsterdam",
+      "address": "Pieter Cornelisz Hooftstraat, Amsterdam",
+      "oldCoords": {
+        "lat": 52.358,
+        "lng": 4.8826
+      },
+      "newCoords": {
+        "lat": 52.360016,
+        "lng": 4.87982
+      },
+      "distanceMeters": 293,
+      "confidence": 0.889259,
+      "matchedAddress": "Pieter Cornelisz. Hooftstraat, 1071 CH Amsterdam, Netherlands"
+    },
+    {
+      "id": "d1dd8586-0807-49ed-a895-a25296c62924",
+      "name": "Noah NYC",
+      "address": "195 Mulberry St, New York, NY 10012",
+      "oldCoords": {
+        "lat": 40.7213,
+        "lng": -73.9959
+      },
+      "newCoords": {
+        "lat": 40.721383,
+        "lng": -73.996705
+      },
+      "distanceMeters": 68,
+      "confidence": 1,
+      "matchedAddress": "195 Mulberry Street, New York, New York 10012, United States"
+    },
+    {
+      "id": "3770c2b5-d83b-4399-b1b2-bd481aa5977e",
+      "name": "Solebox Berlin",
+      "address": "Nürnberger Str. 2, 10787 Berlin",
+      "oldCoords": {
+        "lat": 52.4989,
+        "lng": 13.3437
+      },
+      "newCoords": {
+        "lat": 52.504627,
+        "lng": 13.340635
+      },
+      "distanceMeters": 670,
+      "confidence": 1,
+      "matchedAddress": "Nürnberger Straße 2, 10787 Berlin, Germany"
+    },
+    {
+      "id": "0fd20a48-5592-48e3-acc5-24a2eb0a0fb6",
+      "name": "Antonioli Milan",
+      "address": "Via Pasubio 1, 20154 Milan",
+      "oldCoords": {
+        "lat": 45.4773,
+        "lng": 9.1787
+      },
+      "newCoords": {
+        "lat": 45.53529,
+        "lng": 9.28585
+      },
+      "distanceMeters": 10550,
+      "confidence": 0.738095,
+      "matchedAddress": "Via Pasubio 1, 20093 Cologno Monzese Milan, Italy"
+    },
+    {
+      "id": "490e0db2-035c-477c-91c5-9a657cd71114",
+      "name": "FR2 Harajuku",
+      "address": "Harajuku",
+      "oldCoords": {
+        "lat": 35.6702,
+        "lng": 139.7034
+      },
+      "newCoords": {
+        "lat": 35.377915,
+        "lng": 139.504973
+      },
+      "distanceMeters": 37132,
+      "confidence": 1,
+      "matchedAddress": "原宿, 245-0063, 戸塚区, 横浜市, Kanagawa, Japan"
+    },
+    {
+      "id": "07a2176b-6b2d-485e-8276-9ebab165637d",
+      "name": "A-COLD-WALL* Shanghai Flagship",
+      "address": "Zhangyuan",
+      "oldCoords": {
+        "lat": 31.2304,
+        "lng": 121.4737
+      },
+      "newCoords": {
+        "lat": 31.232276,
+        "lng": 121.469207
+      },
+      "distanceMeters": 475,
+      "confidence": 0.666667,
+      "matchedAddress": "Shanghai, China"
+    },
+    {
+      "id": "a7a41146-e33f-4cd5-aff2-73e1c69588e7",
+      "name": "Cactus Plant Flea Market Los Angeles",
+      "address": "Los Angeles",
+      "oldCoords": {
+        "lat": 34.0522,
+        "lng": -118.2437
+      },
+      "newCoords": {
+        "lat": 34.048051,
+        "lng": -118.254187
+      },
+      "distanceMeters": 1071,
+      "confidence": 0.91,
+      "matchedAddress": "Los Angeles, California, United States"
+    },
+    {
+      "id": "1e756b92-b70e-47fb-8765-179e0fd75d29",
+      "name": "OVO Yorkdale",
+      "address": "3401 Dufferin Street",
+      "oldCoords": {
+        "lat": 43.7254,
+        "lng": -79.4515
+      },
+      "newCoords": {
+        "lat": 43.726075,
+        "lng": -79.451469
+      },
+      "distanceMeters": 75,
+      "confidence": 1,
+      "matchedAddress": "3401 Dufferin Street, Toronto, Ontario M6A 2T9, Canada"
+    },
+    {
+      "id": "b6cb9ff6-d19b-4a63-a59d-210cb0b65caa",
+      "name": "Sacai Aoyama",
+      "address": "5-4-44 Minami Aoyama, Minato-ku",
+      "oldCoords": {
+        "lat": 35.6627,
+        "lng": 139.7185
+      },
+      "newCoords": {
+        "lat": 35.667773,
+        "lng": 139.717743
+      },
+      "distanceMeters": 568,
+      "confidence": 0.88,
+      "matchedAddress": "南青山, 107-0062, 港区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "9f7b03fc-547b-45ad-a914-5165841ad5ed",
+      "name": "Slam Jam Ferrara HQ",
+      "address": "Via Francesco Luigi Ferrari 37/A",
+      "oldCoords": {
+        "lat": 44.8381,
+        "lng": 11.6198
+      },
+      "newCoords": {
+        "lat": 44.853885,
+        "lng": 11.574783
+      },
+      "distanceMeters": 3959,
+      "confidence": 1,
+      "matchedAddress": "Via Francesco Luigi Ferrari 37, 44122 Ferrara Ferrara, Italy"
+    },
+    {
+      "id": "9572b660-e4a7-4e59-95e7-3f1c5622400f",
+      "name": "The North Face 5th Avenue",
+      "address": "511 Fifth Avenue",
+      "oldCoords": {
+        "lat": 40.7549,
+        "lng": -73.981
+      },
+      "newCoords": {
+        "lat": 40.666824,
+        "lng": -73.987952
+      },
+      "distanceMeters": 9811,
+      "confidence": 1,
+      "matchedAddress": "511 Fifth Avenue, Brooklyn, New York 11215, United States"
+    },
+    {
+      "id": "bf4e887b-faa4-4a41-8e3d-d1e35d41d55a",
+      "name": "Off-White Milan",
+      "address": "Piazza Arcole 4",
+      "oldCoords": {
+        "lat": 45.4642,
+        "lng": 9.19
+      },
+      "newCoords": {
+        "lat": 45.450104,
+        "lng": 9.172577
+      },
+      "distanceMeters": 2074,
+      "confidence": 1,
+      "matchedAddress": "Piazza Arcole 4, 20143 Milano Milan, Italy"
+    },
+    {
+      "id": "c009b940-30db-4c0d-95e9-45f11ea3c3b7",
+      "name": "Ambush Workshop",
+      "address": "Shibuya-ku",
+      "oldCoords": {
+        "lat": 35.6628,
+        "lng": 139.7071
+      },
+      "newCoords": {
+        "lat": 35.664455,
+        "lng": 139.69878
+      },
+      "distanceMeters": 774,
+      "confidence": 1,
+      "matchedAddress": "渋谷区, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "a96800d7-1d83-4c91-9687-526c73471eb7",
+      "name": "MKI MIYUKI ZOKU Leeds",
+      "address": "Unit C4, Corn Exchange, Call Lane",
+      "oldCoords": {
+        "lat": 53.7961,
+        "lng": -1.5391
+      },
+      "newCoords": {
+        "lat": 53.795616,
+        "lng": -1.540989
+      },
+      "distanceMeters": 135,
+      "confidence": 1,
+      "matchedAddress": "Call Lane, Leeds, LS1 6DT, United Kingdom"
+    },
+    {
+      "id": "ddcf3544-d44d-4f8e-ad1f-538586332cdc",
+      "name": "Moncler Milan Galleria",
+      "address": "Galleria Vittorio Emanuele II 11-12",
+      "oldCoords": {
+        "lat": 45.4668,
+        "lng": 9.1905
+      },
+      "newCoords": {
+        "lat": 45.432808,
+        "lng": 9.107881
+      },
+      "distanceMeters": 7471,
+      "confidence": 0.873016,
+      "matchedAddress": "Via Vittorio Emanuele Secondo, 20094 Corsico Milan, Italy"
+    },
+    {
+      "id": "0b5251ec-7831-4064-9e07-494d9b9001a0",
+      "name": "Clints Manchester",
+      "address": "City Centre",
+      "oldCoords": {
+        "lat": 53.4808,
+        "lng": -2.2426
+      },
+      "newCoords": {
+        "lat": 53.481186,
+        "lng": -2.243362
+      },
+      "distanceMeters": 66,
+      "confidence": 1,
+      "matchedAddress": "City Centre, Manchester, Greater Manchester, England, United Kingdom"
+    },
+    {
+      "id": "8c171453-84cf-4a08-b298-34c30eb36ce5",
+      "name": "Supreme New York (Lafayette)",
+      "address": "190 Bowery, New York, NY 10012",
+      "oldCoords": {
+        "lat": 40.7224,
+        "lng": -73.9939
+      },
+      "newCoords": {
+        "lat": 40.721182,
+        "lng": -73.994006
+      },
+      "distanceMeters": 136,
+      "confidence": 1,
+      "matchedAddress": "190 Bowery, New York, New York 10012, United States"
+    },
+    {
+      "id": "607558de-5c84-41eb-b3b4-a22a79d67caf",
+      "name": "Brian & Barry Milan",
+      "address": "Via Durini 28, 20122 Milan",
+      "oldCoords": {
+        "lat": 45.4629,
+        "lng": 9.1997
+      },
+      "newCoords": {
+        "lat": 45.465623,
+        "lng": 9.198327
+      },
+      "distanceMeters": 321,
+      "confidence": 1,
+      "matchedAddress": "Via Durini 28, 20122 Milano Milan, Italy"
+    },
+    {
+      "id": "8c90bd30-c66a-4009-8d93-e7019fdf38d4",
+      "name": "10 Corso Como",
+      "address": "Corso Como 10, 20154 Milan",
+      "oldCoords": {
+        "lat": 45.4805,
+        "lng": 9.1887
+      },
+      "newCoords": {
+        "lat": 45.481887,
+        "lng": 9.187423
+      },
+      "distanceMeters": 184,
+      "confidence": 1,
+      "matchedAddress": "Corso Como 10, 20154 Milano Milan, Italy"
+    },
+    {
+      "id": "29d7390d-0c9a-4aea-b7e5-c708240fbe03",
+      "name": "Ragtag Harajuku",
+      "address": "6-14-2 Jingumae, Shibuya-ku",
+      "oldCoords": {
+        "lat": 35.6675,
+        "lng": 139.7067
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 301,
+      "confidence": 0.878519,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "3b5dbdc1-a5c6-42a4-adf6-e7d63e8c17f0",
+      "name": "Comme des Garçons Aoyama",
+      "address": "5-2-1 Minamiaoyama, Minato-ku",
+      "oldCoords": {
+        "lat": 35.663,
+        "lng": 139.7185
+      },
+      "newCoords": {
+        "lat": 35.667773,
+        "lng": 139.717743
+      },
+      "distanceMeters": 535,
+      "confidence": 0.878519,
+      "matchedAddress": "南青山, 107-0062, 港区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "2a881ff5-70eb-4d80-ad20-2a745152fd13",
+      "name": "adidas 5th Avenue",
+      "address": "565 Fifth Avenue",
+      "oldCoords": {
+        "lat": 40.756,
+        "lng": -73.9785
+      },
+      "newCoords": {
+        "lat": 40.665205,
+        "lng": -73.98934
+      },
+      "distanceMeters": 10137,
+      "confidence": 1,
+      "matchedAddress": "565 Fifth Avenue, Brooklyn, New York 11215, United States"
+    },
+    {
+      "id": "2372f3ad-2b2d-48ed-969a-bbff131ebcca",
+      "name": "Arc'teryx Robson Street",
+      "address": "1001 Robson St",
+      "oldCoords": {
+        "lat": 49.2827,
+        "lng": -123.1207
+      },
+      "newCoords": {
+        "lat": 49.283642,
+        "lng": -123.12297
+      },
+      "distanceMeters": 195,
+      "confidence": 1,
+      "matchedAddress": "1001 Robson Street, Vancouver, British Columbia V6E 1A9, Canada"
+    },
+    {
+      "id": "a2334d8f-cc4d-4513-94c3-fc4ed09777ad",
+      "name": "Golf le Fleur Culver City",
+      "address": "Culver City",
+      "oldCoords": {
+        "lat": 34.0211,
+        "lng": -118.3965
+      },
+      "newCoords": {
+        "lat": 34.022661,
+        "lng": -118.395528
+      },
+      "distanceMeters": 195,
+      "confidence": 0.91,
+      "matchedAddress": "Culver City, California, United States"
+    },
+    {
+      "id": "93dc209c-bd0f-4140-ae75-3392d9aa0d87",
+      "name": "Human Made Offline Store",
+      "address": "Harajuku, Gaien Mae",
+      "oldCoords": {
+        "lat": 35.6702,
+        "lng": 139.7071
+      },
+      "newCoords": {
+        "lat": 35.68882,
+        "lng": 139.692526
+      },
+      "distanceMeters": 2453,
+      "confidence": 0.548148,
+      "matchedAddress": "Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "122771f2-6a71-4cd1-b616-ac9e96e3d27e",
+      "name": "C.P. Company Milan",
+      "address": "Milan",
+      "oldCoords": {
+        "lat": 45.4642,
+        "lng": 9.19
+      },
+      "newCoords": {
+        "lat": 45.463945,
+        "lng": 9.188558
+      },
+      "distanceMeters": 116,
+      "confidence": 1,
+      "matchedAddress": "Milano, Milan, Italy"
+    },
+    {
+      "id": "8af03b55-17b7-48a3-9adf-6c0ab4d6a4d9",
+      "name": "Lazy Oaf Carnaby",
+      "address": "Carnaby Street",
+      "oldCoords": {
+        "lat": 51.5136,
+        "lng": -0.1396
+      },
+      "newCoords": {
+        "lat": 51.513,
+        "lng": -0.138659
+      },
+      "distanceMeters": 93,
+      "confidence": 1,
+      "matchedAddress": "Carnaby Street, Westminster, London, W1F 7DB, United Kingdom"
+    },
+    {
+      "id": "58794a13-d06b-40fc-9f12-902025f1991d",
+      "name": "Wtaps W_Lab",
+      "address": "5-3-10 Minamiaoyama, Minato-ku",
+      "oldCoords": {
+        "lat": 35.6629,
+        "lng": 139.7158
+      },
+      "newCoords": {
+        "lat": 35.667773,
+        "lng": 139.717743
+      },
+      "distanceMeters": 570,
+      "confidence": 0.878519,
+      "matchedAddress": "南青山, 107-0062, 港区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "ca2cd18d-09e5-42d7-901d-881991522009",
+      "name": "Goodhood",
+      "address": "151 Curtain Rd, London EC2A 3QE",
+      "oldCoords": {
+        "lat": 51.5257,
+        "lng": -0.0823
+      },
+      "newCoords": {
+        "lat": 51.526593,
+        "lng": -0.08036
+      },
+      "distanceMeters": 167,
+      "confidence": 0.757778,
+      "matchedAddress": "151 Curtain Road, Hackney, London, EC2A 3BS, United Kingdom"
+    },
+    {
+      "id": "8f7acc29-c3d9-44bd-b063-26c73cd720f2",
+      "name": "Machine-A",
+      "address": "13 Brewer St, London W1F 0RH",
+      "oldCoords": {
+        "lat": 51.5108,
+        "lng": -0.1366
+      },
+      "newCoords": {
+        "lat": 51.51219,
+        "lng": -0.13402
+      },
+      "distanceMeters": 236,
+      "confidence": 0.757778,
+      "matchedAddress": "13 Brewer Street, Westminster, London, W1F 0RH, United Kingdom"
+    },
+    {
+      "id": "654d464e-3592-4ab8-8454-c7b16fb8999f",
+      "name": "Size? Carnaby Street",
+      "address": "36-38 Carnaby St, London W1F 7DW",
+      "oldCoords": {
+        "lat": 51.5131,
+        "lng": -0.1388
+      },
+      "newCoords": {
+        "lat": 51.513501,
+        "lng": -0.139407
+      },
+      "distanceMeters": 61,
+      "confidence": 0.66254,
+      "matchedAddress": "W1F 7DW, London, Greater London, England, United Kingdom"
+    },
+    {
+      "id": "f00ef862-87f9-43ec-a4e9-8508df447ac5",
+      "name": "Stüssy Fukuoka",
+      "address": "2-5-13 Tenjin, Chuo-ku, Fukuoka-shi, Fukuoka 810-0001",
+      "oldCoords": {
+        "lat": 33.572124,
+        "lng": 130.3868
+      },
+      "newCoords": {
+        "lat": 33.590438,
+        "lng": 130.397923
+      },
+      "distanceMeters": 2282,
+      "confidence": 0.744254,
+      "matchedAddress": "天神, 810-0001, 中央区, 福岡市, Fukuoka, Japan"
+    },
+    {
+      "id": "bf99d2c4-8964-411b-91f1-fe7b2a145e1f",
+      "name": "Stüssy Harajuku",
+      "address": "4-28-2 Jingumae, Shibuya-ku, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.664455,
+        "lng": 139.69878
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 960,
+      "confidence": 0.816773,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "a5dcef33-2311-484c-9f29-3a938e0cf881",
+      "name": "The North Face London",
+      "address": "42 Foubert's Place, London W1F 7PX",
+      "oldCoords": {
+        "lat": 51.5136,
+        "lng": -0.1382
+      },
+      "newCoords": {
+        "lat": 51.513932,
+        "lng": -0.138411
+      },
+      "distanceMeters": 40,
+      "confidence": 0.757778,
+      "matchedAddress": "42 Foubert's Place, Westminster, London, W1F 7PH, United Kingdom"
+    },
+    {
+      "id": "ec2285a4-763c-4c3c-9134-42cfe604972b",
+      "name": "Stüssy Kyoto",
+      "address": "25 Nakanocho, Higashiiru Tominokoji, Sanjo-Dori, Nakagyo-Ku, Kyoto 604-8083",
+      "oldCoords": {
+        "lat": 35.008488,
+        "lng": 135.74675
+      },
+      "newCoords": {
+        "lat": 35.008641,
+        "lng": 135.764973
+      },
+      "distanceMeters": 1660,
+      "confidence": 0.729735,
+      "matchedAddress": "中之町, 604-8083, 中京区, 京都市, Kyoto, Japan"
+    },
+    {
+      "id": "2c7fc96e-43f8-4726-a3ca-8aee05da2b6d",
+      "name": "Stüssy Madrid",
+      "address": "C.Argensola 10, Madrid, Spain 28004",
+      "oldCoords": {
+        "lat": 40.421345,
+        "lng": -3.701219
+      },
+      "newCoords": {
+        "lat": 40.425198,
+        "lng": -3.694878
+      },
+      "distanceMeters": 687,
+      "confidence": 0.823034,
+      "matchedAddress": "Calle De Argensola 10, 28004 Madrid, Madrid, Spain"
+    },
+    {
+      "id": "9194a0c5-9372-40d9-9a57-ffc4883ffc3c",
+      "name": "Stüssy Milan",
+      "address": "Corso Garibaldi, 12, 20100 Milano MI",
+      "oldCoords": {
+        "lat": 45.463945,
+        "lng": 9.188558
+      },
+      "newCoords": {
+        "lat": 45.472718,
+        "lng": 9.183913
+      },
+      "distanceMeters": 1041,
+      "confidence": 0.825397,
+      "matchedAddress": "Corso Giuseppe Garibaldi 12, 20121 Milano Milan, Italy"
+    },
+    {
+      "id": "7a65c1da-875e-4f5c-889a-d0c1e5c696fd",
+      "name": "Stüssy Nagoya",
+      "address": "3-27-24 Sakae, Naka-Ku, Nagoya-Shi, Aichi 460-0008",
+      "oldCoords": {
+        "lat": 35.168617,
+        "lng": 136.90219
+      },
+      "newCoords": {
+        "lat": 35.166879,
+        "lng": 136.907055
+      },
+      "distanceMeters": 483,
+      "confidence": 0.747619,
+      "matchedAddress": "栄, 460-0008, 中区, 名古屋市, Aichi, Japan"
+    },
+    {
+      "id": "e2138e57-871e-423f-8848-5aebc1ed5e2d",
+      "name": "Stüssy Osaka",
+      "address": "1-7-9 Nishishinsaibashi, Chuo-ku, Osaka 542-0086",
+      "oldCoords": {
+        "lat": 34.679836,
+        "lng": 135.51198
+      },
+      "newCoords": {
+        "lat": 34.671109,
+        "lng": 135.499398
+      },
+      "distanceMeters": 1505,
+      "confidence": 0.766032,
+      "matchedAddress": "西心斎橋, 542-0086, 中央区, 大阪市, Osaka, Japan"
+    },
+    {
+      "id": "8942ca43-8bef-40ec-ad91-2343518476cd",
+      "name": "Stüssy Paris",
+      "address": "44 Rue Du Temple, Paris, France 75004",
+      "oldCoords": {
+        "lat": 48.856882,
+        "lng": 2.355765
+      },
+      "newCoords": {
+        "lat": 48.860079,
+        "lng": 2.354646
+      },
+      "distanceMeters": 365,
+      "confidence": 0.89881,
+      "matchedAddress": "44 Rue Du Temple, 75004 Paris, France"
+    },
+    {
+      "id": "e2dc31bc-36d4-4c31-8403-5eb0d24e094f",
+      "name": "Stüssy Shibuya",
+      "address": "1-14-5 Jinnan, Shibuya-Ku, Tokyo 150-0041",
+      "oldCoords": {
+        "lat": 35.664455,
+        "lng": 139.69878
+      },
+      "newCoords": {
+        "lat": 35.662205,
+        "lng": 139.700829
+      },
+      "distanceMeters": 311,
+      "confidence": 0.816773,
+      "matchedAddress": "神南, 150-0041, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "20388525-d135-45a7-bcff-76fc07cadb6b",
+      "name": "Supreme Milan",
+      "address": "Corso Garibaldi, 20, 20121 Milan MI",
+      "oldCoords": {
+        "lat": 45.463945,
+        "lng": 9.188558
+      },
+      "newCoords": {
+        "lat": 45.473192,
+        "lng": 9.183699
+      },
+      "distanceMeters": 1096,
+      "confidence": 1,
+      "matchedAddress": "Corso Giuseppe Garibaldi 20, 20121 Milano Milan, Italy"
+    },
+    {
+      "id": "ca3343ee-d455-4279-8ec8-a1903c9dc14b",
+      "name": "Supreme Tokyo Shibuya",
+      "address": "1-18-2 Jinnan, Shibuya-Ku",
+      "oldCoords": {
+        "lat": 35.664455,
+        "lng": 139.69878
+      },
+      "newCoords": {
+        "lat": 35.662205,
+        "lng": 139.700829
+      },
+      "distanceMeters": 311,
+      "confidence": 0.878519,
+      "matchedAddress": "神南, 150-0041, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "301cfe13-a199-459a-b522-c9a353910a69",
+      "name": "Supreme Tokyo Daikanyama",
+      "address": "1-6 Daikanyama-Cho, Shibuya-Ku",
+      "oldCoords": {
+        "lat": 35.664455,
+        "lng": 139.69878
+      },
+      "newCoords": {
+        "lat": 35.649774,
+        "lng": 139.704362
+      },
+      "distanceMeters": 1709,
+      "confidence": 0.88,
+      "matchedAddress": "代官山町, 150-0034, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "ff19be50-a9cb-41f3-91ba-e577b1fabf82",
+      "name": "Supreme Nagoya",
+      "address": "3-13-28 Sakae, Naka-Ku, Nagoya",
+      "oldCoords": {
+        "lat": 34.265822,
+        "lng": 135.85222
+      },
+      "newCoords": {
+        "lat": 35.166879,
+        "lng": 136.907055
+      },
+      "distanceMeters": 139044,
+      "confidence": 0.761905,
+      "matchedAddress": "栄, 460-0008, 中区, 名古屋市, Aichi, Japan"
+    },
+    {
+      "id": "9496314b-62b7-41d9-a661-8ddfdcdc11c2",
+      "name": "Supreme Osaka",
+      "address": "1-9-8 Minamihorie, Nishi-Ku",
+      "oldCoords": {
+        "lat": 34.55666,
+        "lng": 135.44029
+      },
+      "newCoords": {
+        "lat": 34.671957,
+        "lng": 135.492747
+      },
+      "distanceMeters": 13690,
+      "confidence": 0.814815,
+      "matchedAddress": "南堀江, 550-0015, 西区, 大阪市, Osaka, Japan"
+    },
+    {
+      "id": "98b91a4c-50d5-435c-aa9b-9f9658a87c8e",
+      "name": "Supreme Fukuoka",
+      "address": "1-15-35 Daimyo, Chuo-Ku",
+      "oldCoords": {
+        "lat": 33.572124,
+        "lng": 130.3868
+      },
+      "newCoords": {
+        "lat": 33.587293,
+        "lng": 130.394074
+      },
+      "distanceMeters": 1816,
+      "confidence": 0.804444,
+      "matchedAddress": "大名, 810-0041, 中央区, 福岡市, Fukuoka, Japan"
+    },
+    {
+      "id": "1ab714d1-a291-49ba-b78c-6874c09ae855",
+      "name": "Dover Street Parfums Market Paris",
+      "address": "11 bis rue Elzévir, Paris 75003",
+      "oldCoords": {
+        "lat": 48.863766,
+        "lng": 2.354858
+      },
+      "newCoords": {
+        "lat": 48.858335,
+        "lng": 2.361548
+      },
+      "distanceMeters": 777,
+      "confidence": 0.674603,
+      "matchedAddress": "Rue Elzévir, 75003 Paris, France"
+    },
+    {
+      "id": "ae1b01f0-a6c0-455e-8d2e-7ea9fd4d191f",
+      "name": "Dover Street Market Los Angeles",
+      "address": "606-608 Imperial Street, Los Angeles, CA 90021",
+      "oldCoords": {
+        "lat": 34.021785,
+        "lng": -118.231342
+      },
+      "newCoords": {
+        "lat": 34.036422,
+        "lng": -118.231394
+      },
+      "distanceMeters": 1628,
+      "confidence": 0.944444,
+      "matchedAddress": "Imperial Street, Los Angeles, California 90021, United States"
+    },
+    {
+      "id": "fe077d69-a7cf-4022-81ba-e044107c5e92",
+      "name": "Nous Paris",
+      "address": "13 Rue des Filles du Calvaire, 75003 Paris",
+      "oldCoords": {
+        "lat": 48.8621,
+        "lng": 2.3664
+      },
+      "newCoords": {
+        "lat": 48.862621,
+        "lng": 2.365622
+      },
+      "distanceMeters": 81,
+      "confidence": 0.844444,
+      "matchedAddress": "13 Rue Des Filles Du Calvaire, 75003 Paris, France"
+    },
+    {
+      "id": "623c10e3-fe8f-44c4-a9fb-355ab2e013b5",
+      "name": "Starcow Paris",
+      "address": "15 Rue Vieille du Temple, 75004 Paris",
+      "oldCoords": {
+        "lat": 48.8576,
+        "lng": 2.3598
+      },
+      "newCoords": {
+        "lat": 48.856774,
+        "lng": 2.356853
+      },
+      "distanceMeters": 234,
+      "confidence": 0.839506,
+      "matchedAddress": "15 Rue Vieille Du Temple, 75004 Paris, France"
+    },
+    {
+      "id": "03bdce04-17b2-4873-b846-86bc6143799d",
+      "name": "Colette Paris (Legacy)",
+      "address": "213 Rue Saint-Honoré, 75001 Paris",
+      "oldCoords": {
+        "lat": 48.8665,
+        "lng": 2.3278
+      },
+      "newCoords": {
+        "lat": 48.861834,
+        "lng": 2.34442
+      },
+      "distanceMeters": 1322,
+      "confidence": 0.583333,
+      "matchedAddress": "75001, Paris, Île-de-France, France"
+    },
+    {
+      "id": "82f989e1-39c6-42f8-ac12-4cae6abedadd",
+      "name": "Dover Street Market London",
+      "address": "18-22 Haymarket, London SW1Y 4DG",
+      "oldCoords": {
+        "lat": 51.5097,
+        "lng": -0.1316
+      },
+      "newCoords": {
+        "lat": 51.509893,
+        "lng": -0.133067
+      },
+      "distanceMeters": 104,
+      "confidence": 0.847963,
+      "matchedAddress": "18-22 Haymarket, Westminster, London, SW1Y 4HA, United Kingdom"
+    },
+    {
+      "id": "b0c784c2-5f7b-4daf-9a56-3f343379fcc8",
+      "name": "Dover Street Market Ginza",
+      "address": "6-9-5 Ginza, Chuo, Tokyo 104-0061",
+      "oldCoords": {
+        "lat": 35.6698,
+        "lng": 139.7632
+      },
+      "newCoords": {
+        "lat": 35.669441,
+        "lng": 139.763104
+      },
+      "distanceMeters": 41,
+      "confidence": 0.777143,
+      "matchedAddress": "銀座, 104-0061, 中央区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "6d3dc92d-c7d8-47af-b448-03b4fc8bca6c",
+      "name": "Dover Street Market Shanghai",
+      "address": "168 Nanjing Rd W, Huangpu, Shanghai",
+      "oldCoords": {
+        "lat": 31.2352,
+        "lng": 121.4766
+      },
+      "newCoords": {
+        "lat": 31.232276,
+        "lng": 121.469207
+      },
+      "distanceMeters": 774,
+      "confidence": 0.481481,
+      "matchedAddress": "Shanghai, China"
+    },
+    {
+      "id": "273cccde-cef4-457d-9a3d-051ee6e5b952",
+      "name": "Dover Street Market Singapore",
+      "address": "18 Dempsey Rd, Singapore 249677",
+      "oldCoords": {
+        "lat": 1.305,
+        "lng": 103.8099
+      },
+      "newCoords": {
+        "lat": 1.305727,
+        "lng": 103.810748
+      },
+      "distanceMeters": 124,
+      "confidence": 0.908796,
+      "matchedAddress": "18 Dempsey Road, Tanglin, Singapore 249677"
+    },
+    {
+      "id": "fa62c5c8-b904-497a-872b-0fa289be9e00",
+      "name": "Palace Tokyo",
+      "address": "5-9-20 Jingumae, Shibuya-Ku, Tokyo 150-0001",
+      "oldCoords": {
+        "lat": 35.664455,
+        "lng": 139.69878
+      },
+      "newCoords": {
+        "lat": 35.670208,
+        "lng": 139.706705
+      },
+      "distanceMeters": 960,
+      "confidence": 0.816773,
+      "matchedAddress": "神宮前, 150-0001, 渋谷区, 東京都, Tokyo Prefecture, Japan"
+    },
+    {
+      "id": "2bf7250a-c6c0-4a89-aa82-22eab0e82536",
+      "name": "Palace Osaka",
+      "address": "3-3-21 Minamisemba, Chuo-Ku, Osaka 542-0081",
+      "oldCoords": {
+        "lat": 34.679836,
+        "lng": 135.51198
+      },
+      "newCoords": {
+        "lat": 34.677585,
+        "lng": 135.501439
+      },
+      "distanceMeters": 996,
+      "confidence": 0.766032,
+      "matchedAddress": "南船場, 542-0081, 中央区, 大阪市, Osaka, Japan"
+    },
+    {
+      "id": "83c66709-49c4-4997-b034-e33796200503",
+      "name": "Palace Fukuoka",
+      "address": "1-1-31, Daimyo, Chuo-Ku, Fukuoka 810-0041",
+      "oldCoords": {
+        "lat": 33.572124,
+        "lng": 130.3868
+      },
+      "newCoords": {
+        "lat": 33.587293,
+        "lng": 130.394074
+      },
+      "distanceMeters": 1816,
+      "confidence": 0.766032,
+      "matchedAddress": "大名, 810-0041, 中央区, 福岡市, Fukuoka, Japan"
+    },
+    {
+      "id": "6d864c03-a5a0-47c2-af79-9be0c0eb0cab",
+      "name": "Centre Pompidou Gift Shop",
+      "address": "Place Georges-Pompidou, 75004 Paris",
+      "oldCoords": {
+        "lat": 48.8606,
+        "lng": 2.3522
+      },
+      "newCoords": {
+        "lat": 48.856882,
+        "lng": 2.355765
+      },
+      "distanceMeters": 489,
+      "confidence": 0.607143,
+      "matchedAddress": "75004, Paris, Île-de-France, France"
+    },
+    {
+      "id": "9d0332a2-5fa7-43dd-b54c-711922aba0b9",
+      "name": "YOHO! Store",
+      "address": "Huaihai Rd, Xuhui, Shanghai",
+      "oldCoords": {
+        "lat": 31.2133,
+        "lng": 121.4556
+      },
+      "newCoords": {
+        "lat": 31.1909,
+        "lng": 121.4326
+      },
+      "distanceMeters": 3315,
+      "confidence": 0.638889,
+      "matchedAddress": "Xuhui Qu, Shanghai, China"
+    },
+    {
+      "id": "654ec0a4-f8ae-4d77-886b-04fbdcff322d",
+      "name": "LABELHOOD Shanghai",
+      "address": "Julu Rd, Jingan, Shanghai",
+      "oldCoords": {
+        "lat": 31.2232,
+        "lng": 121.4531
+      },
+      "newCoords": {
+        "lat": 31.232276,
+        "lng": 121.469207
+      },
+      "distanceMeters": 1834,
+      "confidence": 0.548148,
+      "matchedAddress": "Shanghai, China"
+    },
+    {
+      "id": "b4bff1d5-0ecb-438d-acf1-c2e604be1651",
+      "name": "NPC Beijing",
+      "address": "Sanlitun, Chaoyang, Beijing",
+      "oldCoords": {
+        "lat": 39.9368,
+        "lng": 116.4556
+      },
+      "newCoords": {
+        "lat": 39.92109,
+        "lng": 116.43639
+      },
+      "distanceMeters": 2395,
+      "confidence": 0.683333,
+      "matchedAddress": "Chaoyang Qu, Beijing, China"
+    },
+    {
+      "id": "26523a96-f6db-4211-a70e-7069c4e44e1a",
+      "name": "XCOMMONS",
+      "address": "798 Art District, Chaoyang, Beijing",
+      "oldCoords": {
+        "lat": 39.9857,
+        "lng": 116.4968
+      },
+      "newCoords": {
+        "lat": 39.92109,
+        "lng": 116.43639
+      },
+      "distanceMeters": 8839,
+      "confidence": 0.608952,
+      "matchedAddress": "Chaoyang Qu, Beijing, China"
+    },
+    {
+      "id": "bd698e47-d94e-4dcf-bce2-4781c6840511",
+      "name": "Concrete Store",
+      "address": "Rozengracht 226, 1016 NK Amsterdam",
+      "oldCoords": {
+        "lat": 52.3699,
+        "lng": 4.8785
+      },
+      "newCoords": {
+        "lat": 52.372404,
+        "lng": 4.875004
+      },
+      "distanceMeters": 366,
+      "confidence": 0.856481,
+      "matchedAddress": "Rozengracht 226, 1016 SZ Amsterdam, Netherlands"
+    },
+    {
+      "id": "ee61c92c-beca-4422-93e2-7ae98567138e",
+      "name": "Wood Wood Copenhagen",
+      "address": "Grønnegade 1, 1107 Copenhagen",
+      "oldCoords": {
+        "lat": 55.6826,
+        "lng": 12.5831
+      },
+      "newCoords": {
+        "lat": 55.68099,
+        "lng": 12.582118
+      },
+      "distanceMeters": 189,
+      "confidence": 1,
+      "matchedAddress": "Grønnegade 1, 1107 København, Denmark"
+    },
+    {
+      "id": "6def629a-a16c-457b-b97e-b2d5cdd81a1a",
+      "name": "Illum Department Store",
+      "address": "Østergade 52, 1100 Copenhagen",
+      "oldCoords": {
+        "lat": 55.68,
+        "lng": 12.5784
+      },
+      "newCoords": {
+        "lat": 55.679268,
+        "lng": 12.58069
+      },
+      "distanceMeters": 165,
+      "confidence": 0.814815,
+      "matchedAddress": "Østergade 52, 1100 København, Denmark"
+    },
+    {
+      "id": "c6aebc13-9bbc-4aed-97ab-cd5fe9466676",
+      "name": "Up There Store",
+      "address": "255 Flinders Ln, Melbourne VIC 3000",
+      "oldCoords": {
+        "lat": -37.8175,
+        "lng": 144.9658
+      },
+      "newCoords": {
+        "lat": -37.816839,
+        "lng": 144.965913
+      },
+      "distanceMeters": 74,
+      "confidence": 0.777778,
+      "matchedAddress": "255 Flinders Lane, Melbourne Victoria 3000, Australia"
+    },
+    {
+      "id": "73016337-8175-4340-8630-0d922042b385",
+      "name": "Supply Melbourne",
+      "address": "Melbourne Central, VIC 3000",
+      "oldCoords": {
+        "lat": -37.8105,
+        "lng": 144.9631
+      },
+      "newCoords": {
+        "lat": -37.814199,
+        "lng": 144.963333
+      },
+      "distanceMeters": 412,
+      "confidence": 0.75,
+      "matchedAddress": "3000, Victoria, Australia"
+    },
+    {
+      "id": "a3c7dff2-42ff-48fe-82bf-2a49e5674a8c",
+      "name": "Sneakerboy",
+      "address": "Chadstone Shopping Centre, VIC 3148",
+      "oldCoords": {
+        "lat": -37.8867,
+        "lng": 145.0843
+      },
+      "newCoords": {
+        "lat": -37.88151,
+        "lng": 145.10042
+      },
+      "distanceMeters": 1528,
+      "confidence": 0.607143,
+      "matchedAddress": "Chadstone, Victoria, Australia"
+    },
+    {
+      "id": "2f3b259d-2bfe-480d-a73c-c92bcb85a113",
+      "name": "Subtype Store",
+      "address": "Shop 1/109 Reservoir St, Surry Hills NSW 2010",
+      "oldCoords": {
+        "lat": -33.8863,
+        "lng": 151.2103
+      },
+      "newCoords": {
+        "lat": -33.881302,
+        "lng": 151.210345
+      },
+      "distanceMeters": 556,
+      "confidence": 0.833333,
+      "matchedAddress": "109 Reservoir Street, Surry Hills New South Wales 2010, Australia"
+    },
+    {
+      "id": "f4e48268-d29c-41fb-b390-eb77cd3476e7",
+      "name": "Sneakerboy Sydney",
+      "address": "80 Market St, Sydney NSW 2000",
+      "oldCoords": {
+        "lat": -33.8697,
+        "lng": 151.207
+      },
+      "newCoords": {
+        "lat": -33.870782,
+        "lng": 151.208221
+      },
+      "distanceMeters": 165,
+      "confidence": 0.912698,
+      "matchedAddress": "80 Market Street, Sydney New South Wales 2000, Australia"
+    },
+    {
+      "id": "5fcfcdd4-32af-4a72-9616-22106c780c54",
+      "name": "Incu Surry Hills",
+      "address": "88 Campbell St, Surry Hills NSW 2010",
+      "oldCoords": {
+        "lat": -33.8838,
+        "lng": 151.2116
+      },
+      "newCoords": {
+        "lat": -33.880092,
+        "lng": 151.210237
+      },
+      "distanceMeters": 431,
+      "confidence": 0.833333,
+      "matchedAddress": "88 Campbell Street, Surry Hills New South Wales 2010, Australia"
+    },
+    {
+      "id": "c0c943f4-2be0-466f-956f-a18fceb8a9ba",
+      "name": "Limited Edt Singapore",
+      "address": "Orchard Gateway, Singapore",
+      "oldCoords": {
+        "lat": 1.3008,
+        "lng": 103.839
+      },
+      "newCoords": {
+        "lat": 1.288799,
+        "lng": 103.84094
+      },
+      "distanceMeters": 1352,
+      "confidence": 0.933333,
+      "matchedAddress": "Singapore River, Singapore, Central Singapore Community Development Council"
+    },
+    {
+      "id": "02bc5f97-61a3-473f-9cb8-29cee4024a7a",
+      "name": "Surrender Store",
+      "address": "Millenia Walk, Singapore",
+      "oldCoords": {
+        "lat": 1.2923,
+        "lng": 103.8602
+      },
+      "newCoords": {
+        "lat": 1.288799,
+        "lng": 103.84094
+      },
+      "distanceMeters": 2176,
+      "confidence": 0.637778,
+      "matchedAddress": "Singapore River, Singapore, Central Singapore Community Development Council"
+    },
+    {
+      "id": "09d5471d-5271-4781-88ac-f0425476f53e",
+      "name": "SOULSCAPE",
+      "address": "Capitol Piazza, Singapore",
+      "oldCoords": {
+        "lat": 1.2931,
+        "lng": 103.8524
+      },
+      "newCoords": {
+        "lat": 1.288799,
+        "lng": 103.84094
+      },
+      "distanceMeters": 1361,
+      "confidence": 0.933333,
+      "matchedAddress": "Singapore River, Singapore, Central Singapore Community Development Council"
+    },
+    {
+      "id": "3e13b6b5-8232-4520-a1f9-9c84e0848131",
+      "name": "Livestock Toronto",
+      "address": "238 Queen St W, Toronto, ON M5V 1Z7",
+      "oldCoords": {
+        "lat": 43.6502,
+        "lng": -79.3914
+      },
+      "newCoords": {
+        "lat": 43.65028,
+        "lng": -79.39049
+      },
+      "distanceMeters": 74,
+      "confidence": 1,
+      "matchedAddress": "238 Queen Street West, Toronto, Ontario M5V 1Z7, Canada"
+    },
+    {
+      "id": "702df939-125a-4a44-96bd-72588226c12e",
+      "name": "Haven Toronto",
+      "address": "69 Yorkville Ave, Toronto, ON M5R 1B7",
+      "oldCoords": {
+        "lat": 43.671,
+        "lng": -79.3945
+      },
+      "newCoords": {
+        "lat": 43.67094,
+        "lng": -79.3909
+      },
+      "distanceMeters": 290,
+      "confidence": 1,
+      "matchedAddress": "69 Yorkville Avenue, Toronto, Ontario M5R 1B8, Canada"
+    },
+    {
+      "id": "a34a154f-d3a1-4117-88f1-a80c36297839",
+      "name": "Haven Vancouver",
+      "address": "1134 Alberni St, Vancouver, BC V6E 1A3",
+      "oldCoords": {
+        "lat": 49.2846,
+        "lng": -123.1285
+      },
+      "newCoords": {
+        "lat": 49.285923,
+        "lng": -123.124709
+      },
+      "distanceMeters": 312,
+      "confidence": 0.898889,
+      "matchedAddress": "1134 Alberni Street, Vancouver, British Columbia V6E 1A5, Canada"
+    },
+    {
+      "id": "ac2c8e9e-a81e-40bb-89e5-873632fd6f8b",
+      "name": "Livestock Vancouver",
+      "address": "94 W Cordova St, Vancouver, BC V6B 1E8",
+      "oldCoords": {
+        "lat": 49.283,
+        "lng": -123.1067
+      },
+      "newCoords": {
+        "lat": 49.282714,
+        "lng": -123.105589
+      },
+      "distanceMeters": 87,
+      "confidence": 0.905062,
+      "matchedAddress": "94 West Cordova Street, Vancouver, British Columbia V6B 1C8, Canada"
+    },
+    {
+      "id": "daf6f8f2-8ccd-4c8d-b19b-79e030d201bf",
+      "name": "RSVP Gallery Chicago",
+      "address": "1753 N Damen Ave, Chicago, IL 60647",
+      "oldCoords": {
+        "lat": 41.9136,
+        "lng": -87.6777
+      },
+      "newCoords": {
+        "lat": 41.913921,
+        "lng": -87.677306
+      },
+      "distanceMeters": 48,
+      "confidence": 1,
+      "matchedAddress": "1753 North Damen Avenue, Chicago, Illinois 60647, United States"
+    },
+    {
+      "id": "e8b394d6-528b-4007-bcd9-d271f7434e1a",
+      "name": "Saint Alfred Chicago",
+      "address": "1531 N Milwaukee Ave, Chicago, IL 60622",
+      "oldCoords": {
+        "lat": 41.9089,
+        "lng": -87.6778
+      },
+      "newCoords": {
+        "lat": 41.909481,
+        "lng": -87.675583
+      },
+      "distanceMeters": 195,
+      "confidence": 1,
+      "matchedAddress": "1531 North Milwaukee Avenue, Chicago, Illinois 60622, United States"
+    },
+    {
+      "id": "e1d3edd1-c674-471e-9bfd-1204f8e7d1f1",
+      "name": "Unknwn Miami",
+      "address": "3 Grand Ave, Miami, FL 33133",
+      "oldCoords": {
+        "lat": 25.7275,
+        "lng": -80.2386
+      },
+      "newCoords": {
+        "lat": 25.727733,
+        "lng": -80.250911
+      },
+      "distanceMeters": 1233,
+      "confidence": 0.991481,
+      "matchedAddress": "Grand Avenue, Miami, Florida 33133, United States"
+    }
+  ],
+  "failed": [],
+  "noAddress": []
+}

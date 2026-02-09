@@ -164,7 +164,7 @@ const ShopMap = () => {
   };
 
   const updateMarkers = () => {
-    if (!map.current) return;
+    if (!map.current || !map.current.isStyleLoaded()) return;
 
     // Filter shops by continent
     const filteredShops = selectedContinent === "all" 
@@ -228,11 +228,11 @@ const ShopMap = () => {
         'circle-color': [
           'step',
           ['get', 'point_count'],
-          'hsl(var(--directions))', // Start with directions color
+          'hsl(186, 95%, 55%)', // Start with directions color
           10,
-          'hsl(var(--drops))', // Medium clusters
+          'hsl(271, 85%, 65%)', // Medium clusters
           30,
-          'hsl(var(--pro-gold))' // Large clusters
+          'hsl(45, 93%, 58%)' // Large clusters
         ],
         'circle-radius': [
           'step',
@@ -244,7 +244,7 @@ const ShopMap = () => {
           45
         ],
         'circle-stroke-width': 3,
-        'circle-stroke-color': 'hsl(var(--background))',
+        'circle-stroke-color': '#ffffff',
         'circle-opacity': 0.9
       }
     });
@@ -261,7 +261,7 @@ const ShopMap = () => {
         'text-size': 16
       },
       paint: {
-        'text-color': 'hsl(var(--background))'
+        'text-color': '#ffffff'
       }
     });
 
@@ -285,7 +285,7 @@ const ShopMap = () => {
         ],
         'circle-radius': 20,
         'circle-stroke-width': 3,
-        'circle-stroke-color': 'hsl(var(--background))',
+        'circle-stroke-color': '#ffffff',
         'circle-opacity': 0.9
       }
     });

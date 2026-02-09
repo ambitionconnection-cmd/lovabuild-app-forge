@@ -314,7 +314,7 @@ const BrandDetail = () => {
                   <div
                     key={shop.id}
                     className="flex items-center gap-3 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
-                    onClick={() => navigate('/shop-map')}
+                    onClick={() => navigate(`/directions?shopId=${shop.id}&lat=${shop.latitude}&lng=${shop.longitude}&zoom=16`)}
                   >
                     <div className="w-12 h-12 rounded-lg bg-card border overflow-hidden flex-shrink-0">
                       {shop.image_url ? (
