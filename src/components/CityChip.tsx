@@ -26,7 +26,7 @@ export const CityChip = ({ onCitySelect, currentCity }: CityChipProps) => {
   const activeCityName = currentCity || "London";
 
   return (
-    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+    <div className="absolute top-4 lg:top-16 left-1/2 -translate-x-1/2 z-20">
       {/* Main chip */}
       <button
         onClick={() => setIsOpen(!isOpen)}

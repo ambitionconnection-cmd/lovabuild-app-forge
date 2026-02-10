@@ -169,27 +169,28 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   const handleDragEnd = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    
-    const states: SheetState[] = ['peek', 'expanded', 'full'];
-    const currentIndex = states.indexOf(sheetState);
-    
-    if (dragOffset < -SNAP_THRESHOLD) {
-      // Dragging up - go to next state
-      if (currentIndex < states.length - 1) {
-        setSheetState(states[currentIndex + 1]);
-        haptic.success();
-      }
-    } else if (dragOffset > SNAP_THRESHOLD) {
-      // Dragging down - go to previous state
-      if (currentIndex > 0) {
-        setSheetState(states[currentIndex - 1]);
-        haptic.light();
-      }
+
+    const viewportHeight = window.innerHeight;
+    const currentPercent = getHeightPercent();
+
+    // Snap to nearest logical state based on where user released
+    if (currentPercent > 70) {
+      setSheetState('full');
+      haptic.success();
+    } else if (currentPercent > 35) {
+      setSheetState('expanded');
+      haptic.light();
+    } else if (currentPercent < 10) {
+      // Dragged almost all the way down — go to peek
+      setSheetState('peek');
+      haptic.light();
+    } else {
+      setSheetState('expanded');
+      haptic.light();
     }
-    
+
     setDragOffset(0);
   };
-
   // Add mouse event listeners for desktop dragging
   useEffect(() => {
     if (!isDragging) return;
@@ -246,12 +247,12 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
           onTouchEnd={handleDragEnd}
           onMouseDown={handleDragStart}
         >
-          <div className="flex items-center justify-center py-3">
-            <div className="w-12 h-1.5 rounded-full bg-muted-foreground/30" />
+          <div className="flex items-center justify-center py-1.5">
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
           
           {/* Header - CRITICAL FIX #1: Show closest shop info when peek state */}
-          <div className="px-4 pb-3 flex items-center justify-between border-b border-directions/10">
+          <div className="px-4 pb-2 flex items-center justify-between border-b border-directions/10">
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <MapPin className="w-4 h-4 text-directions flex-shrink-0" />
               {sheetState === 'peek' && closestShop ? (
@@ -275,11 +276,20 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
               )}
             </div>
             
-            <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
-              <ChevronUp className={`w-4 h-4 transition-transform ${sheetState === 'full' ? 'rotate-180' : ''}`} />
-              <span className="hidden xs:inline">
-                {sheetState === 'peek' ? 'Swipe up' : sheetState === 'expanded' ? 'More' : 'Swipe down'}
-              </span>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {sheetState !== 'peek' && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSheetState('peek');
+                    haptic.light();
+                  }}
+                  className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                >
+                  <span className="text-xs text-muted-foreground">✕</span>
+                </button>
+              )}
+              <ChevronUp className={`w-4 h-4 text-muted-foreground transition-transform ${sheetState === 'full' ? 'rotate-180' : ''}`} />
             </div>
           </div>
         </div>
