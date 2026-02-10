@@ -1,0 +1,125 @@
+import { Heart, User, Mail, Info, Bell, Shield, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+
+interface MenuItem {
+  icon: typeof Heart;
+  label: string;
+  description: string;
+  path: string;
+  requiresAuth?: boolean;
+  adminOnly?: boolean;
+}
+
+const menuItems: MenuItem[] = [
+  {
+    icon: Heart,
+    label: "My HEARDROP",
+    description: "Favourites, saved shops & brands",
+    path: "/my-heardrop",
+    requiresAuth: true,
+  },
+  {
+    icon: User,
+    label: "Profile",
+    description: "Account settings & preferences",
+    path: "/profile",
+    requiresAuth: true,
+  },
+  {
+    icon: Bell,
+    label: "Notifications",
+    description: "Drop alerts & reminders",
+    path: "/notifications",
+    requiresAuth: true,
+  },
+  {
+    icon: Mail,
+    label: "Contact",
+    description: "Get in touch, submit a brand",
+    path: "/contact",
+    requiresAuth: true,
+  },
+  {
+    icon: Info,
+    label: "About HEARDROP",
+    description: "Our story & mission",
+    path: "/about",
+  },
+  {
+    icon: Shield,
+    label: "Admin Dashboard",
+    description: "Manage content & submissions",
+    path: "/admin",
+    adminOnly: true,
+  },
+];
+
+const More = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
+
+  const handleItemClick = (item: MenuItem) => {
+    if (item.requiresAuth && !user) {
+      navigate("/auth");
+      return;
+    }
+    navigate(item.path);
+  };
+
+  const visibleItems = menuItems.filter((item) => {
+    if (item.adminOnly && !isAdmin) return false;
+    return true;
+  });
+
+  return (
+    <div className="fixed inset-0 bg-background flex flex-col">
+      <div className="flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16">
+        <h1 className="text-2xl font-bold text-white tracking-wider uppercase">More</h1>
+        <p className="text-sm text-white/40 mt-1">Settings, favourites & more</p>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 pb-20">
+        <div className="space-y-1">
+          {visibleItems.map((item) => {
+            const Icon = item.icon;
+            const needsLogin = item.requiresAuth && !user;
+
+            return (
+              <button
+                key={item.path}
+                onClick={() => handleItemClick(item)}
+                className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors text-left"
+              >
+                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-5 h-5 text-white/70" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-medium text-sm">{item.label}</p>
+                  <p className="text-white/40 text-xs mt-0.5">{item.description}</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {needsLogin && (
+                    <span className="text-[10px] text-white/30 border border-white/10 px-2 py-0.5 rounded-full">
+                      Login
+                    </span>
+                  )}
+                  <ChevronRight className="w-4 h-4 text-white/20" />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 pt-4 border-t border-white/5 text-center">
+          <p className="text-white/20 text-xs">HEARDROP v1.0</p>
+          <p className="text-white/15 text-[10px] mt-1">Never miss a drop again.</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default More;

@@ -22,6 +22,7 @@ import Analytics from "./pages/Analytics";
 import NotificationHistory from "./pages/NotificationHistory";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import More from "./pages/More";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ function App() {
               <Route path="/index" element={<Directions />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/more" element={<More />} />
               <Route path="*" element={<NotFound />} />
              </Routes>
              <DesktopTopNav />
