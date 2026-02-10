@@ -1,41 +1,47 @@
-import { Home, MapPin, Zap, Globe, Heart } from "lucide-react";
+import { Map, Route, Globe, Flame, MoreHorizontal } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
 import haptic from "@/lib/haptics";
 
 interface TabItem {
-  icon: typeof Home;
+  icon: typeof Map;
   label: string;
   path: string;
 }
 
 const tabs: TabItem[] = [
-  { icon: Home, label: "nav.home", path: "/" },
-  { icon: MapPin, label: "nav.directions", path: "/directions" },
-  { icon: Zap, label: "nav.drops", path: "/drops" },
-  { icon: Globe, label: "nav.global", path: "/global-index" },
-  { icon: Heart, label: "nav.myHeardrop", path: "/my-heardrop" },
+  { icon: Map, label: "Map", path: "/" },
+  { icon: Route, label: "Route", path: "/route" },
+  { icon: Globe, label: "Index", path: "/global-index" },
+  { icon: Flame, label: "Drops", path: "/drops" },
+  { icon: MoreHorizontal, label: "More", path: "/more" },
 ];
 
 export const BottomTabBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
-  // Hide on certain routes like admin, profile, etc.
-  const hiddenRoutes = ["/admin", "/profile", "/auth", "/analytics", "/notifications", "/contact", "/shop-map"];
+  // Hide on admin, auth, and detail pages
+  const hiddenRoutes = ["/admin", "/auth", "/analytics", "/notifications"];
   if (hiddenRoutes.some(route => location.pathname.startsWith(route))) {
     return null;
   }
 
+  // Determine active tab - "/" and "/directions" both highlight Map
+  const getIsActive = (tabPath: string) => {
+    if (tabPath === "/") {
+      return location.pathname === "/" || location.pathname === "/directions";
+    }
+    return location.pathname.startsWith(tabPath);
+  };
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border safe-area-bottom">
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-1">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-t border-white/10 safe-area-bottom lg:hidden">
+      <div className="flex items-center justify-around h-14 max-w-lg mx-auto px-1">
         {tabs.map((tab) => {
-          const isActive = location.pathname === tab.path;
+          const isActive = getIsActive(tab.path);
           const Icon = tab.icon;
-          
+
           return (
             <button
               key={tab.path}
@@ -43,26 +49,25 @@ export const BottomTabBar = () => {
                 haptic.selection();
                 navigate(tab.path);
               }}
-              onTouchStart={() => haptic.light()}
               className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full min-h-[48px] gap-0.5 transition-all",
+                "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all",
                 "active:scale-90 active:opacity-70 touch-manipulation select-none",
-                isActive 
-                  ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground"
+                isActive
+                  ? "text-white"
+                  : "text-white/40 hover:text-white/70"
               )}
             >
-              <Icon 
+              <Icon
                 className={cn(
                   "w-5 h-5 transition-all",
                   isActive && "stroke-[2.5px]"
-                )} 
+                )}
               />
               <span className={cn(
-                "text-[10px] font-medium truncate max-w-[60px]",
-                isActive && "font-semibold"
+                "text-[10px] tracking-wide",
+                isActive ? "font-bold" : "font-medium"
               )}>
-                {t(tab.label)}
+                {tab.label}
               </span>
             </button>
           );

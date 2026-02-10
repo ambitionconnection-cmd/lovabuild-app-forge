@@ -499,60 +499,22 @@ const Directions = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        <header className="border-b border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background">
-          <div className="container mx-auto px-3 py-2 flex items-center gap-3">
-            <Link to="/">
-              <Button variant="ghost" size="icon" className="hover:bg-directions/10 h-8 w-8">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </Link>
-            <h1 className="text-base font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
-              Directions
-            </h1>
+      <div className="fixed inset-0 bg-background flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 rounded-md border-2 border-white/20 flex items-center justify-center mx-auto">
+            <span className="text-white font-bold text-lg">H</span>
           </div>
-        </header>
-        <main className="container mx-auto px-3 py-4">
-          <Skeleton className="w-full h-[400px] rounded-xl" />
-        </main>
+          <p className="text-sm text-muted-foreground">Loading map...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:block pb-20">
-      <header className="border-b border-directions/20 bg-gradient-to-r from-background via-directions/5 to-background sticky top-0 z-50 backdrop-blur-sm flex-shrink-0">
-        <div className="container mx-auto px-3 py-2 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Link to="/">
-              <Button variant="ghost" size="icon" className="hover:bg-directions/10 hover:text-directions h-8 w-8">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </Link>
-            <h1 className="text-base font-bold uppercase tracking-wider bg-gradient-to-r from-directions to-primary bg-clip-text text-transparent">
-              Directions
-            </h1>
-          </div>
-          
-          {/* Mobile Filter FAB */}
-          <Button
-            size="icon"
-            variant="secondary"
-            className="lg:hidden relative bg-directions/10 hover:bg-directions/20 border border-directions/30"
-            onClick={() => setIsFilterSheetOpen(true)}
-          >
-            <Filter className="w-5 h-5 text-directions" />
-            {activeFilterCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-directions text-directions-foreground text-xs">
-                {activeFilterCount}
-              </Badge>
-            )}
-          </Button>
-        </div>
-      </header>
-      
-      <main className="flex-1 lg:container lg:mx-auto lg:px-4 lg:py-8 relative flex flex-col lg:block">
-        <div className="lg:grid lg:grid-cols-10 lg:gap-6 flex-1 flex flex-col lg:flex-row relative">
+    <div className="fixed inset-0 bg-background flex flex-col">
+            
+      <main className="flex-1 relative flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col lg:flex-row relative overflow-hidden">
           {/* Desktop Sidebar - Filters and Shop List */}
           <div className="hidden lg:block lg:col-span-3 space-y-6">
             <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
@@ -740,8 +702,8 @@ const Directions = () => {
           </div>
 
           {/* Map - Full height on mobile minus header, tab bar, and peek sheet */}
-          <div className={`lg:col-span-7 relative flex flex-col ${isMapFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
-            <Card className={`border border-primary/20 shadow-lg overflow-hidden ${isMapFullscreen ? 'h-screen rounded-none' : 'h-[calc(100vh-44px-64px-15vh)] lg:h-[500px] rounded-none lg:rounded-xl'}`}>
+          <div className="flex-1 relative flex flex-col">
+            <Card className="border-0 shadow-none overflow-hidden h-full rounded-none">
               <CardContent className="p-0 h-full relative">
                 <div className="w-full h-full">
                   <Map
