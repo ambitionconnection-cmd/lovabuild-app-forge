@@ -667,19 +667,7 @@ const Directions = () => {
                     setMapZoom(zoom);
                   }}
                 />
-                {/* Fullscreen Toggle Button */}
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="absolute top-2 right-2 z-10 bg-background/95 backdrop-blur-md shadow-lg hover:bg-background border border-border h-8 w-8"
-                  onClick={() => setIsMapFullscreen(!isMapFullscreen)}
-                >
-                  {isMapFullscreen ? (
-                    <Minimize2 className="w-4 h-4" />
-                  ) : (
-                    <Maximize2 className="w-4 h-4" />
-                  )}
-                </Button>
+                {/* Fullscreen button removed - map is already full screen */}
               </CardContent>
             </Card>
 

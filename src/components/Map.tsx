@@ -121,10 +121,9 @@ const Map: React.FC<MapProps> = ({
         initialCenterRef.current = initialCenter;
         // Fly to new center if map exists
         if (map.current) {
-          map.current.flyTo({
+          map.current.jumpTo({
             center: initialCenter,
-            zoom: initialZoom || 15,
-            duration: 1000
+            zoom: initialZoom || 15
           });
         }
       }
@@ -164,13 +163,7 @@ const Map: React.FC<MapProps> = ({
     
     mapLog.init('Map instance created');
 
-    // Add navigation controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl({
-        visualizePitch: true,
-      }),
-      'top-right'
-    );
+    // Navigation controls removed - using custom recenter button instead
 
     // Add geolocate control - CRITICAL FIX #3: Disable trackUserLocation to prevent snap-back
     const geolocateControl = new mapboxgl.GeolocateControl({
@@ -182,7 +175,12 @@ const Map: React.FC<MapProps> = ({
       showAccuracyCircle: false,
     });
     
-    map.current.addControl(geolocateControl, 'top-right');
+    map.current.addControl(geolocateControl);
+    // Hide the default geolocate button - we use our own custom recenter button
+    const geolocateEl = mapContainer.current?.querySelector('.mapboxgl-ctrl-geolocate');
+    if (geolocateEl) {
+      (geolocateEl as HTMLElement).style.display = 'none';
+    }
 
     // Listen for user location - Only center on first load if no initialCenter provided
     geolocateControl.on('geolocate', (e: any) => {
@@ -194,11 +192,10 @@ const Map: React.FC<MapProps> = ({
       // CRITICAL FIX #2: Only center on user location on FIRST geolocation AND only if no specific shop target
       if (!hasInitializedLocation.current && map.current && !initialCenterRef.current) {
         hasInitializedLocation.current = true;
-        mapLog.location('Flying to user location (first geolocate)');
-        map.current.flyTo({
+        mapLog.location('Jumping to user location (first geolocate)');
+        map.current.jumpTo({
           center: newLocation,
-          zoom: 14,
-          duration: 1000,
+          zoom: 14
         });
       } else {
         mapLog.location('NOT flying to user location (already initialized or has initialCenter)');
@@ -668,10 +665,9 @@ const Map: React.FC<MapProps> = ({
     
     // Fly to shops area (only if user hasn't interacted yet)
     if (!hasInitializedLocation.current && !isUserInteracting.current) {
-      map.current.flyTo({
+      map.current.jumpTo({
         center: [avgLng, avgLat],
-        zoom: 5, // Overview zoom to show multiple shops
-        duration: 1500
+        zoom: 5
       });
     }
   }, [shops]);
@@ -1016,10 +1012,9 @@ const Map: React.FC<MapProps> = ({
   // Recenter on user location
   const handleRecenter = useCallback(() => {
     if (userLocation && map.current) {
-      map.current.flyTo({
+      map.current.jumpTo({
         center: userLocation,
-        zoom: 14,
-        duration: 1000,
+        zoom: 14
       });
     }
   }, [userLocation]);
@@ -1043,16 +1038,16 @@ const Map: React.FC<MapProps> = ({
         message={loadingMessage}
       />
       
-      {/* Recenter button */}
+      {/* Recenter button - mid right, always visible */}
       {userLocation && (
         <Button
           onClick={handleRecenter}
           size="icon"
           variant="secondary"
-          className="absolute bottom-4 right-4 z-10 h-10 w-10 rounded-full shadow-lg bg-background/95 backdrop-blur-sm border border-directions/30 hover:bg-directions/20 hover:border-directions"
+          className="absolute top-1/3 right-3 z-10 h-10 w-10 rounded-full shadow-lg bg-black/80 backdrop-blur-md border border-white/20 hover:bg-black/90"
           title="Recenter on my location"
         >
-          <Crosshair className="h-5 w-5 text-directions" />
+          <Crosshair className="h-5 w-5 text-white" />
         </Button>
       )}
       

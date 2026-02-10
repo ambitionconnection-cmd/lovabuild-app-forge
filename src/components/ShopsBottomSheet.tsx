@@ -33,7 +33,7 @@ const SHEET_HEIGHTS = {
   full: 90,      // 90% of viewport
 };
 
-const SNAP_THRESHOLD = 30; // pixels needed to trigger snap to next state
+const SNAP_THRESHOLD = 50; // pixels needed to trigger snap to next state
 
 export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   shops,
@@ -54,6 +54,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   const sheetRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const currentHeightRef = useRef(SHEET_HEIGHTS.peek);
+  const dragOffsetRef = useRef(0);
 
   // Calculate shops to display based on map center or visible shops
   // CRITICAL FIX #1: Always show at least the closest shops, never show empty
@@ -163,6 +164,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
     if (!isDragging) return;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     const diff = clientY - startYRef.current;
+    dragOffsetRef.current = diff;
     setDragOffset(diff);
   };
 
@@ -170,25 +172,23 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
     if (!isDragging) return;
     setIsDragging(false);
 
-    const viewportHeight = window.innerHeight;
-    const currentPercent = getHeightPercent();
+    const offset = dragOffsetRef.current;
+    const states: SheetState[] = ['peek', 'expanded', 'full'];
+    const currentIndex = states.indexOf(sheetState);
 
-    // Snap to nearest logical state based on where user released
-    if (currentPercent > 70) {
-      setSheetState('full');
+    // Use drag direction and distance to decide
+    if (offset < -SNAP_THRESHOLD && currentIndex < states.length - 1) {
+      // Dragged UP — go one state higher
+      setSheetState(states[currentIndex + 1]);
       haptic.success();
-    } else if (currentPercent > 35) {
-      setSheetState('expanded');
-      haptic.light();
-    } else if (currentPercent < 10) {
-      // Dragged almost all the way down — go to peek
-      setSheetState('peek');
-      haptic.light();
-    } else {
-      setSheetState('expanded');
+    } else if (offset > SNAP_THRESHOLD && currentIndex > 0) {
+      // Dragged DOWN — go one state lower
+      setSheetState(states[currentIndex - 1]);
       haptic.light();
     }
+    // Otherwise stay in current state
 
+    dragOffsetRef.current = 0;
     setDragOffset(0);
   };
   // Add mouse event listeners for desktop dragging
@@ -197,6 +197,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
 
     const handleMouseMove = (e: MouseEvent) => {
       const diff = e.clientY - startYRef.current;
+      dragOffsetRef.current = diff;
       setDragOffset(diff);
     };
 
