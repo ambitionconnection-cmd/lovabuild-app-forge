@@ -18,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import haptic from "@/lib/haptics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useShopsCache } from "@/hooks/useShopsCache";
+import { CityChip } from "@/components/CityChip";
 import {
   DndContext,
   closestCenter,
@@ -827,6 +828,13 @@ const Directions = () => {
 
                 {/* Removed mobile shops toggle button - bottom sheet is always visible */}
 
+                {/* City Selector Chip */}
+                <CityChip
+                  onCitySelect={(center, zoom) => {
+                    setMapCenter(center);
+                    setMapZoom(zoom);
+                  }}
+                />
                 {/* Fullscreen Toggle Button */}
                 <Button
                   variant="secondary"
