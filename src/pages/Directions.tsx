@@ -1,3 +1,4 @@
+import { DesktopSidePanel } from "@/components/DesktopSidePanel";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -516,192 +517,7 @@ const Directions = () => {
             
       <main className="flex-1 relative flex flex-col overflow-hidden">
         <div className="flex-1 flex flex-col lg:flex-row relative overflow-hidden">
-          {/* Desktop Sidebar - Filters and Shop List */}
-          <div className="hidden lg:block lg:col-span-3 space-y-6">
-            <Card className="glass-card border-2 border-directions/20 bg-background/95 backdrop-blur-md shadow-xl">
-              <CardHeader className="border-b border-directions/10">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="uppercase tracking-wider text-directions font-bold">
-                      🔍 Search & Filter
-                    </CardTitle>
-                    <CardDescription>
-                      📍 {filteredShops.length} shop{filteredShops.length !== 1 ? 's' : ''} found
-                    </CardDescription>
-                  </div>
-                    {activeFilterCount > 0 && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => {
-                          setSearchQuery("");
-                          setSelectedCountry("all");
-                          setSelectedCity("all");
-                      }}
-                      className="h-7 text-xs hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      Clear All
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                {userLocation && (
-                  <div className="flex items-center justify-between p-3 bg-directions/5 rounded-lg border border-directions/20">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Navigation className="w-4 h-4 text-directions" />
-                      <span className="font-medium">Sort by proximity</span>
-                    </div>
-                    <Button
-                      variant={sortByDistance ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSortByDistance(!sortByDistance)}
-                      className={sortByDistance ? "bg-directions hover:bg-directions/90 text-directions-foreground" : ""}
-                    >
-                      {sortByDistance ? "On" : "Off"}
-                    </Button>
-                  </div>
-                )}
-                
-                <Input
-                  placeholder="Search shops..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border-directions/20 focus:ring-directions"
-                />
-
-                <Select value={selectedCountry} onValueChange={(value) => {
-                  setSelectedCountry(value);
-                  setSelectedCity("all"); // Reset city when country changes
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Countries</SelectItem>
-                    {countries.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={selectedCity} onValueChange={setSelectedCity}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="City" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Cities</SelectItem>
-                    {cities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
-
-            {/* Desktop Shop List */}
-            <div className="space-y-3 max-h-[500px] overflow-y-auto">
-              {filteredShops.length === 0 ? (
-                <Card>
-                  <CardContent className="py-8 text-center">
-                    <p className="text-muted-foreground">No shops found</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                filteredShops.slice(0, 20).map((shop) => {
-                  const inJourney = isInJourney(shop.id);
-                  const distance = userLocation && shop.latitude && shop.longitude
-                    ? calculateDistance(userLocation.lat, userLocation.lng, Number(shop.latitude), Number(shop.longitude))
-                    : null;
-                  
-                  return (
-                    <Card 
-                      key={shop.id}
-                      className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg border-2 ${
-                        inJourney
-                          ? 'bg-directions/10 border-directions shadow-lg shadow-directions/20' 
-                          : selectedShop?.id === shop.id 
-                          ? 'bg-directions/5 border-directions/50' 
-                          : highlightedShopId === shop.id
-                          ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20'
-                          : 'border-border hover:border-directions/50'
-                      }`}
-                      onClick={() => !inJourney && setSelectedShop(shop)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold text-sm flex-1">{shop.name}</h3>
-                          <div className="flex items-center gap-2">
-                            {distance !== null && (
-                              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-bold whitespace-nowrap">
-                                {distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`}
-                              </span>
-                            )}
-                            {inJourney && (
-                              <span className="text-xs bg-directions text-directions-foreground px-2 py-1 rounded-full font-bold">
-                                #{journeyStops.findIndex(s => s.id === shop.id) + 1}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="space-y-1 text-xs text-muted-foreground mb-2">
-                          <div className="flex items-start gap-2">
-                            <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                            <span className="line-clamp-2">{shop.address}, {shop.city}</span>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openShopDetails(shop);
-                            }}
-                            className="text-xs h-7"
-                          >
-                            <Info className="w-3 h-3 mr-1" />
-                            Details
-                          </Button>
-                          {!inJourney ? (
-                            <Button 
-                              size="sm" 
-                              className="text-xs h-7 bg-directions hover:bg-directions/90 text-directions-foreground"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                addToJourney(shop);
-                              }}
-                              disabled={!shop.latitude || !shop.longitude}
-                            >
-                              <Navigation className="w-3 h-3 mr-1" />
-                              Add
-                            </Button>
-                          ) : (
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              className="text-xs h-7 border-destructive/50 text-destructive hover:bg-destructive/10"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeFromJourney(shop.id);
-                              }}
-                            >
-                              Remove
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
+          
           {/* Map - Full height on mobile minus header, tab bar, and peek sheet */}
           <div className="flex-1 relative flex flex-col">
             <Card className="border-0 shadow-none overflow-hidden h-full rounded-none">
@@ -828,6 +644,22 @@ const Directions = () => {
 
                 {/* Removed mobile shops toggle button - bottom sheet is always visible */}
 
+                {/* Desktop Side Panel */}
+                <DesktopSidePanel
+                  shops={filteredShops}
+                  visibleShops={visibleShops}
+                  onShopClick={handleShopClickFromSheet}
+                  onAddToJourney={addToJourney}
+                  onOpenDetails={openShopDetails}
+                  isInJourney={isInJourney}
+                  selectedShopId={selectedShop?.id}
+                  highlightedShopId={highlightedShopId}
+                  userLocation={userLocation}
+                  mapCenterLocation={mapCenterLocation}
+                  calculateDistance={calculateDistance}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                />
                 {/* City Selector Chip */}
                 <CityChip
                   onCitySelect={(center, zoom) => {
@@ -908,105 +740,6 @@ const Directions = () => {
               </Card>
             )}
 
-            {/* Nearby Shops List Below Map - Hidden on mobile to save space */}
-            {!isMapFullscreen && (
-              <Card className="hidden lg:block mt-2 border border-directions/20 shadow-md rounded-xl">
-                <CardHeader className="border-b border-directions/10 py-2 px-3">
-                  <CardTitle className="text-xs uppercase tracking-wider text-directions font-bold">
-                    📍 {visibleShops.length > 0 ? `Nearby (${visibleShops.length})` : 'Closest Shops'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-2">
-                  <ScrollArea className="h-[100px]">
-                    {(() => {
-                      // Use visible shops if available, otherwise find closest shops to map center
-                      const referenceLocation = mapCenterLocation || userLocation;
-                      let shopsToShow = visibleShops.length > 0 ? visibleShops : [];
-                      
-                      // If no visible shops, find closest ones based on map center or user location
-                      if (shopsToShow.length === 0 && referenceLocation && filteredShops.length > 0) {
-                        shopsToShow = [...filteredShops]
-                          .filter(shop => shop.latitude && shop.longitude)
-                          .sort((a, b) => {
-                            const distA = calculateDistance(referenceLocation.lat, referenceLocation.lng, Number(a.latitude), Number(a.longitude));
-                            const distB = calculateDistance(referenceLocation.lat, referenceLocation.lng, Number(b.latitude), Number(b.longitude));
-                            return distA - distB;
-                          })
-                          .slice(0, 5);
-                      }
-                      
-                      // ULTIMATE FALLBACK: If still no shops and no location, show first 5 shops alphabetically
-                      if (shopsToShow.length === 0 && filteredShops.length > 0) {
-                        shopsToShow = filteredShops
-                          .filter(shop => shop.latitude && shop.longitude)
-                          .slice(0, 5);
-                      }
-                      
-                      if (shopsToShow.length === 0) {
-                        return (
-                          <div className="space-y-2 pr-2">
-                            {[1, 2, 3].map((i) => (
-                              <div key={i} className="flex items-center gap-2 p-1.5 rounded bg-muted/50">
-                                <div className="flex-1 space-y-1">
-                                  <Skeleton className="h-3 w-3/4" />
-                                  <Skeleton className="h-2 w-1/2" />
-                                </div>
-                                <Skeleton className="h-6 w-6 rounded" />
-                              </div>
-                            ))}
-                            <p className="text-[10px] text-center text-muted-foreground">Getting your location...</p>
-                          </div>
-                        );
-                      }
-                      
-                      return (
-                        <div className="space-y-1 pr-2">
-                          {shopsToShow.slice(0, 10).map((shop) => {
-                            // Calculate distance from map center (not just user location)
-                            const refLoc = mapCenterLocation || userLocation;
-                            const distance = refLoc && shop.latitude && shop.longitude
-                              ? calculateDistance(refLoc.lat, refLoc.lng, Number(shop.latitude), Number(shop.longitude))
-                              : null;
-                            
-                            return (
-                              <div 
-                                key={shop.id}
-                                className="flex items-center gap-2 p-1.5 rounded bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
-                                onClick={() => {
-                                  setMapCenter([Number(shop.longitude), Number(shop.latitude)]);
-                                  setMapZoom(15);
-                                  setHighlightedShopId(shop.id);
-                                }}
-                              >
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-semibold text-xs truncate">{shop.name}</p>
-                                  <p className="text-[10px] text-muted-foreground truncate">
-                                    {shop.city}
-                                    {distance !== null && ` • ${distance < 1 ? `${Math.round(distance * 1000)}m` : distance < 10 ? `${distance.toFixed(1)}km` : `${Math.round(distance)}km`}`}
-                                  </p>
-                                </div>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    addToJourney(shop);
-                                  }}
-                                  className="flex-shrink-0 h-6 w-6 p-0 hover:bg-directions/10 hover:text-directions"
-                                  disabled={isInJourney(shop.id)}
-                                >
-                                  {isInJourney(shop.id) ? <Check className="w-3 h-3 text-directions" /> : <Plus className="w-3 h-3" />}
-                                </Button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })()}
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </main>
