@@ -439,9 +439,11 @@ const Directions = () => {
   // Handle map center change for distance calculations and position persistence
   const handleMapCenterChange = useCallback((center: { lat: number; lng: number; zoom: number }) => {
     setMapCenterLocation(center);
-    // Update mapCenter and mapZoom for persistence
-    setMapCenter([center.lng, center.lat]);
-    setMapZoom(center.zoom);
+    // Only update for persistence, do NOT update mapCenter to avoid re-render loop
+    sessionStorage.setItem('heardrop_map_position', JSON.stringify({
+      center: [center.lng, center.lat],
+      zoom: center.zoom
+    }));
   }, []);
 
   // Center map on a shop when clicked from bottom sheet

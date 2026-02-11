@@ -230,16 +230,18 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   return (
     <div
       ref={sheetRef}
-      className="lg:hidden fixed left-0 right-0 z-40"
+      className="lg:hidden fixed left-0 right-0 z-40 pointer-events-none"
       style={{
         height: `calc(${heightPercent}vh + 64px)`,
         bottom: 0,
-        paddingBottom: '64px', // Space for tab bar
+        paddingBottom: '64px',
         transform: 'translateY(0)',
-        touchAction: isDragging ? 'none' : 'auto',
       }}
     >
-      <Card className="h-full flex flex-col bg-background/98 backdrop-blur-lg border-t-2 border-x border-directions/30 rounded-t-2xl shadow-2xl overflow-hidden">
+      <Card
+        className="h-full flex flex-col bg-background/98 backdrop-blur-lg border-t-2 border-x border-directions/30 rounded-t-2xl shadow-2xl overflow-hidden pointer-events-auto"
+        style={{ touchAction: isDragging ? 'none' : 'pan-y' }}
+      >
         {/* Drag Handle Area */}
         <div
           className="flex-shrink-0 cursor-grab active:cursor-grabbing select-none touch-none"

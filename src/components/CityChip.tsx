@@ -3,7 +3,7 @@ import { MapPin, ChevronDown } from "lucide-react";
 
 interface City {
   name: string;
-  center: [number, number]; // [lng, lat]
+  center: [number, number];
   zoom: number;
 }
 
@@ -22,27 +22,23 @@ interface CityChipProps {
 
 export const CityChip = ({ onCitySelect, currentCity }: CityChipProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const activeCityName = currentCity || "London";
+  const [selectedCity, setSelectedCity] = useState(currentCity || "London");
 
   return (
     <div className="absolute top-4 lg:top-16 left-1/2 -translate-x-1/2 z-20">
-      {/* Main chip */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 backdrop-blur-md border border-white/10 shadow-lg hover:bg-black/90 transition-all"
       >
         <MapPin className="w-3.5 h-3.5 text-white/70" />
         <span className="text-sm font-semibold text-white tracking-wide">
-          {activeCityName}
+          {selectedCity}
         </span>
         <ChevronDown className={`w-3.5 h-3.5 text-white/50 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <>
-          {/* Backdrop to close */}
           <div
             className="fixed inset-0 z-[-1]"
             onClick={() => setIsOpen(false)}
@@ -53,10 +49,11 @@ export const CityChip = ({ onCitySelect, currentCity }: CityChipProps) => {
                 key={city.name}
                 onClick={() => {
                   onCitySelect(city.center, city.zoom);
+                  setSelectedCity(city.name);
                   setIsOpen(false);
                 }}
                 className={`w-full px-4 py-2.5 text-left text-sm transition-colors flex items-center gap-2 ${
-                  city.name === activeCityName
+                  city.name === selectedCity
                     ? "text-white bg-white/10 font-semibold"
                     : "text-white/70 hover:text-white hover:bg-white/5"
                 }`}
