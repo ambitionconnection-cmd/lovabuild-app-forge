@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import Map from "@/components/Map";
 import { ShopDetailsModal } from "@/components/ShopDetailsModal";
 import { ShopsBottomSheet } from "@/components/ShopsBottomSheet";
+import { RouteBottomSheet } from "@/components/RouteBottomSheet";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import haptic from "@/lib/haptics";
@@ -96,6 +97,7 @@ const SortableStop = ({ stop, index, onRemove }: SortableStopProps) => {
 
 const Directions = () => {
   const [searchParams] = useSearchParams();
+  const isRouteMode = searchParams.get('mode') === 'route';
   const navigate = useNavigate();
   const [shops, setShops] = useState<ShopType[]>([]);
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
@@ -826,20 +828,42 @@ const Directions = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Mobile Bottom Sheet for Shops */}
-      <ShopsBottomSheet
-        shops={filteredShops}
-        visibleShops={visibleShops}
-        onShopClick={handleShopClickFromSheet}
-        onAddToJourney={addToJourney}
-        onOpenDetails={openShopDetails}
-        isInJourney={isInJourney}
-        selectedShopId={selectedShop?.id}
-        userLocation={userLocation}
-        calculateDistance={calculateDistance}
-        mapCenterLocation={mapCenterLocation}
-        isLoadingLocation={!userLocation && loading}
-      />
+      {/* Mobile Bottom Sheet - Route mode or Shops mode */}
+      {isRouteMode ? (
+        <RouteBottomSheet
+          journeyStops={journeyStops}
+          onRemoveStop={removeFromJourney}
+          onClearAll={() => setJourneyStops([])}
+          onStartNavigation={() => {
+            const allWaypoints: string[] = [];
+            if (userLocation) {
+              allWaypoints.push(`${userLocation.lat},${userLocation.lng}`);
+            }
+            journeyStops.forEach(stop => {
+              allWaypoints.push(`${stop.latitude},${stop.longitude}`);
+            });
+            window.open(`https://www.google.com/maps/dir/${allWaypoints.join('/')}`, '_blank');
+          }}
+          userLocation={userLocation}
+          onShopClick={handleShopClickFromSheet}
+          calculateDistance={calculateDistance}
+          routeInfo={routeInfo}
+        />
+      ) : (
+        <ShopsBottomSheet
+          shops={filteredShops}
+          visibleShops={visibleShops}
+          onShopClick={handleShopClickFromSheet}
+          onAddToJourney={addToJourney}
+          onOpenDetails={openShopDetails}
+          isInJourney={isInJourney}
+          selectedShopId={selectedShop?.id}
+          userLocation={userLocation}
+          calculateDistance={calculateDistance}
+          mapCenterLocation={mapCenterLocation}
+          isLoadingLocation={!userLocation && loading}
+        />
+      )}
 
       {/* Shop Details Modal */}
       <ShopDetailsModal
