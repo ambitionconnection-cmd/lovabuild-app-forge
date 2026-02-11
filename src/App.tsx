@@ -23,6 +23,7 @@ import NotificationHistory from "./pages/NotificationHistory";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import More from "./pages/More";
+import RoutePage from "./pages/RoutePage";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ function App() {
               <Route path="/index" element={<Directions />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/route" element={<RoutePage />} />
               <Route path="/more" element={<More />} />
               <Route path="*" element={<NotFound />} />
              </Routes>
