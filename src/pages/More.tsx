@@ -76,13 +76,13 @@ const More = () => {
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col">
-      <div className="flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16">
-        <h1 className="text-2xl font-bold text-white tracking-wider uppercase">More</h1>
-        <p className="text-sm text-white/40 mt-1">Settings, favourites & more</p>
+      <div className="flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16 lg:px-12">
+        <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-wider uppercase">More</h1>
+        <p className="text-sm lg:text-base text-white/40 mt-1">Settings, favourites & more</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-20">
-        <div className="space-y-1">
+      <div className="flex-1 overflow-y-auto px-4 lg:px-12 pb-20">
+        <div className="space-y-1 lg:max-w-2xl">
           {visibleItems.map((item) => {
             const Icon = item.icon;
             const needsLogin = item.requiresAuth && !user;
@@ -93,12 +93,12 @@ const More = () => {
                 onClick={() => handleItemClick(item)}
                 className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors text-left"
               >
-                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-white/70" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-5 h-5 lg:w-6 lg:h-6 text-white/70" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium text-sm">{item.label}</p>
-                  <p className="text-white/40 text-xs mt-0.5">{item.description}</p>
+                  <p className="text-white font-medium text-sm lg:text-base">{item.label}</p>
+                  <p className="text-white/40 text-xs lg:text-sm mt-0.5">{item.description}</p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {needsLogin && (

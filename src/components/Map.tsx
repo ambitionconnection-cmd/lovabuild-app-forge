@@ -159,6 +159,8 @@ const Map: React.FC<MapProps> = ({
       style: 'mapbox://styles/mapbox/streets-v12',
       center: startCenter,
       zoom: startZoom,
+      touchPitch: true,
+      dragRotate: true,
     });
     
     mapLog.init('Map instance created');
