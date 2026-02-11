@@ -7,27 +7,27 @@ interface TabItem {
   icon: typeof Map;
   label: string;
   path: string;
+  activeColor: string;
+  activeTextColor: string;
 }
 
 const tabs: TabItem[] = [
-  { icon: Map, label: "Map", path: "/" },
-  { icon: Route, label: "Route", path: "/route" },
-  { icon: Globe, label: "Index", path: "/global-index" },
-  { icon: Flame, label: "Drops", path: "/drops" },
-  { icon: MoreHorizontal, label: "More", path: "/more" },
+  { icon: Map, label: "Map", path: "/", activeColor: "text-[#AD3A49]", activeTextColor: "text-[#AD3A49]" },
+  { icon: Route, label: "Route", path: "/route", activeColor: "text-[#C4956A]", activeTextColor: "text-[#C4956A]" },
+  { icon: Globe, label: "Index", path: "/global-index", activeColor: "text-[#C3C9C9]", activeTextColor: "text-[#C3C9C9]" },
+  { icon: Flame, label: "Drops", path: "/drops", activeColor: "text-[#8B6DAF]", activeTextColor: "text-[#8B6DAF]" },
+  { icon: MoreHorizontal, label: "More", path: "/more", activeColor: "text-[#7D8184]", activeTextColor: "text-[#7D8184]" },
 ];
 
 export const BottomTabBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Hide on admin, auth, and detail pages
   const hiddenRoutes = ["/admin", "/auth", "/analytics", "/notifications"];
   if (hiddenRoutes.some(route => location.pathname.startsWith(route))) {
     return null;
   }
 
-  // Determine active tab - "/" and "/directions" both highlight Map
   const getIsActive = (tabPath: string) => {
     if (tabPath === "/") {
       return location.pathname === "/" || location.pathname === "/directions";
@@ -53,8 +53,8 @@ export const BottomTabBar = () => {
                 "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all",
                 "active:scale-90 active:opacity-70 touch-manipulation select-none",
                 isActive
-                  ? "text-white"
-                  : "text-white/40 hover:text-white/70"
+                  ? tab.activeColor
+                  : "text-white/30 hover:text-white/50"
               )}
             >
               <Icon

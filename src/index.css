@@ -44,18 +44,18 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    /* HEARDROP Brand Colors - Enhanced Vibrancy */
-    --directions: 186 95% 55%;
-    --directions-foreground: 220 20% 8%;
+    /* HEARDROP Brand Colors - Japanese Streetwear Palette */
+    --directions: 352 51% 45%;
+    --directions-foreground: 0 0% 98%;
 
-    --global: 142 90% 60%;
-    --global-foreground: 220 20% 8%;
+    --global: 180 4% 78%;
+    --global-foreground: 240 14% 2%;
 
-    --drops: 271 85% 65%;
+    --drops: 352 51% 55%;
     --drops-foreground: 0 0% 98%;
 
-    --heardrop: 25 95% 53%;
-    --heardrop-foreground: 220 20% 8%;
+    --heardrop: 352 51% 45%;
+    --heardrop-foreground: 0 0% 98%;
 
     /* Utility Colors */
     --logo-red: 0 100% 50%;
@@ -111,33 +111,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 217 32% 17%;
-    --card-foreground: 210 40% 98%;
-    --popover: 215 24% 26%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 198 93% 59%;
-    --primary-foreground: 204 80% 15%;
-    --secondary: 212 26% 83%;
-    --secondary-foreground: 228 84% 4%;
-    --muted: 215 16% 46%;
-    --muted-foreground: 210 40% 98%;
-    --accent: 228 84% 4%;
-    --accent-foreground: 215 20% 65%;
+    --background: 240 14% 2%;
+    --foreground: 180 4% 78%;
+    --card: 240 10% 6%;
+    --card-foreground: 180 4% 78%;
+    --popover: 240 10% 8%;
+    --popover-foreground: 180 4% 78%;
+    --primary: 352 51% 45%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 10% 12%;
+    --secondary-foreground: 180 4% 78%;
+    --muted: 206 2% 50%;
+    --muted-foreground: 60 2% 63%;
+    --accent: 240 10% 10%;
+    --accent-foreground: 180 4% 78%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 85% 97%;
-    --border: 215 19% 34%;
-    --input: 215 19% 34%;
-    --ring: 198 93% 59%;
+    --border: 240 5% 15%;
+    --input: 240 5% 15%;
+    --ring: 352 51% 45%;
     --chart-1: 199 95% 73%;
     --chart-2: 211 96% 78%;
     --chart-3: 215 20% 65%;
     --chart-4: 215 16% 46%;
     --chart-5: 215 19% 34%;
-    --sidebar: 217 32% 17%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 198 93% 59%;
+    --sidebar: 240 10% 6%;
+    --sidebar-foreground: 180 4% 78%;
+    --sidebar-primary: 352 51% 45%;
     --sidebar-primary-foreground: 204 80% 15%;
     --sidebar-accent: 215 20% 65%;
     --sidebar-accent-foreground: 228 84% 4%;

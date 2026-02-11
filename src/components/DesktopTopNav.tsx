@@ -2,12 +2,20 @@ import { Map, Route, Globe, Flame, MoreHorizontal } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-const tabs = [
-  { icon: Map, label: "Map", path: "/" },
-  { icon: Route, label: "Route", path: "/route" },
-  { icon: Globe, label: "Index", path: "/global-index" },
-  { icon: Flame, label: "Drops", path: "/drops" },
-  { icon: MoreHorizontal, label: "More", path: "/more" },
+interface TabItem {
+  icon: typeof Map;
+  label: string;
+  path: string;
+  activeColor: string;
+  borderColor: string;
+}
+
+const tabs: TabItem[] = [
+  { icon: Map, label: "Map", path: "/", activeColor: "text-[#AD3A49]", borderColor: "border-[#AD3A49]" },
+  { icon: Route, label: "Route", path: "/route", activeColor: "text-[#C4956A]", borderColor: "border-[#C4956A]" },
+  { icon: Globe, label: "Index", path: "/global-index", activeColor: "text-[#C3C9C9]", borderColor: "border-[#C3C9C9]" },
+  { icon: Flame, label: "Drops", path: "/drops", activeColor: "text-[#8B6DAF]", borderColor: "border-[#8B6DAF]" },
+  { icon: MoreHorizontal, label: "More", path: "/more", activeColor: "text-[#7D8184]", borderColor: "border-[#7D8184]" },
 ];
 
 export const DesktopTopNav = () => {
@@ -22,36 +30,41 @@ export const DesktopTopNav = () => {
   };
 
   return (
-    <nav className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-12 bg-black/95 backdrop-blur-lg border-b border-white/10 items-center px-6 gap-1">
-      {/* Logo */}
-      <div className="flex items-center gap-2 mr-6">
-        <div className="w-6 h-6 rounded border border-white/20 flex items-center justify-center">
-          <span className="text-white font-bold text-xs">H</span>
+    <nav className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-12 bg-black/95 backdrop-blur-lg border-b border-white/10 items-center px-6">
+      {/* Logo - left */}
+      <div className="flex items-center gap-2 mr-8">
+        <div className="w-6 h-6 rounded border border-[#AD3A49]/50 flex items-center justify-center">
+          <span className="text-[#AD3A49] font-bold text-xs">H</span>
         </div>
         <span className="text-white font-bold text-sm tracking-wider">HEARDROP</span>
       </div>
 
-      {/* Nav tabs */}
-      {tabs.map((tab) => {
-        const isActive = getIsActive(tab.path);
-        const Icon = tab.icon;
+      {/* Nav tabs - centered */}
+      <div className="flex-1 flex items-center justify-center gap-1">
+        {tabs.map((tab) => {
+          const isActive = getIsActive(tab.path);
+          const Icon = tab.icon;
 
-        return (
-          <button
-            key={tab.path}
-            onClick={() => navigate(tab.path)}
-            className={cn(
-              "flex items-center gap-2 px-4 h-full text-sm font-medium transition-all border-b-2",
-              isActive
-                ? "text-white border-white"
-                : "text-white/40 border-transparent hover:text-white/70"
-            )}
-          >
-            <Icon className="w-4 h-4" />
-            {tab.label}
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={tab.path}
+              onClick={() => navigate(tab.path)}
+              className={cn(
+                "flex items-center gap-2 px-5 h-12 text-sm font-medium transition-all border-b-2",
+                isActive
+                  ? `${tab.activeColor} ${tab.borderColor}`
+                  : "text-white/30 border-transparent hover:text-white/50"
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Spacer to balance the logo on the left */}
+      <div className="w-[120px]" />
     </nav>
   );
 };
