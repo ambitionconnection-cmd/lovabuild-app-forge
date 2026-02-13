@@ -47,7 +47,17 @@ export const BottomTabBar = () => {
               key={tab.path}
               onClick={() => {
                 haptic.selection();
-                navigate(tab.path);
+                if (tab.path === '/') {
+                  window.dispatchEvent(new CustomEvent('reopenShopsSheet'));
+                  if (location.pathname !== '/' || location.search) {
+                    navigate('/');
+                  }
+                } else if (tab.path === '/route') {
+                  window.dispatchEvent(new CustomEvent('reopenRouteSheet'));
+                  navigate(tab.path);
+                } else {
+                  navigate(tab.path);
+                }
               }}
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all",

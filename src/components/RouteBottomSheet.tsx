@@ -9,9 +9,10 @@ import { toast } from '@/hooks/use-toast';
 import haptic from '@/lib/haptics';
 
 type ShopType = Tables<'shops_public'>;
-type SheetState = 'peek' | 'expanded' | 'full';
+type SheetState = 'closed' | 'peek' | 'expanded' | 'full';
 
 const SHEET_HEIGHTS = {
+  closed: 0,
   peek: 12,
   expanded: 55,
   full: 90,
@@ -74,7 +75,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
     if (!isDragging) return;
     setIsDragging(false);
     const offset = dragOffsetRef.current;
-    const states: SheetState[] = ['peek', 'expanded', 'full'];
+    const states: SheetState[] = ['closed', 'peek', 'expanded', 'full'];
     const currentIndex = states.indexOf(sheetState);
 
     if (offset < -SNAP_THRESHOLD && currentIndex < states.length - 1) {
@@ -105,6 +106,16 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
     };
   }, [isDragging, sheetState]);
 
+  // Listen for reopen event from tab bar
+  useEffect(() => {
+    const handleReopen = () => {
+      setSheetState('peek');
+      haptic.light();
+    };
+    window.addEventListener('reopenRouteSheet', handleReopen);
+    return () => window.removeEventListener('reopenRouteSheet', handleReopen);
+  }, []);
+
   const heightPercent = getHeightPercent();
 
   const formatDistance = (distance: number) => {
@@ -125,7 +136,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
 
   return (
     <div
-      className="lg:hidden fixed left-0 right-0 z-40 pointer-events-none"
+      className={`lg:hidden fixed left-0 right-0 z-40 pointer-events-none transition-all duration-300 ${sheetState === 'closed' ? 'translate-y-full' : ''}`}
       style={{
         height: `calc(${heightPercent}vh + 64px)`,
         bottom: 0,
@@ -162,10 +173,10 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (sheetState === 'peek') {
+                  if (sheetState === 'closed' || sheetState === 'peek') {
                     setSheetState('expanded');
                   } else {
-                    setSheetState('peek');
+                    setSheetState('closed');
                   }
                   haptic.light();
                 }}

@@ -11,7 +11,7 @@ import haptic from '@/lib/haptics';
 
 type ShopType = Tables<'shops_public'>;
 
-type SheetState = 'peek' | 'expanded' | 'full';
+type SheetState = 'closed' | 'peek' | 'expanded' | 'full';
 
 interface ShopsBottomSheetProps {
   shops: ShopType[];
@@ -28,9 +28,10 @@ interface ShopsBottomSheetProps {
 }
 
 const SHEET_HEIGHTS = {
-  peek: 15,      // 15% of viewport
-  expanded: 55,  // 55% of viewport
-  full: 90,      // 90% of viewport
+  closed: 0,
+  peek: 15,
+  expanded: 55,
+  full: 90,
 };
 
 const SNAP_THRESHOLD = 50; // pixels needed to trigger snap to next state
@@ -173,7 +174,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
     setIsDragging(false);
 
     const offset = dragOffsetRef.current;
-    const states: SheetState[] = ['peek', 'expanded', 'full'];
+    const states: SheetState[] = ['closed', 'peek', 'expanded', 'full'];
     const currentIndex = states.indexOf(sheetState);
 
     // Use drag direction and distance to decide
@@ -214,6 +215,15 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
     };
   }, [isDragging, sheetState]);
 
+  // Listen for reopen event from tab bar
+  useEffect(() => {
+    const handleReopen = () => {
+      setSheetState('peek');
+      haptic.light();
+    };
+    window.addEventListener('reopenShopsSheet', handleReopen);
+    return () => window.removeEventListener('reopenShopsSheet', handleReopen);
+  }, []);
   const heightPercent = getHeightPercent();
 
   // Format distance for display
@@ -230,12 +240,11 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   return (
     <div
       ref={sheetRef}
-      className="lg:hidden fixed left-0 right-0 z-40 pointer-events-none"
+      className={`lg:hidden fixed left-0 right-0 z-40 pointer-events-none transition-all duration-300 ${sheetState === 'closed' ? 'translate-y-full' : ''}`}
       style={{
         height: `calc(${heightPercent}vh + 64px)`,
         bottom: 0,
         paddingBottom: '64px',
-        transform: 'translateY(0)',
       }}
     >
       <Card
@@ -280,19 +289,24 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
             </div>
             
             <div className="flex items-center gap-2 flex-shrink-0">
-              {sheetState !== 'peek' && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSheetState('peek');
-                    haptic.light();
-                  }}
-                  className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                >
-                  <span className="text-xs text-muted-foreground">✕</span>
-                </button>
-              )}
-              <ChevronUp className={`w-4 h-4 text-muted-foreground transition-transform ${sheetState === 'full' ? 'rotate-180' : ''}`} />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (sheetState === 'closed' || sheetState === 'peek') {
+                    setSheetState('expanded');
+                  } else {
+                    setSheetState('closed');
+                  }
+                  haptic.light();
+                }}
+                className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                {sheetState === 'closed' || sheetState === 'peek' ? (
+                  <ChevronUp className="w-3.5 h-3.5 text-white/60" />
+                ) : (
+                  <span className="text-xs text-white/60">✕</span>
+                )}
+              </button>
             </div>
           </div>
         </div>

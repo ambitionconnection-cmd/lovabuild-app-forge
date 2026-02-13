@@ -402,3 +402,18 @@ button, [role="button"], a {
 .dark .shop-popup-custom .mapboxgl-popup-tip {
   border-top-color: hsl(var(--card));
 }
+
+/* Hide default Mapbox geolocate button - we use custom recenter */
+.mapboxgl-ctrl-geolocate {
+  display: none !important;
+}
+
+/* Hide default Mapbox geolocate button - we use custom recenter */
+.mapboxgl-ctrl-geolocate {
+  display: none !important;
+}
+
+/* Hide default Mapbox geolocate button - we use custom recenter */
+.mapboxgl-ctrl-geolocate {
+  display: none !important;
+}

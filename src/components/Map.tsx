@@ -159,8 +159,9 @@ const Map: React.FC<MapProps> = ({
       style: 'mapbox://styles/mapbox/streets-v12',
       center: startCenter,
       zoom: startZoom,
-      touchPitch: true,
-      dragRotate: true,
+      touchPitch: false,
+      dragRotate: false,
+      touchZoomRotate: true,
     });
     
     mapLog.init('Map instance created');
@@ -1040,16 +1041,16 @@ const Map: React.FC<MapProps> = ({
         message={loadingMessage}
       />
       
-      {/* Recenter button - mid right, always visible */}
+      {/* Recenter button - next to city chip at top */}
       {userLocation && (
         <Button
           onClick={handleRecenter}
           size="icon"
           variant="secondary"
-          className="absolute top-1/3 right-3 z-10 h-10 w-10 rounded-full shadow-lg bg-black/80 backdrop-blur-md border border-white/20 hover:bg-black/90"
+          className="absolute top-4 lg:top-16 right-3 z-20 h-9 w-9 rounded-full shadow-lg bg-black/80 backdrop-blur-md border border-white/10 hover:bg-black/90"
           title="Recenter on my location"
         >
-          <Crosshair className="h-5 w-5 text-white" />
+          <Crosshair className="h-4 w-4 text-white" />
         </Button>
       )}
       
