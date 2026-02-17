@@ -108,7 +108,7 @@ const Map: React.FC<MapProps> = ({
 
   useEffect(() => {
     mapLog.init('Debug mode enabled:', DEBUG_MAP);
-    setMapboxToken('pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ');
+    setMapboxToken(import.meta.env.VITE_MAPBOX_TOKEN || '');
   }, []);
 
   // Store initial values in refs so they don't cause re-renders
