@@ -224,6 +224,13 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
     window.addEventListener('reopenShopsSheet', handleReopen);
     return () => window.removeEventListener('reopenShopsSheet', handleReopen);
   }, []);
+
+  // Auto-expand when a shop is selected from pin tap
+  useEffect(() => {
+    if (selectedShopId && sheetState === 'peek') {
+      setSheetState('expanded');
+    }
+  }, [selectedShopId]);
   const heightPercent = getHeightPercent();
 
   // Format distance for display
