@@ -49,12 +49,15 @@ export const BottomTabBar = () => {
                 haptic.selection();
                 if (tab.path === '/') {
                   window.dispatchEvent(new CustomEvent('reopenShopsSheet'));
-                  if (location.pathname !== '/' || location.search) {
+                  if (location.pathname !== '/') {
                     navigate('/');
                   }
                 } else if (tab.path === '/route') {
+                  window.dispatchEvent(new CustomEvent('switchToRouteMode'));
                   window.dispatchEvent(new CustomEvent('reopenRouteSheet'));
-                  navigate(tab.path);
+                  if (location.pathname !== '/') {
+                    navigate('/');
+                  }
                 } else {
                   navigate(tab.path);
                 }

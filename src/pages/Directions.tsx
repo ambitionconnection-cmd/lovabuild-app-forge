@@ -97,8 +97,24 @@ const SortableStop = ({ stop, index, onRemove }: SortableStopProps) => {
 
 const Directions = () => {
   const [searchParams] = useSearchParams();
-  const isRouteMode = searchParams.get('mode') === 'route';
+  const [isRouteMode, setIsRouteMode] = useState(searchParams.get('mode') === 'route');
   const navigate = useNavigate();
+
+  // Listen for mode switches from tab bar (no remount)
+  useEffect(() => {
+    const handleRouteMode = () => {
+      setIsRouteMode(true);
+    };
+    const handleMapMode = () => {
+      setIsRouteMode(false);
+    };
+    window.addEventListener('switchToRouteMode', handleRouteMode);
+    window.addEventListener('reopenShopsSheet', handleMapMode);
+    return () => {
+      window.removeEventListener('switchToRouteMode', handleRouteMode);
+      window.removeEventListener('reopenShopsSheet', handleMapMode);
+    };
+  }, []);
   const [shops, setShops] = useState<ShopType[]>([]);
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -549,7 +565,7 @@ const Directions = () => {
                 {/* Journey Stops Overlay - Draggable floating panel */}
                 {journeyStops.length > 0 && (
                   <div 
-                    className="absolute z-10 lg:max-w-[200px] select-none"
+                    className="hidden lg:block absolute z-10 lg:max-w-[200px] select-none"
                     style={{
                       left: `${journeyPanelPosition.x}px`,
                       bottom: `${80 - journeyPanelPosition.y}px`,
