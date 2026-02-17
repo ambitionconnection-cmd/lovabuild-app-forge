@@ -13,7 +13,7 @@ interface TabItem {
 }
 
 const tabs: TabItem[] = [
-  { icon: Map, label: "Map", path: "/", activeColor: "text-[#AD3A49]", activeTextColor: "text-[#AD3A49]" },
+  { icon: Map, label: "Nearby", path: "/", activeColor: "text-[#AD3A49]", activeTextColor: "text-[#AD3A49]" },
   { icon: Route, label: "Route", path: "/route", activeColor: "text-[#C4956A]", activeTextColor: "text-[#C4956A]" },
   { icon: Globe, label: "Index", path: "/global-index", activeColor: "text-[#C3C9C9]", activeTextColor: "text-[#C3C9C9]" },
   { icon: Flame, label: "Drops", path: "/drops", activeColor: "text-[#8B6DAF]", activeTextColor: "text-[#8B6DAF]" },
