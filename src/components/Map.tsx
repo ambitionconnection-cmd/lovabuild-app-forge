@@ -877,13 +877,20 @@ const Map: React.FC<MapProps> = ({
             source: 'shops',
             filter: ['!', ['has', 'point_count']],
             layout: {
-              'text-field': ['slice', ['get', 'name'], 0, 1],
-              'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
-              'text-size': 12,
-              'text-allow-overlap': true,
+              'text-field': ['get', 'name'],
+              'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
+              'text-size': 11,
+              'text-anchor': 'left',
+              'text-offset': [1.5, 0],
+              'text-max-width': 10,
+              'text-allow-overlap': false,
+              'text-optional': true,
             },
             paint: {
-              'text-color': '#ffffff',
+              'text-color': '#1a1a1a',
+              'text-halo-color': '#ffffff',
+              'text-halo-width': 1.5,
+              'text-halo-blur': 0.5,
             }
           });
           mapLog.layers('Layer "shop-labels" added');
@@ -892,7 +899,7 @@ const Map: React.FC<MapProps> = ({
           // Make circles transparent but keep them clickable for popup functionality
           map.current.setPaintProperty('unclustered-point', 'circle-opacity', 0);
           map.current.setPaintProperty('unclustered-point', 'circle-stroke-opacity', 0);
-          map.current.setLayoutProperty('shop-labels', 'visibility', 'none');
+          // Shop name labels visible by default
                     // Create logo markers for each shop
           shopsWithCoords.forEach(shop => {
             const brand = shop.brand_id ? brandsRef.current.find(b => b.id === shop.brand_id) : null;
@@ -1056,7 +1063,7 @@ const Map: React.FC<MapProps> = ({
       
       {/* Debug overlay - only shown when debug mode is enabled */}
       {DEBUG_MAP && (
-        <div className="absolute top-2 left-2 z-20 bg-background/90 backdrop-blur-sm border border-border rounded-md px-2 py-1 text-xs font-mono">
+        <div className="hidden lg:block absolute top-14 left-2 z-20 bg-background/90 backdrop-blur-sm border border-border rounded-md px-2 py-1 text-xs font-mono">
           <div className="flex items-center gap-2">
             <span>🗺️</span>
             <span>Shops: {debugStats.shopsTotal}</span>
