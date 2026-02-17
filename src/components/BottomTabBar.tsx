@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Map, Route, Globe, Flame, MoreHorizontal } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -28,9 +29,25 @@ export const BottomTabBar = () => {
     return null;
   }
 
+  const [isRouteActive, setIsRouteActive] = useState(false);
+
+  useEffect(() => {
+    const handleRouteMode = () => setIsRouteActive(true);
+    const handleMapMode = () => setIsRouteActive(false);
+    window.addEventListener('switchToRouteMode', handleRouteMode);
+    window.addEventListener('reopenShopsSheet', handleMapMode);
+    return () => {
+      window.removeEventListener('switchToRouteMode', handleRouteMode);
+      window.removeEventListener('reopenShopsSheet', handleMapMode);
+    };
+  }, []);
+
   const getIsActive = (tabPath: string) => {
-    if (tabPath === "/") {
-      return location.pathname === "/" || location.pathname === "/directions";
+    if (tabPath === '/route') {
+      return isRouteActive && location.pathname === '/';
+    }
+    if (tabPath === '/') {
+      return (location.pathname === '/' || location.pathname === '/directions') && !isRouteActive;
     }
     return location.pathname.startsWith(tabPath);
   };

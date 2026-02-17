@@ -1,4 +1,5 @@
 import { DesktopSidePanel } from "@/components/DesktopSidePanel";
+import { RouteSidePanel } from "@/components/RouteSidePanel";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -580,7 +581,7 @@ const Directions = () => {
                 {/* Journey Stops Overlay - Draggable floating panel */}
                 {journeyStops.length > 0 && (
                   <div 
-                    className="hidden lg:block absolute z-10 lg:max-w-[200px] select-none"
+                    className="hidden select-none"
                     style={{
                       left: `${journeyPanelPosition.x}px`,
                       bottom: `${80 - journeyPanelPosition.y}px`,
@@ -680,21 +681,42 @@ const Directions = () => {
                 {/* Removed mobile shops toggle button - bottom sheet is always visible */}
 
                 {/* Desktop Side Panel */}
-                <DesktopSidePanel
-                  shops={filteredShops}
-                  visibleShops={visibleShops}
-                  onShopClick={handleShopClickFromSheet}
-                  onAddToJourney={addToJourney}
-                  onOpenDetails={openShopDetails}
-                  isInJourney={isInJourney}
-                  selectedShopId={selectedShop?.id}
-                  highlightedShopId={highlightedShopId}
-                  userLocation={userLocation}
-                  mapCenterLocation={mapCenterLocation}
-                  calculateDistance={calculateDistance}
-                  searchQuery={searchQuery}
-                  onSearchChange={setSearchQuery}
-                />
+                {isRouteMode ? (
+                  <RouteSidePanel
+                    journeyStops={journeyStops}
+                    onRemoveStop={(id) => setJourneyStops(prev => prev.filter(s => s.id !== id))}
+                    onClearAll={() => setJourneyStops([])}
+                    onStartNavigation={() => {
+                      const allWaypoints: string[] = [];
+                      if (userLocation) {
+                        allWaypoints.push(`${userLocation.lat},${userLocation.lng}`);
+                      }
+                      journeyStops.forEach(stop => {
+                        allWaypoints.push(`${stop.latitude},${stop.longitude}`);
+                      });
+                      window.open(`https://www.google.com/maps/dir/${allWaypoints.join('/')}`, '_blank');
+                    }}
+                    onShopClick={handleShopClickFromSheet}
+                    userLocation={userLocation}
+                    calculateDistance={calculateDistance}
+                  />
+                ) : (
+                  <DesktopSidePanel
+                    shops={filteredShops}
+                    visibleShops={visibleShops}
+                    onShopClick={handleShopClickFromSheet}
+                    onAddToJourney={addToJourney}
+                    onOpenDetails={openShopDetails}
+                    isInJourney={isInJourney}
+                    selectedShopId={selectedShop?.id}
+                    highlightedShopId={highlightedShopId}
+                    userLocation={userLocation}
+                    mapCenterLocation={mapCenterLocation}
+                    calculateDistance={calculateDistance}
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                  />
+                )}
                 {/* City Selector Chip */}
                 <CityChip
                   onCitySelect={(center, zoom) => {

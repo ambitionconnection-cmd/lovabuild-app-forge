@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Map, Route, Globe, Flame, MoreHorizontal } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -22,9 +23,25 @@ export const DesktopTopNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [isRouteActive, setIsRouteActive] = useState(false);
+
+  useEffect(() => {
+    const handleRouteMode = () => setIsRouteActive(true);
+    const handleMapMode = () => setIsRouteActive(false);
+    window.addEventListener('switchToRouteMode', handleRouteMode);
+    window.addEventListener('reopenShopsSheet', handleMapMode);
+    return () => {
+      window.removeEventListener('switchToRouteMode', handleRouteMode);
+      window.removeEventListener('reopenShopsSheet', handleMapMode);
+    };
+  }, []);
+
   const getIsActive = (tabPath: string) => {
-    if (tabPath === "/") {
-      return location.pathname === "/" || location.pathname === "/directions";
+    if (tabPath === '/route') {
+      return isRouteActive && location.pathname === '/';
+    }
+    if (tabPath === '/') {
+      return (location.pathname === '/' || location.pathname === '/directions') && !isRouteActive;
     }
     return location.pathname.startsWith(tabPath);
   };
@@ -48,7 +65,22 @@ export const DesktopTopNav = () => {
           return (
             <button
               key={tab.path}
-              onClick={() => navigate(tab.path)}
+              onClick={() => {
+                if (tab.path === '/') {
+                  window.dispatchEvent(new CustomEvent('reopenShopsSheet'));
+                  if (location.pathname !== '/') {
+                    navigate('/');
+                  }
+                } else if (tab.path === '/route') {
+                  window.dispatchEvent(new CustomEvent('switchToRouteMode'));
+                  window.dispatchEvent(new CustomEvent('reopenRouteSheet'));
+                  if (location.pathname !== '/') {
+                    navigate('/');
+                  }
+                } else {
+                  navigate(tab.path);
+                }
+              }}
               className={cn(
                 "flex items-center gap-2 px-5 h-12 text-sm font-medium transition-all border-b-2",
                 isActive
