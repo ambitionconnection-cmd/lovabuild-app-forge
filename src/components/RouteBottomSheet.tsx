@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { saveRoute, printRoute, shareRoute } from '@/lib/routeActions';
 import { Navigation, Save, Printer, Share2, X, GripVertical, Trash2, MapPin, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -125,13 +126,13 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
   };
 
   const handleSave = () => {
-    toast({ title: "Coming Soon", description: "Save route feature will be available in the next update." });
+    saveRoute(journeyStops, userLocation);
   };
   const handlePrint = () => {
-    toast({ title: "Coming Soon", description: "PDF export will be available in the next update." });
+    printRoute(journeyStops, userLocation);
   };
   const handleShare = () => {
-    toast({ title: "Coming Soon", description: "Share route link will be available in the next update." });
+    shareRoute(journeyStops, userLocation);
   };
 
   return (

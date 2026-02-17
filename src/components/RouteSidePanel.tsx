@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Navigation, Trash2, X, Save, Printer, Share2 } from 'lucide-react';
+import { saveRoute, printRoute, shareRoute } from '@/lib/routeActions';
 import { Tables } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
@@ -56,7 +57,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             variant="outline"
             size="sm"
             className="flex-1 h-8 text-xs border-white/10"
-            onClick={() => toast.info('Save feature coming soon')}
+            onClick={() => saveRoute(journeyStops, userLocation)}
           >
             <Save className="w-3 h-3 mr-1" />
             Save
@@ -65,7 +66,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             variant="outline"
             size="sm"
             className="flex-1 h-8 text-xs border-white/10"
-            onClick={() => toast.info('Print feature coming soon')}
+            onClick={() => saveRoute(journeyStops, userLocation)}
           >
             <Printer className="w-3 h-3 mr-1" />
             Print
@@ -74,7 +75,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             variant="outline"
             size="sm"
             className="flex-1 h-8 text-xs border-white/10"
-            onClick={() => toast.info('Share feature coming soon')}
+            onClick={() => printRoute(journeyStops, userLocation)}
           >
             <Share2 className="w-3 h-3 mr-1" />
             Share
