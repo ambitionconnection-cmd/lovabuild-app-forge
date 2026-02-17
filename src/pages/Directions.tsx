@@ -15,6 +15,7 @@ import Map from "@/components/Map";
 import { ShopDetailsModal } from "@/components/ShopDetailsModal";
 import { ShopsBottomSheet } from "@/components/ShopsBottomSheet";
 import { RouteBottomSheet } from "@/components/RouteBottomSheet";
+import ShopDetailBottomSheet from "@/components/ShopDetailBottomSheet";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import haptic from "@/lib/haptics";
@@ -115,6 +116,7 @@ const Directions = () => {
       window.removeEventListener('reopenShopsSheet', handleMapMode);
     };
   }, []);
+
   const [shops, setShops] = useState<ShopType[]>([]);
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,8 +137,21 @@ const Directions = () => {
   const [mapCenterLocation, setMapCenterLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [sortByDistance, setSortByDistance] = useState(false);
   const [visibleShops, setVisibleShops] = useState<ShopType[]>([]);
-  const [brands, setBrands] = useState<{ id: string; slug: string; name: string; logo_url: string | null }[]>([]);
-  
+  const [brands, setBrands] = useState<{ id: string; slug: string; name: string; logo_url: string | null; banner_url: string | null; description: string | null; history: string | null; instagram_url: string | null; tiktok_url: string | null; official_website: string | null; country: string | null; category: string | null }[]>([]);
+
+  // Listen for pin tap on mobile to open shop detail
+  useEffect(() => {
+    const handleOpenShopDetail = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      const shop = shops.find(s => s.id === detail.shopId);
+      if (shop) {
+        setSelectedShopForDetails(shop);
+      }
+    };
+    window.addEventListener('map:openShopDetail', handleOpenShopDetail);
+    return () => window.removeEventListener('map:openShopDetail', handleOpenShopDetail);
+  }, [shops]);
+
   // Draggable journey panel state
   const [journeyPanelPosition, setJourneyPanelPosition] = useState({ x: 8, y: 0 });
   const [isDraggingPanel, setIsDraggingPanel] = useState(false);
@@ -357,7 +372,7 @@ const Directions = () => {
       // Fetch shops and brands in parallel
       const [shopsResult, brandsResult] = await Promise.all([
         supabase.from('shops_public').select('*').order('name'),
-        supabase.from('brands').select('id, slug, name, logo_url').eq('is_active', true)
+        supabase.from('brands').select('id, slug, name, logo_url, banner_url, description, history, instagram_url, tiktok_url, official_website, country, category').eq('is_active', true)
       ]);
 
       if (shopsResult.error) {
@@ -881,15 +896,31 @@ const Directions = () => {
         />
       )}
 
-      {/* Shop Details Modal */}
-      <ShopDetailsModal
-        shop={selectedShopForDetails}
-        isOpen={detailsModalOpen}
-        onClose={() => setDetailsModalOpen(false)}
-        onAddToJourney={addToJourney}
-        onGetDirections={getDirections}
-        isInJourney={selectedShopForDetails ? isInJourney(selectedShopForDetails.id) : false}
-      />
+      {/* Shop Details - Bottom Sheet on mobile, Modal on desktop */}
+      {selectedShopForDetails && (
+        <div className="lg:hidden">
+          <ShopDetailBottomSheet
+            shop={selectedShopForDetails}
+            brand={brands.find(b => b.id === selectedShopForDetails.brand_id) || null}
+            onClose={() => { setSelectedShopForDetails(null); setDetailsModalOpen(false); }}
+            onAddToJourney={addToJourney}
+            onGetDirections={getDirections}
+            isInJourney={isInJourney(selectedShopForDetails.id)}
+            userLocation={userLocation}
+            calculateDistance={calculateDistance}
+          />
+        </div>
+      )}
+      <div className="hidden lg:block">
+        <ShopDetailsModal
+          shop={selectedShopForDetails}
+          isOpen={detailsModalOpen}
+          onClose={() => setDetailsModalOpen(false)}
+          onAddToJourney={addToJourney}
+          onGetDirections={getDirections}
+          isInJourney={selectedShopForDetails ? isInJourney(selectedShopForDetails.id) : false}
+        />
+      </div>
     </div>
   );
 };

@@ -532,7 +532,20 @@ const Map: React.FC<MapProps> = ({
         const existingPopups = document.querySelectorAll('.mapboxgl-popup');
         existingPopups.forEach(popup => popup.remove());
 
-        // Create improved popup with action buttons
+        // On mobile, skip popup — use detail bottom sheet instead
+        const isMobile = window.innerWidth < 1024;
+        if (isMobile) {
+          // Center on shop
+          map.current.jumpTo({
+            center: coordinates,
+            zoom: Math.max(map.current.getZoom(), 15)
+          });
+          // Open shop detail bottom sheet
+          window.dispatchEvent(new CustomEvent('map:openShopDetail', { detail: { shopId: shop.id } }));
+          return;
+        }
+
+        // Desktop: show popup with action buttons
         const popupId = `popup-${shop.id}`;
         const popup = new mapboxgl.Popup({ 
           offset: 25, 
