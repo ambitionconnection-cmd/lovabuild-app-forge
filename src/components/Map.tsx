@@ -163,9 +163,9 @@ const Map: React.FC<MapProps> = ({
       dragRotate: false,
       touchZoomRotate: true,
     });
-    
+    // Disable rotation but keep pinch zoom
+    map.current.touchZoomRotate.disableRotation();
     mapLog.init('Map instance created');
-
     // Navigation controls removed - using custom recenter button instead
 
     // Add geolocate control - CRITICAL FIX #3: Disable trackUserLocation to prevent snap-back
