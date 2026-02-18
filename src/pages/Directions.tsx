@@ -730,7 +730,7 @@ const Directions = () => {
 
             {/* Turn-by-turn directions panel - Hidden on mobile when shops sheet is open */}
             {(journeyStops.length > 0 || selectedShop) && routeInfo && (
-              <Card className="hidden lg:block absolute bottom-4 right-4 w-80 max-h-96 overflow-hidden border-2 border-directions shadow-2xl animate-slide-in-right backdrop-blur-md bg-background/95">
+              <Card className={`hidden ${isRouteMode ? '' : 'lg:block'} absolute bottom-4 right-4 w-80 max-h-96 overflow-hidden border-2 border-directions shadow-2xl animate-slide-in-right backdrop-blur-md bg-background/95`}>
                 <CardHeader className="border-b border-directions/20 pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-bold uppercase tracking-wider text-directions">
