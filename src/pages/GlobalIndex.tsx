@@ -196,7 +196,7 @@ const GlobalIndex = () => {
           </div>
         </header>
         <main className="container mx-auto px-3 py-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <Skeleton key={i} className="h-[220px] rounded-xl" />
             ))}
@@ -220,101 +220,88 @@ const GlobalIndex = () => {
       </header>
       
       {/* Sticky Filter Section */}
-      <div className="sticky top-[49px] z-40 bg-background/95 backdrop-blur-sm border-b border-border/30 pb-3 pt-3 px-3">
+      <div className="sticky top-[49px] z-40 bg-background/95 backdrop-blur-sm border-b border-border/30 pb-2 pt-2 px-3">
         <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
-          <Card className="glass-card border">
-            <CardHeader className="py-2 px-3">
+          {/* Search bar always visible */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search brands..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-9"
+              />
+            </div>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="w-9 h-9 p-0 flex-shrink-0">
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`} />
+                <span className="sr-only">Toggle filters</span>
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <div className="space-y-3 pt-3">
+              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Countries</SelectItem>
+                  {countries.map((country) => (
+                    <SelectItem key={country} value={country!}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {/* Favorites Toggle */}
+              {user && (
+                <Button
+                  variant={showFavoritesOnly ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 gap-1.5"
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                  {showFavoritesOnly ? 'Showing Favorites' : 'Show Favorites Only'}
+                </Button>
+              )}
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="uppercase tracking-wide text-sm">Browse Brands</CardTitle>
-                  <CardDescription className="text-xs">{filteredBrands.length} brands</CardDescription>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''}
+                  </p>
+                  {(searchQuery || selectedCountry !== "all" || sortBy !== "name-asc" || showFavoritesOnly) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSelectedCountry("all");
+                        setSortBy("name-asc");
+                        setShowFavoritesOnly(false);
+                      }}
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Clear
+                    </Button>
+                  )}
                 </div>
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" size="sm" className="w-9 p-0">
-                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`} />
-                    <span className="sr-only">Toggle filters</span>
-                  </Button>
-                </CollapsibleTrigger>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                    <SelectItem value="country">Country</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </CardHeader>
-            <CollapsibleContent>
-              <CardContent className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    <Input
-                      placeholder="Search brands..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  
-                  <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                    <SelectTrigger className="w-full sm:w-[200px]">
-                      <SelectValue placeholder="Country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Countries</SelectItem>
-                      {countries.map((country) => (
-                        <SelectItem key={country} value={country!}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Favorites Toggle */}
-                {user && (
-                  <Button
-                    variant={showFavoritesOnly ? "default" : "outline"}
-                    size="sm"
-                    className="h-8 gap-1.5"
-                    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                  >
-                    <Heart className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-current' : ''}`} />
-                    {showFavoritesOnly ? 'Showing Favorites' : 'Show Favorites Only'}
-                  </Button>
-                )}
-
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground font-medium">
-                      {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
-                    </p>
-                    {(searchQuery || selectedCountry !== "all" || sortBy !== "name-asc" || showFavoritesOnly) && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
-                        onClick={() => {
-                          setSearchQuery("");
-                          setSelectedCountry("all");
-                          setSortBy("name-asc");
-                          setShowFavoritesOnly(false);
-                        }}
-                      >
-                        <X className="w-3 h-3 mr-1" />
-                        Clear filters
-                      </Button>
-                    )}
-                  </div>
-                  
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-full sm:w-[200px]">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                      <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                      <SelectItem value="country">Country</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </CollapsibleContent>
-          </Card>
+            </div>
+          </CollapsibleContent>
         </Collapsible>
       </div>
 
@@ -330,141 +317,76 @@ const GlobalIndex = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3">
             {filteredBrands.map((brand, index) => (
-              <Card 
+              <div
                 key={brand.id}
                 data-brand-id={brand.id}
-                className={`overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 bg-gradient-to-br from-muted/50 via-card to-muted/30 cursor-pointer animate-scale-in ${
-                  highlightedBrand === brand.id ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''
+                className={`flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-muted/30 to-card hover:from-muted/50 hover:to-card/80 active:scale-[0.99] transition-all duration-200 cursor-pointer animate-scale-in ${
+                  highlightedBrand === brand.id ? 'ring-2 ring-[#AD3A49] ring-offset-1 ring-offset-background' : ''
                 }`}
-                style={{ animationDelay: `${Math.min(index * 50, 300)}ms`, animationFillMode: 'backwards' }}
+                style={{ animationDelay: `${Math.min(index * 30, 200)}ms`, animationFillMode: 'backwards' }}
                 onClick={() => navigate(`/brand/${brand.slug}`)}
               >
-                {/* Favorite Button - Positioned top right */}
-                <div className="relative">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="absolute top-2 right-2 rounded-full h-8 w-8 z-10 bg-muted/80 backdrop-blur-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(brand.id);
-                    }}
-                  >
-                    <Heart 
-                      className={`w-4 h-4 ${
-                        favoriteBrands.has(brand.id) 
-                          ? 'fill-primary text-primary' 
-                          : ''
-                      }`}
-                    />
-                  </Button>
+                {/* Logo */}
+                <div className="w-14 h-14 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0 p-1.5">
+                  {brand.logo_url ? (
+                    <img src={brand.logo_url} alt={brand.name} className="max-w-full max-h-full object-contain" />
+                  ) : (
+                    <span className="text-xl font-bold text-muted-foreground">{brand.name.charAt(0)}</span>
+                  )}
                 </div>
 
-                {/* Brand Logo - Much bigger and centered */}
-                <div className="pt-3 pb-2 flex justify-center">
-                  <div className="w-28 h-28 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden shadow-lg p-3">
-                    {brand.logo_url ? (
-                      <img 
-                        src={brand.logo_url} 
-                        alt={brand.name}
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    ) : (
-                      <span className="text-3xl font-bold text-muted-foreground">
-                        {brand.name.charAt(0)}
-                      </span>
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    {brand.country && (
+                      <span className="text-sm" title={brand.country}>{getCountryFlag(brand.country)}</span>
                     )}
+                    <h3 className="text-sm font-bold uppercase tracking-wide truncate">{brand.name}</h3>
+                  </div>
+                  {brand.description && (
+                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{brand.description}</p>
+                  )}
+                  {/* Action links */}
+                  <div className="flex items-center gap-3 mt-1.5">
+                    {brand.official_website && (
+                      <button
+                        className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
+                        onClick={(e) => { e.stopPropagation(); window.open(brand.official_website!, '_blank'); }}
+                      >
+                        <ExternalLink className="w-3 h-3" /> Web
+                      </button>
+                    )}
+                    {brand.instagram_url && (
+                      <button
+                        className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
+                        onClick={(e) => { e.stopPropagation(); window.open(brand.instagram_url!, '_blank'); }}
+                      >
+                        <Instagram className="w-3 h-3" /> Insta
+                      </button>
+                    )}
+                    <button
+                      className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedBrandForShops({ id: brand.id, name: brand.name });
+                        setShopModalOpen(true);
+                      }}
+                    >
+                      <Store className="w-3 h-3" /> Shops
+                    </button>
                   </div>
                 </div>
 
-                <CardContent className="pt-0 space-y-2 px-2 pb-2">
-                  {/* Brand Name with Country Flag */}
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      {brand.country && (
-                        <span className="text-sm" title={brand.country}>
-                          {getCountryFlag(brand.country)}
-                        </span>
-                      )}
-                      <h3 className="text-xs font-bold uppercase tracking-wide line-clamp-1">{brand.name}</h3>
-                    </div>
-                  </div>
-
-                  {/* Links - 4 buttons in 2 rows */}
-                  <div className="space-y-1.5">
-                    {/* Top row: Web and Insta */}
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {brand.official_website ? (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="h-8 text-xs px-2 font-medium bg-secondary/40 hover:bg-secondary/60"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(brand.official_website!, '_blank');
-                          }}
-                        >
-                          <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                          Web
-                        </Button>
-                      ) : (
-                        <div className="h-8" />
-                      )}
-                      {brand.instagram_url ? (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="h-8 text-xs px-2 font-medium bg-secondary/40 hover:bg-secondary/60"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(brand.instagram_url!, '_blank');
-                          }}
-                        >
-                          <Instagram className="w-3.5 h-3.5 mr-1" />
-                          Insta
-                        </Button>
-                      ) : (
-                        <div className="h-8" />
-                      )}
-                    </div>
-                    
-                    {/* Bottom row: Shops and TikTok */}
-                    <div className="grid grid-cols-2 gap-1.5">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="h-8 text-xs px-2 font-medium bg-secondary/40 hover:bg-secondary/60"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedBrandForShops({ id: brand.id, name: brand.name });
-                          setShopModalOpen(true);
-                        }}
-                      >
-                        <Store className="w-3.5 h-3.5 mr-1" />
-                        Shops
-                      </Button>
-                      {brand.tiktok_url ? (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="h-8 text-xs px-2 font-medium bg-secondary/40 hover:bg-secondary/60"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(brand.tiktok_url!, '_blank');
-                          }}
-                        >
-                          <TikTokIcon className="w-3.5 h-3.5 mr-1" />
-                          TikTok
-                        </Button>
-                      ) : (
-                        <div className="h-8" />
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* Favorite */}
+                <button
+                  className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors"
+                  onClick={(e) => { e.stopPropagation(); toggleFavorite(brand.id); }}
+                >
+                  <Heart className={`w-4 h-4 ${favoriteBrands.has(brand.id) ? 'fill-[#AD3A49] text-[#AD3A49]' : 'text-muted-foreground'}`} />
+                </button>
+              </div>
             ))}
           </div>
         )}
