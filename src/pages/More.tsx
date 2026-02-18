@@ -1,6 +1,7 @@
 import { Heart, User, Mail, Info, Bell, Shield, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 interface MenuItem {
@@ -39,7 +40,6 @@ const menuItems: MenuItem[] = [
     label: "Contact",
     description: "Get in touch, submit a brand",
     path: "/contact",
-    requiresAuth: true,
   },
   {
     icon: Info,
@@ -63,7 +63,13 @@ const More = () => {
 
   const handleItemClick = (item: MenuItem) => {
     if (item.requiresAuth && !user) {
-      navigate("/auth");
+      toast.info('Sign in required', {
+        description: `Sign in to access ${item.label}`,
+        action: {
+          label: 'Sign In',
+          onClick: () => navigate('/auth'),
+        },
+      });
       return;
     }
     navigate(item.path);

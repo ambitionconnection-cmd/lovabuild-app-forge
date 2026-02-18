@@ -378,6 +378,12 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        <button
+          onClick={() => navigate('/')}
+          className="mb-4 text-sm text-muted-foreground hover:text-white transition-colors flex items-center gap-1"
+        >
+          ← Back to map
+        </button>
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
           <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>

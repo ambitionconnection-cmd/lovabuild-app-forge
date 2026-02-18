@@ -23,6 +23,7 @@ import NotificationHistory from "./pages/NotificationHistory";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import More from "./pages/More";
+import About from "./pages/About";
 import RoutePage from "./pages/RoutePage";
 
 const queryClient = new QueryClient();
@@ -52,7 +53,7 @@ function App() {
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute><NotificationHistory /></ProtectedRoute>} />
-              <Route path="/contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
+              <Route path="/contact" element={<Contact />} />
 
               {/* Legacy route - redirect old home to map */}
               <Route path="/index" element={<Directions />} />
@@ -60,6 +61,7 @@ function App() {
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="/route" element={<RoutePage />} />
               <Route path="/more" element={<More />} />
+              <Route path="/about" element={<About />} />
               <Route path="*" element={<NotFound />} />
              </Routes>
              <DesktopTopNav />
