@@ -306,12 +306,12 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                   }
                   haptic.light();
                 }}
-                className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                className="w-6 h-6 flex items-center justify-center rounded-full bg-[#2D2D2D]/10 hover:bg-[#2D2D2D]/15 transition-colors"
               >
                 {sheetState === 'closed' || sheetState === 'peek' ? (
-                  <ChevronUp className="w-3.5 h-3.5 text-white/60" />
+                  <ChevronUp className="w-3.5 h-3.5 text-[#4A4A4A]" />
                 ) : (
-                  <span className="text-xs text-white/60">✕</span>
+                  <span className="text-xs text-[#4A4A4A]">✕</span>
                 )}
               </button>
             </div>
