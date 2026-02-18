@@ -181,12 +181,12 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                   }
                   haptic.light();
                 }}
-                className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-[#2D2D2D]/10 transition-colors"
               >
                 {sheetState === 'peek' ? (
-                  <ChevronUp className="w-3.5 h-3.5 text-white/60" />
+                  <ChevronUp className="w-3.5 h-3.5 text-[#4A4A4A]" />
                 ) : (
-                  <span className="text-xs text-white/60">✕</span>
+                  <span className="text-xs text-[#4A4A4A]">✕</span>
                 )}
               </button>
             </div>
@@ -198,24 +198,24 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
           <div className="py-3 space-y-3">
             {/* Action buttons */}
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1 border-white/10 text-white/60 hover:bg-white/5 text-xs h-8" onClick={handleSave}>
+              <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleSave}>
                 <Save className="w-3 h-3 mr-1" /> Save
               </Button>
-              <Button variant="outline" size="sm" className="flex-1 border-white/10 text-white/60 hover:bg-white/5 text-xs h-8" onClick={handlePrint}>
+              <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handlePrint}>
                 <Printer className="w-3 h-3 mr-1" /> Print
               </Button>
-              <Button variant="outline" size="sm" className="flex-1 border-white/10 text-white/60 hover:bg-white/5 text-xs h-8" onClick={handleShare}>
+              <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleShare}>
                 <Share2 className="w-3 h-3 mr-1" /> Share
               </Button>
             </div>
 
             {journeyStops.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-3">
-                  <Navigation className="w-6 h-6 text-white/20" />
+                <div className="w-12 h-12 rounded-full bg-[#2D2D2D]/5 border border-[#2D2D2D]/15 flex items-center justify-center mb-3">
+                  <Navigation className="w-6 h-6 text-[#AAAAAA]" />
                 </div>
-                <p className="text-white/50 text-sm font-medium">No stops yet</p>
-                <p className="text-white/30 text-xs mt-1">Tap shops on the map and add them to your route</p>
+                <p className="text-[#5A5A5A] text-sm font-medium">No stops yet</p>
+                <p className="text-[#8A8A8A] text-xs mt-1">Tap shops on the map and add them to your route</p>
               </div>
             ) : (
               <>
@@ -224,17 +224,17 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-[#C4956A]/10 border border-[#C4956A]/20">
                     <div className="text-center flex-1">
                       <p className="text-[#C4956A] font-bold text-sm">{(routeInfo.distance / 1000).toFixed(1)}km</p>
-                      <p className="text-white/40 text-[10px]">Distance</p>
+                      <p className="text-[#6A6A6A] text-[10px]">Distance</p>
                     </div>
                     <div className="w-px h-8 bg-white/10" />
                     <div className="text-center flex-1">
                       <p className="text-[#C4956A] font-bold text-sm">{Math.round(routeInfo.duration / 60)}min</p>
-                      <p className="text-white/40 text-[10px]">Walking</p>
+                      <p className="text-[#6A6A6A] text-[10px]">Walking</p>
                     </div>
                     <div className="w-px h-8 bg-white/10" />
                     <div className="text-center flex-1">
                       <p className="text-[#C4956A] font-bold text-sm">{journeyStops.length}</p>
-                      <p className="text-white/40 text-[10px]">Stops</p>
+                      <p className="text-[#6A6A6A] text-[10px]">Stops</p>
                     </div>
                   </div>
                 )}
@@ -243,9 +243,9 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                 {userLocation && (
                   <div className="flex items-center gap-2 p-2 rounded-lg bg-[#AD3A49]/10 border border-[#AD3A49]/20">
                     <div className="w-6 h-6 rounded-full bg-[#AD3A49] flex items-center justify-center flex-shrink-0">
-                      <Navigation className="w-3 h-3 text-white" />
+                      <Navigation className="w-3 h-3 text-[#2D2D2D]" />
                     </div>
-                    <p className="text-white/70 text-xs font-medium">Your Location</p>
+                    <p className="text-[#2D2D2D]/70 text-xs font-medium">Your Location</p>
                   </div>
                 )}
 
@@ -253,15 +253,15 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                 {journeyStops.map((stop, index) => (
                   <div
                     key={stop.id}
-                    className="flex items-center gap-2 p-2 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/8"
+                    className="flex items-center gap-2 p-2 rounded-lg bg-[#2D2D2D]/5 border border-[#2D2D2D]/15 cursor-pointer hover:bg-white/8"
                     onClick={() => onShopClick(stop)}
                   >
                     <div className="w-6 h-6 rounded-full bg-[#C4956A]/20 flex items-center justify-center flex-shrink-0">
                       <span className="text-[#C4956A] text-xs font-bold">{index + 1}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-xs font-medium truncate">{stop.name}</p>
-                      <p className="text-white/40 text-[10px] truncate">{stop.address}, {stop.city}</p>
+                      <p className="text-[#2D2D2D] text-xs font-medium truncate">{stop.name}</p>
+                      <p className="text-[#6A6A6A] text-[10px] truncate">{stop.address}, {stop.city}</p>
                     </div>
                     <button
                       onClick={(e) => {
@@ -270,14 +270,14 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                       }}
                       className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 flex-shrink-0"
                     >
-                      <X className="w-3 h-3 text-white/40" />
+                      <X className="w-3 h-3 text-[#6A6A6A]" />
                     </button>
                   </div>
                 ))}
 
                 {/* Start Navigation */}
                 <Button
-                  className="w-full bg-[#C4956A] hover:bg-[#C4956A]/90 text-white font-bold uppercase tracking-wider text-xs"
+                  className="w-full bg-[#C4956A] hover:bg-[#C4956A]/90 text-[#2D2D2D] font-bold uppercase tracking-wider text-xs"
                   onClick={onStartNavigation}
                 >
                   <Navigation className="w-4 h-4 mr-2" />
@@ -288,7 +288,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full text-white/30 hover:text-white/60 hover:bg-white/5 text-xs"
+                  className="w-full text-[#8A8A8A] hover:text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs"
                   onClick={onClearAll}
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
