@@ -424,19 +424,28 @@ export default function Admin() {
 
   if (adminLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-background lg:pt-14">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground text-sm">Loading...</p>
+          <button
+            onClick={() => navigate('/more')}
+            className="mt-4 text-sm text-[#C4956A] hover:text-[#C4956A]/80 transition-colors"
+          >
+            ← Back
+          </button>
+        </div>
       </div>
     );
   }
-
   if (!isAdmin) {
+    navigate('/more');
     return null;
   }
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full bg-background pt-0 lg:pt-14">
         <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
         
         <div className="flex-1">

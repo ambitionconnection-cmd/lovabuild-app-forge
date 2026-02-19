@@ -76,6 +76,8 @@ const Auth = () => {
     }
   }, [user, navigate, isResetMode]);
 
+  
+
   const signInForm = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -226,7 +228,7 @@ const Auth = () => {
 
   if (isResetMode) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 lg:pt-16">
         <div className="w-full max-w-md">
           <div className="flex items-center justify-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
@@ -282,7 +284,7 @@ const Auth = () => {
 
   if (showVerificationMessage) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 lg:pt-16">
         <div className="w-full max-w-md">
           <div className="flex items-center justify-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
@@ -327,7 +329,7 @@ const Auth = () => {
 
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 lg:pt-16">
         <div className="w-full max-w-md">
           <div className="flex items-center justify-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
@@ -376,13 +378,13 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 lg:pt-16">
       <div className="w-full max-w-md">
         <button
-          onClick={() => navigate('/')}
-          className="mb-4 text-sm text-muted-foreground hover:text-white transition-colors flex items-center gap-1"
+          onClick={() => navigate('/more')}
+          className="mb-4 text-sm text-[#C4956A] hover:text-[#C4956A]/80 transition-colors flex items-center gap-2 py-2"
         >
-          ← Back to map
+          ← Back
         </button>
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />

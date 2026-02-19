@@ -221,11 +221,11 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-0 lg:pt-14">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-3 py-3 sm:px-4 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button variant="ghost" size="icon" className="h-10 w-10 touch-manipulation active:scale-95" onClick={() => navigate("/")}>
+            <Button variant="ghost" size="icon" className="h-10 w-10 touch-manipulation active:scale-95" onClick={() => navigate("/more")}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-lg sm:text-2xl font-bold tracking-tight">Profile Settings</h1>

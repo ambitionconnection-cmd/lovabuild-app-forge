@@ -183,7 +183,7 @@ const MyHeardrop = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-20 pt-0 lg:pt-14">
         <header className="border-b border-border bg-card">
           <div className="container mx-auto px-3 py-2 flex items-center gap-3">
             <Link to="/">
@@ -215,7 +215,7 @@ const MyHeardrop = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-20 pt-0 lg:pt-14">
         <header className="border-b border-border bg-card">
           <div className="container mx-auto px-3 py-2 flex items-center gap-3">
             <Link to="/">
@@ -234,10 +234,10 @@ const MyHeardrop = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 pt-0 lg:pt-14">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-3 py-2 flex items-center gap-3">
-          <Link to="/">
+          <Link to="/more">
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <ArrowLeft className="w-4 h-4" />
             </Button>
