@@ -1,16 +1,16 @@
-import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X, Copy, Check } from "lucide-react";
+import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X, Copy, Check, ChevronDown, ExternalLink, Clock } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { format, formatDistanceToNow, isPast, isFuture } from "date-fns";
 import haptic from "@/lib/haptics";
 
 interface Drop {
@@ -30,6 +30,7 @@ interface Drop {
 interface Brand {
   id: string;
   name: string;
+  logo_url: string | null;
 }
 
 const Drops = () => {
@@ -37,6 +38,7 @@ const Drops = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const highlightId = searchParams.get('highlight');
+
   const [drops, setDrops] = useState<Drop[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [reminders, setReminders] = useState<Set<string>>(new Set());
@@ -46,12 +48,12 @@ const Drops = () => {
   const [brandFilter, setBrandFilter] = useState<string>("all");
   const [copiedCodes, setCopiedCodes] = useState<Set<string>>(new Set());
   const [highlightedDrop, setHighlightedDrop] = useState<string | null>(highlightId);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  // Scroll to highlighted drop after loading
   useEffect(() => {
     if (!loading && highlightId) {
       setTimeout(() => {
@@ -65,32 +67,27 @@ const Drops = () => {
   }, [loading, highlightId]);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const [dropsRes, brandsRes, remindersRes] = await Promise.all([
-        supabase
-          .from('drops')
-          .select('*')
-          .order('release_date', { ascending: true }),
-        supabase
-          .from('brands')
-          .select('id, name')
-          .eq('is_active', true),
-        user
-          ? supabase
-              .from('user_drop_reminders')
-              .select('drop_id')
-              .eq('user_id', user.id)
-          : Promise.resolve({ data: [] })
+      const [dropsRes, brandsRes] = await Promise.all([
+        supabase.from('drops').select('*').order('release_date', { ascending: true }),
+        supabase.from('brands').select('id, name, logo_url'),
       ]);
 
       if (dropsRes.data) setDrops(dropsRes.data);
       if (brandsRes.data) setBrands(brandsRes.data);
-      if (remindersRes.data) {
-        setReminders(new Set(remindersRes.data.map(r => r.drop_id)));
+
+      if (user) {
+        const { data: reminderData } = await supabase
+          .from('drop_reminders')
+          .select('drop_id')
+          .eq('user_id', user.id);
+        if (reminderData) {
+          setReminders(new Set(reminderData.map(r => r.drop_id)));
+        }
       }
     } catch (error) {
       console.error('Error fetching drops:', error);
-      toast.error('Failed to load drops');
     } finally {
       setLoading(false);
     }
@@ -98,355 +95,310 @@ const Drops = () => {
 
   const toggleReminder = async (dropId: string) => {
     if (!user) {
-      haptic.warning();
-      toast.error('Please sign in to set reminders');
+      toast.info('Sign in required', {
+        description: 'Sign in to set drop reminders',
+        action: {
+          label: 'Sign In',
+          onClick: () => navigate('/auth'),
+        },
+      });
       return;
     }
 
-    try {
-      if (reminders.has(dropId)) {
-        // Remove reminder
-        const { error } = await supabase
-          .from('user_drop_reminders')
-          .delete()
-          .eq('drop_id', dropId)
-          .eq('user_id', user.id);
+    haptic.light();
+    const hasReminder = reminders.has(dropId);
 
-        if (error) throw error;
-
-        setReminders(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(dropId);
-          return newSet;
-        });
-        haptic.light();
-        toast.success('Reminder removed');
-      } else {
-        // Add reminder
-        const { error } = await supabase
-          .from('user_drop_reminders')
-          .insert({
-            drop_id: dropId,
-            user_id: user.id
-          });
-
-        if (error) throw error;
-
-        setReminders(prev => new Set(prev).add(dropId));
-        haptic.success();
-        toast.success('Reminder set! You\'ll be notified before the drop');
-      }
-    } catch (error) {
-      console.error('Error toggling reminder:', error);
-      haptic.error();
-      toast.error('Failed to update reminder');
+    if (hasReminder) {
+      await supabase.from('drop_reminders').delete().eq('drop_id', dropId).eq('user_id', user.id);
+      setReminders(prev => {
+        const next = new Set(prev);
+        next.delete(dropId);
+        return next;
+      });
+      toast.success('Reminder removed');
+    } else {
+      await supabase.from('drop_reminders').insert({ drop_id: dropId, user_id: user.id });
+      setReminders(prev => new Set(prev).add(dropId));
+      toast.success('Reminder set!');
     }
   };
 
-  const trackEvent = async (dropId: string, eventType: 'affiliate_click' | 'discount_code_copy') => {
-    try {
-      await supabase.functions.invoke('track-affiliate-analytics', {
-        body: {
-          drop_id: dropId,
-          event_type: eventType,
-          user_id: user?.id || null,
-        },
+  const handleDiscountCodeCopy = (drop: Drop) => {
+    haptic.light();
+    navigator.clipboard.writeText(drop.discount_code);
+    setCopiedCodes(prev => new Set(prev).add(drop.id));
+    toast.success(`Code "${drop.discount_code}" copied!`);
+    setTimeout(() => {
+      setCopiedCodes(prev => {
+        const next = new Set(prev);
+        next.delete(drop.id);
+        return next;
       });
-    } catch (error) {
-      console.error('Error tracking event:', error);
-    }
+    }, 2000);
   };
 
   const handleAffiliateClick = (drop: Drop) => {
-    trackEvent(drop.id, 'affiliate_click');
+    haptic.light();
     window.open(drop.affiliate_link, '_blank');
   };
 
-  const handleDiscountCodeCopy = async (drop: Drop) => {
-    if (!drop.discount_code) return;
-    
-    try {
-      await navigator.clipboard.writeText(drop.discount_code);
-      setCopiedCodes(prev => new Set(prev).add(drop.id));
-      trackEvent(drop.id, 'discount_code_copy');
-      haptic.success();
-      toast.success(`Code "${drop.discount_code}" copied to clipboard!`);
-      
-      // Reset copied state after 2 seconds
-      setTimeout(() => {
-        setCopiedCodes(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(drop.id);
-          return newSet;
-        });
-      }, 2000);
-    } catch (error) {
-      console.error('Error copying code:', error);
-      haptic.error();
-      toast.error('Failed to copy code');
-    }
-  };
-
-  const getStatusColor = (status: string) => {
+  const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'upcoming': return 'default';
-      case 'live': return 'destructive';
-      case 'ended': return 'secondary';
-      default: return 'outline';
+      case 'live': return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'upcoming': return 'bg-[#C4956A]/20 text-[#C4956A] border-[#C4956A]/30';
+      case 'ended': return 'bg-white/10 text-white/40 border-white/10';
+      default: return 'bg-white/10 text-white/40 border-white/10';
     }
   };
 
-  const filteredDrops = drops.filter(drop => {
+  const getTimeLabel = (releaseDate: string) => {
+    try {
+      const date = new Date(releaseDate);
+      if (isPast(date)) return 'Released';
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch {
+      return '';
+    }
+  };
+
+  // Auto-calculate status from release date
+  const dropsWithAutoStatus = drops.map((drop) => {
+    const releaseDate = new Date(drop.release_date);
+    const now = new Date();
+    const oneDayAfter = new Date(releaseDate);
+    oneDayAfter.setDate(oneDayAfter.getDate() + 1);
+    
+    let autoStatus = drop.status;
+    if (isFuture(releaseDate)) {
+      autoStatus = 'upcoming';
+    } else if (isPast(oneDayAfter)) {
+      autoStatus = 'ended';
+    } else {
+      autoStatus = 'live';
+    }
+    return { ...drop, status: autoStatus };
+  });
+
+  const filteredDrops = dropsWithAutoStatus.filter((drop) => {
     const matchesSearch = drop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          drop.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || drop.status === statusFilter;
     const matchesBrand = brandFilter === 'all' || drop.brand_id === brandFilter;
-
     return matchesSearch && matchesStatus && matchesBrand;
   });
 
-  const clearFilters = () => {
-    setSearchQuery("");
-    setStatusFilter("all");
-    setBrandFilter("all");
-  };
-
   const hasActiveFilters = searchQuery || statusFilter !== "all" || brandFilter !== "all";
 
-  return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <div className="container mx-auto px-3 py-2">
-          <div className="flex items-center gap-3 mb-2">
-            <Link to="/">
-              <Button variant="ghost" size="icon" className="h-10 w-10 touch-manipulation active:scale-95">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-            <h1 className="text-base font-bold">Drops</h1>
-            <Badge variant="outline" className="ml-auto text-xs">
-              {filteredDrops.length} {filteredDrops.length === 1 ? 'Drop' : 'Drops'}
-            </Badge>
-          </div>
+  // Sort: live first, then upcoming, then ended
+  const sortedDrops = [...filteredDrops].sort((a, b) => {
+    const order = { live: 0, upcoming: 1, ended: 2 };
+    const aOrder = order[a.status as keyof typeof order] ?? 3;
+    const bOrder = order[b.status as keyof typeof order] ?? 3;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+    return new Date(a.release_date).getTime() - new Date(b.release_date).getTime();
+  });
 
-          {/* Search Bar */}
-          <div className="flex gap-2">
+  return (
+    <div className="min-h-screen bg-background pb-20 pt-0 lg:pt-14 animate-fade-in">
+      {/* Header */}
+      <header className="sticky top-0 lg:top-14 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <div className="container mx-auto px-3 py-2 flex items-center gap-3">
+          <Link to="/">
+            <Button variant="ghost" size="icon" className="h-8 w-8 hover:scale-110 active:scale-95 transition-transform">
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+          </Link>
+          <h1 className="text-base font-bold uppercase tracking-wider">DROPS</h1>
+          <Badge variant="outline" className="ml-auto text-xs border-[#C4956A]/30 text-[#C4956A]">
+            {filteredDrops.length} {filteredDrops.length === 1 ? 'Drop' : 'Drops'}
+          </Badge>
+        </div>
+      </header>
+
+      {/* Sticky Search & Filters */}
+      <div className="sticky top-[49px] lg:top-[105px] z-30 bg-background/95 backdrop-blur-sm border-b border-border/30 pb-2 pt-2 px-3">
+        <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+          <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                type="search"
-                inputMode="search"
-                enterKeyHint="search"
                 placeholder="Search drops..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 min-h-[44px]"
+                className="pl-10 h-9"
               />
               {searchQuery && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 touch-manipulation"
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2"
                   onClick={() => setSearchQuery("")}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="w-9 h-9 p-0 flex-shrink-0">
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`} />
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <div className="space-y-3 pt-3">
+              <div className="flex gap-2">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="flex-1 h-8 text-xs">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="upcoming">Upcoming</SelectItem>
+                    <SelectItem value="live">Live Now</SelectItem>
+                    <SelectItem value="ended">Ended</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={brandFilter} onValueChange={setBrandFilter}>
+                  <SelectTrigger className="flex-1 h-8 text-xs">
+                    <SelectValue placeholder="Brand" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Brands</SelectItem>
+                    {brands.map(brand => (
+                      <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-muted-foreground" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setBrandFilter("all"); }}>
+                  <X className="w-3 h-3 mr-1" /> Clear filters
                 </Button>
               )}
             </div>
-
-            {/* Filters Sheet */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="h-11 w-11 touch-manipulation active:scale-95">
-                  <Filter className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Filter Drops</SheetTitle>
-                  <SheetDescription>
-                    Refine your search with filters
-                  </SheetDescription>
-                </SheetHeader>
-
-                <div className="space-y-4 mt-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Status</label>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="upcoming">Upcoming</SelectItem>
-                        <SelectItem value="live">Live</SelectItem>
-                        <SelectItem value="ended">Ended</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Brand</label>
-                    <Select value={brandFilter} onValueChange={setBrandFilter}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Brands</SelectItem>
-                        {brands.map(brand => (
-                          <SelectItem key={brand.id} value={brand.id}>
-                            {brand.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {hasActiveFilters && (
-                    <Button variant="outline" className="w-full" onClick={clearFilters}>
-                      Clear All Filters
-                    </Button>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </header>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-3 py-4">
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="overflow-hidden animate-pulse">
-                <div className="h-36 bg-muted" />
-                <CardContent className="p-2">
-                  <div className="h-3 bg-muted rounded mb-1" />
-                  <div className="h-2 bg-muted rounded w-2/3" />
-                </CardContent>
-              </Card>
+          <div className="flex flex-col gap-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 animate-pulse">
+                <div className="w-16 h-16 rounded-xl bg-muted flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-muted rounded w-3/4" />
+                  <div className="h-2 bg-muted rounded w-1/2" />
+                  <div className="h-2 bg-muted rounded w-1/3" />
+                </div>
+              </div>
             ))}
           </div>
-        ) : filteredDrops.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <Zap className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
-              <h3 className="text-base font-semibold mb-1">
-                {hasActiveFilters ? 'No drops match your filters' : 'No drops available'}
-              </h3>
-              <p className="text-xs text-muted-foreground mb-3">
-                {hasActiveFilters 
-                  ? 'Try adjusting your search or filters' 
-                  : 'Check back soon for new releases'}
-              </p>
-              {hasActiveFilters && (
-                <Button size="sm" onClick={clearFilters}>Clear Filters</Button>
-              )}
-            </CardContent>
-          </Card>
+        ) : sortedDrops.length === 0 ? (
+          <div className="text-center py-12">
+            <Zap className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
+            <h3 className="text-base font-semibold mb-1 text-white/70">
+              {hasActiveFilters ? 'No drops match your filters' : 'No drops yet'}
+            </h3>
+            <p className="text-xs text-muted-foreground mb-3">
+              {hasActiveFilters ? 'Try adjusting your search or filters' : 'Community drops coming soon'}
+            </p>
+            {hasActiveFilters && (
+              <Button size="sm" variant="outline" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setBrandFilter("all"); }}>Clear Filters</Button>
+            )}
+          </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filteredDrops.map((drop) => {
+          <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3">
+            {sortedDrops.map((drop) => {
               const brand = brands.find(b => b.id === drop.brand_id);
               const hasReminder = reminders.has(drop.id);
+              const timeLabel = getTimeLabel(drop.release_date);
+              const isLive = drop.status === 'live';
+              const isEnded = drop.status === 'ended';
 
               return (
-                <Card 
-                  key={drop.id} 
+                <div
+                  key={drop.id}
                   data-drop-id={drop.id}
-                  className={`overflow-hidden hover:shadow-lg transition-all group ${
-                    highlightedDrop === drop.id ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''
-                  }`}
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer animate-scale-in ${
+                    isEnded 
+                      ? 'bg-muted/20 opacity-60' 
+                      : isLive 
+                        ? 'bg-gradient-to-r from-green-500/10 to-card hover:from-green-500/20' 
+                        : 'bg-gradient-to-r from-muted/30 to-card hover:from-muted/50'
+                  } ${highlightedDrop === drop.id ? 'ring-2 ring-[#AD3A49] ring-offset-1 ring-offset-background' : ''}`}
+                  onClick={() => {
+                    if (drop.affiliate_link) {
+                      handleAffiliateClick(drop);
+                    }
+                  }}
                 >
-                  <div className="relative h-36 bg-muted overflow-hidden">
+                  {/* Drop Image */}
+                  <div className="w-16 h-16 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0">
                     {drop.image_url ? (
-                      <img 
-                        src={drop.image_url} 
-                        alt={drop.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
-                      />
+                      <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" loading="lazy" />
+                    ) : brand?.logo_url ? (
+                      <img src={brand.logo_url} alt={brand.name} className="w-10 h-10 object-contain" loading="lazy" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
-                        <Zap className="h-16 w-16 text-muted-foreground" />
-                      </div>
+                      <Zap className="w-6 h-6 text-muted-foreground/30" />
                     )}
-                    <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-2">
-                      <div className="flex gap-2 flex-wrap">
-                        <Badge variant={getStatusColor(drop.status)} className="capitalize">
-                          {drop.status}
-                        </Badge>
-                        {drop.is_featured && <Badge variant="secondary">Featured</Badge>}
-                        {drop.is_pro_exclusive && <Badge variant="outline">Pro</Badge>}
-                      </div>
-                      <Button
-                        size="icon"
-                        variant={hasReminder ? "default" : "secondary"}
-                        className="h-10 w-10 shadow-lg touch-manipulation active:scale-95"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleReminder(drop.id);
-                        }}
-                      >
-                        {hasReminder ? (
-                          <BellOff className="h-4 w-4" />
-                        ) : (
-                          <Bell className="h-4 w-4" />
-                        )}
-                      </Button>
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-medium uppercase ${getStatusStyle(drop.status)}`}>
+                        {isLive ? '● Live' : drop.status}
+                      </span>
+                      {drop.is_featured && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#AD3A49]/20 text-[#AD3A49] border border-[#AD3A49]/30">Featured</span>
+                      )}
+                    </div>
+                    <h3 className="text-sm font-bold truncate">{drop.title}</h3>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {brand && <span className="text-xs text-muted-foreground">{brand.name}</span>}
+                      <span className="text-[10px] text-muted-foreground/60">•</span>
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                        <Calendar className="w-2.5 h-2.5" />
+                        {format(new Date(drop.release_date), 'MMM d, yyyy')}
+                      </span>
+                    </div>
+                    {/* Action links */}
+                    <div className="flex items-center gap-3 mt-1.5">
+                      {timeLabel && (
+                        <span className={`text-[10px] flex items-center gap-0.5 ${isLive ? 'text-green-400' : isEnded ? 'text-white/30' : 'text-[#C4956A]'}`}>
+                          <Clock className="w-3 h-3" /> {timeLabel}
+                        </span>
+                      )}
+                      {drop.discount_code && (
+                        <button
+                          className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
+                          onClick={(e) => { e.stopPropagation(); handleDiscountCodeCopy(drop); }}
+                        >
+                          {copiedCodes.has(drop.id) ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                          Code
+                        </button>
+                      )}
+                      {drop.affiliate_link && (
+                        <button
+                          className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
+                          onClick={(e) => { e.stopPropagation(); handleAffiliateClick(drop); }}
+                        >
+                          <ExternalLink className="w-3 h-3" /> Shop
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  <CardContent className="p-2">
-                    <div className="mb-1">
-                      <h3 className="font-semibold text-xs mb-0.5 line-clamp-1">{drop.title}</h3>
-                      {brand && (
-                        <p className="text-[10px] text-muted-foreground">{brand.name}</p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between text-[10px] border-t pt-1.5 mt-1.5">
-                      <div className="flex items-center text-muted-foreground">
-                        <Calendar className="h-3 w-3 mr-0.5" />
-                        {format(new Date(drop.release_date), 'MMM d')}
-                      </div>
-                      {drop.discount_code && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-5 px-1.5 text-[10px] gap-1"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDiscountCodeCopy(drop);
-                          }}
-                        >
-                          {copiedCodes.has(drop.id) ? (
-                            <Check className="h-2.5 w-2.5" />
-                          ) : (
-                            <Copy className="h-2.5 w-2.5" />
-                          )}
-                        </Button>
-                      )}
-                    </div>
-
-                    {drop.affiliate_link && (
-                      <Button 
-                        className="w-full mt-1.5 h-6 text-[10px]" 
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAffiliateClick(drop);
-                        }}
-                      >
-                        View
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
+                  {/* Reminder Bell */}
+                  <button
+                    className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                      hasReminder ? 'bg-[#AD3A49]/20 text-[#AD3A49]' : 'hover:bg-muted/50 text-muted-foreground'
+                    }`}
+                    onClick={(e) => { e.stopPropagation(); toggleReminder(drop.id); }}
+                  >
+                    {hasReminder ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+                  </button>
+                </div>
               );
             })}
           </div>
