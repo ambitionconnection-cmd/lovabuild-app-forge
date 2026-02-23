@@ -200,13 +200,19 @@
     "returnHome": "Retour à l'Accueil"
   },
   "categories": {
-    "all": "Toutes les Catégories",
+    "all": "Toutes les catégories",
     "streetwear": "Streetwear",
     "sneakers": "Sneakers",
     "accessories": "Accessoires",
     "luxury": "Luxe",
     "vintage": "Vintage",
-    "sportswear": "Sportswear"
+    "sportswear": "Sportswear",
+    "contemporary": "Contemporain",
+    "techwear": "Techwear",
+    "outdoor": "Outdoor / Gorpcore",
+    "heritage": "Héritage / Workwear",
+    "designer": "Designer",
+    "skate": "Skate"
   },
   "common": {
     "loading": "Chargement...",

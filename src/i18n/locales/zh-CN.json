@@ -202,11 +202,17 @@
   "categories": {
     "all": "所有类别",
     "streetwear": "街头服饰",
-    "sneakers": "球鞋",
+    "sneakers": "运动鞋",
     "accessories": "配饰",
     "luxury": "奢侈品",
     "vintage": "复古",
-    "sportswear": "运动服饰"
+    "sportswear": "运动装",
+    "contemporary": "当代时尚",
+    "techwear": "机能服饰",
+    "outdoor": "户外 / Gorpcore",
+    "heritage": "传统工装",
+    "designer": "设计师品牌",
+    "skate": "滑板"
   },
   "common": {
     "loading": "加载中...",
