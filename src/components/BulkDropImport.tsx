@@ -4,8 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Upload, FileText, Check, X, AlertCircle, Download } from 'lucide-react';
+import { Upload, FileText, Check, X, AlertCircle, Download, Pencil, Plus } from 'lucide-react';
 
 interface ParsedDrop {
   title: string;
@@ -16,11 +21,12 @@ interface ParsedDrop {
   affiliate_link: string;
   discount_code: string;
   is_featured: boolean;
-  // resolved
   brand_id?: string;
   slug?: string;
   valid: boolean;
   errors: string[];
+  selected: boolean;
+  brandUnmatched: boolean;
 }
 
 export function BulkDropImport({ onImportComplete }: { onImportComplete: () => void }) {
@@ -28,6 +34,8 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState(false);
   const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<ParsedDrop | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const generateSlug = (title: string) => {
@@ -79,7 +87,6 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Fetch brands for matching
     const { data: brandData } = await supabase.from('brands').select('id, name');
     const brandList = brandData || [];
     setBrands(brandList);
@@ -107,18 +114,19 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
       const release_date = obj['release_date'] || '';
 
       if (!title) errors.push('Missing title');
-      if (!release_date) errors.push('Missing release_date');
+      if (!release_date) errors.push('Missing date');
 
-      // Validate date format
       const dateObj = new Date(release_date);
       if (release_date && isNaN(dateObj.getTime())) {
-        errors.push('Invalid date format (use YYYY-MM-DD)');
+        errors.push('Invalid date (use YYYY-MM-DD)');
       }
 
-      // Match brand
+      // Case-insensitive brand matching
       const matchedBrand = brandList.find(
         b => b.name.toLowerCase() === brand_name.toLowerCase()
       );
+
+      const brandUnmatched = brand_name !== '' && !matchedBrand;
 
       return {
         title,
@@ -133,30 +141,120 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
         slug: generateSlug(title),
         valid: errors.length === 0,
         errors,
+        selected: errors.length === 0, // auto-select valid drops
+        brandUnmatched,
       };
     });
 
     setParsedDrops(parsed);
     setImported(false);
     toast.success(`Parsed ${parsed.length} drops from CSV`);
+
+    // Reset file input so same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const toggleSelect = (index: number) => {
+    setParsedDrops(prev => prev.map((d, i) => 
+      i === index ? { ...d, selected: !d.selected } : d
+    ));
+  };
+
+  const selectAll = () => {
+    const allSelected = parsedDrops.every(d => d.selected);
+    setParsedDrops(prev => prev.map(d => ({ ...d, selected: !allSelected })));
+  };
+
+  const selectValid = () => {
+    setParsedDrops(prev => prev.map(d => ({ ...d, selected: d.valid })));
+  };
+
+  const openEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditForm({ ...parsedDrops[index] });
+  };
+
+  const saveEdit = () => {
+    if (editingIndex === null || !editForm) return;
+
+    // Re-validate after edit
+    const errors: string[] = [];
+    if (!editForm.title) errors.push('Missing title');
+    if (!editForm.release_date) errors.push('Missing date');
+    const dateObj = new Date(editForm.release_date);
+    if (editForm.release_date && isNaN(dateObj.getTime())) {
+      errors.push('Invalid date (use YYYY-MM-DD)');
+    }
+
+    // Re-match brand (case-insensitive)
+    const matchedBrand = brands.find(
+      b => b.name.toLowerCase() === editForm.brand_name.toLowerCase()
+    );
+
+    const updated = {
+      ...editForm,
+      brand_id: matchedBrand?.id,
+      slug: generateSlug(editForm.title),
+      valid: errors.length === 0,
+      errors,
+      brandUnmatched: editForm.brand_name !== '' && !matchedBrand,
+    };
+
+    setParsedDrops(prev => prev.map((d, i) => i === editingIndex ? updated : d));
+    setEditingIndex(null);
+    setEditForm(null);
+    toast.success('Drop updated');
   };
 
   const handleImport = async () => {
-    const validDrops = parsedDrops.filter(d => d.valid);
-    if (validDrops.length === 0) {
-      toast.error('No valid drops to import');
+    const selectedDrops = parsedDrops.filter(d => d.selected && d.valid);
+    if (selectedDrops.length === 0) {
+      toast.error('No valid drops selected');
       return;
     }
 
     setImporting(true);
     let successCount = 0;
     let errorCount = 0;
+    let brandsCreated = 0;
 
-    for (const drop of validDrops) {
+    // First: auto-create unmatched brands
+    const unmatchedBrandNames = [...new Set(
+      selectedDrops
+        .filter(d => d.brandUnmatched && d.brand_name)
+        .map(d => d.brand_name)
+    )];
+
+    const newBrandMap: Record<string, string> = {}; // name -> id
+
+    for (const brandName of unmatchedBrandNames) {
+      const slug = generateSlug(brandName);
+      const { data, error } = await supabase
+        .from('brands')
+        .insert({ name: brandName, slug, is_active: true })
+        .select('id')
+        .single();
+
+      if (data) {
+        newBrandMap[brandName.toLowerCase()] = data.id;
+        brandsCreated++;
+      } else {
+        console.error('Failed to create brand:', brandName, error);
+      }
+    }
+
+    // Now import drops
+    for (const drop of selectedDrops) {
+      // Use existing brand_id or newly created one
+      let brandId = drop.brand_id || null;
+      if (!brandId && drop.brand_name) {
+        brandId = newBrandMap[drop.brand_name.toLowerCase()] || null;
+      }
+
       const { error } = await supabase.from('drops').insert({
         title: drop.title,
         slug: drop.slug!,
-        brand_id: drop.brand_id || null,
+        brand_id: brandId,
         release_date: drop.release_date,
         description: drop.description || null,
         image_url: drop.image_url || null,
@@ -177,13 +275,22 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
     setImporting(false);
     setImported(true);
 
+    let message = `Imported ${successCount} drops`;
+    if (brandsCreated > 0) message += `, created ${brandsCreated} new brands`;
+    if (errorCount > 0) message += `, ${errorCount} failed`;
+
     if (errorCount === 0) {
-      toast.success(`Successfully imported ${successCount} drops!`);
+      toast.success(message);
     } else {
-      toast.warning(`Imported ${successCount} drops, ${errorCount} failed`);
+      toast.warning(message);
     }
 
     onImportComplete();
+  };
+
+  const handleDiscountCodeCopy = (drop: ParsedDrop) => {
+    navigator.clipboard.writeText(drop.discount_code);
+    toast.success(`Code "${drop.discount_code}" copied!`);
   };
 
   const downloadTemplate = () => {
@@ -200,113 +307,250 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
     URL.revokeObjectURL(url);
   };
 
-  const validCount = parsedDrops.filter(d => d.valid).length;
+  const selectedCount = parsedDrops.filter(d => d.selected).length;
+  const validSelectedCount = parsedDrops.filter(d => d.selected && d.valid).length;
+  const unmatchedCount = parsedDrops.filter(d => d.brandUnmatched).length;
   const invalidCount = parsedDrops.filter(d => !d.valid).length;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Upload className="w-5 h-5" />
-          Bulk Import Drops
-        </CardTitle>
-        <CardDescription>
-          Upload a CSV file to import multiple drops at once. Brand names are matched to existing brands in the database.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Actions */}
-        <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={downloadTemplate}>
-            <Download className="w-4 h-4 mr-1" /> Download Template
-          </Button>
-          <Button size="sm" onClick={() => fileInputRef.current?.click()}>
-            <FileText className="w-4 h-4 mr-1" /> Select CSV File
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            className="hidden"
-            onChange={handleFileSelect}
-          />
-        </div>
-
-        {/* Preview */}
-        {parsedDrops.length > 0 && (
-          <>
-            <div className="flex items-center gap-3 text-sm">
-              <Badge variant="outline" className="text-green-400 border-green-400/30">
-                {validCount} valid
-              </Badge>
-              {invalidCount > 0 && (
-                <Badge variant="outline" className="text-red-400 border-red-400/30">
-                  {invalidCount} errors
-                </Badge>
-              )}
-              <span className="text-muted-foreground text-xs">
-                {parsedDrops.filter(d => d.brand_id).length} / {parsedDrops.length} brands matched
-              </span>
-            </div>
-
-            <div className="border rounded-lg overflow-auto max-h-[400px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-8">✓</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Brand</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Featured</TableHead>
-                    <TableHead>Issues</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {parsedDrops.map((drop, i) => (
-                    <TableRow key={i} className={drop.valid ? '' : 'bg-red-500/5'}>
-                      <TableCell>
-                        {drop.valid ? (
-                          <Check className="w-4 h-4 text-green-400" />
-                        ) : (
-                          <X className="w-4 h-4 text-red-400" />
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm font-medium">{drop.title}</TableCell>
-                      <TableCell className="text-sm">
-                        {drop.brand_id ? (
-                          <span className="text-green-400">{drop.brand_name}</span>
-                        ) : (
-                          <span className="text-yellow-400" title="Brand not found in database">
-                            {drop.brand_name || '—'} ⚠️
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm">{drop.release_date}</TableCell>
-                      <TableCell>{drop.is_featured ? '⭐' : '—'}</TableCell>
-                      <TableCell>
-                        {drop.errors.length > 0 && (
-                          <span className="text-xs text-red-400 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" />
-                            {drop.errors.join(', ')}
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            <Button
-              onClick={handleImport}
-              disabled={importing || imported || validCount === 0}
-              className="w-full"
-            >
-              {importing ? 'Importing...' : imported ? `Imported ${validCount} drops ✓` : `Import ${validCount} valid drops`}
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="w-5 h-5" />
+            Bulk Import Drops
+          </CardTitle>
+          <CardDescription>
+            Upload a CSV file to import multiple drops. Brand names are matched case-insensitively. Unmatched brands are auto-created.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" size="sm" onClick={downloadTemplate}>
+              <Download className="w-4 h-4 mr-1" /> Download Template
             </Button>
-          </>
-        )}
-      </CardContent>
-    </Card>
+            <Button size="sm" onClick={() => fileInputRef.current?.click()}>
+              <FileText className="w-4 h-4 mr-1" /> Select CSV File
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+          </div>
+
+          {parsedDrops.length > 0 && (
+            <>
+              {/* Summary badges */}
+              <div className="flex items-center gap-3 text-sm flex-wrap">
+                <Badge variant="outline" className="text-green-400 border-green-400/30">
+                  {parsedDrops.filter(d => d.valid).length} valid
+                </Badge>
+                {invalidCount > 0 && (
+                  <Badge variant="outline" className="text-red-400 border-red-400/30">
+                    {invalidCount} errors
+                  </Badge>
+                )}
+                {unmatchedCount > 0 && (
+                  <Badge variant="outline" className="text-yellow-400 border-yellow-400/30">
+                    <Plus className="w-3 h-3 mr-1" />
+                    {unmatchedCount} new brands will be created
+                  </Badge>
+                )}
+                <span className="text-muted-foreground text-xs">
+                  {selectedCount} selected
+                </span>
+              </div>
+
+              {/* Selection controls */}
+              <div className="flex gap-2 flex-wrap">
+                <Button variant="outline" size="sm" className="h-7 text-xs" onClick={selectAll}>
+                  {parsedDrops.every(d => d.selected) ? 'Deselect All' : 'Select All'}
+                </Button>
+                <Button variant="outline" size="sm" className="h-7 text-xs" onClick={selectValid}>
+                  Select Valid Only
+                </Button>
+              </div>
+
+              {/* Table */}
+              <div className="border rounded-lg overflow-auto max-h-[500px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-8">
+                        <Checkbox
+                          checked={parsedDrops.length > 0 && parsedDrops.every(d => d.selected)}
+                          onCheckedChange={selectAll}
+                        />
+                      </TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Brand</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="w-8">⭐</TableHead>
+                      <TableHead>Issues</TableHead>
+                      <TableHead className="w-8"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {parsedDrops.map((drop, i) => (
+                      <TableRow
+                        key={i}
+                        className={`${!drop.valid ? 'bg-red-500/5' : ''} ${!drop.selected ? 'opacity-50' : ''}`}
+                      >
+                        <TableCell>
+                          <Checkbox
+                            checked={drop.selected}
+                            onCheckedChange={() => toggleSelect(i)}
+                          />
+                        </TableCell>
+                        <TableCell className="text-sm font-medium max-w-[200px] truncate">
+                          {drop.title}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {drop.brand_id ? (
+                            <span className="text-green-400">{drop.brand_name}</span>
+                          ) : drop.brandUnmatched ? (
+                            <span className="text-yellow-400 flex items-center gap-1" title="New brand will be created on import">
+                              <Plus className="w-3 h-3" /> {drop.brand_name}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">{drop.brand_name || '—'}</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm">{drop.release_date}</TableCell>
+                        <TableCell>{drop.is_featured ? '⭐' : '—'}</TableCell>
+                        <TableCell>
+                          {drop.errors.length > 0 && (
+                            <span className="text-xs text-red-400 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                              {drop.errors.join(', ')}
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => openEdit(i)}
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Import button */}
+              <Button
+                onClick={handleImport}
+                disabled={importing || imported || validSelectedCount === 0}
+                className="w-full"
+              >
+                {importing
+                  ? 'Importing...'
+                  : imported
+                    ? `Done ✓`
+                    : `Import ${validSelectedCount} selected drops${unmatchedCount > 0 ? ` (+ create ${[...new Set(parsedDrops.filter(d => d.selected && d.brandUnmatched).map(d => d.brand_name))].length} new brands)` : ''}`
+                }
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={editingIndex !== null} onOpenChange={(open) => { if (!open) { setEditingIndex(null); setEditForm(null); } }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Drop</DialogTitle>
+          </DialogHeader>
+          {editForm && (
+            <div className="space-y-3">
+              <div>
+                <Label>Title *</Label>
+                <Input
+                  value={editForm.title}
+                  onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Brand Name</Label>
+                <Input
+                  value={editForm.brand_name}
+                  onChange={(e) => setEditForm({ ...editForm, brand_name: e.target.value })}
+                  placeholder="Must match existing brand or will be created"
+                />
+                {editForm.brand_name && !brands.find(b => b.name.toLowerCase() === editForm.brand_name.toLowerCase()) && (
+                  <p className="text-xs text-yellow-400 mt-1 flex items-center gap-1">
+                    <Plus className="w-3 h-3" /> New brand will be created on import
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label>Release Date * (YYYY-MM-DD)</Label>
+                <Input
+                  value={editForm.release_date}
+                  onChange={(e) => setEditForm({ ...editForm, release_date: e.target.value })}
+                  placeholder="2026-03-15"
+                />
+              </div>
+              <div>
+                <Label>Description</Label>
+                <Textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  rows={3}
+                  placeholder="Drop description..."
+                />
+              </div>
+              <div>
+                <Label>Image URL</Label>
+                <Input
+                  value={editForm.image_url}
+                  onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <Label>Affiliate Link</Label>
+                <Input
+                  value={editForm.affiliate_link}
+                  onChange={(e) => setEditForm({ ...editForm, affiliate_link: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <Label>Discount Code</Label>
+                <Input
+                  value={editForm.discount_code}
+                  onChange={(e) => setEditForm({ ...editForm, discount_code: e.target.value })}
+                  placeholder="e.g. SAVE10"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={editForm.is_featured}
+                  onCheckedChange={(checked) => setEditForm({ ...editForm, is_featured: checked === true })}
+                />
+                <Label>Featured Drop</Label>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEditingIndex(null); setEditForm(null); }}>
+              Cancel
+            </Button>
+            <Button onClick={saveEdit}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
