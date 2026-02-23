@@ -32,6 +32,7 @@ const GlobalIndex = () => {
   const [selectedBrandForShops, setSelectedBrandForShops] = useState<{ id: string; name: string } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [highlightedBrand, setHighlightedBrand] = useState<string | null>(highlightId);
 
   // Fetch brands and user favorites
@@ -109,7 +110,9 @@ const GlobalIndex = () => {
     if (selectedCountry !== "all") {
       filtered = filtered.filter(brand => brand.country === selectedCountry);
     }
-
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(brand => brand.category === selectedCategory);
+    }
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
@@ -125,7 +128,7 @@ const GlobalIndex = () => {
     });
 
     setFilteredBrands(sorted);
-  }, [searchQuery, selectedCountry, sortBy, brands, showFavoritesOnly, favoriteBrands]);
+  }, [searchQuery, selectedCountry, selectedCategory, sortBy, brands, showFavoritesOnly, favoriteBrands]);
 
   // Get unique countries from brands
   const countries = Array.from(new Set(brands.map(brand => brand.country).filter(Boolean))).sort();
@@ -240,6 +243,22 @@ const GlobalIndex = () => {
               </Button>
             </CollapsibleTrigger>
           </div>
+          {/* Category Chips */}
+          <div className="flex gap-1.5 overflow-x-auto pt-2 pb-1 scrollbar-hide">
+            {["all", "streetwear", "sneakers", "contemporary", "designer", "luxury", "techwear", "outdoor", "heritage", "skate", "accessories", "vintage", "sportswear"].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`flex-shrink-0 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                  selectedCategory === cat
+                    ? 'bg-[#AD3A49] text-white'
+                    : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </button>
+            ))}
+          </div>
           <CollapsibleContent>
             <div className="space-y-3 pt-3">
               <Select value={selectedCountry} onValueChange={setSelectedCountry}>
@@ -272,7 +291,7 @@ const GlobalIndex = () => {
                   <p className="text-xs text-muted-foreground">
                     {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''}
                   </p>
-                  {(searchQuery || selectedCountry !== "all" || sortBy !== "name-asc" || showFavoritesOnly) && (
+                  {(searchQuery || selectedCountry !== "all" || selectedCategory !== "all" || sortBy !== "name-asc" || showFavoritesOnly) && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -280,6 +299,7 @@ const GlobalIndex = () => {
                       onClick={() => {
                         setSearchQuery("");
                         setSelectedCountry("all");
+                        setSelectedCategory("all");
                         setSortBy("name-asc");
                         setShowFavoritesOnly(false);
                       }}
