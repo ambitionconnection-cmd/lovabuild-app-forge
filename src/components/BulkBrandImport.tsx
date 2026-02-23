@@ -4,8 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Upload, FileText, Check, X, AlertCircle, Download } from 'lucide-react';
+import { Upload, FileText, Check, X, AlertCircle, Download, Pencil } from 'lucide-react';
 
 interface ParsedBrand {
   name: string;
@@ -21,6 +27,8 @@ interface ParsedBrand {
   slug: string;
   valid: boolean;
   errors: string[];
+  selected: boolean;
+  isDuplicate: boolean;
 }
 
 const VALID_CATEGORIES = ['streetwear', 'sneakers', 'accessories', 'luxury', 'vintage', 'sportswear', 'contemporary', 'techwear', 'outdoor', 'heritage', 'designer', 'skate'];
@@ -29,6 +37,8 @@ export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => 
   const [parsedBrands, setParsedBrands] = useState<ParsedBrand[]>([]);
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<ParsedBrand | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const generateSlug = (name: string) => {
@@ -91,9 +101,8 @@ export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => 
     const headers = rows[0].map(h => h.toLowerCase().replace(/\s+/g, '_'));
     const dataRows = rows.slice(1);
 
-    // Check for existing brands to avoid duplicates
+    // Check for existing brands (case-insensitive)
     const { data: existingBrands } = await supabase.from('brands').select('name, slug');
-    const existingSlugs = new Set((existingBrands || []).map(b => b.slug));
     const existingNames = new Set((existingBrands || []).map(b => b.name.toLowerCase()));
 
     const parsed: ParsedBrand[] = dataRows.map((row) => {
@@ -108,11 +117,12 @@ export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => 
       const slug = generateSlug(name);
 
       if (!name) errors.push('Missing name');
-      if (existingSlugs.has(slug) || existingNames.has(name.toLowerCase())) {
-        errors.push('Brand already exists');
-      }
+      
+      const isDuplicate = existingNames.has(name.toLowerCase());
+      if (isDuplicate) errors.push('Already exists');
+
       if (category && !VALID_CATEGORIES.includes(category)) {
-        errors.push(`Invalid category (use: ${VALID_CATEGORIES.join(', ')})`);
+        errors.push(`Invalid category`);
       }
 
       // Validate URLs
@@ -120,7 +130,7 @@ export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => 
       urlFields.forEach(field => {
         const val = obj[field];
         if (val && !val.startsWith('http://') && !val.startsWith('https://')) {
-          errors.push(`${field} must start with http:// or https://`);
+          errors.push(`${field} needs http://`);
         }
       });
 
@@ -138,18 +148,73 @@ export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => 
         slug,
         valid: errors.length === 0,
         errors,
+        selected: errors.length === 0,
+        isDuplicate,
       };
     });
 
     setParsedBrands(parsed);
     setImported(false);
     toast.success(`Parsed ${parsed.length} brands from CSV`);
+
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const toggleSelect = (index: number) => {
+    setParsedBrands(prev => prev.map((b, i) =>
+      i === index ? { ...b, selected: !b.selected } : b
+    ));
+  };
+
+  const selectAll = () => {
+    const allSelected = parsedBrands.every(b => b.selected);
+    setParsedBrands(prev => prev.map(b => ({ ...b, selected: !allSelected })));
+  };
+
+  const selectValid = () => {
+    setParsedBrands(prev => prev.map(b => ({ ...b, selected: b.valid })));
+  };
+
+  const openEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditForm({ ...parsedBrands[index] });
+  };
+
+  const saveEdit = () => {
+    if (editingIndex === null || !editForm) return;
+
+    const errors: string[] = [];
+    if (!editForm.name) errors.push('Missing name');
+    if (editForm.category && !VALID_CATEGORIES.includes(editForm.category.toLowerCase())) {
+      errors.push('Invalid category');
+    }
+
+    const urlFields = ['official_website', 'instagram_url', 'tiktok_url', 'logo_url', 'banner_url'] as const;
+    urlFields.forEach(field => {
+      const val = editForm[field];
+      if (val && !val.startsWith('http://') && !val.startsWith('https://')) {
+        errors.push(`${field} needs http://`);
+      }
+    });
+
+    const updated = {
+      ...editForm,
+      slug: generateSlug(editForm.name),
+      category: editForm.category.toLowerCase(),
+      valid: errors.length === 0,
+      errors,
+    };
+
+    setParsedBrands(prev => prev.map((b, i) => i === editingIndex ? updated : b));
+    setEditingIndex(null);
+    setEditForm(null);
+    toast.success('Brand updated');
   };
 
   const handleImport = async () => {
-    const validBrands = parsedBrands.filter(b => b.valid);
+    const validBrands = parsedBrands.filter(b => b.selected && b.valid);
     if (validBrands.length === 0) {
-      toast.error('No valid brands to import');
+      toast.error('No valid brands selected');
       return;
     }
 
@@ -164,7 +229,6 @@ export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => 
         is_active: true,
       };
 
-      // Only include non-empty fields
       if (brand.description) insertData.description = brand.description;
       if (brand.history) insertData.history = brand.history;
       if (brand.country) insertData.country = brand.country;
@@ -210,102 +274,207 @@ export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => 
     URL.revokeObjectURL(url);
   };
 
-  const validCount = parsedBrands.filter(b => b.valid).length;
+  const selectedCount = parsedBrands.filter(b => b.selected).length;
+  const validSelectedCount = parsedBrands.filter(b => b.selected && b.valid).length;
   const invalidCount = parsedBrands.filter(b => !b.valid).length;
+  const duplicateCount = parsedBrands.filter(b => b.isDuplicate).length;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Upload className="w-5 h-5" />
-          Bulk Import Brands
-        </CardTitle>
-        <CardDescription>
-          Upload a CSV file to import multiple brands at once. Duplicate brands are automatically detected.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={downloadTemplate}>
-            <Download className="w-4 h-4 mr-1" /> Download Template
-          </Button>
-          <Button size="sm" onClick={() => fileInputRef.current?.click()}>
-            <FileText className="w-4 h-4 mr-1" /> Select CSV File
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            className="hidden"
-            onChange={handleFileSelect}
-          />
-        </div>
-
-        {parsedBrands.length > 0 && (
-          <>
-            <div className="flex items-center gap-3 text-sm">
-              <Badge variant="outline" className="text-green-400 border-green-400/30">
-                {validCount} valid
-              </Badge>
-              {invalidCount > 0 && (
-                <Badge variant="outline" className="text-red-400 border-red-400/30">
-                  {invalidCount} errors
-                </Badge>
-              )}
-            </div>
-
-            <div className="border rounded-lg overflow-auto max-h-[400px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-8">✓</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Country</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Website</TableHead>
-                    <TableHead>Issues</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {parsedBrands.map((brand, i) => (
-                    <TableRow key={i} className={brand.valid ? '' : 'bg-red-500/5'}>
-                      <TableCell>
-                        {brand.valid ? (
-                          <Check className="w-4 h-4 text-green-400" />
-                        ) : (
-                          <X className="w-4 h-4 text-red-400" />
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm font-medium">{brand.name}</TableCell>
-                      <TableCell className="text-sm">{brand.country || '—'}</TableCell>
-                      <TableCell className="text-sm">{brand.category || '—'}</TableCell>
-                      <TableCell className="text-sm text-[#C4956A] truncate max-w-[150px]">
-                        {brand.official_website ? '✓' : '—'}
-                      </TableCell>
-                      <TableCell>
-                        {brand.errors.length > 0 && (
-                          <span className="text-xs text-red-400 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3 flex-shrink-0" />
-                            {brand.errors.join(', ')}
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            <Button
-              onClick={handleImport}
-              disabled={importing || imported || validCount === 0}
-              className="w-full"
-            >
-              {importing ? 'Importing...' : imported ? `Imported ${validCount} brands ✓` : `Import ${validCount} valid brands`}
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="w-5 h-5" />
+            Bulk Import Brands
+          </CardTitle>
+          <CardDescription>
+            Upload a CSV file to import multiple brands. Duplicates are detected case-insensitively.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" size="sm" onClick={downloadTemplate}>
+              <Download className="w-4 h-4 mr-1" /> Download Template
             </Button>
-          </>
-        )}
-      </CardContent>
-    </Card>
+            <Button size="sm" onClick={() => fileInputRef.current?.click()}>
+              <FileText className="w-4 h-4 mr-1" /> Select CSV File
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+          </div>
+
+          {parsedBrands.length > 0 && (
+            <>
+              <div className="flex items-center gap-3 text-sm flex-wrap">
+                <Badge variant="outline" className="text-green-400 border-green-400/30">
+                  {parsedBrands.filter(b => b.valid).length} valid
+                </Badge>
+                {invalidCount > 0 && (
+                  <Badge variant="outline" className="text-red-400 border-red-400/30">
+                    {invalidCount} errors
+                  </Badge>
+                )}
+                {duplicateCount > 0 && (
+                  <Badge variant="outline" className="text-yellow-400 border-yellow-400/30">
+                    {duplicateCount} duplicates
+                  </Badge>
+                )}
+                <span className="text-muted-foreground text-xs">{selectedCount} selected</span>
+              </div>
+
+              <div className="flex gap-2 flex-wrap">
+                <Button variant="outline" size="sm" className="h-7 text-xs" onClick={selectAll}>
+                  {parsedBrands.every(b => b.selected) ? 'Deselect All' : 'Select All'}
+                </Button>
+                <Button variant="outline" size="sm" className="h-7 text-xs" onClick={selectValid}>
+                  Select Valid Only
+                </Button>
+              </div>
+
+              <div className="border rounded-lg overflow-auto max-h-[500px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-8">
+                        <Checkbox
+                          checked={parsedBrands.length > 0 && parsedBrands.every(b => b.selected)}
+                          onCheckedChange={selectAll}
+                        />
+                      </TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Country</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Links</TableHead>
+                      <TableHead>Issues</TableHead>
+                      <TableHead className="w-8"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {parsedBrands.map((brand, i) => (
+                      <TableRow
+                        key={i}
+                        className={`${!brand.valid ? 'bg-red-500/5' : ''} ${!brand.selected ? 'opacity-50' : ''}`}
+                      >
+                        <TableCell>
+                          <Checkbox
+                            checked={brand.selected}
+                            onCheckedChange={() => toggleSelect(i)}
+                          />
+                        </TableCell>
+                        <TableCell className="text-sm font-medium max-w-[180px] truncate">
+                          {brand.isDuplicate ? (
+                            <span className="text-yellow-400">{brand.name} ⚠️</span>
+                          ) : (
+                            brand.name
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm">{brand.country || '—'}</TableCell>
+                        <TableCell className="text-sm">{brand.category || '—'}</TableCell>
+                        <TableCell className="text-sm">
+                          <span className="text-[10px] text-muted-foreground">
+                            {[brand.official_website && 'Web', brand.instagram_url && 'IG', brand.tiktok_url && 'TT'].filter(Boolean).join(', ') || '—'}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {brand.errors.length > 0 && (
+                            <span className="text-xs text-red-400 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                              {brand.errors.join(', ')}
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => openEdit(i)}
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <Button
+                onClick={handleImport}
+                disabled={importing || imported || validSelectedCount === 0}
+                className="w-full"
+              >
+                {importing ? 'Importing...' : imported ? `Done ✓` : `Import ${validSelectedCount} selected brands`}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={editingIndex !== null} onOpenChange={(open) => { if (!open) { setEditingIndex(null); setEditForm(null); } }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Brand</DialogTitle>
+          </DialogHeader>
+          {editForm && (
+            <div className="space-y-3">
+              <div>
+                <Label>Name *</Label>
+                <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+              </div>
+              <div>
+                <Label>Description</Label>
+                <Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} rows={2} placeholder="Short description (280 chars)" />
+              </div>
+              <div>
+                <Label>Country</Label>
+                <Input value={editForm.country} onChange={(e) => setEditForm({ ...editForm, country: e.target.value })} placeholder="e.g. United Kingdom" />
+              </div>
+              <div>
+                <Label>Category</Label>
+                <Select value={editForm.category || ''} onValueChange={(val) => setEditForm({ ...editForm, category: val })}>
+                  <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                  <SelectContent>
+                    {VALID_CATEGORIES.map(cat => (
+                      <SelectItem key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Website</Label>
+                <Input value={editForm.official_website} onChange={(e) => setEditForm({ ...editForm, official_website: e.target.value })} placeholder="https://..." />
+              </div>
+              <div>
+                <Label>Instagram URL</Label>
+                <Input value={editForm.instagram_url} onChange={(e) => setEditForm({ ...editForm, instagram_url: e.target.value })} placeholder="https://instagram.com/..." />
+              </div>
+              <div>
+                <Label>TikTok URL</Label>
+                <Input value={editForm.tiktok_url} onChange={(e) => setEditForm({ ...editForm, tiktok_url: e.target.value })} placeholder="https://tiktok.com/@..." />
+              </div>
+              <div>
+                <Label>Logo URL</Label>
+                <Input value={editForm.logo_url} onChange={(e) => setEditForm({ ...editForm, logo_url: e.target.value })} placeholder="https://..." />
+              </div>
+              <div>
+                <Label>History / About</Label>
+                <Textarea value={editForm.history} onChange={(e) => setEditForm({ ...editForm, history: e.target.value })} rows={4} placeholder="Brand story, founding, ethos..." />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEditingIndex(null); setEditForm(null); }}>Cancel</Button>
+            <Button onClick={saveEdit}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

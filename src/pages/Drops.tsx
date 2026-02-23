@@ -307,6 +307,58 @@ const Drops = () => {
             )}
           </div>
         ) : (
+          <>
+          {/* Featured Drops */}
+          {sortedDrops.some(d => d.is_featured) && (
+            <div className="mb-4">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-[#C4956A] mb-2">Featured</h2>
+              <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3">
+                {sortedDrops.filter(d => d.is_featured).map((drop) => {
+                  const brand = brands.find(b => b.id === drop.brand_id);
+                  const hasReminder = reminders.has(drop.id);
+                  const timeLabel = getTimeLabel(drop.release_date);
+                  const isLive = drop.status === 'live';
+                  return (
+                    <div
+                      key={`featured-${drop.id}`}
+                      className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-[#AD3A49]/10 via-card to-[#C4956A]/10 border border-[#AD3A49]/20 cursor-pointer"
+                      onClick={() => {
+                        if (drop.affiliate_link) handleAffiliateClick(drop);
+                        else toast.info(drop.title, { description: drop.description || 'No additional details' });
+                      }}
+                    >
+                      <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {drop.image_url ? (
+                          <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" loading="lazy"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = brand?.logo_url ? `<img src="${brand.logo_url}" alt="${brand?.name}" class="w-12 h-12 object-contain" />` : `<span class="text-2xl font-bold text-muted-foreground">${drop.title.charAt(0)}</span>`; }}
+                          />
+                        ) : brand?.logo_url ? (
+                          <img src={brand.logo_url} alt={brand.name} className="w-12 h-12 object-contain" loading="lazy" />
+                        ) : (
+                          <span className="text-2xl font-bold text-muted-foreground">{drop.title.charAt(0)}</span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#AD3A49]/20 text-[#AD3A49] border border-[#AD3A49]/30 font-medium">⭐ FEATURED</span>
+                        <h3 className="text-base font-bold mt-1 truncate">{drop.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">{brand?.name} · {format(new Date(drop.release_date), 'MMM d, yyyy')}</p>
+                        {timeLabel && <span className={`text-[10px] ${isLive ? 'text-green-400' : 'text-[#C4956A]'}`}><Clock className="w-3 h-3 inline mr-0.5" />{timeLabel}</span>}
+                      </div>
+                      <button
+                        className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${hasReminder ? 'bg-[#AD3A49]/20 text-[#AD3A49]' : 'hover:bg-muted/50 text-muted-foreground'}`}
+                        onClick={(e) => { e.stopPropagation(); toggleReminder(drop.id); }}
+                      >
+                        {hasReminder ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* All Drops */}
+          <h2 className="text-sm font-bold uppercase tracking-wider text-[#C4956A] mb-2">All Drops</h2>
           <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3">
             {sortedDrops.map((drop) => {
               const brand = brands.find(b => b.id === drop.brand_id);
@@ -329,17 +381,27 @@ const Drops = () => {
                   onClick={() => {
                     if (drop.affiliate_link) {
                       handleAffiliateClick(drop);
+                    } else {
+                      toast.info(drop.title, {
+                        description: drop.description || 'No additional details available',
+                      });
                     }
                   }}
                 >
                   {/* Drop Image */}
                   <div className="w-16 h-16 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0">
                     {drop.image_url ? (
-                      <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" loading="lazy" />
+                      <img
+                        src={drop.image_url}
+                        alt={drop.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = brand?.logo_url ? `<img src="${brand.logo_url}" alt="${brand?.name}" class="w-10 h-10 object-contain" />` : `<span class="text-lg font-bold text-muted-foreground">${drop.title.charAt(0)}</span>`; }}
+                      />
                     ) : brand?.logo_url ? (
                       <img src={brand.logo_url} alt={brand.name} className="w-10 h-10 object-contain" loading="lazy" />
                     ) : (
-                      <Zap className="w-6 h-6 text-muted-foreground/30" />
+                      <span className="text-lg font-bold text-muted-foreground">{drop.title.charAt(0)}</span>
                     )}
                   </div>
 
@@ -402,6 +464,7 @@ const Drops = () => {
               );
             })}
           </div>
+          </>
         )}
       </main>
     </div>
