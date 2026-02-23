@@ -23,12 +23,6 @@ const tabs: TabItem[] = [
 export const BottomTabBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const hiddenRoutes = ["/admin", "/auth", "/analytics", "/notifications"];
-  if (hiddenRoutes.some(route => location.pathname.startsWith(route))) {
-    return null;
-  }
-
   const [isRouteActive, setIsRouteActive] = useState(false);
 
   useEffect(() => {
@@ -41,6 +35,11 @@ export const BottomTabBar = () => {
       window.removeEventListener('reopenShopsSheet', handleMapMode);
     };
   }, []);
+
+  const hiddenRoutes = ["/admin", "/auth", "/analytics", "/notifications"];
+  if (hiddenRoutes.some(route => location.pathname.startsWith(route))) {
+    return null;
+  }
 
   const getIsActive = (tabPath: string) => {
     if (tabPath === '/route') {
