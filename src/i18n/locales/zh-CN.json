@@ -4,13 +4,19 @@
     "tagline": "您的街头服饰发售、品牌和商店的终极目的地"
   },
   "nav": {
+    "home": "首页",
     "directions": "方向",
     "globalIndex": "全球索引",
+    "global": "全球",
     "drops": "新品发售",
     "myHeardrop": "我的 HEARDROP",
     "notifications": "通知",
     "profile": "个人资料",
-    "admin": "管理员"
+    "admin": "管理员",
+    "nearby": "附近",
+    "route": "路线",
+    "index": "索引",
+    "more": "更多"
   },
   "auth": {
     "signIn": "登录",

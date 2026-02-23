@@ -1,8 +1,9 @@
-import { Heart, User, Mail, Info, Bell, Shield, ChevronRight } from "lucide-react";
+import { Heart, User, Mail, Info, Bell, Shield, ChevronRight, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useTranslation } from "react-i18next";
 
 interface MenuItem {
   icon: typeof Heart;
@@ -60,6 +61,7 @@ const More = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { i18n } = useTranslation();
 
   const handleItemClick = (item: MenuItem) => {
     if (item.requiresAuth && !user) {
@@ -117,6 +119,37 @@ const More = () => {
               </button>
             );
           })}
+        </div>
+
+        {/* Language Selector */}
+        <div className="mt-6 pt-4 border-t border-white/5">
+          <div className="flex items-center gap-3 mb-3 px-1">
+            <Globe className="w-4 h-4 text-[#C4956A]" />
+            <span className="text-sm font-medium text-white/70">Language</span>
+          </div>
+          <div className="flex flex-wrap gap-2 px-1">
+            {[
+              { code: 'en', label: 'English', flag: '🇬🇧' },
+              { code: 'fr', label: 'Français', flag: '🇫🇷' },
+              { code: 'zh-CN', label: '中文', flag: '🇨🇳' },
+              { code: 'ja', label: '日本語', flag: '🇯🇵' },
+              { code: 'ko', label: '한국어', flag: '🇰🇷' },
+              { code: 'th', label: 'ไทย', flag: '🇹🇭' },
+            ].map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => { i18n.changeLanguage(lang.code); toast.success(`Language changed to ${lang.label}`); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  i18n.language === lang.code || (lang.code === 'en' && !['fr','zh-CN','ja','ko','th'].includes(i18n.language))
+                    ? 'bg-[#AD3A49] text-white'
+                    : 'bg-white/5 text-white/60 hover:bg-white/10 border border-white/10'
+                }`}
+              >
+                <span>{lang.flag}</span>
+                <span>{lang.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="mt-8 pt-4 border-t border-white/5 text-center">

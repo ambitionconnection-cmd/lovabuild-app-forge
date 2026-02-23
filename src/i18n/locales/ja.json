@@ -4,13 +4,19 @@
     "tagline": "ストリートウェアのドロップ、ブランド、ショップの究極の目的地"
   },
   "nav": {
+    "home": "ホーム",
     "directions": "道順",
     "globalIndex": "グローバルインデックス",
+    "global": "グローバル",
     "drops": "ドロップ",
     "myHeardrop": "マイHEARDROP",
     "notifications": "通知",
     "profile": "プロフィール",
-    "admin": "管理者"
+    "admin": "管理者",
+    "nearby": "近く",
+    "route": "ルート",
+    "index": "インデックス",
+    "more": "その他"
   },
   "auth": {
     "signIn": "ログイン",

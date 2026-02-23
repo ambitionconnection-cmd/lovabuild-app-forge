@@ -2,27 +2,28 @@ import { useState, useEffect } from "react";
 import { Map, Route, Globe, Flame, MoreHorizontal } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface TabItem {
   icon: typeof Map;
-  label: string;
+  key: string;
   path: string;
   activeColor: string;
   borderColor: string;
 }
 
-const tabs: TabItem[] = [
-  { icon: Map, label: "Nearby", path: "/", activeColor: "text-[#AD3A49]", borderColor: "border-[#AD3A49]" },
-  { icon: Route, label: "Route", path: "/route", activeColor: "text-[#C4956A]", borderColor: "border-[#C4956A]" },
-  { icon: Globe, label: "Index", path: "/global-index", activeColor: "text-[#C3C9C9]", borderColor: "border-[#C3C9C9]" },
-  { icon: Flame, label: "Drops", path: "/drops", activeColor: "text-[#8B6DAF]", borderColor: "border-[#8B6DAF]" },
-  { icon: MoreHorizontal, label: "More", path: "/more", activeColor: "text-[#7D8184]", borderColor: "border-[#7D8184]" },
+const tabDefs = [
+  { icon: Map, key: "nearby", path: "/", activeColor: "text-[#AD3A49]", borderColor: "border-[#AD3A49]" },
+  { icon: Route, key: "route", path: "/route", activeColor: "text-[#C4956A]", borderColor: "border-[#C4956A]" },
+  { icon: Globe, key: "index", path: "/global-index", activeColor: "text-[#C3C9C9]", borderColor: "border-[#C3C9C9]" },
+  { icon: Flame, key: "drops", path: "/drops", activeColor: "text-[#8B6DAF]", borderColor: "border-[#8B6DAF]" },
+  { icon: MoreHorizontal, key: "more", path: "/more", activeColor: "text-[#7D8184]", borderColor: "border-[#7D8184]" },
 ];
 
 export const DesktopTopNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [isRouteActive, setIsRouteActive] = useState(false);
 
   useEffect(() => {
@@ -58,9 +59,10 @@ export const DesktopTopNav = () => {
 
       {/* Nav tabs - centered */}
       <div className="flex-1 flex items-center justify-center gap-1">
-        {tabs.map((tab) => {
+        {tabDefs.map((tab) => {
           const isActive = getIsActive(tab.path);
           const Icon = tab.icon;
+          const label = t(`nav.${tab.key}`);
 
           return (
             <button
@@ -89,7 +91,7 @@ export const DesktopTopNav = () => {
               )}
             >
               <Icon className="w-4 h-4" />
-              {tab.label}
+              {label}
             </button>
           );
         })}

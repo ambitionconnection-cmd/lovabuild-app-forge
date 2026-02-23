@@ -4,13 +4,19 @@
     "tagline": "스트리트웨어 드롭, 브랜드, 매장을 위한 궁극의 목적지"
   },
   "nav": {
+    "home": "홈",
     "directions": "방향",
     "globalIndex": "글로벌 인덱스",
+    "global": "글로벌",
     "drops": "드롭",
     "myHeardrop": "내 HEARDROP",
     "notifications": "알림",
     "profile": "프로필",
-    "admin": "관리자"
+    "admin": "관리자",
+    "nearby": "주변",
+    "route": "경로",
+    "index": "인덱스",
+    "more": "더보기"
   },
   "auth": {
     "signIn": "로그인",

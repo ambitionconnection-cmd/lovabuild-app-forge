@@ -4,13 +4,19 @@
     "tagline": "Votre destination ultime pour les sorties streetwear, les marques et les boutiques"
   },
   "nav": {
+    "home": "Accueil",
     "directions": "DIRECTIONS",
     "globalIndex": "INDEX GLOBAL",
-    "drops": "SORTIES",
-    "myHeardrop": "MON HEARDROP",
+    "global": "Global",
+    "drops": "Sorties",
+    "myHeardrop": "Favoris",
     "notifications": "Notifications",
     "profile": "Profil",
-    "admin": "Admin"
+    "admin": "Admin",
+    "nearby": "Proches",
+    "route": "Itinéraire",
+    "index": "Index",
+    "more": "Plus"
   },
   "auth": {
     "signIn": "Se Connecter",

@@ -12,7 +12,11 @@
     "myHeardrop": "Favorites",
     "notifications": "Notifications",
     "profile": "Profile",
-    "admin": "Admin"
+    "admin": "Admin",
+    "nearby": "Nearby",
+    "route": "Route",
+    "index": "Index",
+    "more": "More"
   },
   "auth": {
     "signIn": "Sign In",
@@ -208,7 +212,13 @@
     "accessories": "Accessories",
     "luxury": "Luxury",
     "vintage": "Vintage",
-    "sportswear": "Sportswear"
+    "sportswear": "Sportswear",
+    "contemporary": "Contemporary",
+    "techwear": "Techwear",
+    "outdoor": "Outdoor / Gorpcore",
+    "heritage": "Heritage / Workwear",
+    "designer": "Designer",
+    "skate": "Skate"
   },
   "common": {
     "loading": "Loading...",

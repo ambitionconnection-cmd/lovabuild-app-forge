@@ -3,26 +3,28 @@ import { Map, Route, Globe, Flame, MoreHorizontal } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import haptic from "@/lib/haptics";
+import { useTranslation } from "react-i18next";
 
 interface TabItem {
   icon: typeof Map;
-  label: string;
+  key: string;
   path: string;
   activeColor: string;
   activeTextColor: string;
 }
 
-const tabs: TabItem[] = [
-  { icon: Map, label: "Nearby", path: "/", activeColor: "text-[#AD3A49]", activeTextColor: "text-[#AD3A49]" },
-  { icon: Route, label: "Route", path: "/route", activeColor: "text-[#C4956A]", activeTextColor: "text-[#C4956A]" },
-  { icon: Globe, label: "Index", path: "/global-index", activeColor: "text-[#C3C9C9]", activeTextColor: "text-[#C3C9C9]" },
-  { icon: Flame, label: "Drops", path: "/drops", activeColor: "text-[#8B6DAF]", activeTextColor: "text-[#8B6DAF]" },
-  { icon: MoreHorizontal, label: "More", path: "/more", activeColor: "text-[#7D8184]", activeTextColor: "text-[#7D8184]" },
+const tabDefs = [
+  { icon: Map, key: "nearby", path: "/", activeColor: "text-[#AD3A49]", activeTextColor: "text-[#AD3A49]" },
+  { icon: Route, key: "route", path: "/route", activeColor: "text-[#C4956A]", activeTextColor: "text-[#C4956A]" },
+  { icon: Globe, key: "index", path: "/global-index", activeColor: "text-[#C3C9C9]", activeTextColor: "text-[#C3C9C9]" },
+  { icon: Flame, key: "drops", path: "/drops", activeColor: "text-[#8B6DAF]", activeTextColor: "text-[#8B6DAF]" },
+  { icon: MoreHorizontal, key: "more", path: "/more", activeColor: "text-[#7D8184]", activeTextColor: "text-[#7D8184]" },
 ];
 
 export const BottomTabBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isRouteActive, setIsRouteActive] = useState(false);
 
   useEffect(() => {
@@ -54,9 +56,10 @@ export const BottomTabBar = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-t border-white/10 safe-area-bottom lg:hidden">
       <div className="flex items-center justify-around h-14 max-w-lg mx-auto px-1">
-        {tabs.map((tab) => {
+        {tabDefs.map((tab) => {
           const isActive = getIsActive(tab.path);
           const Icon = tab.icon;
+          const label = t(`nav.${tab.key}`);
 
           return (
             <button
@@ -96,7 +99,7 @@ export const BottomTabBar = () => {
                 "text-[10px] tracking-wide",
                 isActive ? "font-bold" : "font-medium"
               )}>
-                {tab.label}
+                {label}
               </span>
             </button>
           );
