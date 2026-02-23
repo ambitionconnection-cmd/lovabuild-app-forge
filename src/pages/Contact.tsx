@@ -21,6 +21,12 @@ const CATEGORIES = [
   { value: "luxury", label: "Luxury" },
   { value: "vintage", label: "Vintage" },
   { value: "sportswear", label: "Sportswear" },
+  { value: "contemporary", label: "Contemporary" },
+  { value: "techwear", label: "Techwear" },
+  { value: "outdoor", label: "Outdoor / Gorpcore" },
+  { value: "heritage", label: "Heritage / Workwear" },
+  { value: "designer", label: "Designer" },
+  { value: "skate", label: "Skate" },
 ];
 
 const COUNTRIES = [

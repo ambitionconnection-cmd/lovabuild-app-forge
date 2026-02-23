@@ -23,7 +23,7 @@ interface ParsedBrand {
   errors: string[];
 }
 
-const VALID_CATEGORIES = ['streetwear', 'sneakers', 'accessories', 'luxury', 'vintage', 'sportswear'];
+const VALID_CATEGORIES = ['streetwear', 'sneakers', 'accessories', 'luxury', 'vintage', 'sportswear', 'contemporary', 'techwear', 'outdoor', 'heritage', 'designer', 'skate'];
 
 export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => void }) {
   const [parsedBrands, setParsedBrands] = useState<ParsedBrand[]>([]);

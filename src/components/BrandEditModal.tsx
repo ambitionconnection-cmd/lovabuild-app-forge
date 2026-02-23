@@ -21,7 +21,7 @@ const COUNTRIES = [
   "South Korea", "Spain", "Sweden", "Switzerland", "Taiwan", "Thailand", "Turkey", 
   "UAE", "UK", "USA", "Vietnam"
 ].sort();
-const CATEGORIES = ["streetwear", "sneakers", "accessories", "luxury", "vintage", "sportswear"];
+const CATEGORIES = ["streetwear", "sneakers", "accessories", "luxury", "vintage", "sportswear", "contemporary", "techwear", "outdoor", "heritage", "designer", "skate"];
 
 interface BrandEditModalProps {
   brand: Brand | null;
