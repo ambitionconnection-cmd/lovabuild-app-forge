@@ -19,6 +19,7 @@ import { ShopManagement } from '@/components/ShopManagement';
 import { DropManagement } from '@/components/DropManagement';
 import { BulkDropImport } from '@/components/BulkDropImport';
 import { BulkBrandImport } from '@/components/BulkBrandImport';
+import { BulkShopImport } from '@/components/BulkShopImport';
 import { DropsCalendar } from '@/components/DropsCalendar';
 import { MediaManagement } from '@/components/MediaManagement';
 import { DataExports } from '@/components/DataExports';
@@ -680,7 +681,10 @@ export default function Admin() {
             )}
 
             {activeTab === "shops" && (
-              <ShopManagement />
+              <div className="space-y-6">
+                <ShopManagement />
+                <BulkShopImport onImportComplete={() => window.location.reload()} />
+              </div>
             )}
 
             {activeTab === "drops" && (
