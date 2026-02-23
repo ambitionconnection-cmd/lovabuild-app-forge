@@ -181,7 +181,7 @@ const BrandDetail = () => {
               {/* Logo */}
               <div className="w-32 h-32 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden shadow-lg animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
                 {brand.logo_url ? (
-                  <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
+                  <img src={brand.logo_url} alt={brand.name} className="max-w-full max-h-full object-contain p-2" />
                 ) : (
                   <span className="text-4xl font-bold text-muted-foreground">{brand.name.charAt(0)}</span>
                 )}
