@@ -18,6 +18,7 @@ import { BrandManagement } from '@/components/BrandManagement';
 import { ShopManagement } from '@/components/ShopManagement';
 import { DropManagement } from '@/components/DropManagement';
 import { BulkDropImport } from '@/components/BulkDropImport';
+import { BulkBrandImport } from '@/components/BulkBrandImport';
 import { DropsCalendar } from '@/components/DropsCalendar';
 import { MediaManagement } from '@/components/MediaManagement';
 import { DataExports } from '@/components/DataExports';
@@ -672,7 +673,10 @@ export default function Admin() {
             )}
 
             {activeTab === "brands" && (
-              <BrandManagement />
+              <div className="space-y-6">
+                <BrandManagement />
+                <BulkBrandImport onImportComplete={() => window.location.reload()} />
+              </div>
             )}
 
             {activeTab === "shops" && (
