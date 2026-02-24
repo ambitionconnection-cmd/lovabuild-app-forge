@@ -220,6 +220,21 @@
     "designer": "ดีไซเนอร์",
     "skate": "สเก็ต"
   },
+  "more": {
+    "subtitle": "ตั้งค่า, รายการโปรด & อื่นๆ",
+    "myHeardrop": "HEARDROP ของฉัน",
+    "myHeardropDesc": "รายการโปรด ร้านค้า & แบรนด์",
+    "profile": "โปรไฟล์",
+    "profileDesc": "ตั้งค่าบัญชี & ค่ากำหนด",
+    "notifications": "การแจ้งเตือน",
+    "notificationsDesc": "แจ้งเตือนดรอป & รีมายเดอร์",
+    "contact": "ติดต่อ",
+    "contactDesc": "ติดต่อเรา ส่งแบรนด์",
+    "about": "เกี่ยวกับ HEARDROP",
+    "aboutDesc": "เรื่องราว & พันธกิจของเรา",
+    "adminDashboard": "แดชบอร์ดผู้ดูแล",
+    "adminDesc": "จัดการเนื้อหา & การส่ง"
+  },
   "common": {
     "loading": "กำลังโหลด...",
     "error": "ข้อผิดพลาด",
