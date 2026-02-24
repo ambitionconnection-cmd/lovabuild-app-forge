@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const signInSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255),
@@ -61,6 +62,7 @@ const Auth = () => {
   const { user, signIn, signUp, signInWithGoogle, resetPassword, updatePassword, resendVerificationEmail } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = React.useState(false);
   const [showForgotPassword, setShowForgotPassword] = React.useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = React.useState(false);
@@ -320,7 +322,7 @@ const Auth = () => {
                   setVerificationEmail("");
                 }}
               >
-                Back to Sign In
+                {t('auth.backToSignIn')}
               </Button>
             </CardContent>
           </Card>
@@ -333,7 +335,7 @@ const Auth = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4 lg:pt-16">
         <div className="w-full max-w-md">
-          <button onClick={() => { setShowForgotPassword(false); }} className="mb-4 text-sm text-[#C4956A] hover:text-[#C4956A]/80 transition-colors flex items-center gap-2 py-2">← Back to Sign In</button>
+          <button onClick={() => { setShowForgotPassword(false); }} className="mb-4 text-sm text-[#C4956A] hover:text-[#C4956A]/80 transition-colors flex items-center gap-2 py-2">← {t('auth.backToSignIn')}</button>
           <div className="flex items-center justify-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
             <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>
@@ -341,7 +343,7 @@ const Auth = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Forgot Password</CardTitle>
+              <CardTitle>{t('auth.forgotPassword')}</CardTitle>
               <CardDescription>Enter your email to receive a reset link</CardDescription>
             </CardHeader>
             <CardContent>
@@ -352,7 +354,7 @@ const Auth = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('auth.email')}</FormLabel>
                         <FormControl>
                           <Input placeholder="you@example.com" type="email" {...field} />
                         </FormControl>
@@ -369,7 +371,7 @@ const Auth = () => {
                     className="w-full" 
                     onClick={() => setShowForgotPassword(false)}
                   >
-                    Back to Sign In
+                    {t('auth.backToSignIn')}
                   </Button>
                 </form>
               </Form>
@@ -396,15 +398,15 @@ const Auth = () => {
 
         <Tabs defaultValue="signin" className="w-full">
           <TabsList className="grid w-full grid-cols-2 h-11">
-            <TabsTrigger value="signin" className="min-h-[40px] touch-manipulation">Sign In</TabsTrigger>
-            <TabsTrigger value="signup" className="min-h-[40px] touch-manipulation">Sign Up</TabsTrigger>
+            <TabsTrigger value="signin" className="min-h-[40px] touch-manipulation">{t('auth.signIn')}</TabsTrigger>
+            <TabsTrigger value="signup" className="min-h-[40px] touch-manipulation">{t('auth.signUp')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="signin">
             <Card>
               <CardHeader>
-                <CardTitle>Welcome Back</CardTitle>
-                <CardDescription>Sign in to your HEARDROP account</CardDescription>
+                <CardTitle>{t('auth.welcomeBack')}</CardTitle>
+                <CardDescription>{t('auth.signInToAccount')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Form {...signInForm}>
@@ -414,7 +416,7 @@ const Auth = () => {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>{t('auth.email')}</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="you@example.com" 
@@ -434,7 +436,7 @@ const Auth = () => {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel>{t('auth.password')}</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="••••••••" 
@@ -455,11 +457,11 @@ const Auth = () => {
                         className="px-0 text-sm"
                         onClick={() => setShowForgotPassword(true)}
                       >
-                        Forgot password?
+                        {t('auth.forgotPassword')}
                       </Button>
                     </div>
                     <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "Signing in..." : "Sign In"}
+                      {isLoading ? t('auth.signingIn') : t('auth.signIn')}
                     </Button>
                   </form>
                 </Form>
@@ -468,7 +470,7 @@ const Auth = () => {
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                    <span className="bg-card px-2 text-muted-foreground">{t('auth.continueWith')}</span>
                   </div>
                 </div>
                 <Button 
@@ -496,7 +498,7 @@ const Auth = () => {
                       fill="#EA4335"
                     />
                   </svg>
-                  Continue with Google
+                  {t('auth.continueWithGoogle')}
                 </Button>
               </CardContent>
             </Card>
@@ -505,7 +507,7 @@ const Auth = () => {
           <TabsContent value="signup">
             <Card>
               <CardHeader>
-                <CardTitle>Create Account</CardTitle>
+                <CardTitle>{t('auth.createAccount')}</CardTitle>
                 <CardDescription>Join the HEARDROP community</CardDescription>
               </CardHeader>
               <CardContent>
@@ -529,7 +531,7 @@ const Auth = () => {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>{t('auth.email')}</FormLabel>
                           <FormControl>
                             <Input placeholder="you@example.com" type="email" {...field} />
                           </FormControl>
@@ -542,7 +544,7 @@ const Auth = () => {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel>{t('auth.password')}</FormLabel>
                           <FormControl>
                             <Input placeholder="••••••••" type="password" {...field} />
                           </FormControl>
@@ -565,7 +567,7 @@ const Auth = () => {
                       )}
                     />
                     <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "Creating account..." : "Sign Up"}
+                      {isLoading ? t('auth.signingIn') : t('auth.signUp')}
                     </Button>
                   </form>
                 </Form>
@@ -574,7 +576,7 @@ const Auth = () => {
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                    <span className="bg-card px-2 text-muted-foreground">{t('auth.continueWith')}</span>
                   </div>
                 </div>
                 <Button 
@@ -602,7 +604,7 @@ const Auth = () => {
                       fill="#EA4335"
                     />
                   </svg>
-                  Continue with Google
+                  {t('auth.continueWithGoogle')}
                 </Button>
               </CardContent>
             </Card>
