@@ -286,8 +286,13 @@ const Map: React.FC<MapProps> = ({
       updateVisibleShopsAndCenter();
       
       setTimeout(() => {
-        mapLog.location('Triggering geolocate control');
-        geolocateControl.trigger();
+        // Only trigger geolocation if no saved/initial position
+        if (!initialCenterRef.current) {
+          mapLog.location('Triggering geolocate control');
+          geolocateControl.trigger();
+        } else {
+          mapLog.location('Skipping geolocate - using saved/initial position');
+        }
         map.current?.resize();
       }, 300);
     });
@@ -680,7 +685,7 @@ const Map: React.FC<MapProps> = ({
     hasRecenteredOnShops.current = true;
     
     // Fly to shops area (only if user hasn't interacted yet)
-    if (!hasInitializedLocation.current && !isUserInteracting.current) {
+    if (!hasInitializedLocation.current && !isUserInteracting.current && !initialCenterRef.current) {
       map.current.jumpTo({
         center: [avgLng, avgLat],
         zoom: 5

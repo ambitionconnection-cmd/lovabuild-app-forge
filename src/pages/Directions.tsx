@@ -125,7 +125,17 @@ const Directions = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedShop, setSelectedShop] = useState<ShopType | null>(null);
-  const [journeyStops, setJourneyStops] = useState<ShopType[]>([]);
+  const [journeyStops, setJourneyStops] = useState<ShopType[]>(() => {
+    try {
+      const saved = sessionStorage.getItem('heardrop_route_stops');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  // Persist route stops to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('heardrop_route_stops', JSON.stringify(journeyStops));
+  }, [journeyStops]);
+
   const [routeInfo, setRouteInfo] = useState<any>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedShopForDetails, setSelectedShopForDetails] = useState<ShopType | null>(null);
@@ -302,10 +312,9 @@ const Directions = () => {
         const { center, zoom } = JSON.parse(saved);
         if (center && !mapCenter) {
           setMapCenter(center);
-          setMapZoom(zoom || 12);
+          setMapZoom(zoom || 14);
         }
-        // Clear saved position after restoring
-        sessionStorage.removeItem('heardrop_map_position');
+        // Keep saved position — don't delete, so it persists across navigations
       } catch (e) {
         console.error('Error restoring map position:', e);
       }
