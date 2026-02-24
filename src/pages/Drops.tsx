@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format, formatDistanceToNow, isPast, isFuture } from "date-fns";
 import haptic from "@/lib/haptics";
+import { useTranslation } from "react-i18next";
 
 interface Drop {
   id: string;
@@ -51,6 +52,7 @@ const Drops = () => {
   const [highlightedDrop, setHighlightedDrop] = useState<string | null>(highlightId);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedDrop, setSelectedDrop] = useState<Drop | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchData();
@@ -210,7 +212,7 @@ const Drops = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-base font-bold uppercase tracking-wider">DROPS</h1>
+          <h1 className="text-base font-bold uppercase tracking-wider">{t('drops.title')}</h1>
           <Badge variant="outline" className="ml-auto text-xs border-[#C4956A]/30 text-[#C4956A]">
             {filteredDrops.length} {filteredDrops.length === 1 ? 'Drop' : 'Drops'}
           </Badge>
@@ -224,7 +226,7 @@ const Drops = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Search drops..."
+                placeholder={t('drops.searchDrops')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-9"
@@ -252,10 +254,10 @@ const Drops = () => {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="upcoming">Upcoming</SelectItem>
-                    <SelectItem value="live">Live Now</SelectItem>
-                    <SelectItem value="ended">Ended</SelectItem>
+                    <SelectItem value="all">{t('drops.allStatus')}</SelectItem>
+                    <SelectItem value="upcoming">{t('drops.upcoming')}</SelectItem>
+                    <SelectItem value="live">{t('drops.live')}</SelectItem>
+                    <SelectItem value="ended">{t('drops.ended')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={brandFilter} onValueChange={setBrandFilter}>
@@ -313,7 +315,7 @@ const Drops = () => {
           {/* Featured Drops */}
           {sortedDrops.some(d => d.is_featured) && (
             <div className="mb-4">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-[#C4956A] mb-2">Featured</h2>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-[#C4956A] mb-2">{t('drops.featured')}</h2>
               <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3">
                 {sortedDrops.filter(d => d.is_featured).map((drop) => {
                   const brand = brands.find(b => b.id === drop.brand_id);
@@ -359,7 +361,7 @@ const Drops = () => {
           )}
 
           {/* All Drops */}
-          <h2 className="text-sm font-bold uppercase tracking-wider text-[#C4956A] mb-2">All Drops</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-[#C4956A] mb-2">{t('drops.title')}</h2>
           <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3">
             {sortedDrops.map((drop) => {
               const brand = brands.find(b => b.id === drop.brand_id);
@@ -561,7 +563,7 @@ const Drops = () => {
                           className="flex-1 bg-[#AD3A49] hover:bg-[#AD3A49]/80 text-white"
                           onClick={() => window.open(selectedDrop.affiliate_link, '_blank')}
                         >
-                          <ShoppingBag className="w-4 h-4 mr-2" /> Buy Now
+                          <ShoppingBag className="w-4 h-4 mr-2" /> {t('drops.viewDrop')}
                         </Button>
                       )}
                       <Button
@@ -570,7 +572,7 @@ const Drops = () => {
                         onClick={() => toggleReminder(selectedDrop.id)}
                       >
                         {reminders.has(selectedDrop.id) ? <BellOff className="w-4 h-4 mr-2" /> : <Bell className="w-4 h-4 mr-2" />}
-                        {reminders.has(selectedDrop.id) ? 'Remove Reminder' : 'Set Reminder'}
+                        {reminders.has(selectedDrop.id) ? t('drops.removeReminder') : t('drops.setReminder')}
                       </Button>
                     </div>
                   </div>

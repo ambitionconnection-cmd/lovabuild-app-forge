@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { getCountryFlag } from "@/lib/countryFlags";
+import { useTranslation } from "react-i18next";
 import haptic from "@/lib/haptics";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
@@ -26,6 +27,7 @@ const GlobalIndex = () => {
   const [favoriteBrands, setFavoriteBrands] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name-asc");
   const [shopModalOpen, setShopModalOpen] = useState(false);
@@ -195,7 +197,7 @@ const GlobalIndex = () => {
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-base font-bold uppercase tracking-wider">GLOBAL INDEX</h1>
+            <h1 className="text-base font-bold uppercase tracking-wider">{t('nav.globalIndex')}</h1>
           </div>
         </header>
         <main className="container mx-auto px-3 py-4">
@@ -218,7 +220,7 @@ const GlobalIndex = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-base font-bold uppercase tracking-wider">GLOBAL INDEX</h1>
+          <h1 className="text-base font-bold uppercase tracking-wider">{t('nav.globalIndex')}</h1>
         </div>
       </header>
       
@@ -230,7 +232,7 @@ const GlobalIndex = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Search brands..."
+                placeholder={t('brands.searchBrands')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-9"
@@ -266,7 +268,7 @@ const GlobalIndex = () => {
                   <SelectValue placeholder="Country" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
+                  <SelectItem value="all">{t('categories.all')}</SelectItem>
                   {countries.map((country) => (
                     <SelectItem key={country} value={country!}>
                       {country}
@@ -330,7 +332,7 @@ const GlobalIndex = () => {
         {filteredBrands.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
-              <p className="text-muted-foreground text-sm">No brands found</p>
+              <p className="text-muted-foreground text-sm">{t('brands.noBrands')}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Try adjusting your search or filters
               </p>
