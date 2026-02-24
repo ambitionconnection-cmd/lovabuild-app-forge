@@ -113,9 +113,10 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
   }, [isDragging, sheetState]);
 
   const heightPercent = getHeightPercent();
-  const distance = shop.latitude && shop.longitude && userLocation
+  const rawDistance = shop.latitude && shop.longitude && userLocation
     ? calculateDistance(shop.latitude, shop.longitude)
     : null;
+  const distance = rawDistance && !rawDistance.includes('NaN') ? rawDistance : null;
 
   const bannerImage = brand?.banner_url || shop.image_url;
   const brandDescription = brand?.description || brand?.history;
@@ -131,7 +132,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
       }}
     >
       <Card
-        className="pointer-events-auto h-full flex flex-col bg-background/95 backdrop-blur-lg border-t border-[#2D2D2D]/10 rounded-t-2xl shadow-2xl overflow-hidden"
+        className="pointer-events-auto h-full flex flex-col bg-background/95 backdrop-blur-lg border-t border-white/10 rounded-t-2xl shadow-2xl overflow-hidden"
         style={{ touchAction: 'none' }}
       >
         {/* Drag handle + close */}
@@ -143,13 +144,13 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           onMouseDown={handleDragStart}
         >
           <div className="flex justify-center pt-2 pb-1">
-            <div className="w-10 h-1 rounded-full bg-[#2D2D2D]/15" />
+            <div className="w-10 h-1 rounded-full bg-white/15" />
           </div>
         </div>
 
         {/* Sticky header - also draggable */}
         <div
-          className="flex-shrink-0 px-4 py-2 flex items-center justify-between border-b border-[#2D2D2D]/5 bg-background/95 cursor-grab active:cursor-grabbing"
+          className="flex-shrink-0 px-4 py-2 flex items-center justify-between border-b border-white/5 bg-background/95 cursor-grab active:cursor-grabbing"
           onTouchStart={handleDragStart}
           onTouchMove={handleDragMove}
           onTouchEnd={handleDragEnd}
@@ -157,20 +158,20 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
         >
           <div className="flex items-center gap-3">
             {brand?.logo_url && (
-              <div className="w-10 h-10 rounded-full bg-[#2D2D2D]/10 border border-[#2D2D2D]/15 overflow-hidden flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 overflow-hidden flex-shrink-0">
                 <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
               </div>
             )}
             <div className="min-w-0">
-              <h2 className="text-base font-bold text-[#2D2D2D] truncate">{shop.name}</h2>
+              <h2 className="text-base font-bold text-[#C3C9C9] truncate">{shop.name}</h2>
               {brand && brand.name !== shop.name && <p className="text-xs text-muted-foreground truncate">{brand.name}</p>}
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#2D2D2D]/10 flex items-center justify-center flex-shrink-0 ml-2"
+            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ml-2"
           >
-            <X className="w-4 h-4 text-[#4A4A4A]" />
+            <X className="w-4 h-4 text-[#A3A39E]" />
           </button>
         </div>
 
@@ -206,8 +207,8 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
               disabled={isInJourney}
               className={`flex-1 h-10 text-sm font-semibold ${
                 isInJourney
-                  ? 'bg-[#2D2D2D]/5 text-[#6A6A6A] border border-[#2D2D2D]/10'
-                  : 'bg-[#AD3A49] hover:bg-[#AD3A49]/80 text-[#2D2D2D]'
+                  ? 'bg-white/5 text-[#A3A39E] border border-white/10'
+                  : 'bg-[#AD3A49] hover:bg-[#AD3A49]/80 text-white'
               }`}
             >
               <Plus className="w-4 h-4 mr-1.5" />
@@ -216,7 +217,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
             <Button
               onClick={() => onGetDirections(shop)}
               variant="outline"
-              className="flex-1 h-10 text-sm font-semibold border-[#2D2D2D]/10 text-[#2D2D2D] hover:bg-[#2D2D2D]/5"
+              className="flex-1 h-10 text-sm font-semibold border-white/10 text-[#C3C9C9] hover:bg-white/5"
             >
               <Navigation className="w-4 h-4 mr-1.5" />
               Directions
@@ -227,12 +228,12 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           {(shop.category || brand?.country) && (
             <div className="px-4 pb-2 flex flex-wrap gap-1.5">
               {shop.category && (
-                <Badge variant="secondary" className="text-xs bg-[#2D2D2D]/5 text-[#5A5A5A] border-[#2D2D2D]/10">
+                <Badge variant="secondary" className="text-xs bg-white/5 text-[#A3A39E] border-white/10">
                   {shop.category}
                 </Badge>
               )}
               {brand?.country && (
-                <Badge variant="secondary" className="text-xs bg-[#2D2D2D]/5 text-[#5A5A5A] border-[#2D2D2D]/10">
+                <Badge variant="secondary" className="text-xs bg-white/5 text-[#A3A39E] border-white/10">
                   🌍 {brand.country}
                 </Badge>
               )}
@@ -240,12 +241,12 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           )}
 
           {/* Divider */}
-          <div className="mx-4 border-t border-[#2D2D2D]/5 my-2" />
+          <div className="mx-4 border-t border-white/5 my-2" />
 
           {/* Brand description */}
           {brandDescription && (
             <div className="px-4 py-2">
-              <h3 className="text-sm font-semibold text-[#2D2D2D] mb-1.5">About {brand?.name || 'the Brand'}</h3>
+              <h3 className="text-sm font-semibold text-[#C3C9C9] mb-1.5">About {brand?.name || 'the Brand'}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{brandDescription}</p>
             </div>
           )}
@@ -253,7 +254,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           {/* Shop description */}
           {shopDescription && shopDescription !== brandDescription && (
             <div className="px-4 py-2">
-              <h3 className="text-sm font-semibold text-[#2D2D2D] mb-1.5">About this location</h3>
+              <h3 className="text-sm font-semibold text-[#C3C9C9] mb-1.5">About this location</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{shopDescription}</p>
             </div>
           )}
@@ -261,24 +262,24 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           {/* External links */}
           <div className="px-4 py-3 flex flex-col gap-2">
             {brand?.official_website && (
-              <a href={brand.official_website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-[#2D2D2D]/5 hover:bg-[#2D2D2D]/10 transition-colors">
+              <a href={brand.official_website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                 <Globe className="w-4 h-4 text-[#C3C9C9]" />
-                <span className="text-sm text-[#2D2D2D]">Official Website</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#6A6A6A] ml-auto" />
+                <span className="text-sm text-[#C3C9C9]">Official Website</span>
+                <ExternalLink className="w-3.5 h-3.5 text-[#A3A39E ml-auto" />
               </a>
             )}
             {shop.official_site && shop.official_site !== brand?.official_website && (
-              <a href={shop.official_site} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-[#2D2D2D]/5 hover:bg-[#2D2D2D]/10 transition-colors">
+              <a href={shop.official_site} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                 <Globe className="w-4 h-4 text-[#C3C9C9]" />
-                <span className="text-sm text-[#2D2D2D]">Shop Website</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#6A6A6A] ml-auto" />
+                <span className="text-sm text-[#C3C9C9]">Shop Website</span>
+                <ExternalLink className="w-3.5 h-3.5 text-[#A3A39E] ml-auto" />
               </a>
             )}
             {brand?.instagram_url && (
-              <a href={brand.instagram_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-[#2D2D2D]/5 hover:bg-[#2D2D2D]/10 transition-colors">
+              <a href={brand.instagram_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                 <Instagram className="w-4 h-4 text-[#C3C9C9]" />
-                <span className="text-sm text-[#2D2D2D]">Instagram</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#6A6A6A] ml-auto" />
+                <span className="text-sm text-[#C3C9C9]">Instagram</span>
+                <ExternalLink className="w-3.5 h-3.5 text-[#A3A39E] ml-auto" />
               </a>
             )}
           </div>
