@@ -1,8 +1,9 @@
-import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X, Copy, Check, ChevronDown, ExternalLink, Clock } from "lucide-react";
+import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X, Copy, Check, ChevronDown, ExternalLink, Clock, Globe, Instagram, ShoppingBag } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -49,6 +50,7 @@ const Drops = () => {
   const [copiedCodes, setCopiedCodes] = useState<Set<string>>(new Set());
   const [highlightedDrop, setHighlightedDrop] = useState<string | null>(highlightId);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [selectedDrop, setSelectedDrop] = useState<Drop | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -323,8 +325,7 @@ const Drops = () => {
                       key={`featured-${drop.id}`}
                       className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-[#AD3A49]/10 via-card to-[#C4956A]/10 border border-[#AD3A49]/20 cursor-pointer"
                       onClick={() => {
-                        if (drop.affiliate_link) handleAffiliateClick(drop);
-                        else toast.info(drop.title, { description: drop.description || 'No additional details' });
+                        setSelectedDrop(drop);
                       }}
                     >
                       <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -379,13 +380,7 @@ const Drops = () => {
                         : 'bg-gradient-to-r from-muted/30 to-card hover:from-muted/50'
                   } ${highlightedDrop === drop.id ? 'ring-2 ring-[#AD3A49] ring-offset-1 ring-offset-background' : ''}`}
                   onClick={() => {
-                    if (drop.affiliate_link) {
-                      handleAffiliateClick(drop);
-                    } else {
-                      toast.info(drop.title, {
-                        description: drop.description || 'No additional details available',
-                      });
-                    }
+                    setSelectedDrop(drop);
                   }}
                 >
                   {/* Drop Image */}
@@ -466,6 +461,124 @@ const Drops = () => {
           </div>
           </>
         )}
+
+        {/* Drop Detail Modal */}
+        <Dialog open={!!selectedDrop} onOpenChange={(open) => { if (!open) setSelectedDrop(null); }}>
+          <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto bg-[#1a1a1a] border-[#C4956A]/20 p-0">
+            {selectedDrop && (() => {
+              const brand = brands.find(b => b.id === selectedDrop.brand_id);
+              return (
+                <div className="flex flex-col">
+                  {/* Header with brand info */}
+                  <div className="sticky top-0 z-10 bg-[#1a1a1a] border-b border-white/5 px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      {brand?.logo_url ? (
+                        <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/10 overflow-hidden flex-shrink-0">
+                          <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain p-1" />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-[#C4956A]/20 border border-[#C4956A]/30 flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-[#C4956A]">{selectedDrop.title.charAt(0)}</span>
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-[#C4956A]">{brand?.name || 'Unknown Brand'}</p>
+                        <h3 className="text-sm font-bold text-white truncate">{selectedDrop.title}</h3>
+                      </div>
+                    </div>
+                    {/* Brand links */}
+                    <div className="flex gap-2 mt-2">
+                      {brand?.official_website && (
+                        <a href={brand.official_website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-white/60 hover:bg-white/10">
+                          <Globe className="w-3 h-3" /> Website
+                        </a>
+                      )}
+                      {brand?.instagram_url && (
+                        <a href={brand.instagram_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-white/60 hover:bg-white/10">
+                          <Instagram className="w-3 h-3" /> Instagram
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Drop info */}
+                  <div className="px-4 py-3 space-y-3">
+                    {/* Status + Date */}
+                    <div className="flex items-center gap-2">
+                      <Badge className={`text-[10px] ${
+                        selectedDrop.status === 'live' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                        selectedDrop.status === 'upcoming' ? 'bg-[#C4956A]/20 text-[#C4956A] border-[#C4956A]/30' :
+                        'bg-white/10 text-white/40 border-white/10'
+                      }`}>
+                        {selectedDrop.status === 'live' ? '● LIVE' : selectedDrop.status?.toUpperCase()}
+                      </Badge>
+                      <span className="text-xs text-white/40 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {format(new Date(selectedDrop.release_date), 'MMM d, yyyy')}
+                      </span>
+                    </div>
+
+                    {/* Description */}
+                    {selectedDrop.description && (
+                      <p className="text-sm text-white/70 leading-relaxed">{selectedDrop.description}</p>
+                    )}
+
+                    {/* Discount code */}
+                    {selectedDrop.discount_code && (
+                      <div className="flex items-center gap-2 p-2 rounded-lg bg-[#C4956A]/10 border border-[#C4956A]/20">
+                        <span className="text-xs text-[#C4956A]">Code:</span>
+                        <code className="text-sm font-mono text-white">{selectedDrop.discount_code}</code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 ml-auto"
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedDrop.discount_code);
+                            toast.success('Code copied!');
+                          }}
+                        >
+                          <Copy className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Product image */}
+                    {selectedDrop.image_url && (
+                      <div className="rounded-xl overflow-hidden border border-white/10">
+                        <img
+                          src={selectedDrop.image_url}
+                          alt={selectedDrop.title}
+                          className="w-full object-cover max-h-64"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
+                    <div className="flex gap-2 pt-2">
+                      {selectedDrop.affiliate_link && (
+                        <Button
+                          className="flex-1 bg-[#AD3A49] hover:bg-[#AD3A49]/80 text-white"
+                          onClick={() => window.open(selectedDrop.affiliate_link, '_blank')}
+                        >
+                          <ShoppingBag className="w-4 h-4 mr-2" /> Buy Now
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        className={`flex-1 ${reminders.has(selectedDrop.id) ? 'border-[#AD3A49] text-[#AD3A49]' : 'border-white/10 text-white/60'}`}
+                        onClick={() => toggleReminder(selectedDrop.id)}
+                      >
+                        {reminders.has(selectedDrop.id) ? <BellOff className="w-4 h-4 mr-2" /> : <Bell className="w-4 h-4 mr-2" />}
+                        {reminders.has(selectedDrop.id) ? 'Remove Reminder' : 'Set Reminder'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
