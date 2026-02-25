@@ -17,41 +17,41 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     icon: Heart,
-    label: "My HEARDROP",
-    description: "Favourites, saved shops & brands",
+    label: "myHeardrop",
+    description: "myHeardropDesc",
     path: "/my-heardrop",
     requiresAuth: true,
   },
   {
     icon: User,
-    label: "Profile",
-    description: "Account settings & preferences",
+    label: "profile",
+    description: "profileDesc",
     path: "/profile",
     requiresAuth: true,
   },
   {
     icon: Bell,
-    label: "Notifications",
-    description: "Drop alerts & reminders",
+    label: "notifications",
+    description: "notificationsDesc",
     path: "/notifications",
     requiresAuth: true,
   },
   {
     icon: Mail,
-    label: "Contact",
-    description: "Get in touch, submit a brand",
+    label: "contact",
+    description: "contactDesc",
     path: "/contact",
   },
   {
     icon: Info,
-    label: "About HEARDROP",
-    description: "Our story & mission",
+    label: "about",
+    description: "aboutDesc",
     path: "/about",
   },
   {
     icon: Shield,
-    label: "Admin Dashboard",
-    description: "Manage content & submissions",
+    label: "adminDashboard",
+    description: "adminDesc",
     path: "/admin",
     adminOnly: true,
   },
@@ -61,7 +61,7 @@ const More = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleItemClick = (item: MenuItem) => {
     if (item.requiresAuth && !user) {
@@ -85,8 +85,8 @@ const More = () => {
   return (
     <div className="fixed inset-0 bg-background flex flex-col">
       <div className="flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16 lg:px-12">
-        <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-wider uppercase">More</h1>
-        <p className="text-sm lg:text-base text-white/40 mt-1">Settings, favourites & more</p>
+        <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-wider uppercase">{t('nav.more')}</h1>
+        <p className="text-sm lg:text-base text-white/40 mt-1">{t('more.subtitle')}</p>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 lg:px-12 pb-20">
@@ -105,8 +105,8 @@ const More = () => {
                   <Icon className="w-5 h-5 lg:w-6 lg:h-6 text-white/70" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium text-sm lg:text-base">{item.label}</p>
-                  <p className="text-white/40 text-xs lg:text-sm mt-0.5">{item.description}</p>
+                  <p className="text-white font-medium text-sm lg:text-base">{t(`more.${item.label}`)}</p>
+                <p className="text-white/40 text-xs lg:text-sm mt-0.5">{t(`more.${item.description}`)}</p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {needsLogin && (

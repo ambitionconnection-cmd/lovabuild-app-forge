@@ -286,13 +286,10 @@ const Map: React.FC<MapProps> = ({
       updateVisibleShopsAndCenter();
       
       setTimeout(() => {
-        // Only trigger geolocation if no saved/initial position
-        if (!initialCenterRef.current) {
-          mapLog.location('Triggering geolocate control');
-          geolocateControl.trigger();
-        } else {
-          mapLog.location('Skipping geolocate - using saved/initial position');
-        }
+        // ALWAYS trigger geolocation so the recenter button appears
+        // (the geolocate handler already prevents re-centering if we have an initialCenter)
+        mapLog.location('Triggering geolocate control');
+        geolocateControl.trigger();
         map.current?.resize();
       }, 300);
     });

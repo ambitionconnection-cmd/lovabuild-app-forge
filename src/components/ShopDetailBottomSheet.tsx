@@ -156,20 +156,20 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           onTouchEnd={handleDragEnd}
           onMouseDown={handleDragStart}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             {brand?.logo_url && (
               <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 overflow-hidden flex-shrink-0">
                 <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
               </div>
             )}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h2 className="text-base font-bold text-[#C3C9C9] truncate">{shop.name}</h2>
               {brand && brand.name !== shop.name && <p className="text-xs text-muted-foreground truncate">{brand.name}</p>}
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ml-2"
+            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ml-3"
           >
             <X className="w-4 h-4 text-[#A3A39E]" />
           </button>
