@@ -214,6 +214,21 @@
     "vintage": "빈티지",
     "sportswear": "스포츠웨어"
   },
+  "more": {
+    "subtitle": "설정, 즐겨찾기 & 더보기",
+    "myHeardrop": "내 HEARDROP",
+    "myHeardropDesc": "즐겨찾기 매장 & 브랜드",
+    "profile": "프로필",
+    "profileDesc": "계정 설정 & 환경설정",
+    "notifications": "알림",
+    "notificationsDesc": "드롭 알림 & 리마인더",
+    "contact": "문의",
+    "contactDesc": "연락하기, 브랜드 제출",
+    "about": "HEARDROP 소개",
+    "aboutDesc": "우리의 이야기 & 미션",
+    "adminDashboard": "관리자 대시보드",
+    "adminDesc": "콘텐츠 & 제출 관리"
+  },
   "common": {
     "loading": "로딩 중...",
     "error": "오류",

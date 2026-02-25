@@ -220,6 +220,21 @@
     "designer": "Designer",
     "skate": "Skate"
   },
+  "more": {
+    "subtitle": "Paramètres, favoris & plus",
+    "myHeardrop": "Mon HEARDROP",
+    "myHeardropDesc": "Favoris, boutiques & marques sauvegardées",
+    "profile": "Profil",
+    "profileDesc": "Paramètres du compte & préférences",
+    "notifications": "Notifications",
+    "notificationsDesc": "Alertes de sorties & rappels",
+    "contact": "Contact",
+    "contactDesc": "Nous contacter, proposer une marque",
+    "about": "À propos de HEARDROP",
+    "aboutDesc": "Notre histoire & mission",
+    "adminDashboard": "Tableau de bord Admin",
+    "adminDesc": "Gérer le contenu & soumissions"
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Erreur",

@@ -220,6 +220,21 @@
     "designer": "设计师品牌",
     "skate": "滑板"
   },
+  "more": {
+    "subtitle": "设置、收藏和更多",
+    "myHeardrop": "我的 HEARDROP",
+    "myHeardropDesc": "收藏的店铺和品牌",
+    "profile": "个人资料",
+    "profileDesc": "账户设置和偏好",
+    "notifications": "通知",
+    "notificationsDesc": "发售提醒和通知",
+    "contact": "联系我们",
+    "contactDesc": "联系我们，提交品牌",
+    "about": "关于 HEARDROP",
+    "aboutDesc": "我们的故事和使命",
+    "adminDashboard": "管理面板",
+    "adminDesc": "管理内容和提交"
+  },
   "common": {
     "loading": "加载中...",
     "error": "错误",

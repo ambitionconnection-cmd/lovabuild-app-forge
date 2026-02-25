@@ -220,8 +220,23 @@
     "designer": "デザイナー",
     "skate": "スケート"
   },
-  "common": {
+  "more": {
+    "subtitle": "設定、お気に入り、その他",
+    "myHeardrop": "マイ HEARDROP",
+    "myHeardropDesc": "お気に入りのショップ＆ブランド",
+    "profile": "プロフィール",
+    "profileDesc": "アカウント設定＆好み",
+    "notifications": "通知",
+    "notificationsDesc": "ドロップアラート＆リマインダー",
+    "contact": "お問い合わせ",
+    "contactDesc": "連絡する、ブランドを提出",
+    "about": "HEARDROPについて",
+    "aboutDesc": "私たちのストーリー＆ミッション",
+    "adminDashboard": "管理ダッシュボード",
+    "adminDesc": "コンテンツ＆投稿を管理"
+  },
     "loading": "読み込み中...",
+  "common": {
     "error": "エラー",
     "success": "成功",
     "cancel": "キャンセル",
