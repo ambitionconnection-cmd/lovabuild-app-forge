@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tables } from '@/integrations/supabase/types';
 import haptic from '@/lib/haptics';
+import { useTranslation } from 'react-i18next';
 
 type ShopType = Tables<'shops_public'>;
 
@@ -49,6 +50,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   mapCenterLocation,
   isLoadingLocation = false,
 }) => {
+  const { t } = useTranslation();
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -277,7 +279,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
               {sheetState === 'peek' && closestShop ? (
                 <div className="flex-1 min-w-0">
                   <span className="font-bold text-sm uppercase tracking-wider text-directions">
-                    Closest Shop
+                    {t('shops.closestShop')}
                   </span>
                   <p className="text-xs text-muted-foreground truncate">
                     {closestShop.shop.name} ({formatDistance(closestShop.distance)})
@@ -286,7 +288,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
               ) : (
                 <>
                   <span className="font-bold text-sm uppercase tracking-wider text-directions">
-                    {sheetState === 'full' ? 'All Shops' : 'Nearby'}
+                    {sheetState === 'full' ? t('shops.allShops') : t('shops.nearby')}
                   </span>
                   <Badge variant="secondary" className="text-xs bg-directions/10 text-directions border-directions/20">
                     {shopsToDisplay.length}
@@ -338,13 +340,13 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                     </div>
                   </div>
                 ))}
-                <p className="text-xs text-center text-muted-foreground mt-2">Getting your location...</p>
+                <p className="text-xs text-center text-muted-foreground mt-2">{t('shops.gettingLocation')}</p>
               </div>
             ) : shopsToDisplay.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                 <MapPin className="w-8 h-8 mb-2 opacity-50" />
-                <p className="text-sm">Pan the map to discover shops</p>
-                <p className="text-xs mt-1">Shops will appear as you explore</p>
+                <p className="text-sm">{t('shops.panToDiscover')}</p>
+                <p className="text-xs mt-1">{t('shops.shopsWillAppear')}</p>
               </div>
             ) : (
               shopsToDisplay.map((shop) => {
@@ -379,7 +381,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                           <h4 className="font-semibold text-sm truncate">{shop.name}</h4>
                           {inJourney && (
                             <Badge className="flex-shrink-0 bg-directions text-directions-foreground text-[10px] px-1.5 py-0">
-                              In Journey
+                              {t('shops.inJourney')}
                             </Badge>
                           )}
                         </div>
@@ -388,7 +390,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                         </p>
                         {distance !== null && (
                           <p className="text-xs font-medium text-primary mt-1">
-                            {formatDistance(distance)} away
+                            {formatDistance(distance)} {t('shops.away')}
                           </p>
                         )}
                       </div>
@@ -410,7 +412,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent side="top" className="text-xs">
-                              View Details
+                              {t('shops.viewDetails')}
                             </TooltipContent>
                           </Tooltip>
                           
@@ -437,8 +439,8 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent side="top" className="text-xs">
-                                Get Directions
-                              </TooltipContent>
+                                {t('shops.getDirections')}
+                            </TooltipContent>
                             </Tooltip>
                           )}
                           
@@ -458,8 +460,8 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent side="top" className="text-xs">
-                                Add to Journey
-                              </TooltipContent>
+                                {t('shops.addToJourney')}
+                            </TooltipContent>
                             </Tooltip>
                           )}
                         </div>

@@ -133,7 +133,7 @@ const Contact = () => {
     if (!selectedType) return;
 
     if (!genericFormData.name || !genericFormData.email || !genericFormData.message) {
-      toast.error("Please fill in all required fields");
+      toast.error(t('contact.fillRequired'));
       return;
     }
 
@@ -151,12 +151,12 @@ const Contact = () => {
 
       if (error) throw error;
 
-      toast.success("Message sent successfully! We'll get back to you soon.");
+      toast.success(t('contact.messageSent'));
       setGenericFormData({ name: "", email: "", subject: "", message: "" });
       setSelectedType(null);
     } catch (error) {
       console.error("Error submitting contact form:", error);
-      toast.error("Failed to send message. Please try again.");
+      toast.error(t('contact.submitFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -167,7 +167,7 @@ const Contact = () => {
 
     if (!brandFormData.brandName || !brandFormData.submitterEmail || !brandFormData.shortDescription || 
         !brandFormData.websiteUrl || !brandFormData.instagramHandle || !brandFormData.country || !brandFormData.category) {
-      toast.error("Please fill in all required fields");
+      toast.error(t('contact.fillRequired'));
       return;
     }
 
@@ -211,7 +211,7 @@ Email: ${brandFormData.submitterEmail}
 
       if (error) throw error;
 
-      toast.success("Brand submitted successfully! We'll review it and add it to the directory soon.");
+      toast.success(t('contact.brandSubmitted'));
       setBrandFormData({
         brandName: "",
         submitterName: "",
@@ -228,7 +228,7 @@ Email: ${brandFormData.submitterEmail}
       setSelectedType(null);
     } catch (error) {
       console.error("Error submitting brand:", error);
-      toast.error("Failed to submit brand. Please try again.");
+      toast.error(t('contact.brandSubmitFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -239,7 +239,7 @@ Email: ${brandFormData.submitterEmail}
 
     if (!releaseFormData.brandName || !releaseFormData.productName || !releaseFormData.releaseDate || 
         !releaseFormData.dropLocation || !releaseFormData.sourceLink || !releaseFormData.submitterEmail) {
-      toast.error("Please fill in all required fields");
+      toast.error(t('contact.fillRequired'));
       return;
     }
 
@@ -280,7 +280,7 @@ Email: ${releaseFormData.submitterEmail}
 
       if (error) throw error;
 
-      toast.success("Release submitted successfully! We'll review and add it to the calendar soon.");
+      toast.success(t('contact.releaseSubmitted'));
       setReleaseFormData({
         brandName: "",
         productName: "",
@@ -296,7 +296,7 @@ Email: ${releaseFormData.submitterEmail}
       setSelectedType(null);
     } catch (error) {
       console.error("Error submitting release:", error);
-      toast.error("Failed to submit release. Please try again.");
+      toast.error(t('contact.releaseSubmitFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -307,20 +307,20 @@ Email: ${releaseFormData.submitterEmail}
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Building2 className="w-5 h-5 text-primary" />
-          Submit a New Brand
+          {t('contact.submitBrand')}
         </CardTitle>
         <CardDescription>
-          Help us grow the directory by submitting a streetwear brand. All submissions are reviewed before publishing.
+          {t('contact.submitBrandDesc')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleBrandSubmit} className="space-y-6">
           {/* Brand Information Section */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Brand Information</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">{t('contact.brandInfo')}</h3>
             
             <div className="space-y-2">
-              <Label htmlFor="brandName">Brand Name *</Label>
+              <Label htmlFor="brandName">{t('contact.brandName')} *</Label>
               <Input
                 id="brandName"
                 placeholder="e.g. Palace, Stüssy, Aimé Leon Dore"
@@ -332,13 +332,13 @@ Email: ${releaseFormData.submitterEmail}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="category">Category *</Label>
+                <Label htmlFor="category">{t('drops.category')} *</Label>
                 <Select 
                   value={brandFormData.category} 
                   onValueChange={(value) => setBrandFormData({ ...brandFormData, category: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder={t('contact.selectCategory')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CATEGORIES.map((cat) => (
@@ -349,13 +349,13 @@ Email: ${releaseFormData.submitterEmail}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="country">Country of Origin *</Label>
+                <Label htmlFor="country">{t('contact.countryOfOrigin')} *</Label>
                 <Select 
                   value={brandFormData.country} 
                   onValueChange={(value) => setBrandFormData({ ...brandFormData, country: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select country" />
+                    <SelectValue placeholder={t('contact.selectCountry')} />
                   </SelectTrigger>
                   <SelectContent>
                     {COUNTRIES.map((country) => (
@@ -367,7 +367,7 @@ Email: ${releaseFormData.submitterEmail}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="shortDescription">Short Description * <span className="text-muted-foreground text-xs">(max 280 characters)</span></Label>
+              <Label htmlFor="shortDescription">{t('contact.shortDescription')} * <span className="text-muted-foreground text-xs">{t('contact.shortDescriptionHint')}</span></Label>
               <Textarea
                 id="shortDescription"
                 placeholder="Elevator pitch — what makes this brand unique?"
@@ -380,7 +380,7 @@ Email: ${releaseFormData.submitterEmail}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fullDescription">Full Description <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Label htmlFor="fullDescription">{t('contact.fullDescription')} <span className="text-muted-foreground text-xs">{t('contact.optional')}</span></Label>
               <Textarea
                 id="fullDescription"
                 placeholder="Brand story, founding, ethos, notable collaborations..."
@@ -393,11 +393,11 @@ Email: ${releaseFormData.submitterEmail}
 
           {/* Links Section */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Links & Social</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">{t('contact.linksSocial')}</h3>
             
             <div className="space-y-2">
               <Label htmlFor="websiteUrl" className="flex items-center gap-2">
-                <Globe className="w-4 h-4" /> Website URL *
+                <Globe className="w-4 h-4" /> {t('contact.websiteUrl')} *
               </Label>
               <Input
                 id="websiteUrl"
@@ -412,7 +412,7 @@ Email: ${releaseFormData.submitterEmail}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="instagramHandle" className="flex items-center gap-2">
-                  <Instagram className="w-4 h-4" /> Instagram Handle *
+                  <Instagram className="w-4 h-4" /> {t('contact.instagramHandle')} *
                 </Label>
                 <Input
                   id="instagramHandle"
@@ -425,7 +425,7 @@ Email: ${releaseFormData.submitterEmail}
 
               <div className="space-y-2">
                 <Label htmlFor="tiktokHandle" className="flex items-center gap-2">
-                  <TikTokIcon className="w-4 h-4" /> TikTok Handle
+                  <TikTokIcon className="w-4 h-4" /> {t('contact.tiktokHandle')}
                 </Label>
                 <Input
                   id="tiktokHandle"
@@ -437,7 +437,7 @@ Email: ${releaseFormData.submitterEmail}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stockists">Stockists / Where to Buy <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Label htmlFor="stockists">{t('contact.stockists')} <span className="text-muted-foreground text-xs">{t('contact.optional')}</span></Label>
               <Textarea
                 id="stockists"
                 placeholder="List online stores and physical shops that carry this brand..."
@@ -464,7 +464,7 @@ Email: ${releaseFormData.submitterEmail}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="submitterEmail">Your Email *</Label>
+                <Label htmlFor="submitterEmail">{t('contact.yourEmail')} *</Label>
                 <Input
                   id="submitterEmail"
                   type="email"
@@ -475,15 +475,14 @@ Email: ${releaseFormData.submitterEmail}
                 />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">We'll notify you when your submission is reviewed.</p>
+            <p className="text-xs text-muted-foreground">{t('contact.notifyOnReview')}</p>
           </div>
-
           <div className="flex gap-3 pt-4">
             <Button type="submit" className="flex-1" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit Brand"}
+              {isSubmitting ? t('contact.submitting') : t('contact.submitBrandBtn')}
             </Button>
             <Button type="button" variant="outline" onClick={() => setSelectedType(null)}>
-              Cancel
+              {t('contact.cancel')}
             </Button>
           </div>
         </form>
@@ -496,21 +495,21 @@ Email: ${releaseFormData.submitterEmail}
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Package className="w-5 h-5 text-drops" />
-          Submit a New Release
+          {t('contact.submitRelease')}
         </CardTitle>
         <CardDescription>
-          Know about an upcoming drop? Submit it here and help the community stay informed. All submissions are reviewed before publishing.
+          {t('contact.submitReleaseDesc')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleReleaseSubmit} className="space-y-6">
           {/* Release Information Section */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Release Information</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">{t('contact.releaseInfo')}</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="releaseBrandName">Brand Name *</Label>
+                <Label htmlFor="releaseBrandName">{t('contact.brandName')} *</Label>
                 <Input
                   id="releaseBrandName"
                   placeholder="e.g. Nike, Supreme, Palace"
@@ -521,7 +520,7 @@ Email: ${releaseFormData.submitterEmail}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="productName">Product Name *</Label>
+                <Label htmlFor="productName">{t('contact.productName')} *</Label>
                 <Input
                   id="productName"
                   placeholder="e.g. Air Max 1 'Patta Waves'"
@@ -534,7 +533,7 @@ Email: ${releaseFormData.submitterEmail}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="releaseDate">Release Date *</Label>
+                <Label htmlFor="releaseDate">{t('contact.releaseDate')} *</Label>
                 <Input
                   id="releaseDate"
                   type="date"
@@ -545,7 +544,7 @@ Email: ${releaseFormData.submitterEmail}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="releaseTime">Release Time <span className="text-muted-foreground text-xs">(if known)</span></Label>
+                <Label htmlFor="releaseTime">{t('contact.releaseTime')} <span className="text-muted-foreground text-xs">{t('contact.ifKnown')}</span></Label>
                 <Input
                   id="releaseTime"
                   type="time"
@@ -557,7 +556,7 @@ Email: ${releaseFormData.submitterEmail}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="retailPrice">Retail Price <span className="text-muted-foreground text-xs">(estimated)</span></Label>
+                <Label htmlFor="retailPrice">{t('contact.retailPrice')} <span className="text-muted-foreground text-xs">{t('contact.retailPriceHint')}</span></Label>
                 <Input
                   id="retailPrice"
                   placeholder="e.g. £150 / $180 / €160"
@@ -567,7 +566,7 @@ Email: ${releaseFormData.submitterEmail}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="dropLocation">Drop Location *</Label>
+                <Label htmlFor="dropLocation">{t('contact.dropLocation')} *</Label>
                 <Input
                   id="dropLocation"
                   placeholder="e.g. SNKRS App, Palace Website, In-store only"
@@ -579,7 +578,7 @@ Email: ${releaseFormData.submitterEmail}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sourceLink">Source Link *</Label>
+              <Label htmlFor="sourceLink">{t('contact.sourceLink')} *</Label>
               <Input
                 id="sourceLink"
                 type="url"
@@ -588,11 +587,11 @@ Email: ${releaseFormData.submitterEmail}
                 onChange={(e) => setReleaseFormData({ ...releaseFormData, sourceLink: e.target.value })}
                 required
               />
-              <p className="text-xs text-muted-foreground">We need a source to verify the release information.</p>
+              <p className="text-xs text-muted-foreground">{t('contact.sourceLinkHint')}</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="releaseNotes">Additional Notes <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Label htmlFor="releaseNotes">{t('contact.additionalNotes')} <span className="text-muted-foreground text-xs">{t('contact.optional')}</span></Label>
               <Textarea
                 id="releaseNotes"
                 placeholder="Limited edition? Raffle? Region exclusive? Any extra context..."
@@ -605,11 +604,10 @@ Email: ${releaseFormData.submitterEmail}
 
           {/* Submitter Section */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Your Information</h3>
-            
+            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">{t('contact.yourInfo')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="releaseSubmitterName">Your Name <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                <Label htmlFor="releaseSubmitterName">{t('contact.yourName')} <span className="text-muted-foreground text-xs">{t('contact.optional')}</span></Label>
                 <Input
                   id="releaseSubmitterName"
                   placeholder="Your name"
@@ -619,7 +617,7 @@ Email: ${releaseFormData.submitterEmail}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="releaseSubmitterEmail">Your Email *</Label>
+                <Label htmlFor="releaseSubmitterEmail">{t('contact.yourEmail')} *</Label>
                 <Input
                   id="releaseSubmitterEmail"
                   type="email"
@@ -630,15 +628,14 @@ Email: ${releaseFormData.submitterEmail}
                 />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">We'll notify you when your submission is reviewed.</p>
+            <p className="text-xs text-muted-foreground">{t('contact.notifyOnReview')}</p>
           </div>
-
           <div className="flex gap-3 pt-4">
             <Button type="submit" className="flex-1 bg-drops hover:bg-drops/90" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit Release"}
+              {isSubmitting ? t('contact.submitting') : t('contact.submitReleaseBtn')}
             </Button>
             <Button type="button" variant="outline" onClick={() => setSelectedType(null)}>
-              Cancel
+              {t('contact.cancel')}
             </Button>
           </div>
         </form>
@@ -659,7 +656,7 @@ Email: ${releaseFormData.submitterEmail}
       <CardContent>
         <form onSubmit={handleGenericSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
+            <Label htmlFor="name">{t('contact.name')} *</Label>
             <Input
               id="name"
               placeholder="Your name"
@@ -670,7 +667,7 @@ Email: ${releaseFormData.submitterEmail}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="email">{t('contact.email')} *</Label>
             <Input
               id="email"
               type="email"
@@ -682,7 +679,7 @@ Email: ${releaseFormData.submitterEmail}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="subject">Subject</Label>
+            <Label htmlFor="subject">{t('contact.subject')}</Label>
             <Input
               id="subject"
               placeholder="Brief description"
@@ -692,7 +689,7 @@ Email: ${releaseFormData.submitterEmail}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="message">Message *</Label>
+            <Label htmlFor="message">{t('contact.message')} *</Label>
             <Textarea
               id="message"
               placeholder="Tell us more about your inquiry..."
@@ -723,9 +720,9 @@ Email: ${releaseFormData.submitterEmail}
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back
+            {t('nav.back')}
           </Button>
-          <h1 className="text-xl font-bold">Contact Us</h1>
+          <h1 className="text-xl font-bold">{t('contact.title')}</h1>
           <div className="w-20" /> {/* Spacer for alignment */}
         </div>
       </header>
@@ -734,8 +731,8 @@ Email: ${releaseFormData.submitterEmail}
         {!selectedType ? (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-3xl font-bold">How can we help?</h2>
-              <p className="text-muted-foreground">Select the option that best describes your inquiry</p>
+              <h2 className="text-3xl font-bold">{t('contact.howCanWeHelp')}</h2>
+              <p className="text-muted-foreground">{t('contact.selectOption')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -769,14 +766,14 @@ Email: ${releaseFormData.submitterEmail}
             </div>
 
             <p className="text-center text-sm text-muted-foreground pt-4">
-              Want to contribute to HEARDROP? Submit a brand or release and help the community grow! 🙌
+              {t('contact.contribute')}
             </p>
           </div>
         ) : (
           <div className="space-y-6">
             <Button variant="ghost" onClick={() => setSelectedType(null)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to options
+              {t('contact.backToOptions')}
             </Button>
 
             {selectedType === "new-brand" && renderBrandForm()}
