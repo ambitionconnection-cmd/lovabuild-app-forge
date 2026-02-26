@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Tables } from "@/integrations/supabase/types";
+import { useTranslation } from "react-i18next";
 
 type ShopType = Tables<'shops_public'>;
 
@@ -39,6 +40,7 @@ export const DesktopSidePanel = ({
   searchQuery,
   onSearchChange,
 }: DesktopSidePanelProps) => {
+  const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Use visible shops, fallback to all shops
@@ -118,7 +120,7 @@ export const DesktopSidePanel = ({
         {/* Shop count */}
         <div className="flex-shrink-0 px-4 py-2 border-b border-white/5 flex items-center justify-between">
           <span className="text-white/50 text-xs uppercase tracking-wider">
-            Nearby Shops
+            {t('shops.nearbyShops')}
           </span>
           <Badge variant="secondary" className="bg-white/10 text-white/70 text-xs border-0">
             {sortedShops.length}
@@ -159,7 +161,7 @@ export const DesktopSidePanel = ({
                         <h4 className="text-white text-sm font-semibold truncate">{shop.name}</h4>
                         {inJourney && (
                           <Badge className="flex-shrink-0 bg-white/20 text-white text-[9px] px-1.5 py-0 border-0">
-                            In Route
+                            {t('shops.inRoute')}
                           </Badge>
                         )}
                       </div>
