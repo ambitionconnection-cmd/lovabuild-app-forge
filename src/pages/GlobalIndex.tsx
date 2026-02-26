@@ -69,7 +69,7 @@ const GlobalIndex = () => {
 
     if (error) {
       console.error('Error fetching brands:', error);
-      toast.error('Failed to load brands');
+      toast.error(t('brands.failedToLoad'));
     } else {
       setBrands(data || []);
       setFilteredBrands(data || []);
@@ -156,7 +156,7 @@ const GlobalIndex = () => {
       if (error) {
         console.error('Error removing favorite:', error);
         haptic.error();
-        toast.error('Failed to remove favorite');
+        toast.error(t('brands.failedToRemove'));
       } else {
         setFavoriteBrands(prev => {
           const newSet = new Set(prev);
@@ -164,7 +164,7 @@ const GlobalIndex = () => {
           return newSet;
         });
         haptic.light();
-        toast.success('Removed from favorites');
+        toast.success(t('brands.removedFromFavorites'));
       }
     } else {
       // Add to favorites
@@ -178,11 +178,11 @@ const GlobalIndex = () => {
       if (error) {
         console.error('Error adding favorite:', error);
         haptic.error();
-        toast.error('Failed to add favorite');
+        toast.error(t('brands.failedToAdd'));
       } else {
         setFavoriteBrands(prev => new Set(prev).add(brandId));
         haptic.success();
-        toast.success('Added to favorites');
+        toast.success(t('brands.addedToFavorites'));
       }
     }
   };
@@ -257,7 +257,7 @@ const GlobalIndex = () => {
                     : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                 }`}
               >
-                {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {t(`categories.${cat}`)}
               </button>
             ))}
           </div>
@@ -285,13 +285,13 @@ const GlobalIndex = () => {
                   onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                 >
                   <Heart className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-current' : ''}`} />
-                  {showFavoritesOnly ? 'Showing Favorites' : 'Show Favorites Only'}
+                  {showFavoritesOnly ? t('brands.showingFavorites') : t('brands.showFavoritesOnly')}
                 </Button>
               )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <p className="text-xs text-muted-foreground">
-                    {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''}
+                    {t('brands.brandsFound', { count: filteredBrands.length })}
                   </p>
                   {(searchQuery || selectedCountry !== "all" || selectedCategory !== "all" || sortBy !== "name-asc" || showFavoritesOnly) && (
                     <Button
@@ -307,7 +307,7 @@ const GlobalIndex = () => {
                       }}
                     >
                       <X className="w-3 h-3 mr-1" />
-                      Clear
+                      {t('brands.clear')}
                     </Button>
                   )}
                 </div>
@@ -316,9 +316,9 @@ const GlobalIndex = () => {
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                    <SelectItem value="country">Country</SelectItem>
+                    <SelectItem value="name-asc">{t('brands.sortNameAsc')}</SelectItem>
+                    <SelectItem value="name-desc">{t('brands.sortNameDesc')}</SelectItem>
+                    <SelectItem value="country">{t('common.country')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -334,7 +334,7 @@ const GlobalIndex = () => {
             <CardContent className="py-8 text-center">
               <p className="text-muted-foreground text-sm">{t('brands.noBrands')}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Try adjusting your search or filters
+                {t('brands.adjustSearch')}
               </p>
             </CardContent>
           </Card>
@@ -377,7 +377,7 @@ const GlobalIndex = () => {
                         className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
                         onClick={(e) => { e.stopPropagation(); window.open(brand.official_website!, '_blank'); }}
                       >
-                        <ExternalLink className="w-3 h-3" /> Web
+                        <ExternalLink className="w-3 h-3" /> {t('brands.web')}
                       </button>
                     )}
                     {brand.instagram_url && (
@@ -385,7 +385,7 @@ const GlobalIndex = () => {
                         className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
                         onClick={(e) => { e.stopPropagation(); window.open(brand.instagram_url!, '_blank'); }}
                       >
-                        <Instagram className="w-3 h-3" /> Insta
+                        <Instagram className="w-3 h-3" /> {t('brands.insta')}
                       </button>
                     )}
                     <button
@@ -396,7 +396,7 @@ const GlobalIndex = () => {
                         setShopModalOpen(true);
                       }}
                     >
-                      <Store className="w-3 h-3" /> Shops
+                      <Store className="w-3 h-3" /> {t('brands.shops')}
                     </button>
                   </div>
                 </div>
