@@ -99,10 +99,10 @@ const Drops = () => {
 
   const toggleReminder = async (dropId: string) => {
     if (!user) {
-      toast.info('Sign in required', {
-        description: 'Sign in to set drop reminders',
+      toast.info(t('auth.signInRequired'), {
+        description: t('auth.signInToReminder'),
         action: {
-          label: 'Sign In',
+          label: t('auth.signIn'),
           onClick: () => navigate('/auth'),
         },
       });
@@ -119,11 +119,11 @@ const Drops = () => {
         next.delete(dropId);
         return next;
       });
-      toast.success('Reminder removed');
+      toast.success(t('drops.reminderRemoved'));
     } else {
       await supabase.from('drop_reminders').insert({ drop_id: dropId, user_id: user.id });
       setReminders(prev => new Set(prev).add(dropId));
-      toast.success('Reminder set!');
+      toast.success(t('drops.reminderSet'));
     }
   };
 
@@ -131,7 +131,7 @@ const Drops = () => {
     haptic.light();
     navigator.clipboard.writeText(drop.discount_code);
     setCopiedCodes(prev => new Set(prev).add(drop.id));
-    toast.success(`Code "${drop.discount_code}" copied!`);
+    toast.success(t('drops.codeCopied'));
     setTimeout(() => {
       setCopiedCodes(prev => {
         const next = new Set(prev);
@@ -158,7 +158,7 @@ const Drops = () => {
   const getTimeLabel = (releaseDate: string) => {
     try {
       const date = new Date(releaseDate);
-      if (isPast(date)) return 'Released';
+      if (isPast(date)) return t('drops.released');
       return formatDistanceToNow(date, { addSuffix: true });
     } catch {
       return '';
@@ -214,7 +214,7 @@ const Drops = () => {
           </Link>
           <h1 className="text-base font-bold uppercase tracking-wider">{t('drops.title')}</h1>
           <Badge variant="outline" className="ml-auto text-xs border-[#C4956A]/30 text-[#C4956A]">
-            {filteredDrops.length} {filteredDrops.length === 1 ? 'Drop' : 'Drops'}
+            {t('drops.dropCount', { count: filteredDrops.length })}
           </Badge>
         </div>
       </header>
@@ -265,7 +265,7 @@ const Drops = () => {
                     <SelectValue placeholder="Brand" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Brands</SelectItem>
+                    <SelectItem value="all">{t('drops.allBrands')}</SelectItem>
                     {brands.map(brand => (
                       <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
                     ))}
@@ -274,7 +274,7 @@ const Drops = () => {
               </div>
               {hasActiveFilters && (
                 <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-muted-foreground" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setBrandFilter("all"); }}>
-                  <X className="w-3 h-3 mr-1" /> Clear filters
+                  <X className="w-3 h-3 mr-1" /> {t('drops.clearFilters')}
                 </Button>
               )}
             </div>
@@ -301,13 +301,13 @@ const Drops = () => {
           <div className="text-center py-12">
             <Zap className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
             <h3 className="text-base font-semibold mb-1 text-white/70">
-              {hasActiveFilters ? 'No drops match your filters' : 'No drops yet'}
+              {hasActiveFilters ? t('drops.noDropsMatch') : t('drops.noDrops')}
             </h3>
             <p className="text-xs text-muted-foreground mb-3">
-              {hasActiveFilters ? 'Try adjusting your search or filters' : 'Community drops coming soon'}
+              {hasActiveFilters ? t('drops.adjustFilters') : t('drops.comingSoon')}
             </p>
             {hasActiveFilters && (
-              <Button size="sm" variant="outline" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setBrandFilter("all"); }}>Clear Filters</Button>
+              <Button size="sm" variant="outline" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setBrandFilter("all"); }}>{t('drops.clearAll')}</Button>
             )}
           </div>
         ) : (
@@ -342,7 +342,7 @@ const Drops = () => {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#AD3A49]/20 text-[#AD3A49] border border-[#AD3A49]/30 font-medium">⭐ FEATURED</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#AD3A49]/20 text-[#AD3A49] border border-[#AD3A49]/30 font-medium">{t('drops.featuredBadge')}</span>
                         <h3 className="text-base font-bold mt-1 truncate">{drop.title}</h3>
                         <p className="text-xs text-muted-foreground mt-0.5">{brand?.name} · {format(new Date(drop.release_date), 'MMM d, yyyy')}</p>
                         {timeLabel && <span className={`text-[10px] ${isLive ? 'text-green-400' : 'text-[#C4956A]'}`}><Clock className="w-3 h-3 inline mr-0.5" />{timeLabel}</span>}
@@ -406,7 +406,7 @@ const Drops = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-medium uppercase ${getStatusStyle(drop.status)}`}>
-                        {isLive ? '● Live' : drop.status}
+                        {isLive ? t('drops.liveNow') : t(`drops.${drop.status}`)}
                       </span>
                       {drop.is_featured && (
                         <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#AD3A49]/20 text-[#AD3A49] border border-[#AD3A49]/30">Featured</span>
@@ -434,7 +434,7 @@ const Drops = () => {
                           onClick={(e) => { e.stopPropagation(); handleDiscountCodeCopy(drop); }}
                         >
                           {copiedCodes.has(drop.id) ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                          Code
+                          {t('drops.code')}
                         </button>
                       )}
                       {drop.affiliate_link && (
@@ -442,7 +442,7 @@ const Drops = () => {
                           className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
                           onClick={(e) => { e.stopPropagation(); handleAffiliateClick(drop); }}
                         >
-                          <ExternalLink className="w-3 h-3" /> Shop
+                          <ExternalLink className="w-3 h-3" /> {t('drops.shop')}
                         </button>
                       )}
                     </div>
@@ -484,7 +484,7 @@ const Drops = () => {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-[#C4956A]">{brand?.name || 'Unknown Brand'}</p>
+                        <p className="text-xs text-[#C4956A]">{brand?.name || t('drops.unknownBrand')}</p>
                         <h3 className="text-sm font-bold text-white truncate">{selectedDrop.title}</h3>
                       </div>
                     </div>
@@ -492,12 +492,12 @@ const Drops = () => {
                     <div className="flex gap-2 mt-2">
                       {brand?.official_website && (
                         <a href={brand.official_website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-white/60 hover:bg-white/10">
-                          <Globe className="w-3 h-3" /> Website
+                          <Globe className="w-3 h-3" /> {t('drops.website')}
                         </a>
                       )}
                       {brand?.instagram_url && (
                         <a href={brand.instagram_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-white/60 hover:bg-white/10">
-                          <Instagram className="w-3 h-3" /> Instagram
+                          <Instagram className="w-3 h-3" /> {t('drops.instagram')}
                         </a>
                       )}
                     </div>
@@ -512,7 +512,7 @@ const Drops = () => {
                         selectedDrop.status === 'upcoming' ? 'bg-[#C4956A]/20 text-[#C4956A] border-[#C4956A]/30' :
                         'bg-white/10 text-white/40 border-white/10'
                       }`}>
-                        {selectedDrop.status === 'live' ? '● LIVE' : selectedDrop.status?.toUpperCase()}
+                        {selectedDrop.status === 'live' ? t('drops.liveNow') : t(`drops.${selectedDrop.status}`)}
                       </Badge>
                       <span className="text-xs text-white/40 flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -536,7 +536,7 @@ const Drops = () => {
                           className="h-6 px-2 ml-auto"
                           onClick={() => {
                             navigator.clipboard.writeText(selectedDrop.discount_code);
-                            toast.success('Code copied!');
+                            toast.success(t('drops.codeCopied'));
                           }}
                         >
                           <Copy className="w-3 h-3" />
