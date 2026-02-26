@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X, Globe, Instagram, MapPin, Navigation, Plus, ExternalLink } from 'lucide-react';
 import { Tables } from '@/integrations/supabase/types';
+import { useTranslation } from 'react-i18next';
 
 type ShopType = Tables<'shops_public'>;
 
@@ -47,6 +48,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
   userLocation,
   calculateDistance,
 }) => {
+  const { t } = useTranslation();
   const [sheetState, setSheetState] = useState<'expanded' | 'full'>('expanded');
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -212,7 +214,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
               }`}
             >
               <Plus className="w-4 h-4 mr-1.5" />
-              {isInJourney ? 'Added' : 'Add to Route'}
+              {isInJourney ? t('shops.added') : t('shops.addToRoute')}
             </Button>
             <Button
               onClick={() => onGetDirections(shop)}
@@ -220,7 +222,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
               className="flex-1 h-10 text-sm font-semibold border-white/10 text-[#C3C9C9] hover:bg-white/5"
             >
               <Navigation className="w-4 h-4 mr-1.5" />
-              Directions
+              {t('shops.directions')}
             </Button>
           </div>
 
@@ -246,7 +248,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           {/* Brand description */}
           {brandDescription && (
             <div className="px-4 py-2">
-              <h3 className="text-sm font-semibold text-[#C3C9C9] mb-1.5">About {brand?.name || 'the Brand'}</h3>
+              <h3 className="text-sm font-semibold text-[#C3C9C9] mb-1.5">{t('shops.aboutBrand', { name: brand?.name || '' })}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{brandDescription}</p>
             </div>
           )}
@@ -254,7 +256,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           {/* Shop description */}
           {shopDescription && shopDescription !== brandDescription && (
             <div className="px-4 py-2">
-              <h3 className="text-sm font-semibold text-[#C3C9C9] mb-1.5">About this location</h3>
+              <h3 className="text-sm font-semibold text-[#C3C9C9] mb-1.5">{t('shops.aboutLocation')}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{shopDescription}</p>
             </div>
           )}
@@ -264,21 +266,22 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
             {brand?.official_website && (
               <a href={brand.official_website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                 <Globe className="w-4 h-4 text-[#C3C9C9]" />
-                <span className="text-sm text-[#C3C9C9]">Official Website</span>
+                <span className="text-sm text-[#C3C9C9]">{t('shops.officialWebsite')}</span>
                 <ExternalLink className="w-3.5 h-3.5 text-[#A3A39E ml-auto" />
               </a>
             )}
             {shop.official_site && shop.official_site !== brand?.official_website && (
               <a href={shop.official_site} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                 <Globe className="w-4 h-4 text-[#C3C9C9]" />
-                <span className="text-sm text-[#C3C9C9]">Shop Website</span>
+                
+<span className="text-sm text-[#C3C9C9]">{t('shops.shopWebsite')}</span>
                 <ExternalLink className="w-3.5 h-3.5 text-[#A3A39E] ml-auto" />
               </a>
             )}
             {brand?.instagram_url && (
               <a href={brand.instagram_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                 <Instagram className="w-4 h-4 text-[#C3C9C9]" />
-                <span className="text-sm text-[#C3C9C9]">Instagram</span>
+                <span className="text-sm text-[#C3C9C9]">{t('drops.instagram')}</span>
                 <ExternalLink className="w-3.5 h-3.5 text-[#A3A39E] ml-auto" />
               </a>
             )}
