@@ -89,40 +89,40 @@ const Contact = () => {
     {
       type: "new-brand" as InquiryType,
       icon: Building2,
-      title: "NEW BRAND",
-      description: "Submit a streetwear brand to be added to our directory",
+      title: t('contact.newBrand'),
+      description: t('contact.newBrandDesc'),
       color: "text-primary",
       bgColor: "bg-primary/10"
     },
     {
       type: "new-release" as InquiryType,
       icon: Package,
-      title: "NEW RELEASE",
-      description: "Submit an upcoming drop or release",
+      title: t('contact.newRelease'),
+      description: t('contact.newReleaseDesc'),
       color: "text-drops",
       bgColor: "bg-drops/10"
     },
     {
       type: "correction" as InquiryType,
       icon: AlertCircle,
-      title: "Report Issue",
-      description: "Noticed incorrect info or missing details",
+      title: t('contact.reportIssue'),
+      description: t('contact.reportIssueDesc'),
       color: "text-orange-500",
       bgColor: "bg-orange-500/10"
     },
     {
       type: "partnership" as InquiryType,
       icon: Megaphone,
-      title: "Partnership",
-      description: "Advertising, collaborations, or offers",
+      title: t('contact.partnership'),
+      description: t('contact.partnershipDesc'),
       color: "text-green-500",
       bgColor: "bg-green-500/10"
     },
     {
       type: "other" as InquiryType,
       icon: MessageCircle,
-      title: "Other",
-      description: "General inquiries or feedback",
+      title: t('contact.other'),
+      description: t('contact.otherDesc'),
       color: "text-purple-500",
       bgColor: "bg-purple-500/10"
     }
