@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import haptic from "@/lib/haptics";
+import { useTranslation } from "react-i18next";
 
 interface FavoriteBrand extends Tables<'brands'> {
   favoriteId: string;
@@ -27,6 +28,7 @@ interface DropReminder extends Tables<'drops'> {
 }
 
 const MyHeardrop = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [favoriteBrands, setFavoriteBrands] = useState<FavoriteBrand[]>([]);
@@ -199,12 +201,12 @@ const MyHeardrop = () => {
           <Card className="max-w-sm mx-auto">
             <CardContent className="py-8 text-center">
               <Heart className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
-              <h2 className="text-lg font-bold mb-1">Sign In Required</h2>
+              <h2 className="text-lg font-bold mb-1">{t('myHeardrop.signInRequired')}</h2>
               <p className="text-xs text-muted-foreground mb-4">
-                Sign in to view your favorites and recommendations
+                {t('myHeardrop.signInToView')}
               </p>
               <Button size="sm" onClick={() => navigate('/auth')}>
-                Sign In
+                {t('auth.signIn')}
               </Button>
             </CardContent>
           </Card>

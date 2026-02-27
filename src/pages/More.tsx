@@ -65,8 +65,8 @@ const More = () => {
 
   const handleItemClick = (item: MenuItem) => {
     if (item.requiresAuth && !user) {
-      toast.info('Sign in required', {
-        description: `Sign in to access ${item.label}`,
+      toast.info(t('auth.signInRequired'), {
+        description: t('myHeardrop.signInToView'),
         action: {
           label: 'Sign In',
           onClick: () => navigate('/auth'),
@@ -111,7 +111,7 @@ const More = () => {
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {needsLogin && (
                     <span className="text-[10px] text-white/30 border border-white/10 px-2 py-0.5 rounded-full">
-                      Login
+                      {t('auth.signIn')}
                     </span>
                   )}
                   <ChevronRight className="w-4 h-4 text-white/20" />
