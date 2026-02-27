@@ -367,6 +367,18 @@
     "adminDashboard": "Tableau de bord admin",
     "adminDesc": "Gérer le contenu et les soumissions"
   },
+  "onboarding": {
+    "skip": "Passer",
+    "next": "Suivant",
+    "getStarted": "Commencer",
+    "tagline": "NE RATEZ PLUS AUCUNE SORTIE",
+    "slide1Title": "Trouvez des boutiques",
+    "slide1Desc": "Découvrez les boutiques streetwear sur une carte interactive. Obtenez l'itinéraire, voyez les marques et planifiez votre parcours.",
+    "slide2Title": "Suivez chaque sortie",
+    "slide2Desc": "Restez informé avec les dates de sortie, les rappels et les drops soumis par la communauté.",
+    "slide3Title": "Construisez votre collection",
+    "slide3Desc": "Sauvegardez vos marques préférées, créez des itinéraires shopping et ne ratez plus jamais une sortie."
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Erreur",

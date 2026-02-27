@@ -367,6 +367,18 @@
     "adminDashboard": "管理面板",
     "adminDesc": "管理内容和提交"
   },
+  "onboarding": {
+    "skip": "跳过",
+    "next": "下一步",
+    "getStarted": "开始使用",
+    "tagline": "绝不错过任何发售",
+    "slide1Title": "发现附近商店",
+    "slide1Desc": "在互动地图上发现街头服饰商店。获取路线、查看品牌，规划你的购物路线。",
+    "slide2Title": "追踪每一次发售",
+    "slide2Desc": "通过发售日期、提醒和社区提交的信息，始终领先一步。",
+    "slide3Title": "打造你的收藏",
+    "slide3Desc": "收藏你喜欢的品牌，规划购物路线，再也不错过任何发售。"
+  },
   "common": {
     "loading": "加载中...",
     "error": "错误",

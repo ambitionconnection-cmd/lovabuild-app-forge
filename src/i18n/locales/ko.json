@@ -367,6 +367,18 @@
     "adminDashboard": "관리자 대시보드",
     "adminDesc": "콘텐츠 및 제출물 관리"
   },
+  "onboarding": {
+    "skip": "건너뛰기",
+    "next": "다음",
+    "getStarted": "시작하기",
+    "tagline": "드롭을 놓치지 마세요",
+    "slide1Title": "주변 매장 찾기",
+    "slide1Desc": "인터랙티브 지도에서 스트릿웨어 매장을 발견하세요. 길안내, 브랜드 확인, 경로 계획이 가능합니다.",
+    "slide2Title": "모든 드롭 추적",
+    "slide2Desc": "출시일, 리마인더, 커뮤니티 제출 드롭 정보로 항상 앞서가세요.",
+    "slide3Title": "컬렉션을 만드세요",
+    "slide3Desc": "좋아하는 브랜드를 저장하고, 쇼핑 경로를 만들고, 다시는 출시를 놓치지 마세요."
+  },
   "common": {
     "loading": "로딩 중...",
     "error": "오류",

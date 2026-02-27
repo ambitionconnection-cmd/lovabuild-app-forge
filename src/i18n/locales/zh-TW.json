@@ -367,6 +367,18 @@
     "adminDashboard": "管理面板",
     "adminDesc": "管理內容和提交"
   },
+  "onboarding": {
+    "skip": "跳過",
+    "next": "下一步",
+    "getStarted": "開始使用",
+    "tagline": "絕不錯過任何發售",
+    "slide1Title": "發現附近商店",
+    "slide1Desc": "在互動地圖上發現街頭服飾商店。取得路線、查看品牌，規劃你的購物路線。",
+    "slide2Title": "追蹤每一次發售",
+    "slide2Desc": "透過發售日期、提醒和社群提交的資訊，始終領先一步。",
+    "slide3Title": "打造你的收藏",
+    "slide3Desc": "收藏你喜歡的品牌，規劃購物路線，再也不錯過任何發售。"
+  },
   "common": {
     "loading": "載入中...",
     "error": "錯誤",
