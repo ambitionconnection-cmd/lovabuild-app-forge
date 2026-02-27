@@ -675,22 +675,22 @@ export default function Admin() {
 
             {activeTab === "brands" && (
               <div className="space-y-6">
-                <BrandManagement />
                 <BulkBrandImport onImportComplete={() => window.location.reload()} />
+                <BrandManagement />
               </div>
             )}
 
             {activeTab === "shops" && (
               <div className="space-y-6">
-                <ShopManagement />
                 <BulkShopImport onImportComplete={() => window.location.reload()} />
+                <ShopManagement />
               </div>
             )}
 
             {activeTab === "drops" && (
               <div className="space-y-6">
-                <DropManagement />
                 <BulkDropImport onImportComplete={() => window.location.reload()} />
+                <DropManagement />
               </div>
             )}
 
