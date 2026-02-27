@@ -22,6 +22,7 @@ import Analytics from "./pages/Analytics";
 import NotificationHistory from "./pages/NotificationHistory";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import OnboardingSplash from "./components/OnboardingSplash";
 import More from "./pages/More";
 import About from "./pages/About";
 import RoutePage from "./pages/RoutePage";
@@ -29,11 +30,21 @@ import RoutePage from "./pages/RoutePage";
 const queryClient = new QueryClient();
 
 function App() {
+  const [showOnboarding, setShowOnboarding] = React.useState(() => {
+    return !localStorage.getItem('heardrop_onboarding_done');
+  });
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('heardrop_onboarding_done', 'true');
+    setShowOnboarding(false);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark">
         <BrowserRouter>
           <AuthProvider>
+            {showOnboarding && <OnboardingSplash onComplete={handleOnboardingComplete} />}
             <Routes>
               {/* Auth page - always public */}
               <Route path="/auth" element={<Auth />} />

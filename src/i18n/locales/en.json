@@ -367,6 +367,18 @@
     "adminDashboard": "Admin Dashboard",
     "adminDesc": "Manage content & submissions"
   },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "getStarted": "Get Started",
+    "tagline": "NEVER MISS A DROP",
+    "slide1Title": "Find Shops Near You",
+    "slide1Desc": "Discover streetwear stores on an interactive map. Get directions, see what brands they carry, and plan your route.",
+    "slide2Title": "Track Every Drop",
+    "slide2Desc": "Stay ahead with release dates, reminders, and community-submitted drops from brands you love.",
+    "slide3Title": "Build Your Collection",
+    "slide3Desc": "Save your favourite brands, build shopping routes, and never miss a release again."
+  },
   "common": {
     "loading": "Loading...",
     "error": "Error",
