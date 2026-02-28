@@ -20,6 +20,7 @@ interface Drop {
   title: string;
   description: string;
   image_url: string;
+  product_images: string[] | null;
   release_date: string;
   status: string;
   is_featured: boolean;
@@ -52,6 +53,7 @@ const Drops = () => {
   const [highlightedDrop, setHighlightedDrop] = useState<string | null>(highlightId);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedDrop, setSelectedDrop] = useState<Drop | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -328,6 +330,7 @@ const Drops = () => {
                       className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-[#AD3A49]/10 via-card to-[#C4956A]/10 border border-[#AD3A49]/20 cursor-pointer"
                       onClick={() => {
                         setSelectedDrop(drop);
+                        setSelectedImageIndex(0);
                       }}
                     >
                       <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -383,6 +386,7 @@ const Drops = () => {
                   } ${highlightedDrop === drop.id ? 'ring-2 ring-[#AD3A49] ring-offset-1 ring-offset-background' : ''}`}
                   onClick={() => {
                     setSelectedDrop(drop);
+                    setSelectedImageIndex(0);
                   }}
                 >
                   {/* Drop Image */}
@@ -544,8 +548,34 @@ const Drops = () => {
                       </div>
                     )}
 
-                    {/* Product image */}
-                    {selectedDrop.image_url && (
+                    {/* Product images */}
+                    {(selectedDrop.product_images && selectedDrop.product_images.length > 0) ? (
+                      <div className="space-y-2">
+                        <div className="rounded-xl overflow-hidden border border-white/10">
+                          <img
+                            src={selectedDrop.product_images[selectedImageIndex] || selectedDrop.image_url}
+                            alt={`${selectedDrop.title} - ${selectedImageIndex + 1}`}
+                            className="w-full object-cover max-h-64"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        </div>
+                        {selectedDrop.product_images.length > 1 && (
+                          <div className="flex gap-1.5 overflow-x-auto pb-1">
+                            {selectedDrop.product_images.map((img, i) => (
+                              <button
+                                key={i}
+                                onClick={() => setSelectedImageIndex(i)}
+                                className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${
+                                  i === selectedImageIndex ? 'border-[#AD3A49] opacity-100' : 'border-white/10 opacity-50 hover:opacity-75'
+                                }`}
+                              >
+                                <img src={img} alt={`${selectedDrop.title} ${i + 1}`} className="w-full h-full object-cover" />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : selectedDrop.image_url ? (
                       <div className="rounded-xl overflow-hidden border border-white/10">
                         <img
                           src={selectedDrop.image_url}
@@ -554,7 +584,7 @@ const Drops = () => {
                           onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                         />
                       </div>
-                    )}
+                    ) : null}
 
                     {/* Action buttons */}
                     <div className="flex gap-2 pt-2">

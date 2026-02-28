@@ -18,6 +18,7 @@ interface ParsedDrop {
   release_date: string;
   description: string;
   image_url: string;
+  product_images: string[];
   affiliate_link: string;
   discount_code: string;
   is_featured: boolean;
@@ -134,6 +135,7 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
         release_date,
         description: obj['description'] || '',
         image_url: obj['image_url'] || '',
+        product_images: obj['product_images'] ? obj['product_images'].split('|').map((u: string) => u.trim()).filter(Boolean) : [],
         affiliate_link: obj['affiliate_link'] || '',
         discount_code: obj['discount_code'] || '',
         is_featured: obj['is_featured']?.toLowerCase() === 'true',
@@ -258,6 +260,7 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
         release_date: drop.release_date,
         description: drop.description || null,
         image_url: drop.image_url || null,
+        product_images: drop.product_images.length > 0 ? drop.product_images : null,
         affiliate_link: drop.affiliate_link || null,
         discount_code: drop.discount_code || null,
         is_featured: drop.is_featured,
@@ -294,8 +297,8 @@ export function BulkDropImport({ onImportComplete }: { onImportComplete: () => v
   };
 
   const downloadTemplate = () => {
-    const template = `title,brand_name,release_date,description,image_url,affiliate_link,discount_code,is_featured
-"Nike x Stüssy Air Force 1","Nike","2026-03-15","Limited edition collaboration","https://example.com/image.jpg","https://nike.com/launch","STUSSY10",true
+    const template = `title,brand_name,release_date,description,image_url,product_images,affiliate_link,discount_code,is_featured
+"Nike x Stüssy Air Force 1","Nike","2026-03-15","Limited edition collaboration","https://example.com/main.jpg","https://example.com/img1.jpg|https://example.com/img2.jpg|https://example.com/img3.jpg","https://nike.com/launch","STUSSY10",true
 "Palace Spring 2026 Week 1","Palace Skateboards","2026-03-20","First drop of the Spring season","","","",false`;
 
     const blob = new Blob([template], { type: 'text/csv' });
