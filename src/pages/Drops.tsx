@@ -34,6 +34,8 @@ interface Brand {
   id: string;
   name: string;
   logo_url: string | null;
+  official_website: string | null;
+  instagram_url: string | null;
 }
 
 const Drops = () => {
@@ -77,7 +79,7 @@ const Drops = () => {
     try {
       const [dropsRes, brandsRes] = await Promise.all([
         supabase.from('drops').select('*').order('release_date', { ascending: true }),
-        supabase.from('brands').select('id, name, logo_url'),
+        supabase.from('brands').select('id, name, logo_url, official_website, instagram_url'),
       ]);
 
       if (dropsRes.data) setDrops(dropsRes.data);
@@ -85,11 +87,11 @@ const Drops = () => {
 
       if (user) {
         const { data: reminderData } = await supabase
-          .from('drop_reminders')
+          .from('user_drop_reminders')
           .select('drop_id')
           .eq('user_id', user.id);
         if (reminderData) {
-          setReminders(new Set(reminderData.map(r => r.drop_id)));
+          setReminders(new Set(reminderData.map((r: any) => r.drop_id)));
         }
       }
     } catch (error) {
@@ -115,7 +117,7 @@ const Drops = () => {
     const hasReminder = reminders.has(dropId);
 
     if (hasReminder) {
-      await supabase.from('drop_reminders').delete().eq('drop_id', dropId).eq('user_id', user.id);
+      await supabase.from('user_drop_reminders').delete().eq('drop_id', dropId).eq('user_id', user.id);
       setReminders(prev => {
         const next = new Set(prev);
         next.delete(dropId);
@@ -123,7 +125,7 @@ const Drops = () => {
       });
       toast.success(t('drops.reminderRemoved'));
     } else {
-      await supabase.from('drop_reminders').insert({ drop_id: dropId, user_id: user.id });
+      await supabase.from('user_drop_reminders').insert({ drop_id: dropId, user_id: user.id });
       setReminders(prev => new Set(prev).add(dropId));
       toast.success(t('drops.reminderSet'));
     }

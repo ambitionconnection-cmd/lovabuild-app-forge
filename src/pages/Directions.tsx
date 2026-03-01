@@ -938,7 +938,11 @@ const Directions = () => {
             onGetDirections={getDirections}
             isInJourney={isInJourney(selectedShopForDetails.id)}
             userLocation={userLocation}
-            calculateDistance={calculateDistance}
+            calculateDistance={(lat: number, lng: number) => {
+              if (!userLocation) return '';
+              const dist = calculateDistance(userLocation.lat, userLocation.lng, lat, lng);
+              return dist < 1 ? `${Math.round(dist * 1000)}m` : `${dist.toFixed(1)}km`;
+            }}
           />
         </div>
       )}

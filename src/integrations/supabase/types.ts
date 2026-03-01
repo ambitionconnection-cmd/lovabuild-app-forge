@@ -389,6 +389,33 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_routes: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          stops: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          stops: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          stops?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       scheduled_audit_exports: {
         Row: {
           admin_email: string
@@ -790,6 +817,12 @@ export type Database = {
         | "luxury"
         | "vintage"
         | "sportswear"
+        | "contemporary"
+        | "techwear"
+        | "outdoor"
+        | "heritage"
+        | "designer"
+        | "skate"
       drop_status: "upcoming" | "live" | "ended"
     }
     CompositeTypes: {

@@ -27,7 +27,7 @@ export const saveRoute = async (
   if (user) {
     // Save to Supabase
     const routeName = `Route - ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-    const { error } = await supabase.from('saved_routes').insert({
+    const { error } = await (supabase.from('saved_routes') as any).insert({
       user_id: user.id,
       name: routeName,
       stops: stops.map(s => ({
