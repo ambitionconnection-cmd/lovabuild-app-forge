@@ -272,7 +272,7 @@ export function BulkShopImport({ onImportComplete }: { onImportComplete: () => v
         brandId = newBrandMap[shop.brand_name.toLowerCase()] || null;
       }
 
-      const insertData: Record<string, unknown> = {
+      const insertData: any = {
         name: shop.name,
         slug: shop.slug,
         address: shop.address,

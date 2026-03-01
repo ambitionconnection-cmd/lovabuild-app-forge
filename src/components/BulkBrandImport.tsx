@@ -223,7 +223,7 @@ export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => 
     let errorCount = 0;
 
     for (const brand of validBrands) {
-      const insertData: Record<string, unknown> = {
+      const insertData: any = {
         name: brand.name,
         slug: brand.slug,
         is_active: true,
