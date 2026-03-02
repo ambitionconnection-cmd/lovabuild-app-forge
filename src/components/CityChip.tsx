@@ -9,10 +9,12 @@ interface City {
 
 const CITIES: City[] = [
   { name: "London", center: [-0.1276, 51.5074], zoom: 12 },
-  { name: "Paris", center: [2.3522, 48.8566], zoom: 12 },
+  { name: "Paris", center: [2.3522, 48.8566], zoom: 13 },
   { name: "New York", center: [-73.9857, 40.7484], zoom: 12 },
-  { name: "Tokyo", center: [139.6917, 35.6895], zoom: 12 },
+  { name: "Tokyo", center: [139.7020, 35.6695], zoom: 13 },
   { name: "Los Angeles", center: [-118.2437, 34.0522], zoom: 11 },
+  { name: "Shanghai", center: [121.4737, 31.2304], zoom: 12 },
+  { name: "Beijing", center: [116.4074, 39.9042], zoom: 12 },
 ];
 
 interface CityChipProps {
