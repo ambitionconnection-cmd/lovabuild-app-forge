@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tables } from '@/integrations/supabase/types';
-import { Crosshair } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import MapLoadingOverlay from '@/components/MapLoadingOverlay';
 // Debug mode - enable via URL param ?mapDebug=true or localStorage
 const getDebugMode = () => {
@@ -46,6 +44,8 @@ interface MapProps {
   isFullscreen?: boolean;
   deferRouteCalculation?: boolean;
   showGeolocateTooltip?: boolean;
+  onRecenterReady?: (recenter: () => void) => void;
+  onUserLocationChange?: (location: [number, number] | null) => void;
 }
 
 const Map: React.FC<MapProps> = ({ 
@@ -63,7 +63,9 @@ const Map: React.FC<MapProps> = ({
   highlightedShopId,
   isFullscreen = false,
   deferRouteCalculation = true,
-  showGeolocateTooltip = false
+  showGeolocateTooltip = false,
+  onRecenterReady,
+  onUserLocationChange
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -1030,6 +1032,15 @@ const Map: React.FC<MapProps> = ({
     }
   }, [userLocation]);
 
+  // Expose recenter and userLocation to parent
+  useEffect(() => {
+    onRecenterReady?.(handleRecenter);
+  }, [handleRecenter, onRecenterReady]);
+
+  useEffect(() => {
+    onUserLocationChange?.(userLocation);
+  }, [userLocation, onUserLocationChange]);
+
   if (!mapboxToken) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-muted rounded-lg">
@@ -1049,18 +1060,7 @@ const Map: React.FC<MapProps> = ({
         message={loadingMessage}
       />
       
-      {/* Recenter button - next to city chip at top */}
-      {userLocation && (
-        <Button
-          onClick={handleRecenter}
-          size="icon"
-          variant="secondary"
-          className="absolute top-4 lg:top-16 right-3 z-20 h-9 w-9 rounded-full shadow-lg bg-black/80 backdrop-blur-md border border-white/10 hover:bg-black/90"
-          title="Recenter on my location"
-        >
-          <Crosshair className="h-4 w-4 text-white" />
-        </Button>
-      )}
+      {/* Recenter button - rendered via parent wrapper */}
       
       {/* Debug overlay - only shown when debug mode is enabled */}
       {DEBUG_MAP && (
