@@ -117,18 +117,50 @@ Deno.serve(async (req) => {
       if (body?.limit) brandLimit = Number(body.limit);
     } catch { /* no body */ }
 
-    // Get active brands
-    let query = supabase
-      .from("brands")
-      .select("id, name")
-      .eq("is_active", true)
-      .order("name");
-    
-    if (brandLimit) query = query.limit(brandLimit);
-    
-    const { data: brands, error: brandsError } = await query;
+    // Get popular brands (most favorited first)
+    const maxBrands = brandLimit || 30;
 
-    if (brandsError) throw brandsError;
+    const { data: favoritedBrands, error: favError } = await supabase
+      .rpc("get_popular_brands_for_radar", { brand_limit: maxBrands });
+
+    if (favError) {
+      console.error("Error fetching popular brands, falling back:", favError);
+    }
+
+    let brands: { id: string; name: string }[] = favoritedBrands || [];
+
+    // Fallback: if fewer than 10 favorited brands, pad with popular streetwear defaults
+    if (brands.length < 10) {
+      const fallbackNames = [
+        "Supreme", "Nike", "Palace", "Stüssy", "Carhartt WIP",
+        "The North Face", "adidas", "New Balance", "BAPE", "Off-White",
+        "Jordan Brand", "Stone Island", "Corteiz", "Trapstar", "Kith"
+      ];
+
+      const { data: fallbackBrands } = await supabase
+        .from("brands")
+        .select("id, name")
+        .eq("is_active", true)
+        .in("name", fallbackNames);
+
+      if (fallbackBrands) {
+        const existingIds = new Set(brands.map(b => b.id));
+        for (const fb of fallbackBrands) {
+          if (!existingIds.has(fb.id) && brands.length < maxBrands) {
+            brands.push(fb);
+            existingIds.add(fb.id);
+          }
+        }
+      }
+    }
+
+    if (brands.length === 0) {
+      console.log("No brands to process.");
+      return new Response(
+        JSON.stringify({ success: true, brands_processed: 0, items_inserted: 0 }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     console.log(`Processing ${brands.length} brands...`);
 

@@ -936,6 +936,13 @@ export type Database = {
       cleanup_old_ip_attempts: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
       get_current_user_email: { Args: never; Returns: string }
+      get_popular_brands_for_radar: {
+        Args: { brand_limit?: number }
+        Returns: {
+          id: string
+          name: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
