@@ -461,13 +461,15 @@ export const StreetSpottedFeed = () => {
         />
       )}
 
-      {/* Post detail drawer */}
+      {/* Post detail drawer with swipe navigation */}
       {selectedPost && (
         <StreetSpottedPostDetail
           post={selectedPost}
           brands={brands}
           onClose={() => setSelectedPost(null)}
           onToggleLike={toggleLike}
+          posts={filteredPosts}
+          onNavigate={(post) => setSelectedPost(post)}
         />
       )}
     </div>

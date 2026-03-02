@@ -142,8 +142,28 @@ const Directions = () => {
   const [selectedShopForDetails, setSelectedShopForDetails] = useState<ShopType | null>(null);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
-  const [mapZoom, setMapZoom] = useState<number>(12);
+  const [mapCenter, setMapCenter] = useState<[number, number] | null>(() => {
+    if (searchParams.get('shopId')) return null; // Don't restore if navigating to specific shop
+    try {
+      const saved = sessionStorage.getItem('heardrop_map_position');
+      if (saved) {
+        const { center } = JSON.parse(saved);
+        return center || null;
+      }
+    } catch {}
+    return null;
+  });
+  const [mapZoom, setMapZoom] = useState<number>(() => {
+    if (searchParams.get('shopId')) return 12;
+    try {
+      const saved = sessionStorage.getItem('heardrop_map_position');
+      if (saved) {
+        const { zoom } = JSON.parse(saved);
+        return zoom || 12;
+      }
+    } catch {}
+    return 12;
+  });
   const [highlightedShopId, setHighlightedShopId] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [mapCenterLocation, setMapCenterLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -305,22 +325,8 @@ const Directions = () => {
     };
   }, [shops, journeyStops, navigate, brands, saveMapPosition]);
 
-  // Restore map position on mount
-  useEffect(() => {
-    const saved = sessionStorage.getItem('heardrop_map_position');
-    if (saved && !searchParams.get('shopId')) {
-      try {
-        const { center, zoom } = JSON.parse(saved);
-        if (center && !mapCenter) {
-          setMapCenter(center);
-          setMapZoom(zoom || 14);
-        }
-        // Keep saved position — don't delete, so it persists across navigations
-      } catch (e) {
-        console.error('Error restoring map position:', e);
-      }
-    }
-  }, []);
+  // Map position is now restored synchronously in useState initializer above
+  // No need for a separate useEffect to restore it
 
   // Draggable panel handlers
   const handlePanelDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {

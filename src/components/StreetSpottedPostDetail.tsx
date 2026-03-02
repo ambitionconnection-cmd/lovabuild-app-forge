@@ -1,13 +1,14 @@
-import { Flame, MapPin, X, ExternalLink, ShoppingBag } from "lucide-react";
+import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { Drawer, DrawerContent, DrawerClose } from "@/components/ui/drawer";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useTranslation } from "react-i18next";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface Post {
   id: string;
@@ -39,15 +40,44 @@ interface Props {
   brands: Brand[];
   onClose: () => void;
   onToggleLike: (postId: string) => void;
+  posts?: Post[];
+  onNavigate?: (post: Post) => void;
 }
 
-const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
+const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const postBrands = brands.filter(b => post.brand_ids.includes(b.id));
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    // Only trigger if horizontal swipe is dominant and > 60px
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0 && hasNext && onNext) onNext();
+      if (dx > 0 && hasPrev && onPrev) onPrev();
+    }
+  };
 
   return (
-    <div className="max-h-[85vh] overflow-y-auto">
+    <div
+      ref={scrollRef}
+      className="max-h-[85vh] overflow-y-auto"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Image */}
       <div className="relative w-full bg-muted">
         <img
@@ -61,6 +91,23 @@ const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
               {t("hot.sponsored")}
             </Badge>
           </div>
+        )}
+        {/* Navigation arrows */}
+        {hasPrev && (
+          <button
+            onClick={onPrev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
+        {hasNext && (
+          <button
+            onClick={onNext}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         )}
       </div>
 
@@ -185,14 +232,36 @@ const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
   );
 };
 
-export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike }: Props) => {
+export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate }: Props) => {
   const isMobile = useIsMobile();
+
+  const currentIndex = posts.findIndex(p => p.id === post.id);
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex < posts.length - 1 && currentIndex >= 0;
+
+  const goToPrev = useCallback(() => {
+    if (hasPrev && onNavigate) onNavigate(posts[currentIndex - 1]);
+  }, [hasPrev, currentIndex, posts, onNavigate]);
+
+  const goToNext = useCallback(() => {
+    if (hasNext && onNavigate) onNavigate(posts[currentIndex + 1]);
+  }, [hasNext, currentIndex, posts, onNavigate]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goToPrev();
+      if (e.key === "ArrowRight") goToNext();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [goToPrev, goToNext]);
 
   if (isMobile) {
     return (
       <Drawer open onOpenChange={(open) => !open && onClose()}>
         <DrawerContent className="max-h-[90vh]">
-          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} />
+          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} />
         </DrawerContent>
       </Drawer>
     );
@@ -201,7 +270,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike }:
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg p-0 overflow-hidden">
-        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} />
+        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} />
       </DialogContent>
     </Dialog>
   );
