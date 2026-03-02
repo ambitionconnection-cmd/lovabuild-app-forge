@@ -68,6 +68,9 @@ All colors MUST be HSL.
     --warning: 45 93% 58%;
     --error: 0 84.2% 60.2%;
 
+    /* Brand Logo Background - neutral tone for contrast with both black & white logos */
+    --logo-bg: 60 2% 63%;
+
     /* Glassmorphism */
     --glass-bg: 220 20% 8%;
     --glass-opacity: 0.3;
@@ -143,6 +146,7 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 228 84% 4%;
     --sidebar-border: 215 19% 34%;
     --sidebar-ring: 198 93% 59%;
+    --logo-bg: 206 2% 51%;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);

@@ -22,7 +22,7 @@ export const BrandLogo = ({ brand, className = "max-w-full max-h-full object-con
 
   // Fallback: Display formatted brand name
   return (
-    <div className="w-full h-full flex items-center justify-center p-4 bg-gradient-to-br from-foreground/5 to-foreground/10">
+    <div className="w-full h-full flex items-center justify-center p-4 bg-logo-bg">
       <div className="text-center">
         <div className="text-2xl font-bold text-foreground uppercase tracking-tight line-clamp-2">
           {brand.name}

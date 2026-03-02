@@ -289,7 +289,7 @@ const Index = () => {
                   onClick={() => navigate(`/global-index?highlight=${brand.id}`)}
                 >
                   <CardContent className="p-2">
-                    <div className="aspect-square bg-foreground/5 rounded-md mb-1 flex items-center justify-center overflow-hidden border border-border">
+                    <div className="aspect-square bg-logo-bg rounded-md mb-1 flex items-center justify-center overflow-hidden border border-border">
                       <BrandLogo brand={brand} />
                     </div>
                     <p className="font-medium text-[10px] text-center line-clamp-1">

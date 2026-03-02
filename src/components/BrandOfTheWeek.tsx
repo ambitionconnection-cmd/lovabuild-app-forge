@@ -70,7 +70,7 @@ export const BrandOfTheWeek = () => {
 
         <div className="flex items-center gap-3 p-3">
           {/* Logo */}
-          <div className="w-14 h-14 rounded-xl bg-muted border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0">
+          <div className="w-14 h-14 rounded-xl bg-logo-bg border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0">
             {brand.logo_url ? (
               <img src={brand.logo_url} alt={brand.name} className="max-w-full max-h-full object-contain p-1" />
             ) : (
