@@ -1,8 +1,6 @@
-import { ArrowLeft, Newspaper, Camera } from "lucide-react";
+import { ArrowLeft, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BrandRadarFeed } from "@/components/BrandRadarFeed";
 import { StreetSpottedFeed } from "@/components/StreetSpottedFeed";
 
 const Feed = () => {
@@ -16,33 +14,17 @@ const Feed = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-base font-bold uppercase tracking-wider">Feed</h1>
+          <div className="flex items-center gap-2">
+            <Flame className="w-5 h-5 text-orange-500" />
+            <h1 className="text-base font-bold uppercase tracking-wider">Hot</h1>
+          </div>
         </div>
       </header>
 
-      {/* Tabs */}
-      <Tabs defaultValue="spotted" className="w-full">
-        <div className="sticky top-[49px] lg:top-[105px] z-30 bg-background/95 backdrop-blur-sm border-b border-border/30 px-3 pt-2">
-          <TabsList className="w-full grid grid-cols-2 h-10">
-            <TabsTrigger value="spotted" className="gap-1.5 text-xs font-bold uppercase tracking-wider">
-              <Camera className="w-4 h-4" />
-              Street Spotted
-            </TabsTrigger>
-            <TabsTrigger value="radar" className="gap-1.5 text-xs font-bold uppercase tracking-wider">
-              <Newspaper className="w-4 h-4" />
-              Brand Radar
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="spotted" className="mt-0 pt-3">
-          <StreetSpottedFeed />
-        </TabsContent>
-
-        <TabsContent value="radar" className="mt-0 pt-3">
-          <BrandRadarFeed />
-        </TabsContent>
-      </Tabs>
+      {/* Street Spotted Feed */}
+      <div className="mt-0 pt-3">
+        <StreetSpottedFeed />
+      </div>
     </div>
   );
 };

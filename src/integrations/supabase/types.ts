@@ -108,6 +108,7 @@ export type Database = {
       }
       brands: {
         Row: {
+          affiliate_url: string | null
           banner_url: string | null
           category: Database["public"]["Enums"]["category_type"] | null
           country: string | null
@@ -125,6 +126,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          affiliate_url?: string | null
           banner_url?: string | null
           category?: Database["public"]["Enums"]["category_type"] | null
           country?: string | null
@@ -142,6 +144,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          affiliate_url?: string | null
           banner_url?: string | null
           category?: Database["public"]["Enums"]["category_type"] | null
           country?: string | null
@@ -679,6 +682,9 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          is_sponsored: boolean
+          status: string
+          style_tags: string[]
           user_id: string
         }
         Insert: {
@@ -688,6 +694,9 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          is_sponsored?: boolean
+          status?: string
+          style_tags?: string[]
           user_id: string
         }
         Update: {
@@ -697,6 +706,9 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          is_sponsored?: boolean
+          status?: string
+          style_tags?: string[]
           user_id?: string
         }
         Relationships: []
