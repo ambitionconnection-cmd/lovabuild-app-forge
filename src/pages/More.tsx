@@ -1,4 +1,4 @@
-import { Heart, User, Mail, Info, Bell, Shield, ChevronRight, Globe } from "lucide-react";
+import { Heart, User, Mail, Info, Bell, Shield, ChevronRight, Globe, Layers } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -35,6 +35,12 @@ const menuItems: MenuItem[] = [
     description: "notificationsDesc",
     path: "/notifications",
     requiresAuth: true,
+  },
+  {
+    icon: Layers,
+    label: "collections",
+    description: "collectionsDesc",
+    path: "/collections",
   },
   {
     icon: Mail,
