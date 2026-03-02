@@ -62,6 +62,50 @@ export type Database = {
           },
         ]
       }
+      brand_radar_items: {
+        Row: {
+          brand_id: string
+          created_at: string
+          id: string
+          published_at: string | null
+          source_name: string | null
+          source_url: string
+          summary: string | null
+          thumbnail_url: string | null
+          title: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          source_name?: string | null
+          source_url: string
+          summary?: string | null
+          thumbnail_url?: string | null
+          title: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          source_name?: string | null
+          source_url?: string
+          summary?: string | null
+          thumbnail_url?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_radar_items_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           banner_url: string | null
@@ -564,6 +608,98 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      street_spotted_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "street_spotted_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "street_spotted_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      street_spotted_post_brands: {
+        Row: {
+          brand_id: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          brand_id: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          brand_id?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "street_spotted_post_brands_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "street_spotted_post_brands_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "street_spotted_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      street_spotted_posts: {
+        Row: {
+          caption: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          id: string
+          image_url: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_drop_reminders: {
         Row: {
