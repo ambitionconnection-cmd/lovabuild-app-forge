@@ -268,8 +268,9 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
               <div className="flex items-center justify-between mb-1.5">
                 <h3 className="text-sm font-semibold text-[#C3C9C9]">{t('shops.aboutBrand', { name: brand?.name || '' })}</h3>
                 {showTranslate && (
-                  <button onClick={() => openTranslate(brandDescription)} className="p-1.5 rounded-full hover:bg-white/10 transition-colors" title="Translate">
-                    <Languages className="w-3.5 h-3.5 text-[#A3A39E]" />
+                  <button onClick={() => openTranslate(brandDescription)} className="flex items-center gap-1 px-2 py-1 rounded-full hover:bg-white/10 transition-colors text-[#A3A39E]" title={t('shops.translate')}>
+                    <Languages className="w-3.5 h-3.5" />
+                    <span className="text-[10px] font-medium">{t('shops.translate')}</span>
                   </button>
                 )}
               </div>
@@ -283,8 +284,9 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
               <div className="flex items-center justify-between mb-1.5">
                 <h3 className="text-sm font-semibold text-[#C3C9C9]">{t('shops.aboutLocation')}</h3>
                 {showTranslate && (
-                  <button onClick={() => openTranslate(shopDescription)} className="p-1.5 rounded-full hover:bg-white/10 transition-colors" title="Translate">
-                    <Languages className="w-3.5 h-3.5 text-[#A3A39E]" />
+                  <button onClick={() => openTranslate(shopDescription)} className="flex items-center gap-1 px-2 py-1 rounded-full hover:bg-white/10 transition-colors text-[#A3A39E]" title={t('shops.translate')}>
+                    <Languages className="w-3.5 h-3.5" />
+                    <span className="text-[10px] font-medium">{t('shops.translate')}</span>
                   </button>
                 )}
               </div>
