@@ -1,123 +1,111 @@
 
 
-# Roadmap to Completion
+# Shop Research: Paris, Tokyo (Harajuku/Shibuya), and China
 
-Based on your two strategy documents, what's already built, and the removal of the Drops section, here is the consolidated list of remaining work organized by priority.
+## Summary of Findings
 
----
-
-## Already Done (No Action Needed)
-
-- Map with pins, geolocation, navigation, city selector
-- Brand directory (Global Index) with 1000+ brands
-- Brand detail pages with shops, favorites, social links
-- Route builder with drag-and-drop reordering
-- Save route (to database for logged-in users, localStorage for guests)
-- PDF export with branded header/footer
-- Share route (native share + clipboard fallback)
-- Contact page with New Brand / New Release submission forms
-- Admin dashboard with brand, shop, drop management
-- Hot page (Street Spotted) with masonry grid, moderation, style tags, filters
-- User auth, profiles, favorites, notifications
-- PWA configuration
-- i18n (7 languages)
-- Security: RLS, login rate limiting, audit logs
+Based on web research from multiple streetwear guides (Sneaker Freaker, Flexdog, enfntsterribles, Corner.inc, Culture Trip), here are the shops I found for each city, **excluding duplicates** already in your database.
 
 ---
 
-## What Still Needs to Be Done
+## PARIS (Priority -- 25 new shops)
 
-### Priority 1: Route Sharing (Shareable Links)
-**Problem you raised**: When you share a route, the recipient can't open it and follow the path from their own location.
+Paris streetwear is concentrated in two hubs: **Le Marais** (3e/4e arrondissement) and **Les Halles / Rue Etienne Marcel** (1er/2e arrondissement), with a few on **Champs-Elysees** and **Rue Cambon**.
 
-- Create a `shared_routes` table with a unique short code (e.g., `heardrop.app/route/abc123`)
-- Add a new route `/route/:code` that loads the shared route's stops
-- The recipient sees the stops on the map starting from **their** location
-- Update `shareRoute()` in `routeActions.ts` to generate a shareable link instead of just text
-- No auth required to view a shared route
+| # | Shop Name | Area/Hub | Address | Type |
+|---|-----------|----------|---------|------|
+| 1 | Kith Paris | Le Marais | 22 Rue Madame de Sévigné, 75004 | Streetwear/Lifestyle |
+| 2 | The Broken Arm | Le Marais | 12 Rue Perrée, 75003 | Concept Store |
+| 3 | Opium Paris | Les Halles | 6 Rue du Caire, 75002 | Sneakers/Basketball |
+| 4 | Shinzo Paris | Etienne Marcel | 39 Rue Étienne Marcel, 75001 | Multi-store complex |
+| 5 | Larry Deadstock | Le Marais | 21 Rue du Temple, 75004 | Resale/Deadstock |
+| 6 | BAPE Paris | Le Marais | 34 Rue de la Verrerie, 75004 | Streetwear |
+| 7 | No. 42 (Adidas) | Le Marais | 42 Rue de Sévigné, 75003 | Sneakers/Concept |
+| 8 | Nike House of Innovation | Champs-Elysées | 79 Av. des Champs-Elysées, 75008 | Flagship |
+| 9 | Naked Copenhagen Paris | Le Marais | 25 Rue de Poitou, 75003 | Women's streetwear |
+| 10 | Sneakersnstuff Paris | Le Marais | 95 Rue de Turenne, 75003 | Sneakers |
+| 11 | Citadium Caumartin | Opéra | 56 Rue de Caumartin, 75009 | Department/Streetwear |
+| 12 | Kizuna Paris | Le Marais | 22 Rue de Picardie, 75003 | Japanese vintage |
+| 13 | Off-White Paris | Le Marais | 5 Rue du Pont aux Choux, 75003 | Luxury streetwear |
+| 14 | Dover Street Market Paris | Saint-Germain | 35 Rue des Saints-Pères, 75006 | Concept Store |
+| 15 | Maison Kitsuné | Palais Royal | 38 Rue de Richelieu, 75001 | Streetwear/Lifestyle |
+| 16 | Highsnobiety Paris | Le Marais | Rue de Turenne, 75003 | Concept |
+| 17 | Colette successor - La Bourse de Commerce area | Les Halles | Various, 75001 | Concept |
+| 18 | Leclaireur Marais | Le Marais | 40 Rue de Sévigné, 75003 | Avant-garde |
+| 19 | Centre Commercial | Canal Saint-Martin | 2 Rue de Marseille, 75010 | Sustainable streetwear |
+| 20 | Merci | Le Marais | 111 Bd Beaumarchais, 75003 | Concept Store |
+| 21 | Le Bon Marché (Streetwear Floor) | Rive Gauche | 24 Rue de Sèvres, 75007 | Department |
+| 22 | Montaigne Market | Champs area | 57 Av. Montaigne, 75008 | Luxury/Street |
+| 23 | Exception | Le Marais | 24 Rue Berger, 75001 | Concept |
+| 24 | Footpatrol Paris | Les Halles | 47 Rue du Caire, 75002 | Sneakers |
+| 25 | SneakersNStuff Paris | Le Marais | 95 Rue de Turenne, 75003 | Sneakers |
 
-### Priority 2: Discovery Features
-From your strategic plan, Section 4:
-
-1. **"Brand of the Week"** on the map homepage
-   - Add a `featured_brand_id` field or a small `featured_brands` table with date ranges
-   - Show a dismissible card/banner on the Directions page highlighting the featured brand
-   - Admin can set the featured brand from the dashboard
-
-2. **"Similar To..." recommendations** on brand detail pages
-   - Tag-based matching using existing `category` field
-   - Show 4-6 related brands at the bottom of `BrandDetail.tsx`
-   - No ML needed — simple category + country matching
-
-3. **Curated Collections** (5 to start)
-   - New `collections` table: `id`, `title`, `slug`, `description`, `brand_ids` (uuid[]), `is_active`
-   - New `/collections` page or section within Global Index
-   - Examples: "Japanese Streetwear", "London Underground Labels", "Heritage Brands"
-   - Admin can create/edit collections from dashboard
-
-### Priority 3: "Suggest an Edit" on Brand Pages
-- Add a button on `BrandDetail.tsx` that opens a lightweight form
-- Submits to `contact_submissions` with `inquiry_type = 'correction'` and the brand ID
-- Already partially supported by the Contact page — just needs a shortcut from brand pages
-
-### Priority 4: MyHeardrop Cleanup
-- The "Reminders" tab still references Drops (`/drops` route, drop reminders). Since Drops is removed:
-  - Either repurpose the tab for saved routes display
-  - Or remove the Reminders tab and replace with a **"My Routes"** tab showing saved routes with load/delete actions
-- The "Recommendations" tab references drops — update to only recommend brands
-
-### Priority 5: Brand Detail — "Shop Online" CTA
-- The `affiliate_url` column already exists on `brands`
-- Add a prominent "Shop Online" button on `BrandDetail.tsx` when `affiliate_url` is set
-- Track clicks for analytics (reuse `affiliate_analytics` table)
-
-### Priority 6: Deployment Polish
-From your short roadmap:
-
-1. **Final PWA verification** — test install on Android/iOS
-2. **Service worker** — verify offline capability with `vite-plugin-pwa`
-3. **Full walkthrough** on phone — every page, every flow
-4. **App name change** — you mentioned HEARDROP will be renamed. When ready:
-   - Update all references in code, translations, PDF export, PWA manifest
-   - Upload new logo to replace current branding
-
-### Priority 7: Marketing Assets (Post-Deploy)
-1. 5 screenshot mockups for social media
-2. QR code linking to the app
-3. One-page pitch document
+**Paris Hubs** (similar to Soho in London):
+- **Le Marais (3e/4e)** -- the main hub, comparable to Soho. Most shops cluster here.
+- **Rue Etienne Marcel / Les Halles (1er/2e)** -- the sneaker corridor, Shinzo, Opium, Starcow.
+- **Champs-Elysées (8e)** -- flagship stores (Nike, Louis Vuitton).
 
 ---
 
-## Items from Strategic Plan NOT Needed / Deferred
+## TOKYO -- Harajuku & Shibuya (20 new shops)
 
-| Item | Status |
-|------|--------|
-| Drops/Release Calendar | **Removed** — replaced by Hot page |
-| Brand Radar (news aggregator) | **Removed** — no third-party dependency |
-| Premium user tier | **Deferred** — needs 5,000+ users first |
-| City-level sponsorships | **Deferred** — needs multi-city scale |
-| Display advertising | **Never** (per your strategic plan) |
-| Brand Analytics Dashboard (selling data to brands) | **Deferred** — Year 2 |
-| Push notifications for drops | **Removed** with Drops section |
+| # | Shop Name | District | Type |
+|---|-----------|----------|------|
+| 1 | GR8 | Harajuku | Concept/High-end streetwear |
+| 2 | NUBIAN Harajuku | Harajuku | Multi-brand streetwear |
+| 3 | Billy's Tokyo | Harajuku | Sneakers |
+| 4 | Atmos Shibuya | Shibuya | Sneakers |
+| 5 | CACTUS CEEJAY (CJ) | Harajuku | Vintage/Streetwear |
+| 6 | UNDERCOVER Flagship | Harajuku | Avant-garde streetwear |
+| 7 | visvim General Store | Harajuku | Premium streetwear |
+| 8 | WACKO MARIA Harajuku | Harajuku | Japanese streetwear |
+| 9 | sacai Aoyama | Aoyama (near Harajuku) | Luxury streetwear |
+| 10 | CDG Flagship Aoyama | Aoyama | Comme des Garcons |
+| 11 | BAPEXCLUSIVE Aoyama | Aoyama | Premium BAPE |
+| 12 | MIYASHITA PARK (Shibuya) | Shibuya | Multi-brand mall |
+| 13 | Issey Miyake Shibuya | Shibuya | Designer |
+| 14 | 2G Shibuya | Shibuya | Streetwear/Concept |
+| 15 | JOURNAL STANDARD | Shibuya | Japanese casual |
+| 16 | NANAMICA Daikanyama | Near Shibuya | Outdoor/Street |
+| 17 | Stussy Shibuya Chapter | Shibuya | Streetwear |
+| 18 | Palace Tokyo | Harajuku | Skate/Streetwear |
+| 19 | Kith Tokyo | Shibuya | Streetwear/Lifestyle |
+| 20 | Off-White Tokyo | Harajuku | Luxury streetwear |
 
 ---
 
-## Suggested Implementation Order
+## CHINA (6 new shops -- Beijing & Shanghai)
 
-```text
-Step 1  →  Route sharing (shareable links)
-Step 2  →  MyHeardrop cleanup (remove drop references, add My Routes)
-Step 3  →  Brand detail: Shop Online CTA + Suggest an Edit
-Step 4  →  Similar To... recommendations
-Step 5  →  Brand of the Week
-Step 6  →  Curated Collections
-Step 7  →  Deployment polish + PWA verification
-Step 8  →  Name/logo change (when designer delivers)
-Step 9  →  Marketing assets
-Step 10 →  User testing + feedback fixes
-```
+| # | Shop Name | City | Type |
+|---|-----------|------|------|
+| 1 | DOE Shanghai | Shanghai | Multi-brand streetwear |
+| 2 | Stussy Shanghai | Shanghai | Streetwear |
+| 3 | Supreme Shanghai | Shanghai | Streetwear |
+| 4 | ACU Shanghai | Shanghai | Sneaker culture |
+| 5 | Sanlitun Taikoo Li (multi-brand) | Beijing | Streetwear district |
+| 6 | INNERSECT Shanghai | Shanghai | Streetwear convention/store |
 
-Each step is self-contained and deployable. Steps 1-3 are the highest impact for the least effort. Steps 4-6 add discovery and retention. Steps 7-10 are launch prep.
+---
 
-Ready to start with Step 1 (shareable route links) when you give the go-ahead.
+## Implementation Approach
+
+For each city you approve, the implementation will:
+
+1. **Prepare a CSV** with shop name, address, city, country, and associated brands
+2. **Use the existing Bulk Shop Import** in the Admin panel to insert them into the `shops` table
+3. **Run the geocode edge function** to populate lat/lng coordinates from Mapbox
+4. **Add "Paris" to the CityChip** dropdown so users can quick-navigate to the Paris map view (and Tokyo/China if desired)
+
+The geocoding function already exists and works. The bulk import tool is already built. No new code is needed -- just data entry and a city chip update.
+
+---
+
+## Recommended Order
+
+Since Paris is your priority, I suggest:
+1. **Paris first** -- 25 shops, most impactful for your upcoming visit
+2. **Tokyo** -- 20 shops, strong brand overlap with existing data
+3. **China** -- 6 shops, smaller set
+
+Which cities would you like me to populate first?
 
