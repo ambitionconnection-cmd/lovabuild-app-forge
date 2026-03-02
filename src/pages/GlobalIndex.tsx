@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X } from "lucide-react";
+import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X, Layers } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
@@ -220,7 +220,16 @@ const GlobalIndex = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-base font-bold uppercase tracking-wider">{t('nav.globalIndex')}</h1>
+          <h1 className="text-base font-bold uppercase tracking-wider flex-1">{t('nav.globalIndex')}</h1>
+          <Link to="/collections">
+            <Button
+              size="sm"
+              className="h-8 gap-1.5 bg-gradient-to-r from-[#8B6DAF] to-[#AD3A49] hover:from-[#8B6DAF]/90 hover:to-[#AD3A49]/90 text-white border-0 font-semibold text-xs shadow-lg shadow-[#AD3A49]/20"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Collections
+            </Button>
+          </Link>
         </div>
       </header>
       
