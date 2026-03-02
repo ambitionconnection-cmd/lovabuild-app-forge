@@ -123,6 +123,8 @@ const Directions = () => {
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [hasUserLocation, setHasUserLocation] = useState(false);
+  const recenterRef = useRef<(() => void) | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedShop, setSelectedShop] = useState<ShopType | null>(null);
@@ -591,6 +593,8 @@ const Directions = () => {
                     highlightedShopId={highlightedShopId}
                     isFullscreen={isMapFullscreen}
                     deferRouteCalculation={true}
+                    onRecenterReady={(fn) => { recenterRef.current = fn; }}
+                    onUserLocationChange={(loc) => setHasUserLocation(!!loc)}
                   />
                 </div>
                 
@@ -733,12 +737,14 @@ const Directions = () => {
                     onSearchChange={setSearchQuery}
                   />
                 )}
-                {/* City Selector Chip */}
+                {/* City Selector Chip + Recenter Button */}
                 <CityChip
                   onCitySelect={(center, zoom) => {
                     setMapCenter(center);
                     setMapZoom(zoom);
                   }}
+                  showRecenter={hasUserLocation}
+                  onRecenter={() => recenterRef.current?.()}
                 />
                 {/* Brand of the Week */}
                 <BrandOfTheWeek />
