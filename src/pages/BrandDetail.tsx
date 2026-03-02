@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, ExternalLink, Instagram, Store, MapPin, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, Heart, ExternalLink, Instagram, Store, MapPin, Calendar, Clock, ShoppingBag, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,6 +28,9 @@ const BrandDetail = () => {
   const [drops, setDrops] = useState<(Tables<'drops'> & { brands?: { name: string } | null })[]>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', email: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -120,6 +127,34 @@ const BrandDetail = () => {
     }
   };
 
+  const submitSuggestEdit = async () => {
+    if (!editForm.name.trim() || !editForm.email.trim() || !editForm.message.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    if (editForm.message.trim().length > 1000) {
+      toast.error('Message must be less than 1000 characters');
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from('contact_submissions').insert({
+      inquiry_type: 'correction',
+      name: editForm.name.trim(),
+      email: editForm.email.trim(),
+      subject: `Edit suggestion for ${brand?.name}`,
+      message: `[Brand: ${brand?.name} | ID: ${brand?.id}]\n\n${editForm.message.trim()}`,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error('Failed to submit. Try again.');
+    } else {
+      haptic.success();
+      toast.success('Thanks! We will review your suggestion.');
+      setSuggestEditOpen(false);
+      setEditForm({ name: '', email: '', message: '' });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background pb-20">
@@ -199,6 +234,25 @@ const BrandDetail = () => {
                   <p className="text-sm text-muted-foreground mt-2 max-w-md">{brand.description}</p>
                 )}
               </div>
+
+              {/* Shop Online CTA */}
+              {brand.affiliate_url && (
+                <Button
+                  className="w-full max-w-xs bg-[#C4956A] hover:bg-[#C4956A]/80 text-white font-semibold h-11"
+                  onClick={() => {
+                    window.open(brand.affiliate_url!, '_blank');
+                    // Track click (fire-and-forget)
+                    supabase.from('affiliate_analytics' as any).insert({
+                      drop_id: brand.id, // reusing field for brand tracking
+                      event_type: 'shop_online_click',
+                      user_id: user?.id || null,
+                    }).then(() => {});
+                  }}
+                >
+                  <ShoppingBag className="w-4 h-4 mr-2" />
+                  Shop Online
+                </Button>
+              )}
 
               {/* Social Links */}
               <div className="flex flex-wrap justify-center gap-2">
@@ -338,7 +392,72 @@ const BrandDetail = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Suggest an Edit */}
+        <div className="flex justify-center pt-2 pb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => setSuggestEditOpen(true)}
+          >
+            <Flag className="w-3 h-3 mr-1.5" />
+            Suggest an Edit
+          </Button>
+        </div>
       </main>
+
+      {/* Suggest Edit Dialog */}
+      <Dialog open={suggestEditOpen} onOpenChange={setSuggestEditOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-base">Suggest an Edit</DialogTitle>
+            <DialogDescription className="text-xs">
+              Spotted incorrect info for {brand.name}? Let us know.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Name</Label>
+              <Input
+                placeholder="Your name"
+                value={editForm.name}
+                onChange={(e) => setEditForm(f => ({ ...f, name: e.target.value }))}
+                maxLength={100}
+                className="h-9 text-sm"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Email</Label>
+              <Input
+                type="email"
+                placeholder="your@email.com"
+                value={editForm.email}
+                onChange={(e) => setEditForm(f => ({ ...f, email: e.target.value }))}
+                maxLength={255}
+                className="h-9 text-sm"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">What needs to be corrected?</Label>
+              <Textarea
+                placeholder="e.g. The website URL is wrong, the country should be Japan..."
+                value={editForm.message}
+                onChange={(e) => setEditForm(f => ({ ...f, message: e.target.value }))}
+                maxLength={1000}
+                className="text-sm min-h-[80px]"
+              />
+            </div>
+            <Button
+              className="w-full"
+              onClick={submitSuggestEdit}
+              disabled={submitting}
+            >
+              {submitting ? 'Submitting...' : 'Submit'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
