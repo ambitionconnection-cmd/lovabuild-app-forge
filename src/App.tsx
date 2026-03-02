@@ -15,7 +15,7 @@ import Directions from "./pages/Directions";
 import GlobalIndex from "./pages/GlobalIndex";
 import BrandDetail from "./pages/BrandDetail";
 import ShopMap from "./pages/ShopMap";
-import Drops from "./pages/Drops";
+import Feed from "./pages/Feed";
 import MyHeardrop from "./pages/MyHeardrop";
 import Admin from "./pages/Admin";
 import Analytics from "./pages/Analytics";
@@ -55,7 +55,8 @@ function App() {
               <Route path="/global-index" element={<GlobalIndex />} />
               <Route path="/brand/:slug" element={<BrandDetail />} />
               <Route path="/shop-map" element={<ShopMap />} />
-              <Route path="/drops" element={<Drops />} />
+              <Route path="/drops" element={<Feed />} />
+              <Route path="/feed" element={<Feed />} />
 
 
               {/* PROTECTED PAGES - Login required */}
