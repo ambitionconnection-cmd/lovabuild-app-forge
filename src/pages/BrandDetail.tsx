@@ -33,7 +33,7 @@ const BrandDetail = () => {
   const [editForm, setEditForm] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [similarBrands, setSimilarBrands] = useState<Tables<'brands'>[]>([]);
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const showTranslate = i18n.language !== 'en';
 
   const openTranslate = (text: string) => {
@@ -339,8 +339,9 @@ const BrandDetail = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm uppercase tracking-wide">About</CardTitle>
                 {showTranslate && (
-                  <button onClick={() => openTranslate(brand.history!)} className="p-1.5 rounded-full hover:bg-muted transition-colors" title="Translate">
-                    <Languages className="w-4 h-4 text-muted-foreground" />
+                  <button onClick={() => openTranslate(brand.history!)} className="flex items-center gap-1 px-2 py-1 rounded-full hover:bg-muted transition-colors text-muted-foreground" title={t('shops.translate')}>
+                    <Languages className="w-4 h-4" />
+                    <span className="text-[10px] font-medium">{t('shops.translate')}</span>
                   </button>
                 )}
               </div>
