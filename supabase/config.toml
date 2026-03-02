@@ -15,3 +15,6 @@ verify_jwt = false
 [functions.track-affiliate-analytics]
 verify_jwt = false
 
+[functions.brand-radar-fetch]
+verify_jwt = false
+
