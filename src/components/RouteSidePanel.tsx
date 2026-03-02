@@ -66,7 +66,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             variant="outline"
             size="sm"
             className="flex-1 h-8 text-xs border-white/10"
-            onClick={() => saveRoute(journeyStops, userLocation)}
+            onClick={() => printRoute(journeyStops, userLocation)}
           >
             <Printer className="w-3 h-3 mr-1" />
             Print
@@ -75,7 +75,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             variant="outline"
             size="sm"
             className="flex-1 h-8 text-xs border-white/10"
-            onClick={() => printRoute(journeyStops, userLocation)}
+            onClick={() => shareRoute(journeyStops, userLocation)}
           >
             <Share2 className="w-3 h-3 mr-1" />
             Share

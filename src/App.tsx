@@ -26,6 +26,7 @@ import OnboardingSplash from "./components/OnboardingSplash";
 import More from "./pages/More";
 import About from "./pages/About";
 import RoutePage from "./pages/RoutePage";
+import SharedRoute from "./pages/SharedRoute";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ function App() {
               <Route path="/index" element={<Directions />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/route/:code" element={<SharedRoute />} />
               <Route path="/route" element={<RoutePage />} />
               <Route path="/more" element={<More />} />
               <Route path="/about" element={<About />} />
