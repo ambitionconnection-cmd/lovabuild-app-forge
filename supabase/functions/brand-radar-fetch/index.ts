@@ -6,7 +6,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const LOVABLE_API_URL = "https://api.lovable.dev/v1/chat/completions";
+const LOVABLE_API_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 interface BrandRadarItem {
   brand_id: string;
@@ -55,16 +55,21 @@ JSON format:
     });
 
     if (!response.ok) {
-      console.error(`AI API error for ${brandName}: ${response.status}`);
+      const errBody = await response.text();
+      console.error(`AI API error for ${brandName}: ${response.status} - ${errBody.slice(0, 200)}`);
       return [];
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
+    console.log(`AI response for ${brandName}: ${content.slice(0, 300)}`);
 
     // Extract JSON from response (may be wrapped in markdown code blocks)
     const jsonMatch = content.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) return [];
+    if (!jsonMatch) {
+      console.log(`No JSON array found for ${brandName}`);
+      return [];
+    }
 
     const items: any[] = JSON.parse(jsonMatch[0]);
 
@@ -105,12 +110,23 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Parse optional limit from request body
+    let brandLimit: number | null = null;
+    try {
+      const body = await req.json();
+      if (body?.limit) brandLimit = Number(body.limit);
+    } catch { /* no body */ }
+
     // Get active brands
-    const { data: brands, error: brandsError } = await supabase
+    let query = supabase
       .from("brands")
       .select("id, name")
       .eq("is_active", true)
       .order("name");
+    
+    if (brandLimit) query = query.limit(brandLimit);
+    
+    const { data: brands, error: brandsError } = await query;
 
     if (brandsError) throw brandsError;
 
