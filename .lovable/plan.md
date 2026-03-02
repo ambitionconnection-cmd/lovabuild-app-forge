@@ -1,121 +1,123 @@
 
 
-# Street Spotted: The Final Page Strategy
+# Roadmap to Completion
 
-## Overview
-
-Transform Street Spotted from a simple feed into the app's flagship content page with a visually stunning layout, admin moderation, rich filtering, and multiple monetization paths. Remove Brand Radar entirely. Rename the tab from "Feed" to "Hot".
+Based on your two strategy documents, what's already built, and the removal of the Drops section, here is the consolidated list of remaining work organized by priority.
 
 ---
 
-## Part 1: Visual Design (Mobile + Desktop)
+## Already Done (No Action Needed)
 
-### Mobile: Instagram-meets-Pinterest hybrid
-- **Masonry grid (2 columns)** for browsing — taller images get more space, creating visual variety
-- Tap-to-expand into a **full-screen detail view** with swipe-to-dismiss (using Vaul drawer)
-- Brand tags appear as floating pills on images (current behavior, keep it)
-- Sticky top filters bar with horizontal scroll chips (City, Country, Brand, Style tag)
-- "Trending" section at top: top 5 most-fired posts this week as a horizontal carousel
-
-### Desktop: 3-column masonry grid
-- Sidebar filter panel (left) with brand, city, country, style checkboxes
-- Hover-to-reveal brand tags + fire count overlay
-- Click opens a modal with large image, brand links, and "Shop the Look" links
-
-### Layout change
-- Replace the current single-column card feed with CSS masonry using `columns-2 lg:columns-3` + `break-inside-avoid`
-- Images keep their natural aspect ratios instead of forced 4:5
-
----
-
-## Part 2: Admin Moderation System
-
-### New `status` column on `street_spotted_posts`
-- Values: `pending`, `approved`, `rejected`
-- Default: `pending`
-- Public feed only shows `approved` posts
-- RLS policy update: SELECT only where `status = 'approved'` (or user's own posts)
-
-### Admin moderation queue
-- New section in existing Admin page
-- Shows pending posts with Approve / Reject buttons
-- Reject sends no notification (silent removal)
+- Map with pins, geolocation, navigation, city selector
+- Brand directory (Global Index) with 1000+ brands
+- Brand detail pages with shops, favorites, social links
+- Route builder with drag-and-drop reordering
+- Save route (to database for logged-in users, localStorage for guests)
+- PDF export with branded header/footer
+- Share route (native share + clipboard fallback)
+- Contact page with New Brand / New Release submission forms
+- Admin dashboard with brand, shop, drop management
+- Hot page (Street Spotted) with masonry grid, moderation, style tags, filters
+- User auth, profiles, favorites, notifications
+- PWA configuration
+- i18n (7 languages)
+- Security: RLS, login rate limiting, audit logs
 
 ---
 
-## Part 3: Enhanced Filtering & Discovery
+## What Still Needs to Be Done
 
-### New fields on `street_spotted_posts`
-- `style_tags` (text array) — e.g. "streetwear", "techwear", "vintage", "minimalist", "y2k"
-- Submitter picks 1-3 style tags from a preset list when posting
+### Priority 1: Route Sharing (Shareable Links)
+**Problem you raised**: When you share a route, the recipient can't open it and follow the path from their own location.
 
-### Filter options
-- **By brand** (existing, via brand tags)
-- **By country** (existing field)
-- **By city** (existing field)  
-- **By style tag** (new)
-- **Trending** — sorted by fire count in last 7 days
+- Create a `shared_routes` table with a unique short code (e.g., `heardrop.app/route/abc123`)
+- Add a new route `/route/:code` that loads the shared route's stops
+- The recipient sees the stops on the map starting from **their** location
+- Update `shareRoute()` in `routeActions.ts` to generate a shareable link instead of just text
+- No auth required to view a shared route
+
+### Priority 2: Discovery Features
+From your strategic plan, Section 4:
+
+1. **"Brand of the Week"** on the map homepage
+   - Add a `featured_brand_id` field or a small `featured_brands` table with date ranges
+   - Show a dismissible card/banner on the Directions page highlighting the featured brand
+   - Admin can set the featured brand from the dashboard
+
+2. **"Similar To..." recommendations** on brand detail pages
+   - Tag-based matching using existing `category` field
+   - Show 4-6 related brands at the bottom of `BrandDetail.tsx`
+   - No ML needed — simple category + country matching
+
+3. **Curated Collections** (5 to start)
+   - New `collections` table: `id`, `title`, `slug`, `description`, `brand_ids` (uuid[]), `is_active`
+   - New `/collections` page or section within Global Index
+   - Examples: "Japanese Streetwear", "London Underground Labels", "Heritage Brands"
+   - Admin can create/edit collections from dashboard
+
+### Priority 3: "Suggest an Edit" on Brand Pages
+- Add a button on `BrandDetail.tsx` that opens a lightweight form
+- Submits to `contact_submissions` with `inquiry_type = 'correction'` and the brand ID
+- Already partially supported by the Contact page — just needs a shortcut from brand pages
+
+### Priority 4: MyHeardrop Cleanup
+- The "Reminders" tab still references Drops (`/drops` route, drop reminders). Since Drops is removed:
+  - Either repurpose the tab for saved routes display
+  - Or remove the Reminders tab and replace with a **"My Routes"** tab showing saved routes with load/delete actions
+- The "Recommendations" tab references drops — update to only recommend brands
+
+### Priority 5: Brand Detail — "Shop Online" CTA
+- The `affiliate_url` column already exists on `brands`
+- Add a prominent "Shop Online" button on `BrandDetail.tsx` when `affiliate_url` is set
+- Track clicks for analytics (reuse `affiliate_analytics` table)
+
+### Priority 6: Deployment Polish
+From your short roadmap:
+
+1. **Final PWA verification** — test install on Android/iOS
+2. **Service worker** — verify offline capability with `vite-plugin-pwa`
+3. **Full walkthrough** on phone — every page, every flow
+4. **App name change** — you mentioned HEARDROP will be renamed. When ready:
+   - Update all references in code, translations, PDF export, PWA manifest
+   - Upload new logo to replace current branding
+
+### Priority 7: Marketing Assets (Post-Deploy)
+1. 5 screenshot mockups for social media
+2. QR code linking to the app
+3. One-page pitch document
 
 ---
 
-## Part 4: Monetization (4 Revenue Streams)
+## Items from Strategic Plan NOT Needed / Deferred
 
-### Stream 1: "Shop the Look" Affiliate Links
-When a user tags brands like Nike, Supreme, etc., the post detail view shows a **"Shop the Look"** section with affiliate links to:
-- The brand's official store (from `brands.official_website`)
-- StockX, GOAT, or Grailed search for that brand
-- Admin can add `affiliate_url` per brand in the brands table
-
-This is the primary revenue driver — every post with brand tags becomes a shoppable moment.
-
-### Stream 2: Sponsored/Featured Spots
-- New `is_sponsored` boolean on posts
-- Admin can mark any post as "Sponsored" (or create posts on behalf of brands)
-- Sponsored posts get a subtle "Sponsored" badge and appear pinned at top
-- Brands pay for placement (handled outside the app)
-
-### Stream 3: Brand Profile Boost
-- When users tap a brand tag on a post, they go to the brand detail page
-- Brand detail page already exists with shop locations — add a "Shop Online" CTA with affiliate link
-- Brands with the most community posts get higher visibility
-
-### Stream 4: Premium Content / Early Access (Future)
-- Flag certain posts as "Premium" — only visible to logged-in users
-- Drives sign-ups and engagement
-- Could gate behind a future subscription tier
+| Item | Status |
+|------|--------|
+| Drops/Release Calendar | **Removed** — replaced by Hot page |
+| Brand Radar (news aggregator) | **Removed** — no third-party dependency |
+| Premium user tier | **Deferred** — needs 5,000+ users first |
+| City-level sponsorships | **Deferred** — needs multi-city scale |
+| Display advertising | **Never** (per your strategic plan) |
+| Brand Analytics Dashboard (selling data to brands) | **Deferred** — Year 2 |
+| Push notifications for drops | **Removed** with Drops section |
 
 ---
 
-## Part 5: Rename & Navigation Changes
+## Suggested Implementation Order
 
-1. Bottom tab: icon stays as `Rss`, label changes from "Feed" to "Hot" in all translation files
-2. Route stays at `/feed` (no breaking change)
-3. Remove the tabs (Brand Radar / Street Spotted) — page is now single-purpose Street Spotted
-4. Page header says "Hot" with a flame accent
+```text
+Step 1  →  Route sharing (shareable links)
+Step 2  →  MyHeardrop cleanup (remove drop references, add My Routes)
+Step 3  →  Brand detail: Shop Online CTA + Suggest an Edit
+Step 4  →  Similar To... recommendations
+Step 5  →  Brand of the Week
+Step 6  →  Curated Collections
+Step 7  →  Deployment polish + PWA verification
+Step 8  →  Name/logo change (when designer delivers)
+Step 9  →  Marketing assets
+Step 10 →  User testing + feedback fixes
+```
 
----
+Each step is self-contained and deployable. Steps 1-3 are the highest impact for the least effort. Steps 4-6 add discovery and retention. Steps 7-10 are launch prep.
 
-## Technical Summary
-
-### Database migration
-- Add `status` column (`text DEFAULT 'pending'`) to `street_spotted_posts`
-- Add `style_tags` column (`text[] DEFAULT '{}'`) to `street_spotted_posts`
-- Add `is_sponsored` column (`boolean DEFAULT false`) to `street_spotted_posts`
-- Add `affiliate_url` column (`text`) to `brands` table
-- Update RLS: public SELECT only `status = 'approved'` OR `user_id = auth.uid()`
-- Admin can UPDATE status on any post
-
-### Files to modify
-- `src/pages/Feed.tsx` — remove tabs, rename to Hot, single Street Spotted layout
-- `src/components/StreetSpottedFeed.tsx` — masonry grid, filters, trending carousel, shop-the-look
-- `src/components/StreetSpottedCreatePost.tsx` — add style tag picker
-- `src/components/BottomTabBar.tsx` — rename label
-- `src/components/DesktopTopNav.tsx` — rename label
-- `src/pages/Admin.tsx` — add moderation queue section
-- Translation files (en, fr, ja, ko, th, zh-CN, zh-TW) — update "feed" to "hot"
-
-### No external dependencies needed
-- Masonry layout via pure CSS (`columns-2`)
-- All monetization is link-based (no payment integration needed for affiliate)
-- Moderation uses existing admin role system
+Ready to start with Step 1 (shareable route links) when you give the go-ahead.
 
