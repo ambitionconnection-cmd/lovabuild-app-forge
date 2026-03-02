@@ -13,6 +13,7 @@ import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExpor
 import { ScheduledExportManager } from '@/components/ScheduledExportManager';
 import { EmailAnalytics } from '@/components/EmailAnalytics';
 import { BrandImageGenerator } from '@/components/BrandImageGenerator';
+import { SpotModerationQueue } from '@/components/SpotModerationQueue';
 import { ContactManagement } from '@/components/ContactManagement';
 import { BrandManagement } from '@/components/BrandManagement';
 import { ShopManagement } from '@/components/ShopManagement';
@@ -696,6 +697,10 @@ export default function Admin() {
 
             {activeTab === "calendar" && (
               <DropsCalendar />
+            )}
+
+            {activeTab === "spot-moderation" && (
+              <SpotModerationQueue />
             )}
 
             {activeTab === "media" && (

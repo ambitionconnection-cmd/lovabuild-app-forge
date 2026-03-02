@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Map, Route, Globe, Rss, MoreHorizontal } from "lucide-react";
+import { Map, Route, Globe, Flame, MoreHorizontal } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import haptic from "@/lib/haptics";
@@ -17,7 +17,7 @@ const tabDefs = [
   { icon: Map, key: "nearby", path: "/", activeColor: "text-[#AD3A49]", activeTextColor: "text-[#AD3A49]" },
   { icon: Route, key: "route", path: "/route", activeColor: "text-[#C4956A]", activeTextColor: "text-[#C4956A]" },
   { icon: Globe, key: "index", path: "/global-index", activeColor: "text-[#C3C9C9]", activeTextColor: "text-[#C3C9C9]" },
-  { icon: Rss, key: "feed", path: "/feed", activeColor: "text-[#8B6DAF]", activeTextColor: "text-[#8B6DAF]" },
+  { icon: Flame, key: "hot", path: "/feed", activeColor: "text-[#8B6DAF]", activeTextColor: "text-[#8B6DAF]" },
   { icon: MoreHorizontal, key: "more", path: "/more", activeColor: "text-[#7D8184]", activeTextColor: "text-[#7D8184]" },
 ];
 

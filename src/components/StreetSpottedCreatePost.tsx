@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { X, Camera, Upload, Check } from "lucide-react";
+import { X, Camera, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBrands } from "@/hooks/useBrands";
@@ -13,6 +13,12 @@ interface Props {
   onClose: () => void;
   onPostCreated: () => void;
 }
+
+const STYLE_TAG_OPTIONS = [
+  "streetwear", "techwear", "vintage", "minimalist", "y2k",
+  "gorpcore", "workwear", "avant-garde", "skate", "luxury",
+  "casual", "sportswear", "grunge", "preppy"
+];
 
 const resizeImage = (file: File, maxWidth: number): Promise<Blob> => {
   return new Promise((resolve, reject) => {
@@ -44,6 +50,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [brandSearch, setBrandSearch] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -62,6 +69,15 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
     setBrandSearch("");
   };
 
+  const toggleStyle = (style: string) => {
+    haptic.selection();
+    setSelectedStyles(prev => {
+      if (prev.includes(style)) return prev.filter(s => s !== style);
+      if (prev.length >= 3) { toast.info("Max 3 style tags"); return prev; }
+      return [...prev, style];
+    });
+  };
+
   const filteredBrands = brandSearch
     ? brands.filter(b => b.name.toLowerCase().includes(brandSearch.toLowerCase())).slice(0, 10)
     : [];
@@ -74,7 +90,6 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
 
     setSubmitting(true);
     try {
-      // Resize and upload image
       const resized = await resizeImage(imageFile, 1200);
       const fileName = `${user.id}/${Date.now()}.jpg`;
       const { error: uploadError } = await supabase.storage
@@ -85,7 +100,6 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
 
       const { data: urlData } = supabase.storage.from("street-spotted").getPublicUrl(fileName);
 
-      // Create post
       const { data: post, error: postError } = await supabase
         .from("street_spotted_posts")
         .insert({
@@ -94,13 +108,13 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
           caption: caption || null,
           city: city || null,
           country: country || null,
-        })
+          style_tags: selectedStyles,
+        } as any)
         .select("id")
         .single();
 
       if (postError) throw postError;
 
-      // Insert brand tags
       const brandInserts = selectedBrands.map(brand_id => ({
         post_id: post.id,
         brand_id,
@@ -108,7 +122,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
       await supabase.from("street_spotted_post_brands").insert(brandInserts);
 
       haptic.success();
-      toast.success("Spot posted! 🔥");
+      toast.success("Spot submitted for review! 🔥");
       onPostCreated();
     } catch (err) {
       console.error("Error creating post:", err);
@@ -158,6 +172,25 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
             <span className="text-sm text-muted-foreground">Tap to add photo</span>
           </button>
         )}
+
+        {/* Style tags */}
+        <div className="mb-4">
+          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
+            Style Tags (pick up to 3)
+          </label>
+          <div className="flex flex-wrap gap-1.5">
+            {STYLE_TAG_OPTIONS.map(style => (
+              <Badge
+                key={style}
+                variant={selectedStyles.includes(style) ? "default" : "outline"}
+                className="cursor-pointer text-xs"
+                onClick={() => toggleStyle(style)}
+              >
+                {style}
+              </Badge>
+            ))}
+          </div>
+        </div>
 
         {/* Brand tags */}
         <div className="mb-4">
@@ -231,6 +264,11 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
             <Input placeholder="e.g. UK" value={country} onChange={e => setCountry(e.target.value)} className="h-9" />
           </div>
         </div>
+
+        {/* Info about moderation */}
+        <p className="text-[10px] text-muted-foreground text-center mb-3">
+          Posts are reviewed before appearing publicly
+        </p>
 
         {/* Submit */}
         <Button

@@ -16,7 +16,7 @@ const tabDefs = [
   { icon: Map, key: "nearby", path: "/", activeColor: "text-[#AD3A49]", borderColor: "border-[#AD3A49]" },
   { icon: Route, key: "route", path: "/route", activeColor: "text-[#C4956A]", borderColor: "border-[#C4956A]" },
   { icon: Globe, key: "index", path: "/global-index", activeColor: "text-[#C3C9C9]", borderColor: "border-[#C3C9C9]" },
-  { icon: Flame, key: "drops", path: "/drops", activeColor: "text-[#8B6DAF]", borderColor: "border-[#8B6DAF]" },
+  { icon: Flame, key: "hot", path: "/feed", activeColor: "text-[#8B6DAF]", borderColor: "border-[#8B6DAF]" },
   { icon: MoreHorizontal, key: "more", path: "/more", activeColor: "text-[#7D8184]", borderColor: "border-[#7D8184]" },
 ];
 

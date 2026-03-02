@@ -1,17 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Flame, MapPin, Camera } from "lucide-react";
+import { Plus, Flame, MapPin, Camera, ExternalLink, Filter, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBrands } from "@/hooks/useBrands";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BrandLogo } from "@/components/BrandLogo";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import haptic from "@/lib/haptics";
 import { StreetSpottedCreatePost } from "./StreetSpottedCreatePost";
+import { StreetSpottedPostDetail } from "./StreetSpottedPostDetail";
 import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Post {
   id: string;
@@ -25,7 +26,15 @@ interface Post {
   like_count: number;
   user_liked: boolean;
   display_name: string | null;
+  style_tags: string[];
+  is_sponsored: boolean;
 }
+
+const STYLE_TAG_OPTIONS = [
+  "streetwear", "techwear", "vintage", "minimalist", "y2k",
+  "gorpcore", "workwear", "avant-garde", "skate", "luxury",
+  "casual", "sportswear", "grunge", "preppy"
+];
 
 export const StreetSpottedFeed = () => {
   const { user } = useAuth();
@@ -34,24 +43,31 @@ export const StreetSpottedFeed = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
+  // Filters
   const [brandFilter, setBrandFilter] = useState<string | null>(null);
+  const [countryFilter, setCountryFilter] = useState<string | null>(null);
+  const [cityFilter, setCityFilter] = useState<string | null>(null);
+  const [styleFilter, setStyleFilter] = useState<string | null>(null);
+  const [showTrending, setShowTrending] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      // Fetch posts
       const { data: postsData, error: postsError } = await supabase
         .from("street_spotted_posts")
         .select("*")
+        .eq("status", "approved")
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(100);
 
       if (postsError) throw postsError;
       if (!postsData?.length) { setPosts([]); setLoading(false); return; }
 
       const postIds = postsData.map(p => p.id);
 
-      // Fetch brands and likes in parallel
       const [brandsRes, likesRes, userLikesRes, profilesRes] = await Promise.all([
         supabase.from("street_spotted_post_brands").select("post_id, brand_id").in("post_id", postIds),
         supabase.from("street_spotted_likes").select("post_id").in("post_id", postIds),
@@ -86,18 +102,17 @@ export const StreetSpottedFeed = () => {
         like_count: likeCountMap.get(p.id) || 0,
         user_liked: userLikedSet.has(p.id),
         display_name: profileMap.get(p.user_id) || null,
+        style_tags: (p as any).style_tags || [],
+        is_sponsored: (p as any).is_sponsored || false,
       }));
 
-      setPosts(brandFilter
-        ? enrichedPosts.filter(p => p.brand_ids.includes(brandFilter))
-        : enrichedPosts
-      );
+      setPosts(enrichedPosts);
     } catch (err) {
       console.error("Error fetching posts:", err);
     } finally {
       setLoading(false);
     }
-  }, [user, brandFilter]);
+  }, [user]);
 
   useEffect(() => { fetchPosts(); }, [fetchPosts]);
 
@@ -113,7 +128,6 @@ export const StreetSpottedFeed = () => {
     const post = posts.find(p => p.id === postId);
     if (!post) return;
 
-    // Optimistic update
     setPosts(prev => prev.map(p =>
       p.id === postId
         ? { ...p, user_liked: !p.user_liked, like_count: p.user_liked ? p.like_count - 1 : p.like_count + 1 }
@@ -132,23 +146,109 @@ export const StreetSpottedFeed = () => {
     fetchPosts();
   };
 
-  // Brand chips for filtering
+  // Apply filters
+  let filteredPosts = posts;
+
+  // Sponsored posts pinned at top
+  const sponsoredPosts = filteredPosts.filter(p => p.is_sponsored);
+  const regularPosts = filteredPosts.filter(p => !p.is_sponsored);
+
+  if (brandFilter) {
+    filteredPosts = [...sponsoredPosts, ...regularPosts].filter(p => p.brand_ids.includes(brandFilter));
+  } else {
+    filteredPosts = [...sponsoredPosts, ...regularPosts];
+  }
+
+  if (countryFilter) {
+    filteredPosts = filteredPosts.filter(p => p.country === countryFilter);
+  }
+  if (cityFilter) {
+    filteredPosts = filteredPosts.filter(p => p.city === cityFilter);
+  }
+  if (styleFilter) {
+    filteredPosts = filteredPosts.filter(p => p.style_tags.includes(styleFilter));
+  }
+  if (showTrending) {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    filteredPosts = filteredPosts
+      .filter(p => new Date(p.created_at) >= sevenDaysAgo)
+      .sort((a, b) => b.like_count - a.like_count);
+  }
+
+  // Get unique filter values from posts
   const usedBrandIds = [...new Set(posts.flatMap(p => p.brand_ids))];
   const filterBrands = brands.filter(b => usedBrandIds.includes(b.id));
+  const countries = [...new Set(posts.map(p => p.country).filter(Boolean))] as string[];
+  const cities = [...new Set(posts.map(p => p.city).filter(Boolean))] as string[];
+  const usedStyles = [...new Set(posts.flatMap(p => p.style_tags))];
+
+  // Trending posts for carousel
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const trendingPosts = posts
+    .filter(p => new Date(p.created_at) >= sevenDaysAgo && p.like_count > 0)
+    .sort((a, b) => b.like_count - a.like_count)
+    .slice(0, 5);
+
+  const hasActiveFilters = brandFilter || countryFilter || cityFilter || styleFilter || showTrending;
 
   return (
     <div className="relative">
-      {/* Brand filter chips */}
-      {filterBrands.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-3 px-3 scrollbar-hide">
-          <Badge
-            variant={brandFilter === null ? "default" : "outline"}
-            className="cursor-pointer flex-shrink-0 text-xs"
-            onClick={() => setBrandFilter(null)}
+      {/* Trending carousel */}
+      {trendingPosts.length > 0 && !hasActiveFilters && (
+        <div className="px-3 pb-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Flame className="w-3.5 h-3.5 text-orange-500" />
+            Trending This Week
+          </h3>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+            {trendingPosts.map(post => (
+              <button
+                key={post.id}
+                onClick={() => setSelectedPost(post)}
+                className="flex-shrink-0 w-28 rounded-lg overflow-hidden relative group"
+              >
+                <img
+                  src={post.image_url}
+                  alt={post.caption || "Trending"}
+                  className="w-full h-36 object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center gap-1 text-white text-[10px] font-medium">
+                  <Flame className="w-3 h-3 fill-orange-400 text-orange-400" />
+                  {post.like_count}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Filter bar */}
+      <div className="sticky top-[49px] lg:top-[105px] z-30 bg-background/95 backdrop-blur-sm border-b border-border/30 px-3 py-2">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide items-center">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={cn(
+              "flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
+              hasActiveFilters
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:text-foreground"
+            )}
           >
-            All
+            <Filter className="w-3 h-3" />
+            Filter
+          </button>
+
+          <Badge
+            variant={showTrending ? "default" : "outline"}
+            className="cursor-pointer flex-shrink-0 text-xs"
+            onClick={() => setShowTrending(!showTrending)}
+          >
+            🔥 Trending
           </Badge>
-          {filterBrands.map(brand => (
+
+          {filterBrands.slice(0, 6).map(brand => (
             <Badge
               key={brand.id}
               variant={brandFilter === brand.id ? "default" : "outline"}
@@ -158,23 +258,94 @@ export const StreetSpottedFeed = () => {
               {brand.name}
             </Badge>
           ))}
-        </div>
-      )}
 
-      {/* Posts feed */}
-      {loading ? (
-        <div className="space-y-4 px-3">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="rounded-xl overflow-hidden">
-              <Skeleton className="w-full aspect-[4/5]" />
-              <div className="p-3 space-y-2">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-3 w-2/3" />
+          {hasActiveFilters && (
+            <button
+              onClick={() => {
+                setBrandFilter(null);
+                setCountryFilter(null);
+                setCityFilter(null);
+                setStyleFilter(null);
+                setShowTrending(false);
+              }}
+              className="flex-shrink-0 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            >
+              <X className="w-3 h-3" /> Clear
+            </button>
+          )}
+        </div>
+
+        {/* Expanded filter panel */}
+        {showFilters && (
+          <div className="mt-2 pt-2 border-t border-border/30 space-y-2">
+            {/* Style tags */}
+            {usedStyles.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Style</p>
+                <div className="flex flex-wrap gap-1">
+                  {usedStyles.map(style => (
+                    <Badge
+                      key={style}
+                      variant={styleFilter === style ? "default" : "outline"}
+                      className="cursor-pointer text-[10px]"
+                      onClick={() => setStyleFilter(styleFilter === style ? null : style)}
+                    >
+                      {style}
+                    </Badge>
+                  ))}
+                </div>
               </div>
+            )}
+            {/* Country */}
+            {countries.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Country</p>
+                <div className="flex flex-wrap gap-1">
+                  {countries.map(c => (
+                    <Badge
+                      key={c}
+                      variant={countryFilter === c ? "default" : "outline"}
+                      className="cursor-pointer text-[10px]"
+                      onClick={() => setCountryFilter(countryFilter === c ? null : c)}
+                    >
+                      {c}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* City */}
+            {cities.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">City</p>
+                <div className="flex flex-wrap gap-1">
+                  {cities.slice(0, 10).map(c => (
+                    <Badge
+                      key={c}
+                      variant={cityFilter === c ? "default" : "outline"}
+                      className="cursor-pointer text-[10px]"
+                      onClick={() => setCityFilter(cityFilter === c ? null : c)}
+                    >
+                      {c}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Posts masonry grid */}
+      {loading ? (
+        <div className="columns-2 lg:columns-3 gap-2 px-3 pt-3">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="break-inside-avoid mb-2">
+              <Skeleton className="w-full rounded-xl" style={{ height: `${180 + (i % 3) * 60}px` }} />
             </div>
           ))}
         </div>
-      ) : posts.length === 0 ? (
+      ) : filteredPosts.length === 0 ? (
         <div className="text-center py-16 px-6">
           <Camera className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30" />
           <h3 className="text-lg font-semibold mb-2 text-foreground/70">No spots yet</h3>
@@ -188,66 +359,80 @@ export const StreetSpottedFeed = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-4 px-3">
-          {posts.map(post => {
+        <div className="columns-2 lg:columns-3 gap-2 px-3 pt-3">
+          {filteredPosts.map(post => {
             const postBrands = brands.filter(b => post.brand_ids.includes(b.id));
             return (
-              <div key={post.id} className="rounded-xl overflow-hidden bg-card border border-border/50">
-                {/* Image */}
-                <div className="relative w-full aspect-[4/5] bg-muted">
+              <div
+                key={post.id}
+                className="break-inside-avoid mb-2 rounded-xl overflow-hidden bg-card border border-border/50 cursor-pointer group relative"
+                onClick={() => setSelectedPost(post)}
+              >
+                {/* Sponsored badge */}
+                {post.is_sponsored && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <Badge variant="secondary" className="text-[9px] bg-amber-500/90 text-white border-0 backdrop-blur-sm">
+                      Sponsored
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Image — natural aspect ratio */}
+                <div className="relative w-full bg-muted">
                   <img
                     src={post.image_url}
                     alt={post.caption || "Street spotted"}
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto object-cover"
                     loading="lazy"
                   />
-                  {/* Overlay info */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-12">
-                    {/* Brand tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      {postBrands.map(brand => (
-                        <button
-                          key={brand.id}
-                          onClick={() => navigate(`/brand/${brand.slug}`)}
-                          className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium hover:bg-white/30 transition-colors"
-                        >
-                          {brand.logo_url && (
-                            <img src={brand.logo_url} alt="" className="w-3 h-3 object-contain rounded-full" />
-                          )}
+                  {/* Hover overlay (desktop) */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity lg:block hidden">
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <div className="flex flex-wrap gap-1 mb-1">
+                        {postBrands.slice(0, 3).map(brand => (
+                          <span key={brand.id} className="px-1.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-medium">
+                            {brand.name}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1 text-white text-xs">
+                        <Flame className={cn("w-3.5 h-3.5", post.like_count > 0 && "fill-orange-400 text-orange-400")} />
+                        {post.like_count}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile: always-visible overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 pt-6 lg:hidden">
+                    <div className="flex flex-wrap gap-1 mb-0.5">
+                      {postBrands.slice(0, 2).map(brand => (
+                        <span key={brand.id} className="px-1.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[9px] font-medium">
                           {brand.name}
-                        </button>
+                        </span>
                       ))}
                     </div>
-                    {/* Location */}
-                    {(post.city || post.country) && (
-                      <div className="flex items-center gap-1 text-white/70 text-xs mb-1">
-                        <MapPin className="w-3 h-3" />
-                        {[post.city, post.country].filter(Boolean).join(", ")}
-                      </div>
-                    )}
                   </div>
                 </div>
 
                 {/* Bottom bar */}
-                <div className="flex items-center justify-between p-3">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <button
-                      onClick={() => toggleLike(post.id)}
-                      className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                        post.user_liked ? "text-orange-400" : "text-muted-foreground hover:text-orange-400"
-                      }`}
-                    >
-                      <Flame className={`w-5 h-5 ${post.user_liked ? "fill-orange-400" : ""}`} />
-                      {post.like_count > 0 && post.like_count}
-                    </button>
-                    {post.caption && (
-                      <p className="text-xs text-muted-foreground truncate ml-2">{post.caption}</p>
+                <div className="flex items-center justify-between p-2">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleLike(post.id); }}
+                    className={cn(
+                      "flex items-center gap-1 text-xs font-medium transition-colors",
+                      post.user_liked ? "text-orange-400" : "text-muted-foreground hover:text-orange-400"
                     )}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground flex-shrink-0">
-                    {post.display_name && <span className="font-medium">{post.display_name}</span>}
-                    <span>·</span>
-                    <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
+                  >
+                    <Flame className={cn("w-4 h-4", post.user_liked && "fill-orange-400")} />
+                    {post.like_count > 0 && post.like_count}
+                  </button>
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    {(post.city || post.country) && (
+                      <>
+                        <MapPin className="w-2.5 h-2.5" />
+                        <span className="truncate max-w-[60px]">{post.city || post.country}</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -271,6 +456,16 @@ export const StreetSpottedFeed = () => {
         <StreetSpottedCreatePost
           onClose={() => setShowCreate(false)}
           onPostCreated={handlePostCreated}
+        />
+      )}
+
+      {/* Post detail drawer */}
+      {selectedPost && (
+        <StreetSpottedPostDetail
+          post={selectedPost}
+          brands={brands}
+          onClose={() => setSelectedPost(null)}
+          onToggleLike={toggleLike}
         />
       )}
     </div>
