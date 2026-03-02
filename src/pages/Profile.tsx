@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, User, Lock, CreditCard, Shield, Calendar, Mail, Crown, AlertCircle, Bell, History } from "lucide-react";
+import { ArrowLeft, User, Lock, CreditCard, Shield, Calendar, Mail, Crown, AlertCircle, Bell, History, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -24,7 +24,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const profileSchema = z.object({
   display_name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
-  avatar_url: z.string().url({ message: "Must be a valid URL" }).optional().or(z.literal("")),
+  avatar_url: z.string().optional().or(z.literal("")),
 });
 
 const passwordSchema = z.object({
@@ -52,7 +52,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = React.useState(false);
+  const [isAvatarUploading, setIsAvatarUploading] = React.useState(false);
   const [profile, setProfile] = React.useState<any>(null);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
   const [notificationPrefs, setNotificationPrefs] = React.useState<NotificationPreferences>({
     drop_reminders: true,
     favorite_brand_drops: true,
@@ -191,6 +193,38 @@ const Profile = () => {
       .slice(0, 2);
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setIsAvatarUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${ext}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { contentType: file.type, upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+
+      await supabase
+        .from('profiles')
+        .update({ avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+
+      toast.success("Avatar updated!");
+      loadProfile();
+    } catch (err) {
+      console.error('Avatar upload error:', err);
+      toast.error("Failed to upload avatar");
+    } finally {
+      setIsAvatarUploading(false);
+    }
+  };
+
   const updateNotificationPreference = async (key: keyof NotificationPreferences, value: boolean | string) => {
     if (!user) return;
 
@@ -245,10 +279,26 @@ const Profile = () => {
         <Card className="mb-6">
           <CardContent className="pt-6">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-              <Avatar className="w-24 h-24">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-3xl">{getInitials()}</AvatarFallback>
-              </Avatar>
+              <div className="relative group">
+                <Avatar className="w-24 h-24">
+                  <AvatarImage src={profile?.avatar_url} />
+                  <AvatarFallback className="text-3xl">{getInitials()}</AvatarFallback>
+                </Avatar>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
+                <button
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={isAvatarUploading}
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <Upload className="w-6 h-6 text-white" />
+                </button>
+              </div>
               <div className="flex-1 text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 mb-2">
                   <h2 className="text-2xl font-bold">{profile?.display_name || 'User'}</h2>
