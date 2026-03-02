@@ -308,6 +308,44 @@ export type Database = {
         }
         Relationships: []
       }
+      featured_brands: {
+        Row: {
+          brand_id: string
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          is_active: boolean
+          start_date: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          start_date?: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_brands_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ip_login_attempts: {
         Row: {
           attempts: number

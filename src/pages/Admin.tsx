@@ -28,6 +28,7 @@ import { Tables } from '@/integrations/supabase/types';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import { AdminStatsCards } from '@/components/AdminStatsCards';
+import { FeaturedBrandManagement } from '@/components/FeaturedBrandManagement';
 
 interface LoginAttempt {
   id: string;
@@ -701,6 +702,10 @@ export default function Admin() {
 
             {activeTab === "spot-moderation" && (
               <SpotModerationQueue />
+            )}
+
+            {activeTab === "featured-brand" && (
+              <FeaturedBrandManagement brands={brands} />
             )}
 
             {activeTab === "media" && (

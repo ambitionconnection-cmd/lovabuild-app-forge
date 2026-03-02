@@ -1,4 +1,4 @@
-import { Shield, Lock, FileText, Users, Store, Package, Calendar, Mail, Clock, Image, ChevronRight, MessageSquare, Download, Eye } from "lucide-react";
+import { Shield, Lock, FileText, Users, Store, Package, Calendar, Mail, Clock, Image, ChevronRight, MessageSquare, Download, Eye, Star } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -35,6 +35,7 @@ const navGroups = [
       { title: "Drops", value: "drops", icon: Package },
       { title: "Calendar", value: "calendar", icon: Calendar },
       { title: "Spot Moderation", value: "spot-moderation", icon: Eye },
+      { title: "Featured Brand", value: "featured-brand", icon: Star },
     ],
   },
   {

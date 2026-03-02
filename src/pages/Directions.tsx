@@ -23,6 +23,7 @@ import haptic from "@/lib/haptics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useShopsCache } from "@/hooks/useShopsCache";
 import { CityChip } from "@/components/CityChip";
+import { BrandOfTheWeek } from "@/components/BrandOfTheWeek";
 import {
   DndContext,
   closestCenter,
@@ -733,6 +734,8 @@ const Directions = () => {
                     setMapZoom(zoom);
                   }}
                 />
+                {/* Brand of the Week */}
+                <BrandOfTheWeek />
                 {/* Fullscreen button removed - map is already full screen */}
               </CardContent>
             </Card>
