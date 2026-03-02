@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { X, Globe, Instagram, MapPin, Navigation, Plus, ExternalLink } from 'lucide-react';
+import { X, Globe, Instagram, MapPin, Navigation, Plus, ExternalLink, Languages } from 'lucide-react';
 import { Tables } from '@/integrations/supabase/types';
 import { useTranslation } from 'react-i18next';
 
@@ -123,6 +123,14 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
   const bannerImage = brand?.banner_url || shop.image_url;
   const brandDescription = brand?.description || brand?.history;
   const shopDescription = shop.description;
+  const { i18n } = useTranslation();
+  const showTranslate = i18n.language !== 'en';
+
+  const openTranslate = (text: string) => {
+    const langMap: Record<string, string> = { fr: 'fr', ja: 'ja', ko: 'ko', th: 'th', 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW' };
+    const tl = langMap[i18n.language] || 'en';
+    window.open(`https://translate.google.com/?sl=en&tl=${tl}&text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   return (
     <div
@@ -179,8 +187,8 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
 
         {/* Scrollable content */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain">
-          {/* Hero banner */}
-          {bannerImage && (
+          {/* Hero banner or logo fallback */}
+          {bannerImage ? (
             <div className="relative w-full h-40">
               <img
                 src={bannerImage}
@@ -189,7 +197,16 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
             </div>
-          )}
+          ) : brand?.logo_url ? (
+            <div className="relative w-full h-40 bg-logo-bg flex items-center justify-center">
+              <img
+                src={brand.logo_url}
+                alt={brand.name}
+                className="max-w-[60%] max-h-[70%] object-contain"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+            </div>
+          ) : null}
 
           {/* Address + distance */}
           <div className="px-4 py-2">
@@ -248,7 +265,14 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           {/* Brand description */}
           {brandDescription && (
             <div className="px-4 py-2">
-              <h3 className="text-sm font-semibold text-[#C3C9C9] mb-1.5">{t('shops.aboutBrand', { name: brand?.name || '' })}</h3>
+              <div className="flex items-center justify-between mb-1.5">
+                <h3 className="text-sm font-semibold text-[#C3C9C9]">{t('shops.aboutBrand', { name: brand?.name || '' })}</h3>
+                {showTranslate && (
+                  <button onClick={() => openTranslate(brandDescription)} className="p-1.5 rounded-full hover:bg-white/10 transition-colors" title="Translate">
+                    <Languages className="w-3.5 h-3.5 text-[#A3A39E]" />
+                  </button>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{brandDescription}</p>
             </div>
           )}
@@ -256,7 +280,14 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           {/* Shop description */}
           {shopDescription && shopDescription !== brandDescription && (
             <div className="px-4 py-2">
-              <h3 className="text-sm font-semibold text-[#C3C9C9] mb-1.5">{t('shops.aboutLocation')}</h3>
+              <div className="flex items-center justify-between mb-1.5">
+                <h3 className="text-sm font-semibold text-[#C3C9C9]">{t('shops.aboutLocation')}</h3>
+                {showTranslate && (
+                  <button onClick={() => openTranslate(shopDescription)} className="p-1.5 rounded-full hover:bg-white/10 transition-colors" title="Translate">
+                    <Languages className="w-3.5 h-3.5 text-[#A3A39E]" />
+                  </button>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{shopDescription}</p>
             </div>
           )}

@@ -38,7 +38,46 @@ export const getCountryFlag = (country: string): string => {
     'Hong Kong': '🇭🇰',
     'Taiwan': '🇹🇼',
     'Mexico': '🇲🇽',
+    'Thailand': '🇹🇭',
+    'India': '🇮🇳',
+    'Philippines': '🇵🇭',
+    'Colombia': '🇨🇴',
+    'South Africa': '🇿🇦',
+    'Turkey': '🇹🇷',
+    'Russia': '🇷🇺',
+    'Greece': '🇬🇷',
+    'Austria': '🇦🇹',
+    'Switzerland': '🇨🇭',
+    'New Zealand': '🇳🇿',
+    'Ireland': '🇮🇪',
+    'Romania': '🇷🇴',
+    'Hungary': '🇭🇺',
+    'Morocco': '🇲🇦',
+    'Ghana': '🇬🇭',
+    'Egypt': '🇪🇬',
+    'Jamaica': '🇯🇲',
+    'Peru': '🇵🇪',
+    'Ukraine': '🇺🇦',
+    'Finland': '🇫🇮',
+    'Croatia': '🇭🇷',
   };
 
   return countryFlags[country] || '🌍';
+};
+
+// Export sorted country list for dropdowns
+export const getCountryList = (): { name: string; flag: string }[] => {
+  const countries = [
+    'Argentina', 'Australia', 'Austria', 'Belgium', 'Brazil', 'Canada',
+    'Chile', 'China', 'Colombia', 'Croatia', 'Czech Republic', 'Denmark',
+    'Egypt', 'Finland', 'France', 'Germany', 'Ghana', 'Greece',
+    'Hong Kong', 'Hungary', 'India', 'Indonesia', 'Ireland', 'Italy',
+    'Jamaica', 'Japan', 'Kenya', 'Malaysia', 'Mexico', 'Morocco',
+    'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Peru',
+    'Philippines', 'Poland', 'Portugal', 'Romania', 'Russia',
+    'Senegal', 'Singapore', 'South Africa', 'South Korea', 'Spain',
+    'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Turkey', 'UAE',
+    'UK', 'Ukraine', 'USA', 'Vietnam',
+  ];
+  return countries.map(name => ({ name, flag: getCountryFlag(name) }));
 };

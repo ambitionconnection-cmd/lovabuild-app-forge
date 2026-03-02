@@ -6,9 +6,11 @@ import { useBrands } from "@/hooks/useBrands";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import haptic from "@/lib/haptics";
 import { useTranslation } from "react-i18next";
+import { getCountryList } from "@/lib/countryFlags";
 
 interface Props {
   onClose: () => void;
@@ -285,7 +287,18 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
           </div>
           <div className="flex-1">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">{t("hot.country")}</label>
-            <Input placeholder={t("hot.countryPlaceholder")} value={country} onChange={e => setCountry(e.target.value)} className="h-9" />
+            <Select value={country} onValueChange={setCountry}>
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder={t("hot.countryPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {getCountryList().map(c => (
+                  <SelectItem key={c.name} value={c.name}>
+                    {c.flag} {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
