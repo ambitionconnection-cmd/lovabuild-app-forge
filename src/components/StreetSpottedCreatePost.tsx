@@ -45,6 +45,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
   const { user } = useAuth();
   const { data: brands = [] } = useBrands();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -153,6 +154,14 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
           onChange={handleFileSelect}
           className="hidden"
         />
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
 
         {imagePreview ? (
           <div className="relative mb-4 rounded-xl overflow-hidden">
@@ -165,13 +174,27 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
             </button>
           </div>
         ) : (
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full aspect-[4/5] rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-3 mb-4 hover:border-primary/50 transition-colors"
-          >
+          <div className="w-full aspect-[4/5] rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-4 mb-4">
             <Camera className="w-10 h-10 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Tap to add photo</span>
-          </button>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => cameraInputRef.current?.click()}
+              >
+                📸 {t("hot.takePhoto")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                🖼️ {t("hot.fromGallery")}
+              </Button>
+            </div>
+          </div>
         )}
 
         {/* Style tags */}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, Zap, Heart } from "lucide-react";
+import { MapPin, Flame, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
@@ -16,7 +16,7 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       description: t('onboarding.slide1Desc'),
     },
     {
-      icon: Zap,
+      icon: Flame,
       color: "text-[#C4956A]",
       bgColor: "bg-[#C4956A]/10",
       title: t('onboarding.slide2Title'),
