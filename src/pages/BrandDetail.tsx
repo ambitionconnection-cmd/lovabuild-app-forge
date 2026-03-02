@@ -31,6 +31,7 @@ const BrandDetail = () => {
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [similarBrands, setSimilarBrands] = useState<Tables<'brands'>[]>([]);
 
   useEffect(() => {
     if (slug) {
@@ -84,6 +85,34 @@ const BrandDetail = () => {
     if (!shopsResult.error) setShops(shopsResult.data || []);
     if (!dropsResult.error) setDrops(dropsResult.data || []);
     if (favoriteResult.data) setIsFavorite(true);
+
+    // Fetch similar brands (same category or country, excluding current)
+    if (brandData.category || brandData.country) {
+      let query = supabase
+        .from('brands')
+        .select('*')
+        .eq('is_active', true)
+        .neq('id', brandData.id)
+        .limit(6);
+
+      if (brandData.category && brandData.country) {
+        // Prefer same category, will sort by country match client-side
+        query = query.eq('category', brandData.category);
+      } else if (brandData.category) {
+        query = query.eq('category', brandData.category);
+      } else {
+        query = query.eq('country', brandData.country!);
+      }
+
+      const { data: simData } = await query;
+      // Sort: same country first
+      const sorted = (simData || []).sort((a, b) => {
+        const aMatch = a.country === brandData.country ? 1 : 0;
+        const bMatch = b.country === brandData.country ? 1 : 0;
+        return bMatch - aMatch;
+      });
+      setSimilarBrands(sorted.slice(0, 6));
+    }
 
     setLoading(false);
   };
@@ -392,6 +421,38 @@ const BrandDetail = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Similar Brands */}
+        {similarBrands.length > 0 && (
+          <Card className="animate-fade-in" style={{ animationDelay: '300ms', animationFillMode: 'backwards' }}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm uppercase tracking-wide">Similar To {brand.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                {similarBrands.map((b) => (
+                  <div
+                    key={b.id}
+                    className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                    onClick={() => navigate(`/brand/${b.slug}`)}
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-card border border-border/50 flex items-center justify-center overflow-hidden">
+                      {b.logo_url ? (
+                        <img src={b.logo_url} alt={b.name} className="max-w-full max-h-full object-contain p-1" />
+                      ) : (
+                        <span className="text-sm font-bold text-muted-foreground">{b.name.charAt(0)}</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] font-medium text-center line-clamp-1 w-full">{b.name}</p>
+                    {b.country && (
+                      <span className="text-xs">{getCountryFlag(b.country)}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Suggest an Edit */}
         <div className="flex justify-center pt-2 pb-4">
