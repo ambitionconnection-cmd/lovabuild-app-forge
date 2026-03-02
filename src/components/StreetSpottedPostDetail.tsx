@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Drawer, DrawerContent, DrawerClose } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface Post {
   id: string;
@@ -41,6 +42,7 @@ interface Props {
 }
 
 const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const postBrands = brands.filter(b => post.brand_ids.includes(b.id));
 
@@ -56,7 +58,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
         {post.is_sponsored && (
           <div className="absolute top-3 left-3">
             <Badge variant="secondary" className="text-[10px] bg-amber-500/90 text-white border-0">
-              Sponsored
+              {t("hot.sponsored")}
             </Badge>
           </div>
         )}
@@ -73,7 +75,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
             )}
           >
             <Flame className={cn("w-5 h-5", post.user_liked && "fill-orange-400")} />
-            {post.like_count > 0 && <span>{post.like_count} fire{post.like_count !== 1 ? "s" : ""}</span>}
+            {post.like_count > 0 && <span>{post.like_count}</span>}
           </button>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             {post.display_name && <span className="font-medium">{post.display_name}</span>}
@@ -109,7 +111,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
         {/* Brand tags */}
         {postBrands.length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tagged Brands</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("hot.tagBrands")}</p>
             <div className="flex flex-wrap gap-2">
               {postBrands.map(brand => (
                 <button
@@ -132,7 +134,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
           <div className="space-y-2 pt-2 border-t border-border/50">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <ShoppingBag className="w-3.5 h-3.5" />
-              Shop the Look
+              {t("hot.shopTheLook")}
             </p>
             <div className="grid gap-2">
               {postBrands.map(brand => (
@@ -154,7 +156,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike }: Props) => {
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/80 transition-colors"
                     >
-                      {brand.name} Official <ExternalLink className="w-3 h-3" />
+                      {t("hot.visitStore")} <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
                   <a
