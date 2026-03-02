@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import haptic from "@/lib/haptics";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   onClose: () => void;
@@ -40,6 +41,7 @@ const resizeImage = (file: File, maxWidth: number): Promise<Blob> => {
 };
 
 export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: brands = [] } = useBrands();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,7 +75,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
     haptic.selection();
     setSelectedStyles(prev => {
       if (prev.includes(style)) return prev.filter(s => s !== style);
-      if (prev.length >= 3) { toast.info("Max 3 style tags"); return prev; }
+      if (prev.length >= 3) { toast.info(t("hot.maxStyleTags")); return prev; }
       return [...prev, style];
     });
   };
@@ -84,7 +86,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
 
   const handleSubmit = async () => {
     if (!user || !imageFile || selectedBrands.length === 0) {
-      toast.error("Please add a photo and tag at least one brand");
+      toast.error(t("hot.addPhotoAndBrand"));
       return;
     }
 
@@ -122,11 +124,11 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
       await supabase.from("street_spotted_post_brands").insert(brandInserts);
 
       haptic.success();
-      toast.success("Spot submitted for review! 🔥");
+      toast.success(t("hot.spotSubmitted"));
       onPostCreated();
     } catch (err) {
       console.error("Error creating post:", err);
-      toast.error("Failed to post. Try again.");
+      toast.error(t("hot.postFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -137,7 +139,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
       <div className="max-w-lg mx-auto p-4 pb-28">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold uppercase tracking-wider">Post a Spot</h2>
+          <h2 className="text-lg font-bold uppercase tracking-wider">{t("hot.postASpot")}</h2>
           <button onClick={onClose} className="p-2 hover:bg-muted rounded-full">
             <X className="w-5 h-5" />
           </button>
@@ -176,7 +178,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
         {/* Style tags */}
         <div className="mb-4">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-            Style Tags (pick up to 3)
+            {t("hot.styleTags")}
           </label>
           <div className="flex flex-wrap gap-1.5">
             {STYLE_TAG_OPTIONS.map(style => (
@@ -195,7 +197,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
         {/* Brand tags */}
         <div className="mb-4">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-            Tag Brands *
+            {t("hot.tagBrands")} *
           </label>
           {selectedBrands.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-2">
@@ -215,7 +217,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
             </div>
           )}
           <Input
-            placeholder="Search brands..."
+            placeholder={t("hot.searchBrands")}
             value={brandSearch}
             onChange={e => setBrandSearch(e.target.value)}
             className="h-9"
@@ -242,10 +244,10 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
         {/* Caption */}
         <div className="mb-4">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-            Caption
+            {t("hot.caption")}
           </label>
           <Input
-            placeholder="Describe the fit..."
+            placeholder={t("hot.captionPlaceholder")}
             value={caption}
             onChange={e => setCaption(e.target.value)}
             maxLength={280}
@@ -256,18 +258,18 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
         {/* Location */}
         <div className="flex gap-2 mb-6">
           <div className="flex-1">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">City</label>
-            <Input placeholder="e.g. London" value={city} onChange={e => setCity(e.target.value)} className="h-9" />
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">{t("hot.city")}</label>
+            <Input placeholder={t("hot.cityPlaceholder")} value={city} onChange={e => setCity(e.target.value)} className="h-9" />
           </div>
           <div className="flex-1">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Country</label>
-            <Input placeholder="e.g. UK" value={country} onChange={e => setCountry(e.target.value)} className="h-9" />
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">{t("hot.country")}</label>
+            <Input placeholder={t("hot.countryPlaceholder")} value={country} onChange={e => setCountry(e.target.value)} className="h-9" />
           </div>
         </div>
 
         {/* Info about moderation */}
         <p className="text-[10px] text-muted-foreground text-center mb-3">
-          Posts are reviewed before appearing publicly
+          {t("hot.moderationNotice")}
         </p>
 
         {/* Submit */}
@@ -276,7 +278,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
           disabled={submitting || !imageFile || selectedBrands.length === 0}
           className="w-full h-12 text-base font-bold"
         >
-          {submitting ? "Posting..." : "Post Spot 🔥"}
+          {submitting ? t("hot.posting") : t("hot.postSpot")}
         </Button>
       </div>
     </div>

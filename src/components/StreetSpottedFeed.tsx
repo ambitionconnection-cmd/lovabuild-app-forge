@@ -13,6 +13,7 @@ import { StreetSpottedCreatePost } from "./StreetSpottedCreatePost";
 import { StreetSpottedPostDetail } from "./StreetSpottedPostDetail";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface Post {
   id: string;
@@ -37,6 +38,7 @@ const STYLE_TAG_OPTIONS = [
 ];
 
 export const StreetSpottedFeed = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: brands = [] } = useBrands();
@@ -118,8 +120,8 @@ export const StreetSpottedFeed = () => {
 
   const toggleLike = async (postId: string) => {
     if (!user) {
-      toast.info("Sign in to like posts", {
-        action: { label: "Sign In", onClick: () => navigate("/auth") },
+      toast.info(t("hot.signInToLike"), {
+        action: { label: t("hot.signIn"), onClick: () => navigate("/auth") },
       });
       return;
     }
@@ -198,7 +200,7 @@ export const StreetSpottedFeed = () => {
         <div className="px-3 pb-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
             <Flame className="w-3.5 h-3.5 text-orange-500" />
-            Trending This Week
+            {t("hot.trendingThisWeek")}
           </h3>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
             {trendingPosts.map(post => (
@@ -209,7 +211,7 @@ export const StreetSpottedFeed = () => {
               >
                 <img
                   src={post.image_url}
-                  alt={post.caption || "Trending"}
+                  alt={post.caption || t("hot.trending")}
                   className="w-full h-36 object-cover"
                   loading="lazy"
                 />
@@ -237,7 +239,7 @@ export const StreetSpottedFeed = () => {
             )}
           >
             <Filter className="w-3 h-3" />
-            Filter
+            {t("hot.filter")}
           </button>
 
           <Badge
@@ -245,7 +247,7 @@ export const StreetSpottedFeed = () => {
             className="cursor-pointer flex-shrink-0 text-xs"
             onClick={() => setShowTrending(!showTrending)}
           >
-            🔥 Trending
+            🔥 {t("hot.trending")}
           </Badge>
 
           {filterBrands.slice(0, 6).map(brand => (
@@ -270,7 +272,7 @@ export const StreetSpottedFeed = () => {
               }}
               className="flex-shrink-0 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
             >
-              <X className="w-3 h-3" /> Clear
+              <X className="w-3 h-3" /> {t("hot.clear")}
             </button>
           )}
         </div>
@@ -281,7 +283,7 @@ export const StreetSpottedFeed = () => {
             {/* Style tags */}
             {usedStyles.length > 0 && (
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Style</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{t("hot.style")}</p>
                 <div className="flex flex-wrap gap-1">
                   {usedStyles.map(style => (
                     <Badge
@@ -299,7 +301,7 @@ export const StreetSpottedFeed = () => {
             {/* Country */}
             {countries.length > 0 && (
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Country</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{t("hot.country")}</p>
                 <div className="flex flex-wrap gap-1">
                   {countries.map(c => (
                     <Badge
@@ -317,7 +319,7 @@ export const StreetSpottedFeed = () => {
             {/* City */}
             {cities.length > 0 && (
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">City</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{t("hot.city")}</p>
                 <div className="flex flex-wrap gap-1">
                   {cities.slice(0, 10).map(c => (
                     <Badge
@@ -348,13 +350,13 @@ export const StreetSpottedFeed = () => {
       ) : filteredPosts.length === 0 ? (
         <div className="text-center py-16 px-6">
           <Camera className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30" />
-          <h3 className="text-lg font-semibold mb-2 text-foreground/70">No spots yet</h3>
+          <h3 className="text-lg font-semibold mb-2 text-foreground/70">{t("hot.noSpotsYet")}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Be the first to share a streetwear sighting!
+            {t("hot.beTheFirst")}
           </p>
           {user && (
             <Button onClick={() => setShowCreate(true)} className="gap-2">
-              <Plus className="w-4 h-4" /> Post a Spot
+              <Plus className="w-4 h-4" /> {t("hot.postASpot")}
             </Button>
           )}
         </div>
@@ -372,7 +374,7 @@ export const StreetSpottedFeed = () => {
                 {post.is_sponsored && (
                   <div className="absolute top-2 left-2 z-10">
                     <Badge variant="secondary" className="text-[9px] bg-amber-500/90 text-white border-0 backdrop-blur-sm">
-                      Sponsored
+                      {t("hot.sponsored")}
                     </Badge>
                   </div>
                 )}
