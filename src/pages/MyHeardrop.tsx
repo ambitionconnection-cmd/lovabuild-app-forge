@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Bell, TrendingUp, MapPin, ExternalLink, Instagram, Globe, Zap, Calendar, Trash2 } from "lucide-react";
+import { ArrowLeft, Heart, Navigation, TrendingUp, MapPin, Trash2, Share2, FileText, Route } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,9 +22,11 @@ interface FavoriteShop extends Tables<'shops'> {
   favoriteId: string;
 }
 
-interface DropReminder extends Tables<'drops'> {
-  reminderId: string;
-  isNotified: boolean;
+interface SavedRoute {
+  id: string;
+  name: string;
+  stops: any[];
+  created_at: string;
 }
 
 const MyHeardrop = () => {
@@ -33,9 +35,8 @@ const MyHeardrop = () => {
   const navigate = useNavigate();
   const [favoriteBrands, setFavoriteBrands] = useState<FavoriteBrand[]>([]);
   const [favoriteShops, setFavoriteShops] = useState<FavoriteShop[]>([]);
-  const [dropReminders, setDropReminders] = useState<DropReminder[]>([]);
+  const [savedRoutes, setSavedRoutes] = useState<SavedRoute[]>([]);
   const [recommendedBrands, setRecommendedBrands] = useState<Tables<'brands'>[]>([]);
-  const [recommendedDrops, setRecommendedDrops] = useState<Tables<'drops'>[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -80,21 +81,13 @@ const MyHeardrop = () => {
 
       setFavoriteShops(shops || []);
 
-      // Fetch drop reminders
-      const { data: remindersData, error: remindersError } = await supabase
-        .from('user_drop_reminders')
-        .select('id, is_notified, drop_id, drops(*)')
-        .eq('user_id', user.id);
+      // Fetch saved routes
+      const { data: routesData } = await (supabase.from('saved_routes') as any)
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-      if (remindersError) throw remindersError;
-
-      const reminders = remindersData?.map(item => ({
-        ...item.drops,
-        reminderId: item.id,
-        isNotified: item.is_notified
-      })) as DropReminder[];
-
-      setDropReminders(reminders || []);
+      setSavedRoutes(routesData || []);
 
       // Fetch recommendations based on favorite categories
       const favoriteCategories = brands
@@ -102,7 +95,6 @@ const MyHeardrop = () => {
         .filter(c => c !== null);
 
       if (favoriteCategories.length > 0) {
-        // Recommend brands from same categories
         const { data: recBrands } = await supabase
           .from('brands')
           .select('*')
@@ -112,18 +104,6 @@ const MyHeardrop = () => {
           .limit(6);
 
         setRecommendedBrands(recBrands || []);
-
-        // Recommend upcoming drops from same categories
-        const { data: recDrops } = await supabase
-          .from('drops')
-          .select('*')
-          .in('brand_id', brands.map(b => b.id))
-          .eq('status', 'upcoming')
-          .not('id', 'in', reminders.length > 0 ? `(${reminders.map(r => r.id).join(',')})` : '()')
-          .order('release_date', { ascending: true })
-          .limit(4);
-
-        setRecommendedDrops(recDrops || []);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -146,7 +126,7 @@ const MyHeardrop = () => {
       haptic.light();
       setFavoriteBrands(prev => prev.filter(b => b.favoriteId !== favoriteId));
       toast.success('Removed from favorites');
-      fetchUserData(); // Refresh recommendations
+      fetchUserData();
     }
   };
 
@@ -166,21 +146,24 @@ const MyHeardrop = () => {
     }
   };
 
-  const removeReminder = async (reminderId: string) => {
-    const { error } = await supabase
-      .from('user_drop_reminders')
+  const deleteRoute = async (routeId: string) => {
+    const { error } = await (supabase.from('saved_routes') as any)
       .delete()
-      .eq('id', reminderId);
+      .eq('id', routeId);
 
     if (error) {
       haptic.error();
-      toast.error('Failed to remove reminder');
+      toast.error('Failed to delete route');
     } else {
       haptic.light();
-      setDropReminders(prev => prev.filter(r => r.reminderId !== reminderId));
-      toast.success('Reminder removed');
-      fetchUserData(); // Refresh recommendations
+      setSavedRoutes(prev => prev.filter(r => r.id !== routeId));
+      toast.success('Route deleted');
     }
+  };
+
+  const shareRoute = async (route: SavedRoute) => {
+    const { shareRoute: doShare } = await import('@/lib/routeActions');
+    await doShare(route.stops, null);
   };
 
   if (!user) {
@@ -255,9 +238,9 @@ const MyHeardrop = () => {
               <Heart className="w-3 h-3 mr-1" />
               Favorites
             </TabsTrigger>
-            <TabsTrigger value="reminders" className="text-xs">
-              <Bell className="w-3 h-3 mr-1" />
-              Reminders
+            <TabsTrigger value="routes" className="text-xs">
+              <Route className="w-3 h-3 mr-1" />
+              My Routes
             </TabsTrigger>
             <TabsTrigger value="recommendations" className="text-xs">
               <TrendingUp className="w-3 h-3 mr-1" />
@@ -377,57 +360,75 @@ const MyHeardrop = () => {
             </section>
           </TabsContent>
 
-          {/* Reminders Tab */}
-          <TabsContent value="reminders">
+          {/* My Routes Tab */}
+          <TabsContent value="routes">
             <section>
-              <h2 className="text-sm font-bold mb-2">Drop Reminders</h2>
-              {dropReminders.length === 0 ? (
+              <h2 className="text-sm font-bold mb-2">Saved Routes</h2>
+              {savedRoutes.length === 0 ? (
                 <Card>
-                  <CardContent className="py-12 text-center">
-                    <Bell className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">No drop reminders set</p>
+                  <CardContent className="py-6 text-center">
+                    <Navigation className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-xs text-muted-foreground">No saved routes yet</p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-1">
+                      Build a route on the map and save it
+                    </p>
                     <Button 
                       variant="link" 
-                      onClick={() => navigate('/drops')}
-                      className="mt-2"
+                      size="sm"
+                      onClick={() => navigate('/')}
+                      className="mt-1 text-xs"
                     >
-                      Browse drops
+                      Go to Map
                     </Button>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {dropReminders.map((drop) => (
-                    <Card key={drop.id} className="overflow-hidden">
-                      <div className="relative h-24 bg-muted">
-                        {drop.image_url ? (
-                          <img src={drop.image_url} alt={drop.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Zap className="h-6 w-6 text-muted-foreground" />
+                <div className="space-y-2">
+                  {savedRoutes.map((route) => (
+                    <Card key={route.id}>
+                      <CardContent className="p-3">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm truncate">{route.name}</h3>
+                            <p className="text-[10px] text-muted-foreground">
+                              {route.stops?.length || 0} stop{(route.stops?.length || 0) !== 1 ? 's' : ''} · {format(new Date(route.created_at), 'MMM d, yyyy')}
+                            </p>
                           </div>
-                        )}
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-1 right-1 h-7 w-7 touch-manipulation active:scale-95"
-                          onClick={() => removeReminder(drop.reminderId)}
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      </div>
-                      <CardContent className="p-2">
-                        <h3 className="font-semibold text-xs mb-1 line-clamp-1">{drop.title}</h3>
-                        <div className="flex items-center text-[10px] text-muted-foreground">
-                          <Calendar className="h-3 w-3 mr-0.5" />
-                          {format(new Date(drop.release_date), 'MMM d')}
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={() => shareRoute(route)}
+                            >
+                              <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={() => deleteRoute(route.id)}
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                            </Button>
+                          </div>
                         </div>
-                        {drop.isNotified && (
-                          <Badge variant="secondary" className="text-[10px] mt-1 py-0">
-                            <Bell className="w-2.5 h-2.5 mr-0.5" />
-                            Notified
-                          </Badge>
-                        )}
+                        {/* Stop preview */}
+                        <div className="space-y-1">
+                          {(route.stops || []).slice(0, 3).map((stop: any, i: number) => (
+                            <div key={i} className="flex items-center gap-2 text-[11px]">
+                              <div className="w-4 h-4 rounded-full bg-[#C4956A]/20 text-[#C4956A] flex items-center justify-center text-[9px] font-bold flex-shrink-0">
+                                {i + 1}
+                              </div>
+                              <span className="truncate text-muted-foreground">{stop.name}</span>
+                            </div>
+                          ))}
+                          {(route.stops?.length || 0) > 3 && (
+                            <p className="text-[10px] text-muted-foreground/60 pl-6">
+                              +{route.stops.length - 3} more
+                            </p>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -438,7 +439,6 @@ const MyHeardrop = () => {
 
           {/* Recommendations Tab */}
           <TabsContent value="recommendations" className="space-y-4">
-            {/* Recommended Brands */}
             <section>
               <h2 className="text-sm font-bold mb-2">Recommended Brands</h2>
               {recommendedBrands.length === 0 ? (
@@ -459,59 +459,21 @@ const MyHeardrop = () => {
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                   {recommendedBrands.map((brand) => (
-                    <Card key={brand.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/global-index')}>
-                      <CardContent className="p-4">
-                        <div className="aspect-square bg-muted rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                    <Card key={brand.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/brand/${brand.slug}`)}>
+                      <CardContent className="p-3">
+                        <div className="aspect-square bg-muted rounded-lg mb-2 flex items-center justify-center overflow-hidden">
                           {brand.logo_url ? (
                             <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-2xl font-bold">{brand.name.charAt(0)}</span>
                           )}
                         </div>
-                        <p className="font-medium text-sm text-center line-clamp-1">{brand.name}</p>
+                        <p className="font-medium text-xs text-center line-clamp-1">{brand.name}</p>
                         {brand.category && (
-                          <p className="text-xs text-muted-foreground text-center capitalize">{brand.category}</p>
+                          <p className="text-[10px] text-muted-foreground text-center capitalize">{brand.category}</p>
                         )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Recommended Drops */}
-            <section>
-              <h2 className="text-2xl font-bold mb-4">Upcoming Drops You Might Like</h2>
-              {recommendedDrops.length === 0 ? (
-                <Card>
-                  <CardContent className="py-12 text-center">
-                    <Zap className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">
-                      No upcoming drops from your favorite brands
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {recommendedDrops.map((drop) => (
-                    <Card key={drop.id} className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/drops')}>
-                      <div className="relative h-32 bg-muted">
-                        {drop.image_url ? (
-                          <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Zap className="h-8 w-8 text-muted-foreground" />
-                          </div>
-                        )}
-                      </div>
-                      <CardContent className="p-4">
-                        <h3 className="font-semibold text-sm mb-2 line-clamp-1">{drop.title}</h3>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {format(new Date(drop.release_date), 'MMM d, yyyy')}
-                        </div>
                       </CardContent>
                     </Card>
                   ))}
