@@ -134,7 +134,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm overflow-y-auto">
-      <div className="max-w-lg mx-auto p-4">
+      <div className="max-w-lg mx-auto p-4 pb-28">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold uppercase tracking-wider">Post a Spot</h2>
