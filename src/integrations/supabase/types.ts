@@ -163,6 +163,45 @@ export type Database = {
         }
         Relationships: []
       }
+      collections: {
+        Row: {
+          brand_ids: string[]
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          brand_ids?: string[]
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          brand_ids?: string[]
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string | null
