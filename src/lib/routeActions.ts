@@ -162,6 +162,17 @@ export const printRoute = (
 };
 
 // ==================== SHARE ====================
+
+/** Generate a random 8-char alphanumeric code */
+const generateCode = (): string => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
+
 export const shareRoute = async (
   stops: RouteStop[],
   userLocation: { lat: number; lng: number } | null
@@ -171,8 +182,40 @@ export const shareRoute = async (
     return;
   }
 
+  // Save to shared_routes table and get a short code
+  const code = generateCode();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { error } = await (supabase.from('shared_routes') as any).insert({
+    code,
+    stops: stops.map(s => ({
+      id: s.id,
+      name: s.name,
+      address: s.address,
+      city: s.city,
+      latitude: s.latitude,
+      longitude: s.longitude,
+    })),
+    created_by: user?.id || null,
+  });
+
+  if (error) {
+    console.error('Share error:', error);
+    // Fallback to text share
+    const stopNames = stops.map((s, i) => `${i + 1}. ${s.name}`).join('\n');
+    const shareText = `My HEARDROP Route:\n${stopNames}\n\nPlan your streetwear trip at heardrop.app`;
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast.success('Route copied to clipboard');
+    } catch {
+      toast.error('Could not share route');
+    }
+    return;
+  }
+
+  const shareUrl = `${window.location.origin}/route/${code}`;
   const stopNames = stops.map((s, i) => `${i + 1}. ${s.name}`).join('\n');
-  const shareText = `My HEARDROP Route:\n${stopNames}\n\nPlan your streetwear trip at heardrop.app`;
+  const shareText = `My HEARDROP Route:\n${stopNames}\n\nFollow the route: ${shareUrl}`;
 
   // Try native share (mobile)
   if (navigator.share) {
@@ -180,7 +223,7 @@ export const shareRoute = async (
       await navigator.share({
         title: 'My HEARDROP Route',
         text: shareText,
-        url: 'https://heardrop.app',
+        url: shareUrl,
       });
       return;
     } catch (e) {
@@ -190,8 +233,8 @@ export const shareRoute = async (
 
   // Fallback: copy to clipboard
   try {
-    await navigator.clipboard.writeText(shareText);
-    toast.success('Route copied to clipboard');
+    await navigator.clipboard.writeText(shareUrl);
+    toast.success('Shareable link copied!');
   } catch {
     toast.error('Could not share route');
   }

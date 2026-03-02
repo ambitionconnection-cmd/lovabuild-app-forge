@@ -535,6 +535,30 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_routes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          stops: Json
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          stops: Json
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          stops?: Json
+        }
+        Relationships: []
+      }
       shops: {
         Row: {
           address: string
