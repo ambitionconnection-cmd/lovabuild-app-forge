@@ -29,6 +29,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import { AdminStatsCards } from '@/components/AdminStatsCards';
 import { FeaturedBrandManagement } from '@/components/FeaturedBrandManagement';
+import { CollectionManagement } from '@/components/CollectionManagement';
 
 interface LoginAttempt {
   id: string;
@@ -706,6 +707,10 @@ export default function Admin() {
 
             {activeTab === "featured-brand" && (
               <FeaturedBrandManagement brands={brands} />
+            )}
+
+            {activeTab === "collections" && (
+              <CollectionManagement brands={brands} />
             )}
 
             {activeTab === "media" && (

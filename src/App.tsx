@@ -27,6 +27,7 @@ import More from "./pages/More";
 import About from "./pages/About";
 import RoutePage from "./pages/RoutePage";
 import SharedRoute from "./pages/SharedRoute";
+import Collections from "./pages/Collections";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ function App() {
               <Route path="/shop-map" element={<ShopMap />} />
               <Route path="/drops" element={<Feed />} />
               <Route path="/feed" element={<Feed />} />
+              <Route path="/collections" element={<Collections />} />
 
 
               {/* PROTECTED PAGES - Login required */}
