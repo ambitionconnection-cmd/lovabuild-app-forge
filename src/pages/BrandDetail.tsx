@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, ExternalLink, Instagram, Store, MapPin, Calendar, Clock, ShoppingBag, Flag } from "lucide-react";
+import { ArrowLeft, Heart, ExternalLink, Instagram, Store, MapPin, Calendar, Clock, ShoppingBag, Flag, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +17,7 @@ import { getCountryFlag } from "@/lib/countryFlags";
 import haptic from "@/lib/haptics";
 import { format } from "date-fns";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { useTranslation } from "react-i18next";
 
 const BrandDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -32,6 +33,14 @@ const BrandDetail = () => {
   const [editForm, setEditForm] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [similarBrands, setSimilarBrands] = useState<Tables<'brands'>[]>([]);
+  const { i18n } = useTranslation();
+  const showTranslate = i18n.language !== 'en';
+
+  const openTranslate = (text: string) => {
+    const langMap: Record<string, string> = { fr: 'fr', ja: 'ja', ko: 'ko', th: 'th', 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW' };
+    const tl = langMap[i18n.language] || 'en';
+    window.open(`https://translate.google.com/?sl=en&tl=${tl}&text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   useEffect(() => {
     if (slug) {
@@ -327,7 +336,14 @@ const BrandDetail = () => {
         {brand.history && (
           <Card className="animate-fade-in" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm uppercase tracking-wide">About</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm uppercase tracking-wide">About</CardTitle>
+                {showTranslate && (
+                  <button onClick={() => openTranslate(brand.history!)} className="p-1.5 rounded-full hover:bg-muted transition-colors" title="Translate">
+                    <Languages className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground leading-relaxed">{brand.history}</p>
