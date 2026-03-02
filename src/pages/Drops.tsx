@@ -481,7 +481,7 @@ const Drops = () => {
                   <div className="sticky top-0 z-10 bg-[#1a1a1a] border-b border-white/5 px-4 py-3">
                     <div className="flex items-center gap-3">
                       {brand?.logo_url ? (
-                        <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/10 overflow-hidden flex-shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-logo-bg border border-white/10 overflow-hidden flex-shrink-0">
                           <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain p-1" />
                         </div>
                       ) : (

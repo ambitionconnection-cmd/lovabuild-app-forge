@@ -243,7 +243,7 @@ const BrandDetail = () => {
           <CardContent className="p-4">
             <div className="flex flex-col items-center gap-4">
               {/* Logo */}
-              <div className="w-32 h-32 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden shadow-lg animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
+              <div className="w-32 h-32 rounded-2xl bg-logo-bg border border-border/50 flex items-center justify-center overflow-hidden shadow-lg animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
                 {brand.logo_url ? (
                   <img src={brand.logo_url} alt={brand.name} className="max-w-full max-h-full object-contain p-2" />
                 ) : (
@@ -436,7 +436,7 @@ const BrandDetail = () => {
                     className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
                     onClick={() => navigate(`/brand/${b.slug}`)}
                   >
-                    <div className="w-12 h-12 rounded-lg bg-card border border-border/50 flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 rounded-lg bg-logo-bg border border-border/50 flex items-center justify-center overflow-hidden">
                       {b.logo_url ? (
                         <img src={b.logo_url} alt={b.name} className="max-w-full max-h-full object-contain p-1" />
                       ) : (

@@ -71,9 +71,10 @@ export default {
   				DEFAULT: 'hsl(var(--logo-red))',
   				foreground: 'hsl(var(--logo-red-foreground))'
   			},
-  			success: 'hsl(var(--success))',
-  			warning: 'hsl(var(--warning))',
-  			error: 'hsl(var(--error))'
+			'logo-bg': 'hsl(var(--logo-bg))',
+			success: 'hsl(var(--success))',
+			warning: 'hsl(var(--warning))',
+			error: 'hsl(var(--error))'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

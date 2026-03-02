@@ -360,7 +360,7 @@ const GlobalIndex = () => {
                 onClick={() => navigate(`/brand/${brand.slug}`)}
               >
                 {/* Logo */}
-                <div className="w-14 h-14 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0 p-1.5">
+                <div className="w-14 h-14 rounded-xl bg-logo-bg border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0 p-1.5">
                   {brand.logo_url ? (
                     <img src={brand.logo_url} alt={brand.name} className="max-w-full max-h-full object-contain" />
                   ) : (
