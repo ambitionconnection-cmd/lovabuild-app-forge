@@ -168,47 +168,11 @@ const Map: React.FC<MapProps> = ({
     mapLog.init('Map instance created');
     // Navigation controls removed - using custom recenter button instead
 
-    // Add geolocate control - CRITICAL FIX #3: Disable trackUserLocation to prevent snap-back
-    const geolocateControl = new mapboxgl.GeolocateControl({
-      positionOptions: {
-        enableHighAccuracy: true
-      },
-      trackUserLocation: false, // DISABLED: Prevents map from snapping back to user location
-      showUserHeading: false,
-      showAccuracyCircle: false,
-    });
-    
-    map.current.addControl(geolocateControl);
-    // Hide the default geolocate button - we use our own custom recenter button
-    const geolocateEl = mapContainer.current?.querySelector('.mapboxgl-ctrl-geolocate');
-    if (geolocateEl) {
-      (geolocateEl as HTMLElement).style.display = 'none';
-    }
-
-    // Listen for user location - Only center on first load if no initialCenter provided
-    geolocateControl.on('geolocate', (e: any) => {
-      const newLocation: [number, number] = [e.coords.longitude, e.coords.latitude];
-      mapLog.location('Geolocate success:', newLocation);
-      mapLog.location('hasInitializedLocation:', hasInitializedLocation.current, 'initialCenter:', !!initialCenterRef.current);
-      setUserLocation(newLocation);
-      
-      // CRITICAL FIX #2: Only center on user location on FIRST geolocation AND only if no specific shop target
-      if (!hasInitializedLocation.current && map.current && !initialCenterRef.current) {
-        hasInitializedLocation.current = true;
-        mapLog.location('Jumping to user location (first geolocate)');
-        map.current.jumpTo({
-          center: newLocation,
-          zoom: 14
-        });
-      } else {
-        mapLog.location('NOT flying to user location (already initialized or has initialCenter)');
-      }
-      
-      // Update user marker (blue dot)
+    // Get user location via raw geolocation API (NOT GeolocateControl which auto-centers the map)
+    const addUserMarker = (coords: [number, number]) => {
       if (userMarkerRef.current) {
         userMarkerRef.current.remove();
       }
-      
       const el = document.createElement('div');
       el.innerHTML = `
         <div style="
@@ -220,16 +184,33 @@ const Map: React.FC<MapProps> = ({
           box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         "></div>
       `;
+      if (map.current) {
+        userMarkerRef.current = new mapboxgl.Marker(el)
+          .setLngLat(coords)
+          .addTo(map.current);
+      }
+    };
+
+    const handleGeolocationSuccess = (position: GeolocationPosition) => {
+      const newLocation: [number, number] = [position.coords.longitude, position.coords.latitude];
+      mapLog.location('Geolocation success:', newLocation);
+      mapLog.location('hasInitializedLocation:', hasInitializedLocation.current, 'initialCenter:', !!initialCenterRef.current);
+      setUserLocation(newLocation);
       
-      userMarkerRef.current = new mapboxgl.Marker(el)
-        .setLngLat(newLocation)
-        .addTo(map.current!);
-      mapLog.location('User marker added');
-    });
-    
-    geolocateControl.on('error', (e: any) => {
-      mapLog.warn('Geolocate error:', e.message || e);
-    });
+      // Only center on user location on FIRST geolocation AND only if no saved/specific position
+      if (!hasInitializedLocation.current && map.current && !initialCenterRef.current) {
+        hasInitializedLocation.current = true;
+        mapLog.location('Jumping to user location (first geolocate, no saved position)');
+        map.current.jumpTo({
+          center: newLocation,
+          zoom: 14
+        });
+      } else {
+        mapLog.location('NOT moving map (already initialized or has saved position)');
+      }
+      
+      addUserMarker(newLocation);
+    };
 
     // Track user interaction and show tooltip when user navigates away
     const handleUserInteraction = () => {
@@ -286,10 +267,15 @@ const Map: React.FC<MapProps> = ({
       updateVisibleShopsAndCenter();
       
       setTimeout(() => {
-        // ALWAYS trigger geolocation so the recenter button appears
-        // (the geolocate handler already prevents re-centering if we have an initialCenter)
-        mapLog.location('Triggering geolocate control');
-        geolocateControl.trigger();
+        // Use raw geolocation API - does NOT move the map
+        mapLog.location('Requesting user location via navigator.geolocation');
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            handleGeolocationSuccess,
+            (err) => mapLog.warn('Geolocation error:', err.message),
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
+          );
+        }
         map.current?.resize();
       }, 300);
     });
