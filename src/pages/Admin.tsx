@@ -30,6 +30,7 @@ import { AdminSidebar } from '@/components/AdminSidebar';
 import { AdminStatsCards } from '@/components/AdminStatsCards';
 import { FeaturedBrandManagement } from '@/components/FeaturedBrandManagement';
 import { CollectionManagement } from '@/components/CollectionManagement';
+import { ImageArchiveManagement } from '@/components/ImageArchiveManagement';
 
 interface LoginAttempt {
   id: string;
@@ -715,6 +716,10 @@ export default function Admin() {
 
             {activeTab === "media" && (
               <MediaManagement />
+            )}
+
+            {activeTab === "image-archive" && (
+              <ImageArchiveManagement />
             )}
 
             {activeTab === "data-exports" && (
