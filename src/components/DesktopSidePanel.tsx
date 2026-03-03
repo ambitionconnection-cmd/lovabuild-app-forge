@@ -92,9 +92,9 @@ export const DesktopSidePanel = ({
         <div className="flex-shrink-0 p-4 border-b border-white/10">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-7 h-7 rounded-md border border-white/20 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">H</span>
+              <span className="text-white font-bold text-sm">F</span>
             </div>
-            <h2 className="text-white font-bold tracking-wider text-sm uppercase">HEARDROP</h2>
+            <h2 className="text-white font-bold tracking-wider text-sm uppercase">FLYAF</h2>
           </div>
 
           {/* Search */}

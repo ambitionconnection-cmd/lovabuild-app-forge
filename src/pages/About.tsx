@@ -24,21 +24,21 @@ const About = () => {
           <div className="py-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-14 h-14 rounded-xl border border-[#AD3A49]/50 flex items-center justify-center">
-                <span className="text-[#AD3A49] font-bold text-2xl">H</span>
+                <span className="text-[#AD3A49] font-bold text-2xl">F</span>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">HEARDROP</h2>
+                <h2 className="text-xl font-bold text-white">FLYAF</h2>
                 <p className="text-sm text-[#AD3A49]">Never miss a drop again.</p>
               </div>
             </div>
           </div>
 
-          {/* What is HEARDROP */}
+          {/* What is FLYAF */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">What is HEARDROP?</h3>
+            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">What is FLYAF?</h3>
             <p className="text-sm text-white/70 leading-relaxed">
-              HEARDROP is the streetwear discovery platform that puts every shop, brand, and drop on your map. 
-              Whether you're a tourist exploring Soho or a local planning your weekend route, HEARDROP helps you 
+              FLYAF is the streetwear discovery platform that puts every shop, brand, and drop on your map. 
+              Whether you're a tourist exploring Soho or a local planning your weekend route, FLYAF helps you 
               find the stores that matter and never miss a release.
             </p>
           </div>
@@ -81,7 +81,7 @@ const About = () => {
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">Built for the culture</h3>
             <p className="text-sm text-white/70 leading-relaxed">
-              HEARDROP was born from a simple frustration: streetwear shops are everywhere but hard to find, 
+              FLYAF was born from a simple frustration: streetwear shops are everywhere but hard to find, 
               drops happen fast and are easy to miss, and no single platform connects the physical shopping 
               experience with the digital release calendar. We're changing that.
             </p>
@@ -103,7 +103,7 @@ const About = () => {
 
           {/* Version */}
           <div className="pt-6 border-t border-white/5 text-center">
-            <p className="text-white/20 text-xs">HEARDROP v1.0</p>
+            <p className="text-white/20 text-xs">FLYAF v1.0</p>
             <p className="text-white/15 text-[10px] mt-1">Made in London 🇬🇧</p>
           </div>
         </div>

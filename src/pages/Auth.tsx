@@ -234,8 +234,8 @@ const Auth = () => {
         <div className="w-full max-w-md">
           <button onClick={() => navigate('/more')} className="mb-4 text-sm text-[#C4956A] hover:text-[#C4956A]/80 transition-colors flex items-center gap-2 py-2">← Back</button>
           <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
-            <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-flyaf" />
+            <h1 className="text-3xl font-bold tracking-tight">FLYAF</h1>
           </div>
 
           <Card>
@@ -291,8 +291,8 @@ const Auth = () => {
         <div className="w-full max-w-md">
           <button onClick={() => navigate('/more')} className="mb-4 text-sm text-[#C4956A] hover:text-[#C4956A]/80 transition-colors flex items-center gap-2 py-2">← Back</button>
           <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
-            <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-flyaf" />
+            <h1 className="text-3xl font-bold tracking-tight">FLYAF</h1>
           </div>
 
           <Card>
@@ -337,8 +337,8 @@ const Auth = () => {
         <div className="w-full max-w-md">
           <button onClick={() => { setShowForgotPassword(false); }} className="mb-4 text-sm text-[#C4956A] hover:text-[#C4956A]/80 transition-colors flex items-center gap-2 py-2">← {t('auth.backToSignIn')}</button>
           <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
-            <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-flyaf" />
+            <h1 className="text-3xl font-bold tracking-tight">FLYAF</h1>
           </div>
 
           <Card>
@@ -392,8 +392,8 @@ const Auth = () => {
           ← Back
         </button>
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-heardrop" />
-          <h1 className="text-3xl font-bold tracking-tight">HEARDROP</h1>
+          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-directions via-drops to-flyaf" />
+          <h1 className="text-3xl font-bold tracking-tight">FLYAF</h1>
         </div>
 
         <Tabs defaultValue="signin" className="w-full">

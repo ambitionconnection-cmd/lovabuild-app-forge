@@ -44,7 +44,7 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    /* HEARDROP Brand Colors - Japanese Streetwear Palette */
+    /* FLYAF Brand Colors - Japanese Streetwear Palette */
     --directions: 352 51% 45%;
     --directions-foreground: 0 0% 98%;
 
@@ -54,8 +54,8 @@ All colors MUST be HSL.
     --drops: 352 51% 55%;
     --drops-foreground: 0 0% 98%;
 
-    --heardrop: 352 51% 45%;
-    --heardrop-foreground: 0 0% 98%;
+    --flyaf: 352 51% 45%;
+    --flyaf-foreground: 0 0% 98%;
 
     /* Utility Colors */
     --logo-red: 0 100% 50%;

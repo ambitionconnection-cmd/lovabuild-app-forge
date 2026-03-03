@@ -59,9 +59,9 @@ export default {
   				DEFAULT: 'hsl(var(--drops))',
   				foreground: 'hsl(var(--drops-foreground))'
   			},
-  			heardrop: {
-  				DEFAULT: 'hsl(var(--heardrop))',
-  				foreground: 'hsl(var(--heardrop-foreground))'
+  			flyaf: {
+  				DEFAULT: 'hsl(var(--flyaf))',
+  				foreground: 'hsl(var(--flyaf-foreground))'
   			},
   			pro: {
   				DEFAULT: 'hsl(var(--pro-gold))',

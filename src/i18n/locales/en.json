@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "HEARDROP",
+    "name": "FLYAF",
     "tagline": "Your ultimate destination for streetwear drops, brands, and shops"
   },
   "nav": {
@@ -40,9 +40,9 @@
     "sending": "Sending...",
     "backToSignIn": "Back to Sign In",
     "welcomeBack": "Welcome Back",
-    "signInToAccount": "Sign in to your HEARDROP account",
+    "signInToAccount": "Sign in to your FLYAF account",
     "createAccount": "Create Account",
-    "joinCommunity": "Join the HEARDROP community",
+    "joinCommunity": "Join the FLYAF community",
     "continueWith": "Or continue with",
     "continueWithGoogle": "Continue with Google",
     "checkEmail": "Check Your Email",
@@ -63,7 +63,7 @@
     "title": "Profile Settings",
     "displayName": "Display Name",
     "displayNamePlaceholder": "Your name",
-    "displayNameDescription": "This is your public display name on HEARDROP",
+    "displayNameDescription": "This is your public display name on FLYAF",
     "avatar": "Avatar",
     "avatarUrl": "Avatar URL",
     "avatarPlaceholder": "https://example.com/avatar.jpg",
@@ -73,7 +73,7 @@
     "personalInfo": "Personal Information",
     "personalInfoDescription": "Update your profile details and avatar",
     "notificationSettings": "Email Notifications",
-    "notificationDescription": "Manage which emails you receive from HEARDROP",
+    "notificationDescription": "Manage which emails you receive from FLYAF",
     "emailAddress": "Email Address",
     "notificationsSentTo": "Notifications will be sent to {{email}}",
     "save": "Save Changes",
@@ -222,7 +222,7 @@
     "failedToRemove": "Failed to remove favorite"
   },
   "myHeardrop": {
-    "title": "MY HEARDROP",
+    "title": "MY FLYAF",
     "favorites": "Favorites",
     "reminders": "Reminders",
     "forYou": "For You",
@@ -277,7 +277,7 @@
     "howCanWeHelp": "How can we help?",
     "selectOption": "Select the option that best describes your inquiry",
     "backToOptions": "Back to options",
-    "contribute": "Want to contribute to HEARDROP? Submit a brand or release and help the community grow! 🙌",
+    "contribute": "Want to contribute to FLYAF? Submit a brand or release and help the community grow! 🙌",
     "newBrand": "NEW BRAND",
     "newBrandDesc": "Submit a streetwear brand to be added to our directory",
     "newRelease": "NEW RELEASE",
@@ -357,7 +357,7 @@
   },
   "more": {
     "subtitle": "Settings, favourites & more",
-    "myHeardrop": "My HEARDROP",
+    "myHeardrop": "My FLYAF",
     "myHeardropDesc": "Favourites, saved shops & brands",
     "profile": "Profile",
     "profileDesc": "Account settings & preferences",
@@ -367,7 +367,7 @@
     "collections": "Collections",
     "collectionsDesc": "Curated brand selections",
     "contactDesc": "Get in touch, submit a brand",
-    "about": "About HEARDROP",
+    "about": "About FLYAF",
     "aboutDesc": "Our story & mission",
     "adminDashboard": "Admin Dashboard",
     "adminDesc": "Manage content & submissions"

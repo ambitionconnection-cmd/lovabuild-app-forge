@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "HEARDROP",
+    "name": "FLYAF",
     "tagline": "จุดหมายสูงสุดสำหรับการดรอปสตรีทแวร์ แบรนด์ และร้านค้า"
   },
   "nav": {
@@ -39,9 +39,9 @@
     "sending": "กำลังส่ง...",
     "backToSignIn": "กลับไปเข้าสู่ระบบ",
     "welcomeBack": "ยินดีต้อนรับกลับ",
-    "signInToAccount": "เข้าสู่ระบบบัญชี HEARDROP ของคุณ",
+    "signInToAccount": "เข้าสู่ระบบบัญชี FLYAF ของคุณ",
     "createAccount": "สร้างบัญชี",
-    "joinCommunity": "เข้าร่วมชุมชน HEARDROP",
+    "joinCommunity": "เข้าร่วมชุมชน FLYAF",
     "continueWith": "หรือดำเนินการต่อด้วย",
     "continueWithGoogle": "ดำเนินการต่อด้วย Google",
     "checkEmail": "ตรวจสอบอีเมลของคุณ",
@@ -62,7 +62,7 @@
     "title": "ตั้งค่าโปรไฟล์",
     "displayName": "ชื่อที่แสดง",
     "displayNamePlaceholder": "ชื่อของคุณ",
-    "displayNameDescription": "นี่คือชื่อสาธารณะของคุณบน HEARDROP",
+    "displayNameDescription": "นี่คือชื่อสาธารณะของคุณบน FLYAF",
     "avatar": "อวาตาร์",
     "avatarUrl": "URL อวาตาร์",
     "avatarPlaceholder": "https://example.com/avatar.jpg",
@@ -72,7 +72,7 @@
     "personalInfo": "ข้อมูลส่วนตัว",
     "personalInfoDescription": "อัปเดตรายละเอียดโปรไฟล์และอวาตาร์",
     "notificationSettings": "การแจ้งเตือนทางอีเมล",
-    "notificationDescription": "จัดการอีเมลที่คุณได้รับจาก HEARDROP",
+    "notificationDescription": "จัดการอีเมลที่คุณได้รับจาก FLYAF",
     "emailAddress": "ที่อยู่อีเมล",
     "notificationsSentTo": "การแจ้งเตือนจะถูกส่งไปที่ {{email}}",
     "save": "บันทึกการเปลี่ยนแปลง",
@@ -221,7 +221,7 @@
     "failedToRemove": "ลบรายการโปรดไม่สำเร็จ"
   },
   "myHeardrop": {
-    "title": "HEARDROP ของฉัน",
+    "title": "FLYAF ของฉัน",
     "favorites": "รายการโปรด",
     "reminders": "การแจ้งเตือน",
     "forYou": "สำหรับคุณ",
@@ -276,7 +276,7 @@
     "howCanWeHelp": "เราช่วยอะไรคุณได้บ้าง?",
     "selectOption": "เลือกตัวเลือกที่ตรงกับคำถามของคุณมากที่สุด",
     "backToOptions": "กลับไปตัวเลือก",
-    "contribute": "อยากมีส่วนร่วมกับ HEARDROP? ส่งแบรนด์หรือข้อมูลการเปิดตัวและช่วยให้ชุมชนเติบโต! 🙌",
+    "contribute": "อยากมีส่วนร่วมกับ FLYAF? ส่งแบรนด์หรือข้อมูลการเปิดตัวและช่วยให้ชุมชนเติบโต! 🙌",
     "newBrand": "แบรนด์ใหม่",
     "newBrandDesc": "ส่งแบรนด์สตรีทแวร์เพื่อเพิ่มในไดเรกทอรี",
     "newRelease": "การเปิดตัวใหม่",
@@ -356,7 +356,7 @@
   },
   "more": {
     "subtitle": "การตั้งค่า รายการโปรด และอื่นๆ",
-    "myHeardrop": "HEARDROP ของฉัน",
+    "myHeardrop": "FLYAF ของฉัน",
     "myHeardropDesc": "ร้านค้าและแบรนด์โปรด",
     "profile": "โปรไฟล์",
     "profileDesc": "ตั้งค่าบัญชีและการตั้งค่า",
@@ -364,7 +364,7 @@
     "notificationsDesc": "การแจ้งเตือนดรอปและเตือนความจำ",
     "contact": "ติดต่อ",
     "contactDesc": "ติดต่อเรา ส่งแบรนด์",
-    "about": "เกี่ยวกับ HEARDROP",
+    "about": "เกี่ยวกับ FLYAF",
     "aboutDesc": "เรื่องราวและภารกิจของเรา",
     "adminDashboard": "แดชบอร์ดแอดมิน",
     "adminDesc": "จัดการเนื้อหาและการส่ง"

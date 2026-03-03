@@ -130,13 +130,13 @@ const Directions = () => {
   const [selectedShop, setSelectedShop] = useState<ShopType | null>(null);
   const [journeyStops, setJourneyStops] = useState<ShopType[]>(() => {
     try {
-      const saved = sessionStorage.getItem('heardrop_route_stops');
+      const saved = sessionStorage.getItem('flyaf_route_stops');
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
   // Persist route stops to sessionStorage
   useEffect(() => {
-    sessionStorage.setItem('heardrop_route_stops', JSON.stringify(journeyStops));
+    sessionStorage.setItem('flyaf_route_stops', JSON.stringify(journeyStops));
   }, [journeyStops]);
 
   const [routeInfo, setRouteInfo] = useState<any>(null);
@@ -147,7 +147,7 @@ const Directions = () => {
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(() => {
     if (searchParams.get('shopId')) return null; // Don't restore if navigating to specific shop
     try {
-      const saved = sessionStorage.getItem('heardrop_map_position');
+      const saved = sessionStorage.getItem('flyaf_map_position');
       if (saved) {
         const { center } = JSON.parse(saved);
         return center || null;
@@ -158,7 +158,7 @@ const Directions = () => {
   const [mapZoom, setMapZoom] = useState<number>(() => {
     if (searchParams.get('shopId')) return 12;
     try {
-      const saved = sessionStorage.getItem('heardrop_map_position');
+      const saved = sessionStorage.getItem('flyaf_map_position');
       if (saved) {
         const { zoom } = JSON.parse(saved);
         return zoom || 12;
@@ -269,7 +269,7 @@ const Directions = () => {
   // their position is always saved
   const saveMapPosition = useCallback(() => {
     if (mapCenter) {
-      sessionStorage.setItem('heardrop_map_position', JSON.stringify({
+      sessionStorage.setItem('flyaf_map_position', JSON.stringify({
         center: mapCenter,
         zoom: mapZoom
       }));
@@ -492,7 +492,7 @@ const Directions = () => {
   const handleMapCenterChange = useCallback((center: { lat: number; lng: number; zoom: number }) => {
     setMapCenterLocation(center);
     // Only update for persistence, do NOT update mapCenter to avoid re-render loop
-    sessionStorage.setItem('heardrop_map_position', JSON.stringify({
+    sessionStorage.setItem('flyaf_map_position', JSON.stringify({
       center: [center.lng, center.lat],
       zoom: center.zoom
     }));

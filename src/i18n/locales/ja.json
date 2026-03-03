@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "HEARDROP",
+    "name": "FLYAF",
     "tagline": "ストリートウェアのドロップ、ブランド、ショップの究極ガイド"
   },
   "nav": {
@@ -39,9 +39,9 @@
     "sending": "送信中...",
     "backToSignIn": "ログインに戻る",
     "welcomeBack": "おかえりなさい",
-    "signInToAccount": "HEARDROPアカウントにログイン",
+    "signInToAccount": "FLYAFアカウントにログイン",
     "createAccount": "アカウント作成",
-    "joinCommunity": "HEARDROPコミュニティに参加",
+    "joinCommunity": "FLYAFコミュニティに参加",
     "continueWith": "または以下で続行",
     "continueWithGoogle": "Googleで続行",
     "checkEmail": "メールを確認してください",
@@ -62,7 +62,7 @@
     "title": "プロフィール設定",
     "displayName": "表示名",
     "displayNamePlaceholder": "お名前",
-    "displayNameDescription": "HEARDROPでの公開表示名です",
+    "displayNameDescription": "FLYAFでの公開表示名です",
     "avatar": "アバター",
     "avatarUrl": "アバターURL",
     "avatarPlaceholder": "https://example.com/avatar.jpg",
@@ -72,7 +72,7 @@
     "personalInfo": "個人情報",
     "personalInfoDescription": "プロフィール情報とアバターを更新",
     "notificationSettings": "メール通知",
-    "notificationDescription": "HEARDROPからのメール通知を管理",
+    "notificationDescription": "FLYAFからのメール通知を管理",
     "emailAddress": "メールアドレス",
     "notificationsSentTo": "通知は {{email}} に送信されます",
     "save": "変更を保存",
@@ -221,7 +221,7 @@
     "failedToRemove": "お気に入りの削除に失敗しました"
   },
   "myHeardrop": {
-    "title": "マイ HEARDROP",
+    "title": "マイ FLYAF",
     "favorites": "お気に入り",
     "reminders": "リマインダー",
     "forYou": "おすすめ",
@@ -276,7 +276,7 @@
     "howCanWeHelp": "何かお手伝いできますか？",
     "selectOption": "お問い合わせ内容に最も合うオプションを選択してください",
     "backToOptions": "オプションに戻る",
-    "contribute": "HEARDROPに貢献しませんか？ブランドやリリース情報を投稿して、コミュニティの成長を助けましょう！🙌",
+    "contribute": "FLYAFに貢献しませんか？ブランドやリリース情報を投稿して、コミュニティの成長を助けましょう！🙌",
     "newBrand": "新規ブランド",
     "newBrandDesc": "ストリートウェアブランドをディレクトリに追加申請",
     "newRelease": "新規リリース",
@@ -356,7 +356,7 @@
   },
   "more": {
     "subtitle": "設定、お気に入りなど",
-    "myHeardrop": "マイ HEARDROP",
+    "myHeardrop": "マイ FLYAF",
     "myHeardropDesc": "お気に入りのショップとブランド",
     "profile": "プロフィール",
     "profileDesc": "アカウント設定と環境設定",
@@ -364,7 +364,7 @@
     "notificationsDesc": "ドロップアラートとリマインダー",
     "contact": "お問い合わせ",
     "contactDesc": "ご連絡、ブランドの投稿",
-    "about": "HEARDROPについて",
+    "about": "FLYAFについて",
     "aboutDesc": "私たちのストーリーとミッション",
     "adminDashboard": "管理ダッシュボード",
     "adminDesc": "コンテンツと投稿の管理"

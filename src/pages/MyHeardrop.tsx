@@ -176,7 +176,7 @@ const MyHeardrop = () => {
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-base font-bold">MY HEARDROP</h1>
+            <h1 className="text-base font-bold">MY FLYAF</h1>
           </div>
         </header>
         
@@ -208,7 +208,7 @@ const MyHeardrop = () => {
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <h1 className="text-base font-bold">MY HEARDROP</h1>
+            <h1 className="text-base font-bold">MY FLYAF</h1>
           </div>
         </header>
         <main className="container mx-auto px-3 py-4">
@@ -227,7 +227,7 @@ const MyHeardrop = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-base font-bold">MY HEARDROP</h1>
+          <h1 className="text-base font-bold">MY FLYAF</h1>
         </div>
       </header>
       
