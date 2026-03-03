@@ -25,7 +25,7 @@ export const BrandOfTheWeek = () => {
 
   useEffect(() => {
     // Check if already dismissed this session
-    if (sessionStorage.getItem('heardrop_botw_dismissed')) {
+    if (sessionStorage.getItem('flyaf_botw_dismissed')) {
       setDismissed(true);
       return;
     }
@@ -53,7 +53,7 @@ export const BrandOfTheWeek = () => {
   const brand = featured.brands;
 
   const handleDismiss = () => {
-    sessionStorage.setItem('heardrop_botw_dismissed', 'true');
+    sessionStorage.setItem('flyaf_botw_dismissed', 'true');
     setDismissed(true);
   };
 

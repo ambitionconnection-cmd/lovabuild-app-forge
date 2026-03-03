@@ -48,7 +48,7 @@ export const saveRoute = async (
     }
   } else {
     // Save to localStorage for non-logged-in users
-    const savedRoutes = JSON.parse(localStorage.getItem('heardrop_saved_routes') || '[]');
+    const savedRoutes = JSON.parse(localStorage.getItem('flyaf_saved_routes') || '[]');
     const routeName = `Route - ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
     savedRoutes.push({
       id: crypto.randomUUID(),
@@ -63,7 +63,7 @@ export const saveRoute = async (
       })),
       created_at: new Date().toISOString(),
     });
-    localStorage.setItem('heardrop_saved_routes', JSON.stringify(savedRoutes));
+    localStorage.setItem('flyaf_saved_routes', JSON.stringify(savedRoutes));
     toast.success(`Route saved as "${routeName}"`, {
       description: 'Sign in to sync routes across devices',
     });
@@ -151,7 +151,7 @@ export const printRoute = (
   }
   doc.setTextColor(150, 150, 150);
   doc.setFontSize(8);
-  doc.text('Route powered by HEARDROP — heardrop.app', 15, y);
+  doc.text('Route powered by FLYAF — flyaf.app', 15, y);
   doc.text(`Generated ${new Date().toLocaleString('en-GB')}`, 15, y + 5);
 
   // Open in new tab
@@ -203,7 +203,7 @@ export const shareRoute = async (
     console.error('Share error:', error);
     // Fallback to text share
     const stopNames = stops.map((s, i) => `${i + 1}. ${s.name}`).join('\n');
-    const shareText = `My HEARDROP Route:\n${stopNames}\n\nPlan your streetwear trip at heardrop.app`;
+    const shareText = `My FLYAF Route:\n${stopNames}\n\nPlan your streetwear trip at flyaf.app`;
     try {
       await navigator.clipboard.writeText(shareText);
       toast.success('Route copied to clipboard');

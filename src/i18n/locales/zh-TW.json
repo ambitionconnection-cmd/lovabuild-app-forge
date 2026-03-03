@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "HEARDROP",
+    "name": "FLYAF",
     "tagline": "您的街頭服飾發售、品牌和商店的終極目的地"
   },
   "nav": {
@@ -10,7 +10,7 @@
     "global": "全球",
     "drops": "新品發售",
     "hot": "Hot",
-    "myHeardrop": "我的 HEARDROP",
+    "myHeardrop": "我的 FLYAF",
     "notifications": "通知",
     "profile": "個人資料",
     "admin": "管理員",
@@ -39,9 +39,9 @@
     "sending": "傳送中...",
     "backToSignIn": "返回登入",
     "welcomeBack": "歡迎回來",
-    "signInToAccount": "登入您的 HEARDROP 帳戶",
+    "signInToAccount": "登入您的 FLYAF 帳戶",
     "createAccount": "建立帳戶",
-    "joinCommunity": "加入 HEARDROP 社群",
+    "joinCommunity": "加入 FLYAF 社群",
     "continueWith": "或繼續使用",
     "continueWithGoogle": "使用 Google 繼續",
     "checkEmail": "檢查您的電子郵件",
@@ -62,7 +62,7 @@
     "title": "個人資料設定",
     "displayName": "顯示名稱",
     "displayNamePlaceholder": "您的名字",
-    "displayNameDescription": "這是您在 HEARDROP 上的公開顯示名稱",
+    "displayNameDescription": "這是您在 FLYAF 上的公開顯示名稱",
     "avatar": "頭像",
     "avatarUrl": "頭像URL",
     "avatarPlaceholder": "https://example.com/avatar.jpg",
@@ -72,7 +72,7 @@
     "personalInfo": "個人資訊",
     "personalInfoDescription": "更新您的個人資料詳情和頭像",
     "notificationSettings": "電子郵件通知",
-    "notificationDescription": "管理您從 HEARDROP 收到的郵件",
+    "notificationDescription": "管理您從 FLYAF 收到的郵件",
     "emailAddress": "電子郵件地址",
     "notificationsSentTo": "通知將發送至 {{email}}",
     "save": "儲存變更",
@@ -221,7 +221,7 @@
     "failedToRemove": "取消收藏失敗"
   },
   "myHeardrop": {
-    "title": "我的 HEARDROP",
+    "title": "我的 FLYAF",
     "favorites": "收藏",
     "reminders": "提醒",
     "forYou": "為您推薦",
@@ -276,7 +276,7 @@
     "howCanWeHelp": "我們能幫您什麼？",
     "selectOption": "選擇最符合您需求的選項",
     "backToOptions": "返回選項",
-    "contribute": "想為 HEARDROP 做貢獻？提交品牌或發售資訊，幫助社群成長！🙌",
+    "contribute": "想為 FLYAF 做貢獻？提交品牌或發售資訊，幫助社群成長！🙌",
     "newBrand": "新品牌",
     "newBrandDesc": "提交一個街頭服飾品牌到我們的目錄",
     "newRelease": "新發售",
@@ -356,7 +356,7 @@
   },
   "more": {
     "subtitle": "設定、收藏和更多",
-    "myHeardrop": "我的 HEARDROP",
+    "myHeardrop": "我的 FLYAF",
     "myHeardropDesc": "收藏的店鋪和品牌",
     "profile": "個人資料",
     "profileDesc": "帳戶設定和偏好",
@@ -364,7 +364,7 @@
     "notificationsDesc": "發售提醒和通知",
     "contact": "聯絡我們",
     "contactDesc": "聯絡我們，提交品牌",
-    "about": "關於 HEARDROP",
+    "about": "關於 FLYAF",
     "aboutDesc": "我們的故事和使命",
     "adminDashboard": "管理面板",
     "adminDesc": "管理內容和提交"

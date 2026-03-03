@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "HEARDROP",
+    "name": "FLYAF",
     "tagline": "Votre destination ultime pour les sorties streetwear, marques et boutiques"
   },
   "nav": {
@@ -39,9 +39,9 @@
     "sending": "Envoi...",
     "backToSignIn": "Retour à la connexion",
     "welcomeBack": "Bon retour",
-    "signInToAccount": "Connectez-vous à votre compte HEARDROP",
+    "signInToAccount": "Connectez-vous à votre compte FLYAF",
     "createAccount": "Créer un compte",
-    "joinCommunity": "Rejoignez la communauté HEARDROP",
+    "joinCommunity": "Rejoignez la communauté FLYAF",
     "continueWith": "Ou continuer avec",
     "continueWithGoogle": "Continuer avec Google",
     "checkEmail": "Vérifiez votre e-mail",
@@ -62,7 +62,7 @@
     "title": "Paramètres du profil",
     "displayName": "Nom d'affichage",
     "displayNamePlaceholder": "Votre nom",
-    "displayNameDescription": "C'est votre nom public sur HEARDROP",
+    "displayNameDescription": "C'est votre nom public sur FLYAF",
     "avatar": "Avatar",
     "avatarUrl": "URL de l'avatar",
     "avatarPlaceholder": "https://example.com/avatar.jpg",
@@ -72,7 +72,7 @@
     "personalInfo": "Informations personnelles",
     "personalInfoDescription": "Mettez à jour vos informations de profil et votre avatar",
     "notificationSettings": "Notifications par e-mail",
-    "notificationDescription": "Gérez les e-mails que vous recevez de HEARDROP",
+    "notificationDescription": "Gérez les e-mails que vous recevez de FLYAF",
     "emailAddress": "Adresse e-mail",
     "notificationsSentTo": "Les notifications seront envoyées à {{email}}",
     "save": "Enregistrer",
@@ -221,7 +221,7 @@
     "failedToRemove": "Échec de la suppression des favoris"
   },
   "myHeardrop": {
-    "title": "MON HEARDROP",
+    "title": "MON FLYAF",
     "favorites": "Favoris",
     "reminders": "Rappels",
     "forYou": "Pour vous",
@@ -276,7 +276,7 @@
     "howCanWeHelp": "Comment pouvons-nous vous aider ?",
     "selectOption": "Sélectionnez l'option qui correspond le mieux à votre demande",
     "backToOptions": "Retour aux options",
-    "contribute": "Vous voulez contribuer à HEARDROP ? Soumettez une marque ou une sortie et aidez la communauté à grandir ! 🙌",
+    "contribute": "Vous voulez contribuer à FLYAF ? Soumettez une marque ou une sortie et aidez la communauté à grandir ! 🙌",
     "newBrand": "NOUVELLE MARQUE",
     "newBrandDesc": "Soumettre une marque streetwear à ajouter à notre répertoire",
     "newRelease": "NOUVELLE SORTIE",
@@ -356,7 +356,7 @@
   },
   "more": {
     "subtitle": "Paramètres, favoris et plus",
-    "myHeardrop": "Mon HEARDROP",
+    "myHeardrop": "Mon FLYAF",
     "myHeardropDesc": "Favoris, boutiques et marques sauvegardées",
     "profile": "Profil",
     "profileDesc": "Paramètres du compte et préférences",
@@ -364,7 +364,7 @@
     "notificationsDesc": "Alertes et rappels de sorties",
     "contact": "Contact",
     "contactDesc": "Nous contacter, soumettre une marque",
-    "about": "À propos de HEARDROP",
+    "about": "À propos de FLYAF",
     "aboutDesc": "Notre histoire et notre mission",
     "adminDashboard": "Tableau de bord admin",
     "adminDesc": "Gérer le contenu et les soumissions"

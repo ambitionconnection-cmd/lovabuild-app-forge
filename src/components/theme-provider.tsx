@@ -23,7 +23,7 @@ const ThemeProviderContext = React.createContext<ThemeProviderState>(initialStat
 export function ThemeProvider({
   children,
   defaultTheme = "dark",
-  storageKey = "heardrop-theme",
+  storageKey = "flyaf-theme",
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = React.useState<Theme>(

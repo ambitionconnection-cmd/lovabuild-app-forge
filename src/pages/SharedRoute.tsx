@@ -213,7 +213,7 @@ const SharedRoute = () => {
           </Button>
           <Link to="/" className="flex-1">
             <Button variant="outline" className="w-full">
-              Open in HEARDROP
+              Open in FLYAF
             </Button>
           </Link>
         </div>

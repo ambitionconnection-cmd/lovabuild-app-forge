@@ -33,11 +33,11 @@ const queryClient = new QueryClient();
 
 function App() {
   const [showOnboarding, setShowOnboarding] = React.useState(() => {
-    return !localStorage.getItem('heardrop_onboarding_done');
+    return !localStorage.getItem('flyaf_onboarding_done');
   });
 
   const handleOnboardingComplete = () => {
-    localStorage.setItem('heardrop_onboarding_done', 'true');
+    localStorage.setItem('flyaf_onboarding_done', 'true');
     setShowOnboarding(false);
   };
 

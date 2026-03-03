@@ -121,7 +121,7 @@ const Index = () => {
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center space-y-1 md:space-y-3">
           <div className="space-y-0.5">
             <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-wider text-shadow-strong uppercase">
-              HEARDROP
+              FLYAF
             </h2>
             <p className="text-xs md:text-base text-foreground/90 font-medium text-shadow-strong">
               Your Global Guide Streetwear

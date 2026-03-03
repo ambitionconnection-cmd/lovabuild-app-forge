@@ -59,7 +59,7 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
 
       {/* Logo */}
       <div className="mb-12">
-        <h1 className="text-2xl font-black tracking-[0.3em] text-[#C3C9C9]">HEARDROP</h1>
+        <h1 className="text-2xl font-black tracking-[0.3em] text-[#C3C9C9]">FLYAF</h1>
         <p className="text-[10px] tracking-[0.2em] text-[#AD3A49] text-center mt-1">
           {t('onboarding.tagline')}
         </p>

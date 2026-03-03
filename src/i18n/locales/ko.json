@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "HEARDROP",
+    "name": "FLYAF",
     "tagline": "스트릿웨어 드롭, 브랜드, 매장을 위한 최고의 가이드"
   },
   "nav": {
@@ -39,9 +39,9 @@
     "sending": "보내는 중...",
     "backToSignIn": "로그인으로 돌아가기",
     "welcomeBack": "다시 오신 것을 환영합니다",
-    "signInToAccount": "HEARDROP 계정에 로그인",
+    "signInToAccount": "FLYAF 계정에 로그인",
     "createAccount": "계정 만들기",
-    "joinCommunity": "HEARDROP 커뮤니티에 참여하세요",
+    "joinCommunity": "FLYAF 커뮤니티에 참여하세요",
     "continueWith": "또는 다음으로 계속",
     "continueWithGoogle": "Google로 계속",
     "checkEmail": "이메일을 확인하세요",
@@ -62,7 +62,7 @@
     "title": "프로필 설정",
     "displayName": "표시 이름",
     "displayNamePlaceholder": "이름",
-    "displayNameDescription": "HEARDROP에서 표시되는 공개 이름입니다",
+    "displayNameDescription": "FLYAF에서 표시되는 공개 이름입니다",
     "avatar": "아바타",
     "avatarUrl": "아바타 URL",
     "avatarPlaceholder": "https://example.com/avatar.jpg",
@@ -72,7 +72,7 @@
     "personalInfo": "개인정보",
     "personalInfoDescription": "프로필 정보와 아바타를 업데이트하세요",
     "notificationSettings": "이메일 알림",
-    "notificationDescription": "HEARDROP에서 받는 이메일을 관리하세요",
+    "notificationDescription": "FLYAF에서 받는 이메일을 관리하세요",
     "emailAddress": "이메일 주소",
     "notificationsSentTo": "알림은 {{email}}로 발송됩니다",
     "save": "변경사항 저장",
@@ -221,7 +221,7 @@
     "failedToRemove": "즐겨찾기 제거 실패"
   },
   "myHeardrop": {
-    "title": "마이 HEARDROP",
+    "title": "마이 FLYAF",
     "favorites": "즐겨찾기",
     "reminders": "리마인더",
     "forYou": "추천",
@@ -276,7 +276,7 @@
     "howCanWeHelp": "어떻게 도와드릴까요?",
     "selectOption": "문의 내용에 맞는 옵션을 선택하세요",
     "backToOptions": "옵션으로 돌아가기",
-    "contribute": "HEARDROP에 기여하고 싶으신가요? 브랜드나 출시 정보를 제출하고 커뮤니티 성장을 도와주세요! 🙌",
+    "contribute": "FLYAF에 기여하고 싶으신가요? 브랜드나 출시 정보를 제출하고 커뮤니티 성장을 도와주세요! 🙌",
     "newBrand": "새 브랜드",
     "newBrandDesc": "디렉토리에 스트릿웨어 브랜드 추가 신청",
     "newRelease": "새 출시",
@@ -356,7 +356,7 @@
   },
   "more": {
     "subtitle": "설정, 즐겨찾기 등",
-    "myHeardrop": "마이 HEARDROP",
+    "myHeardrop": "마이 FLYAF",
     "myHeardropDesc": "즐겨찾기 매장과 브랜드",
     "profile": "프로필",
     "profileDesc": "계정 설정 및 환경설정",
@@ -364,7 +364,7 @@
     "notificationsDesc": "드롭 알림 및 리마인더",
     "contact": "문의",
     "contactDesc": "문의하기, 브랜드 제출",
-    "about": "HEARDROP 소개",
+    "about": "FLYAF 소개",
     "aboutDesc": "우리의 이야기와 미션",
     "adminDashboard": "관리자 대시보드",
     "adminDesc": "콘텐츠 및 제출물 관리"
