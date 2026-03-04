@@ -69,6 +69,7 @@ const navGroups = [
     label: "Data",
     icon: Download,
     items: [
+      { title: "User Analytics", value: "user-analytics", icon: Users },
       { title: "Data Exports", value: "data-exports", icon: Download },
     ],
   },
