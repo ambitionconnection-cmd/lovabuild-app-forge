@@ -32,6 +32,7 @@ import { FeaturedBrandManagement } from '@/components/FeaturedBrandManagement';
 import { CollectionManagement } from '@/components/CollectionManagement';
 import { ImageArchiveManagement } from '@/components/ImageArchiveManagement';
 import { AmbassadorCodeManagement } from '@/components/AmbassadorCodeManagement';
+import { BrandRequestsQueue } from '@/components/BrandRequestsQueue';
 
 interface LoginAttempt {
   id: string;
@@ -725,6 +726,10 @@ export default function Admin() {
 
             {activeTab === "ambassador-codes" && (
               <AmbassadorCodeManagement />
+            )}
+
+            {activeTab === "brand-requests" && (
+              <BrandRequestsQueue />
             )}
 
             {activeTab === "data-exports" && (

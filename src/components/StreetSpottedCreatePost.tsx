@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { X, Camera, Check } from "lucide-react";
+import { X, Camera, Check, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBrands } from "@/hooks/useBrands";
@@ -60,6 +60,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [brandSearch, setBrandSearch] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [requestedBrands, setRequestedBrands] = useState<string[]>([]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,12 +86,31 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
     });
   };
 
-  const filteredBrands = brandSearch
+  const handleRequestBrand = () => {
+    const name = brandSearch.trim();
+    if (!name || name.length < 2) return;
+    if (requestedBrands.some(r => r.toLowerCase() === name.toLowerCase())) {
+      toast.info("Brand already requested");
+      return;
+    }
+    haptic.selection();
+    setRequestedBrands(prev => [...prev, name]);
+    setBrandSearch("");
+    toast.success(`"${name}" will be suggested to our team`);
+  };
+
+  const removeRequestedBrand = (name: string) => {
+    setRequestedBrands(prev => prev.filter(r => r !== name));
+  };
+
+  const filteredBrands = brandSearch.trim().length >= 2
     ? brands.filter(b => b.name.toLowerCase().includes(brandSearch.toLowerCase())).slice(0, 10)
     : [];
 
+  const showRequestButton = brandSearch.trim().length >= 2 && filteredBrands.length === 0;
+
   const handleSubmit = async () => {
-    if (!user || !imageFile || selectedBrands.length === 0) {
+    if (!user || !imageFile) {
       toast.error(t("hot.addPhotoAndBrand"));
       return;
     }
@@ -124,11 +144,24 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
 
       if (postError) throw postError;
 
-      const brandInserts = selectedBrands.map(brand_id => ({
-        post_id: post.id,
-        brand_id,
-      }));
-      await supabase.from("street_spotted_post_brands").insert(brandInserts);
+      // Insert linked brands if any selected
+      if (selectedBrands.length > 0) {
+        const brandInserts = selectedBrands.map(brand_id => ({
+          post_id: post.id,
+          brand_id,
+        }));
+        await supabase.from("street_spotted_post_brands").insert(brandInserts);
+      }
+
+      // Submit brand requests if any
+      if (requestedBrands.length > 0) {
+        const brandRequests = requestedBrands.map(brand_name => ({
+          requested_by: user.id,
+          brand_name,
+          post_id: post.id,
+        }));
+        await supabase.from("brand_requests").insert(brandRequests as any);
+      }
 
       haptic.success();
       toast.success(t("hot.spotSubmitted"));
@@ -225,9 +258,10 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
         {/* Brand tags */}
         <div className="mb-4">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-            {t("hot.tagBrands")} *
+            {t("hot.tagBrands")}
           </label>
-          {selectedBrands.length > 0 && (
+          {/* Selected existing brands */}
+          {(selectedBrands.length > 0 || requestedBrands.length > 0) && (
             <div className="flex flex-wrap gap-1.5 mb-2">
               {selectedBrands.map(id => {
                 const brand = brands.find(b => b.id === id);
@@ -242,6 +276,16 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
                   </Badge>
                 ) : null;
               })}
+              {requestedBrands.map(name => (
+                <Badge
+                  key={name}
+                  variant="secondary"
+                  className="cursor-pointer gap-1 border-dashed border"
+                  onClick={() => removeRequestedBrand(name)}
+                >
+                  {name} <span className="text-[10px] opacity-60">(new)</span> <X className="w-3 h-3" />
+                </Badge>
+              ))}
             </div>
           )}
           <Input
@@ -267,6 +311,18 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
               ))}
             </div>
           )}
+          {showRequestButton && (
+            <button
+              onClick={handleRequestBrand}
+              className="mt-1 w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg border border-dashed border-border hover:bg-muted/50 transition-colors text-muted-foreground"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Can't find it? Request <strong className="text-foreground">"{brandSearch.trim()}"</strong></span>
+            </button>
+          )}
+          <p className="text-[10px] text-muted-foreground mt-1">
+            Optional — tag brands you're wearing or leave blank
+          </p>
         </div>
 
         {/* Caption */}
@@ -326,7 +382,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
         {/* Submit */}
         <Button
           onClick={handleSubmit}
-          disabled={submitting || !imageFile || selectedBrands.length === 0}
+          disabled={submitting || !imageFile}
           className="w-full h-12 text-base font-bold"
         >
           {submitting ? t("hot.posting") : t("hot.postSpot")}
