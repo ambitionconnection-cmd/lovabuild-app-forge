@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X, Layers } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
@@ -18,7 +19,7 @@ import haptic from "@/lib/haptics";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 const GlobalIndex = () => {
-  const { user } = useAuth();
+  const { user, isPro } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const highlightId = searchParams.get('highlight');
@@ -36,6 +37,7 @@ const GlobalIndex = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [highlightedBrand, setHighlightedBrand] = useState<string | null>(highlightId);
+  const [showProModal, setShowProModal] = useState(false);
 
   // Fetch brands and user favorites
   useEffect(() => {
@@ -167,6 +169,11 @@ const GlobalIndex = () => {
         toast.success(t('brands.removedFromFavorites'));
       }
     } else {
+      // Check limit for free users
+      if (!isPro && favoriteBrands.size >= 8) {
+        setShowProModal(true);
+        return;
+      }
       // Add to favorites
       const { error } = await supabase
         .from('user_favorite_brands')
@@ -212,6 +219,7 @@ const GlobalIndex = () => {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-background pb-20 animate-fade-in">
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-3 py-2 flex items-center gap-3">
@@ -438,6 +446,8 @@ const GlobalIndex = () => {
         />
       )}
     </div>
+    <ProUpgradeModal open={showProModal} onOpenChange={setShowProModal} trigger="favourites" />
+    </>
   );
 };
 

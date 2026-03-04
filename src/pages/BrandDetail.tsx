@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { toast } from "sonner";
 import { getCountryFlag } from "@/lib/countryFlags";
 import haptic from "@/lib/haptics";
@@ -21,7 +22,7 @@ import { useTranslation } from "react-i18next";
 
 const BrandDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { user } = useAuth();
+  const { user, isPro } = useAuth();
   const navigate = useNavigate();
   
   const [brand, setBrand] = useState<Tables<'brands'> | null>(null);
@@ -33,6 +34,7 @@ const BrandDetail = () => {
   const [editForm, setEditForm] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [similarBrands, setSimilarBrands] = useState<Tables<'brands'>[]>([]);
+  const [showProModal, setShowProModal] = useState(false);
   const { t, i18n } = useTranslation();
   const showTranslate = i18n.language !== 'en';
 
@@ -150,6 +152,18 @@ const BrandDetail = () => {
         toast.success('Removed from favorites');
       }
     } else {
+      // Check limit for free users
+      if (!isPro) {
+        const { count } = await supabase
+          .from('user_favorite_brands')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+        if ((count ?? 0) >= 8) {
+          setShowProModal(true);
+          return;
+        }
+      }
+
       const { error } = await supabase
         .from('user_favorite_brands')
         .insert({ user_id: user.id, brand_id: brand.id });
@@ -221,6 +235,7 @@ const BrandDetail = () => {
   if (!brand) return null;
 
   return (
+    <>
     <div className="min-h-screen bg-background pb-20 animate-fade-in">
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-3 py-2 flex items-center justify-between">
@@ -537,6 +552,8 @@ const BrandDetail = () => {
         </DialogContent>
       </Dialog>
     </div>
+    <ProUpgradeModal open={showProModal} onOpenChange={setShowProModal} trigger="favourites" />
+    </>
   );
 };
 

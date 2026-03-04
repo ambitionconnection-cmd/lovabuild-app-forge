@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X, Globe, Instagram, MapPin, Navigation, Plus, ExternalLink, Languages, Heart } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
+import { ProUpgradeModal } from '@/components/ProUpgradeModal';
 import { Tables } from '@/integrations/supabase/types';
 import { useTranslation } from 'react-i18next';
 
@@ -51,6 +52,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
 }) => {
   const { t } = useTranslation();
   const { isFavorite, toggleFavorite } = useFavorites('shop');
+  const [showProModal, setShowProModal] = useState(false);
   const [sheetState, setSheetState] = useState<'expanded' | 'full'>('expanded');
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -135,6 +137,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
   };
 
   return (
+    <>
     <div
       className="lg:hidden fixed left-0 right-0 z-50 pointer-events-none transition-all duration-300"
       style={{
@@ -181,7 +184,11 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 ml-3">
             <button
-              onClick={() => shop.id && toggleFavorite(shop.id)}
+              onClick={async () => {
+                if (!shop.id) return;
+                const result = await toggleFavorite(shop.id);
+                if (result === 'limit_reached') setShowProModal(true);
+              }}
               className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"
             >
               <Heart className={`w-4 h-4 ${shop.id && isFavorite(shop.id) ? 'fill-[#AD3A49] text-[#AD3A49]' : 'text-[#A3A39E]'}`} />
@@ -335,6 +342,8 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
         </div>
       </Card>
     </div>
+    <ProUpgradeModal open={showProModal} onOpenChange={setShowProModal} trigger="favourites" />
+    </>
   );
 };
 
