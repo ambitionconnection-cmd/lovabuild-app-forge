@@ -52,6 +52,8 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
+  const [instagramHandle, setInstagramHandle] = useState("");
+  const [tiktokHandle, setTiktokHandle] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -114,6 +116,8 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
           city: city || null,
           country: country || null,
           style_tags: selectedStyles,
+          instagram_handle: instagramHandle || null,
+          tiktok_handle: tiktokHandle || null,
         } as any)
         .select("id")
         .single();
@@ -277,6 +281,18 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
             maxLength={280}
             className="h-9"
           />
+        </div>
+
+        {/* Social handles */}
+        <div className="flex gap-2 mb-4">
+          <div className="flex-1">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Instagram</label>
+            <Input placeholder="@yourhandle" value={instagramHandle} onChange={e => setInstagramHandle(e.target.value)} className="h-9" />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">TikTok</label>
+            <Input placeholder="@yourhandle" value={tiktokHandle} onChange={e => setTiktokHandle(e.target.value)} className="h-9" />
+          </div>
         </div>
 
         {/* Location */}

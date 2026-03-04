@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { X, Globe, Instagram, MapPin, Navigation, Plus, ExternalLink, Languages } from 'lucide-react';
+import { X, Globe, Instagram, MapPin, Navigation, Plus, ExternalLink, Languages, Heart } from 'lucide-react';
+import { useFavorites } from '@/hooks/useFavorites';
 import { Tables } from '@/integrations/supabase/types';
 import { useTranslation } from 'react-i18next';
 
@@ -49,6 +50,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
   calculateDistance,
 }) => {
   const { t } = useTranslation();
+  const { isFavorite, toggleFavorite } = useFavorites('shop');
   const [sheetState, setSheetState] = useState<'expanded' | 'full'>('expanded');
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -177,12 +179,20 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
               {brand && brand.name !== shop.name && <p className="text-xs text-muted-foreground truncate">{brand.name}</p>}
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ml-3"
-          >
-            <X className="w-4 h-4 text-[#A3A39E]" />
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+            <button
+              onClick={() => shop.id && toggleFavorite(shop.id)}
+              className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"
+            >
+              <Heart className={`w-4 h-4 ${shop.id && isFavorite(shop.id) ? 'fill-[#AD3A49] text-[#AD3A49]' : 'text-[#A3A39E]'}`} />
+            </button>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"
+            >
+              <X className="w-4 h-4 text-[#A3A39E]" />
+            </button>
+          </div>
         </div>
 
         {/* Scrollable content */}

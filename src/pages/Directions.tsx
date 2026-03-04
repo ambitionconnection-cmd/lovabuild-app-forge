@@ -130,13 +130,15 @@ const Directions = () => {
   const [selectedShop, setSelectedShop] = useState<ShopType | null>(null);
   const [journeyStops, setJourneyStops] = useState<ShopType[]>(() => {
     try {
-      const saved = sessionStorage.getItem('flyaf_route_stops');
+      const saved = sessionStorage.getItem('flyaf_route_stops') || localStorage.getItem('flyaf_route_stops');
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
-  // Persist route stops to sessionStorage
+  // Persist route stops to both sessionStorage and localStorage
   useEffect(() => {
-    sessionStorage.setItem('flyaf_route_stops', JSON.stringify(journeyStops));
+    const json = JSON.stringify(journeyStops);
+    sessionStorage.setItem('flyaf_route_stops', json);
+    localStorage.setItem('flyaf_route_stops', json);
   }, [journeyStops]);
 
   const [routeInfo, setRouteInfo] = useState<any>(null);
@@ -147,7 +149,7 @@ const Directions = () => {
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(() => {
     if (searchParams.get('shopId')) return null; // Don't restore if navigating to specific shop
     try {
-      const saved = sessionStorage.getItem('flyaf_map_position');
+      const saved = sessionStorage.getItem('flyaf_map_position') || localStorage.getItem('flyaf_map_position');
       if (saved) {
         const { center } = JSON.parse(saved);
         return center || null;
@@ -158,7 +160,7 @@ const Directions = () => {
   const [mapZoom, setMapZoom] = useState<number>(() => {
     if (searchParams.get('shopId')) return 12;
     try {
-      const saved = sessionStorage.getItem('flyaf_map_position');
+      const saved = sessionStorage.getItem('flyaf_map_position') || localStorage.getItem('flyaf_map_position');
       if (saved) {
         const { zoom } = JSON.parse(saved);
         return zoom || 12;
@@ -269,10 +271,9 @@ const Directions = () => {
   // their position is always saved
   const saveMapPosition = useCallback(() => {
     if (mapCenter) {
-      sessionStorage.setItem('flyaf_map_position', JSON.stringify({
-        center: mapCenter,
-        zoom: mapZoom
-      }));
+      const pos = JSON.stringify({ center: mapCenter, zoom: mapZoom });
+      sessionStorage.setItem('flyaf_map_position', pos);
+      localStorage.setItem('flyaf_map_position', pos);
     }
   }, [mapCenter, mapZoom]);
 
@@ -492,10 +493,9 @@ const Directions = () => {
   const handleMapCenterChange = useCallback((center: { lat: number; lng: number; zoom: number }) => {
     setMapCenterLocation(center);
     // Only update for persistence, do NOT update mapCenter to avoid re-render loop
-    sessionStorage.setItem('flyaf_map_position', JSON.stringify({
-      center: [center.lng, center.lat],
-      zoom: center.zoom
-    }));
+    const pos = JSON.stringify({ center: [center.lng, center.lat], zoom: center.zoom });
+    sessionStorage.setItem('flyaf_map_position', pos);
+    localStorage.setItem('flyaf_map_position', pos);
   }, []);
 
   // Center map on a shop when clicked from bottom sheet
@@ -706,6 +706,7 @@ const Directions = () => {
                     journeyStops={journeyStops}
                     onRemoveStop={(id) => setJourneyStops(prev => prev.filter(s => s.id !== id))}
                     onClearAll={() => setJourneyStops([])}
+                    onReorderStops={(newStops) => setJourneyStops(newStops)}
                     onStartNavigation={() => {
                       const allWaypoints: string[] = [];
                       if (userLocation) {
@@ -911,6 +912,7 @@ const Directions = () => {
           journeyStops={journeyStops}
           onRemoveStop={removeFromJourney}
           onClearAll={() => setJourneyStops([])}
+          onReorderStops={(newStops) => setJourneyStops(newStops)}
           onStartNavigation={() => {
             const allWaypoints: string[] = [];
             if (userLocation) {

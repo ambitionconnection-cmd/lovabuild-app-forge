@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { MapPin, Navigation, Info, ChevronUp, ExternalLink } from 'lucide-react';
+import { MapPin, Navigation, Info, ChevronUp, ExternalLink, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -375,28 +375,23 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                     }`}
                     onClick={() => onShopClick(shop)}
                   >
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-2 overflow-visible">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-semibold text-sm truncate">{shop.name}</h4>
-                          {inJourney && (
-                            <Badge className="flex-shrink-0 bg-directions text-directions-foreground text-[10px] px-1.5 py-0">
-                              {t('shops.inJourney')}
-                            </Badge>
-                          )}
+                          <h4 className={`font-semibold text-sm truncate ${isSelected || inJourney ? 'text-foreground' : ''}`}>{shop.name}</h4>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                        <p className={`text-xs mt-0.5 truncate ${isSelected || inJourney ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
                           {shop.address}, {shop.city}
                         </p>
                         {distance !== null && (
-                          <p className="text-xs font-medium text-primary mt-1">
+                          <p className={`text-xs font-medium mt-1 ${isSelected || inJourney ? 'text-primary' : 'text-primary'}`}>
                             {formatDistance(distance)} {t('shops.away')}
                           </p>
                         )}
                       </div>
                       
                       <TooltipProvider delayDuration={300}>
-                        <div className="flex gap-1.5 flex-shrink-0">
+                        <div className="flex gap-1 flex-shrink-0">
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
@@ -426,7 +421,6 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     haptic.light();
-                                    // Detect iOS vs Android/other and open appropriate maps app
                                     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
                                     const destination = `${shop.latitude},${shop.longitude}`;
                                     const url = isIOS
@@ -440,7 +434,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                               </TooltipTrigger>
                               <TooltipContent side="top" className="text-xs">
                                 {t('shops.getDirections')}
-                            </TooltipContent>
+                              </TooltipContent>
                             </Tooltip>
                           )}
                           
@@ -461,7 +455,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                               </TooltipTrigger>
                               <TooltipContent side="top" className="text-xs">
                                 {t('shops.addToJourney')}
-                            </TooltipContent>
+                              </TooltipContent>
                             </Tooltip>
                           )}
                         </div>

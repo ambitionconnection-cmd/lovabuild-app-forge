@@ -1,7 +1,21 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Navigation, Trash2, X, Save, Printer, Share2 } from 'lucide-react';
+import { Navigation, Trash2, X, Save, Printer, Share2, GripVertical } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { saveRoute, printRoute, shareRoute } from '@/lib/routeActions';
 import { Tables } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
@@ -16,7 +30,46 @@ interface RouteSidePanelProps {
   onShopClick: (shop: ShopType) => void;
   userLocation: { lat: number; lng: number } | null;
   calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
+  onReorderStops?: (stops: ShopType[]) => void;
 }
+
+const SortableSidePanelStop = ({ stop, index, onRemove, onShopClick, userLocation, calculateDistance }: {
+  stop: ShopType; index: number; onRemove: (id: string) => void; onShopClick: (shop: ShopType) => void;
+  userLocation: { lat: number; lng: number } | null;
+  calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stop.id! });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer group ${isDragging ? 'opacity-50 shadow-lg z-50' : ''}`}
+      onClick={() => onShopClick(stop)}
+    >
+      <button className="flex-shrink-0 cursor-grab active:cursor-grabbing touch-none opacity-0 group-hover:opacity-100 transition-opacity" {...attributes} {...listeners}>
+        <GripVertical className="w-3 h-3 text-[#C4956A]" />
+      </button>
+      <div className="w-5 h-5 rounded-full bg-[#C4956A]/20 text-[#C4956A] flex items-center justify-center text-xs font-bold flex-shrink-0">
+        {index + 1}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-white font-medium truncate">{stop.name}</p>
+        <p className="text-xs text-muted-foreground truncate">{stop.address}</p>
+        {stop.latitude && stop.longitude && userLocation && (
+          <p className="text-xs text-[#C4956A]">{calculateDistance(userLocation.lat, userLocation.lng, stop.latitude, stop.longitude).toFixed(1)} km away</p>
+        )}
+      </div>
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(stop.id!); }}
+        className="w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white/10 transition-all"
+      >
+        <X className="w-3 h-3 text-white/60" />
+      </button>
+    </div>
+  );
+};
 
 export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
   journeyStops,
@@ -26,7 +79,9 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
   onShopClick,
   userLocation,
   calculateDistance,
+  onReorderStops,
 }) => {
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
   return (
     <div className="hidden lg:flex absolute top-16 left-4 z-10 w-80 max-h-[calc(100vh-120px)] flex-col bg-background/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl overflow-hidden">
       {/* Header */}
@@ -99,33 +154,35 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
                 Your Location
               </div>
             )}
-            {journeyStops.map((stop, index) => (
-              <div
-                key={stop.id}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer group"
-                onClick={() => onShopClick(stop)}
-              >
-                <div className="w-5 h-5 rounded-full bg-[#C4956A]/20 text-[#C4956A] flex items-center justify-center text-xs font-bold flex-shrink-0">
-                  {index + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white font-medium truncate">{stop.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{stop.address}</p>
-                  {stop.latitude && stop.longitude && userLocation && (
-                    <p className="text-xs text-[#C4956A]">{calculateDistance(userLocation.lat, userLocation.lng, stop.latitude, stop.longitude).toFixed(1)} km away</p>
-                  )}
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemoveStop(stop.id!);
-                  }}
-                  className="w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white/10 transition-all"
-                >
-                  <X className="w-3 h-3 text-white/60" />
-                </button>
-              </div>
-            ))}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(event: DragEndEvent) => {
+                const { active, over } = event;
+                if (over && active.id !== over.id && onReorderStops) {
+                  const oldIndex = journeyStops.findIndex(s => s.id === active.id);
+                  const newIndex = journeyStops.findIndex(s => s.id === over.id);
+                  const newStops = [...journeyStops];
+                  const [moved] = newStops.splice(oldIndex, 1);
+                  newStops.splice(newIndex, 0, moved);
+                  onReorderStops(newStops);
+                }
+              }}
+            >
+              <SortableContext items={journeyStops.map(s => s.id!)} strategy={verticalListSortingStrategy}>
+                {journeyStops.map((stop, index) => (
+                  <SortableSidePanelStop
+                    key={stop.id}
+                    stop={stop}
+                    index={index}
+                    onRemove={onRemoveStop}
+                    onShopClick={onShopClick}
+                    userLocation={userLocation}
+                    calculateDistance={calculateDistance}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
         )}
       </div>

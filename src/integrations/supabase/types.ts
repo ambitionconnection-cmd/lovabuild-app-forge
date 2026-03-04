@@ -783,9 +783,11 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          instagram_handle: string | null
           is_sponsored: boolean
           status: string
           style_tags: string[]
+          tiktok_handle: string | null
           user_id: string
         }
         Insert: {
@@ -795,9 +797,11 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          instagram_handle?: string | null
           is_sponsored?: boolean
           status?: string
           style_tags?: string[]
+          tiktok_handle?: string | null
           user_id: string
         }
         Update: {
@@ -807,9 +811,11 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          instagram_handle?: string | null
           is_sponsored?: boolean
           status?: string
           style_tags?: string[]
+          tiktok_handle?: string | null
           user_id?: string
         }
         Relationships: []

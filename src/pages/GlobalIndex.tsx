@@ -353,7 +353,7 @@ const GlobalIndex = () => {
               <div
                 key={brand.id}
                 data-brand-id={brand.id}
-                className={`flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-muted/30 to-card hover:from-muted/50 hover:to-card/80 active:scale-[0.99] transition-all duration-200 cursor-pointer animate-scale-in ${
+                className={`flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-muted/30 to-card hover:from-muted/50 hover:to-card/80 active:scale-[0.99] transition-all duration-200 cursor-pointer animate-scale-in border-l-2 border-[#C4956A]/30 ${
                   highlightedBrand === brand.id ? 'ring-2 ring-[#AD3A49] ring-offset-1 ring-offset-background' : ''
                 }`}
                 style={{ animationDelay: `${Math.min(index * 30, 200)}ms`, animationFillMode: 'backwards' }}
@@ -374,16 +374,18 @@ const GlobalIndex = () => {
                     {brand.country && (
                       <span className="text-sm" title={brand.country}>{getCountryFlag(brand.country)}</span>
                     )}
-                    <h3 className="text-sm font-bold uppercase tracking-wide truncate">{brand.name}</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wide truncate text-[#E8E0D8]">{brand.name}</h3>
                   </div>
-                  {brand.description && (
+                  {brand.description ? (
                     <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{brand.description}</p>
+                  ) : (
+                    <p className="text-xs text-[#C4956A]/50 italic mt-0.5">Explore this brand →</p>
                   )}
                   {/* Action links */}
-                  <div className="flex items-center gap-3 mt-1.5">
+                  <div className="flex items-center gap-2 mt-1.5">
                     {brand.official_website && (
                       <button
-                        className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
+                        className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[#C4956A]/10"
                         onClick={(e) => { e.stopPropagation(); window.open(brand.official_website!, '_blank'); }}
                       >
                         <ExternalLink className="w-3 h-3" /> {t('brands.web')}
@@ -391,14 +393,14 @@ const GlobalIndex = () => {
                     )}
                     {brand.instagram_url && (
                       <button
-                        className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
+                        className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[#C4956A]/10"
                         onClick={(e) => { e.stopPropagation(); window.open(brand.instagram_url!, '_blank'); }}
                       >
                         <Instagram className="w-3 h-3" /> {t('brands.insta')}
                       </button>
                     )}
                     <button
-                      className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5"
+                      className="text-[10px] text-[#C4956A] hover:text-[#C4956A]/80 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[#C4956A]/10"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedBrandForShops({ id: brand.id, name: brand.name });
