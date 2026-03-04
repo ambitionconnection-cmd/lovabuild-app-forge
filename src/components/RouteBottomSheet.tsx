@@ -181,6 +181,12 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
     const result = await saveRoute(journeyStops, userLocation, isPro);
     if (result === 'limit_reached') {
       setShowProModal(true);
+    } else if (result === 'sign_in_required') {
+      toast({
+        title: 'Sign in required',
+        description: 'Create an account or sign in to save your routes.',
+        action: <Button size="sm" variant="default" onClick={() => window.location.href = '/auth'}>Sign In</Button>,
+      });
     }
   };
   const handlePrint = () => {

@@ -28,6 +28,7 @@ interface Post {
   is_sponsored: boolean;
   instagram_handle?: string | null;
   tiktok_handle?: string | null;
+  is_pro: boolean;
 }
 
 interface Brand {
@@ -152,7 +153,14 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
             )}
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {post.display_name && <span className="font-medium">{post.display_name}</span>}
+            {post.display_name && (
+              <span className="font-medium flex items-center gap-1">
+                {post.display_name}
+                {post.is_pro && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[8px] font-bold leading-none">PRO</span>
+                )}
+              </span>
+            )}
             {post.instagram_handle && (
               <a href={`https://instagram.com/${post.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[#C4956A] hover:underline">
                 <Instagram className="w-3 h-3" />@{post.instagram_handle.replace('@', '')}

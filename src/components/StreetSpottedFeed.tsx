@@ -31,6 +31,7 @@ interface Post {
   is_sponsored: boolean;
   instagram_handle?: string | null;
   tiktok_handle?: string | null;
+  is_pro: boolean;
 }
 
 const STYLE_TAG_OPTIONS = [
@@ -78,7 +79,7 @@ export const StreetSpottedFeed = () => {
         user
           ? supabase.from("street_spotted_likes").select("post_id").in("post_id", postIds).eq("user_id", user.id)
           : Promise.resolve({ data: [] }),
-        supabase.from("profiles").select("id, display_name").in("id", [...new Set(postsData.map(p => p.user_id))]),
+        supabase.from("profiles").select("id, display_name, is_pro").in("id", [...new Set(postsData.map(p => p.user_id))]),
       ]);
 
       const brandMap = new Map<string, string[]>();
@@ -95,9 +96,9 @@ export const StreetSpottedFeed = () => {
 
       const userLikedSet = new Set((userLikesRes.data || []).map((l: any) => l.post_id));
 
-      const profileMap = new Map<string, string>();
+      const profileMap = new Map<string, { display_name: string | null; is_pro: boolean }>();
       (profilesRes.data || []).forEach((p: any) => {
-        profileMap.set(p.id, p.display_name);
+        profileMap.set(p.id, { display_name: p.display_name, is_pro: p.is_pro || false });
       });
 
       const enrichedPosts: Post[] = postsData.map(p => ({
@@ -105,7 +106,8 @@ export const StreetSpottedFeed = () => {
         brand_ids: brandMap.get(p.id) || [],
         like_count: likeCountMap.get(p.id) || 0,
         user_liked: userLikedSet.has(p.id),
-        display_name: profileMap.get(p.user_id) || null,
+        display_name: profileMap.get(p.user_id)?.display_name || null,
+        is_pro: profileMap.get(p.user_id)?.is_pro || false,
         style_tags: (p as any).style_tags || [],
         is_sponsored: (p as any).is_sponsored || false,
         instagram_handle: (p as any).instagram_handle || null,
@@ -433,8 +435,17 @@ export const StreetSpottedFeed = () => {
                     {post.like_count > 0 && post.like_count}
                   </button>
                   <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    {post.display_name && (
+                      <span className="font-medium flex items-center gap-0.5 truncate max-w-[60px]">
+                        {post.display_name}
+                        {post.is_pro && (
+                          <span className="inline-flex items-center px-1 py-px rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none">PRO</span>
+                        )}
+                      </span>
+                    )}
                     {(post.city || post.country) && (
                       <>
+                        {post.display_name && <span>·</span>}
                         <MapPin className="w-2.5 h-2.5" />
                         <span className="truncate max-w-[60px]">{post.city || post.country}</span>
                       </>
