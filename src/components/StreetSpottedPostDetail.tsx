@@ -1,4 +1,6 @@
-import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
+import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram } from "lucide-react";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,6 +26,8 @@ interface Post {
   display_name: string | null;
   style_tags: string[];
   is_sponsored: boolean;
+  instagram_handle?: string | null;
+  tiktok_handle?: string | null;
 }
 
 interface Brand {
@@ -47,6 +51,22 @@ interface Props {
 const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(post.image_url);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `flyaf-spot-${post.id.slice(0, 8)}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch { /* ignore */ }
+  };
   const postBrands = brands.filter(b => post.brand_ids.includes(b.id));
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -114,18 +134,35 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
       <div className="p-4 space-y-4">
         {/* Like + meta */}
         <div className="flex items-center justify-between">
-          <button
-            onClick={() => onToggleLike(post.id)}
-            className={cn(
-              "flex items-center gap-1.5 text-sm font-medium transition-colors",
-              post.user_liked ? "text-orange-400" : "text-muted-foreground hover:text-orange-400"
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onToggleLike(post.id)}
+              className={cn(
+                "flex items-center gap-1.5 text-sm font-medium transition-colors",
+                post.user_liked ? "text-orange-400" : "text-muted-foreground hover:text-orange-400"
+              )}
+            >
+              <Flame className={cn("w-5 h-5", post.user_liked && "fill-orange-400")} />
+              {post.like_count > 0 && <span>{post.like_count}</span>}
+            </button>
+            {user && post.user_id === user.id && (
+              <button onClick={handleDownload} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                <Download className="w-4 h-4" />
+              </button>
             )}
-          >
-            <Flame className={cn("w-5 h-5", post.user_liked && "fill-orange-400")} />
-            {post.like_count > 0 && <span>{post.like_count}</span>}
-          </button>
+          </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             {post.display_name && <span className="font-medium">{post.display_name}</span>}
+            {post.instagram_handle && (
+              <a href={`https://instagram.com/${post.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[#C4956A] hover:underline">
+                <Instagram className="w-3 h-3" />@{post.instagram_handle.replace('@', '')}
+              </a>
+            )}
+            {post.tiktok_handle && (
+              <a href={`https://tiktok.com/@${post.tiktok_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[#C4956A] hover:underline">
+                <TikTokIcon className="w-3 h-3" />@{post.tiktok_handle.replace('@', '')}
+              </a>
+            )}
             <span>·</span>
             <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
           </div>

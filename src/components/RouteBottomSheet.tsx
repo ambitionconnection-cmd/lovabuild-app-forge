@@ -1,6 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { saveRoute, printRoute, shareRoute } from '@/lib/routeActions';
 import { Navigation, Save, Printer, Share2, X, GripVertical, Trash2, MapPin, ChevronUp } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +43,39 @@ interface RouteBottomSheetProps {
   onShopClick: (shop: ShopType) => void;
   calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
   routeInfo?: { distance: number; duration: number; steps: any[] } | null;
+  onReorderStops?: (stops: ShopType[]) => void;
 }
+
+const SortableRouteStop = ({ stop, index, onRemove, onShopClick }: { stop: ShopType; index: number; onRemove: (id: string) => void; onShopClick: (shop: ShopType) => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stop.id! });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 p-2 rounded-lg bg-[#2D2D2D]/5 border border-[#2D2D2D]/15 cursor-pointer hover:bg-white/8 ${isDragging ? 'opacity-50 shadow-lg z-50' : ''}`}
+      onClick={() => onShopClick(stop)}
+    >
+      <button className="flex-shrink-0 cursor-grab active:cursor-grabbing touch-none" {...attributes} {...listeners}>
+        <GripVertical className="w-3.5 h-3.5 text-[#C4956A]" />
+      </button>
+      <div className="w-6 h-6 rounded-full bg-[#C4956A]/20 flex items-center justify-center flex-shrink-0">
+        <span className="text-[#C4956A] text-xs font-bold">{index + 1}</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[#2D2D2D] text-xs font-medium truncate">{stop.name}</p>
+        <p className="text-[#6A6A6A] text-[10px] truncate">{stop.address}, {stop.city}</p>
+      </div>
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(stop.id!); }}
+        className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 flex-shrink-0"
+      >
+        <X className="w-3 h-3 text-[#6A6A6A]" />
+      </button>
+    </div>
+  );
+};
 
 export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
   journeyStops,
@@ -40,6 +86,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
   onShopClick,
   calculateDistance,
   routeInfo,
+  onReorderStops,
 }) => {
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const [isDragging, setIsDragging] = useState(false);
@@ -249,31 +296,30 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                   </div>
                 )}
 
-                {/* Journey stops */}
-                {journeyStops.map((stop, index) => (
-                  <div
-                    key={stop.id}
-                    className="flex items-center gap-2 p-2 rounded-lg bg-[#2D2D2D]/5 border border-[#2D2D2D]/15 cursor-pointer hover:bg-white/8"
-                    onClick={() => onShopClick(stop)}
-                  >
-                    <div className="w-6 h-6 rounded-full bg-[#C4956A]/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-[#C4956A] text-xs font-bold">{index + 1}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[#2D2D2D] text-xs font-medium truncate">{stop.name}</p>
-                      <p className="text-[#6A6A6A] text-[10px] truncate">{stop.address}, {stop.city}</p>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveStop(stop.id);
-                      }}
-                      className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 flex-shrink-0"
-                    >
-                      <X className="w-3 h-3 text-[#6A6A6A]" />
-                    </button>
-                  </div>
-                ))}
+                {/* Journey stops - drag to reorder */}
+                <DndContext
+                  sensors={useSensors(
+                    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+                  )}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(event: DragEndEvent) => {
+                    const { active, over } = event;
+                    if (over && active.id !== over.id && onReorderStops) {
+                      const oldIndex = journeyStops.findIndex(s => s.id === active.id);
+                      const newIndex = journeyStops.findIndex(s => s.id === over.id);
+                      const newStops = [...journeyStops];
+                      const [moved] = newStops.splice(oldIndex, 1);
+                      newStops.splice(newIndex, 0, moved);
+                      onReorderStops(newStops);
+                    }
+                  }}
+                >
+                  <SortableContext items={journeyStops.map(s => s.id!)} strategy={verticalListSortingStrategy}>
+                    {journeyStops.map((stop, index) => (
+                      <SortableRouteStop key={stop.id} stop={stop} index={index} onRemove={onRemoveStop} onShopClick={onShopClick} />
+                    ))}
+                  </SortableContext>
+                </DndContext>
 
                 {/* Start Navigation */}
                 <Button

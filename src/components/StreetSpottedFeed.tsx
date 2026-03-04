@@ -29,6 +29,8 @@ interface Post {
   display_name: string | null;
   style_tags: string[];
   is_sponsored: boolean;
+  instagram_handle?: string | null;
+  tiktok_handle?: string | null;
 }
 
 const STYLE_TAG_OPTIONS = [
@@ -106,6 +108,8 @@ export const StreetSpottedFeed = () => {
         display_name: profileMap.get(p.user_id) || null,
         style_tags: (p as any).style_tags || [],
         is_sponsored: (p as any).is_sponsored || false,
+        instagram_handle: (p as any).instagram_handle || null,
+        tiktok_handle: (p as any).tiktok_handle || null,
       }));
 
       setPosts(enrichedPosts);
