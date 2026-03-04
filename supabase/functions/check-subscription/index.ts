@@ -26,9 +26,6 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
 
@@ -39,12 +36,73 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // ── Admin bypass: admins always get Pro ──
+    const { data: adminRole } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (adminRole) {
+      logStep("Admin user detected — granting Pro bypass", { userId: user.id });
+      await supabaseClient.from("profiles").update({
+        is_pro: true,
+        pro_expires_at: null,
+      }).eq("id", user.id);
+
+      return new Response(JSON.stringify({
+        subscribed: true,
+        product_id: "admin_bypass",
+        subscription_end: null,
+        is_admin: true,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // ── Standard Stripe check ──
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
     if (customers.data.length === 0) {
       logStep("No Stripe customer found");
-      // Update profile to not pro
+      // Check if user has Pro via founding member or ambassador code (don't revoke)
+      const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("is_pro, is_founding_member")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profile?.is_pro && profile?.is_founding_member) {
+        logStep("Founding member with active Pro — preserving");
+        return new Response(JSON.stringify({ subscribed: true, product_id: "founding_member", subscription_end: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+
+      // Check if Pro was granted by ambassador code (pro_expires_at is null = permanent)
+      if (profile?.is_pro) {
+        const { data: redemption } = await supabaseClient
+          .from("code_redemptions")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (redemption) {
+          logStep("Ambassador code user with active Pro — preserving");
+          return new Response(JSON.stringify({ subscribed: true, product_id: "ambassador", subscription_end: null }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+      }
+
       await supabaseClient.from("profiles").update({
         is_pro: false,
         pro_expires_at: null,
@@ -75,13 +133,28 @@ serve(async (req) => {
       productId = subscription.items.data[0].price.product;
       logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
 
-      // Update profile to pro
       await supabaseClient.from("profiles").update({
         is_pro: true,
         pro_expires_at: subscriptionEnd,
       }).eq("id", user.id);
     } else {
       logStep("No active subscription");
+
+      // Don't revoke founding member or ambassador Pro
+      const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("is_pro, is_founding_member")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profile?.is_founding_member && profile?.is_pro) {
+        logStep("Founding member — preserving Pro");
+        return new Response(JSON.stringify({ subscribed: true, product_id: "founding_member", subscription_end: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+
       await supabaseClient.from("profiles").update({
         is_pro: false,
         pro_expires_at: null,

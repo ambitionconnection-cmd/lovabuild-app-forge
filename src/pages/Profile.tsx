@@ -22,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { RedeemCodeCard } from "@/components/RedeemCodeCard";
 
 const profileSchema = z.object({
   display_name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
@@ -644,9 +645,13 @@ const Profile = () => {
                   <>
                     <Alert className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/50">
                       <Crown className="h-4 w-4 text-yellow-500" />
-                      <AlertTitle className="text-yellow-700 dark:text-yellow-300">FLYAF Pro Member</AlertTitle>
+                      <AlertTitle className="text-yellow-700 dark:text-yellow-300">
+                        {profile?.is_founding_member ? "🏆 Founding Member — FLYAF Pro" : "FLYAF Pro Member"}
+                      </AlertTitle>
                       <AlertDescription className="text-yellow-600 dark:text-yellow-400">
-                        You have access to all premium features — unlimited routes, favourites, PDF export & Pro badge
+                        {profile?.is_founding_member
+                          ? "You're one of FLYAF's first 500 members. Pro is on us — thanks for being here from the start."
+                          : "You have access to all premium features — unlimited routes, favourites, PDF export & Pro badge"}
                       </AlertDescription>
                     </Alert>
 
@@ -714,6 +719,8 @@ const Profile = () => {
                         You're on the free plan. Upgrade to FLYAF Pro for the full experience!
                       </AlertDescription>
                     </Alert>
+
+                    <RedeemCodeCard />
 
                     <Card className="bg-gradient-to-br from-[#c48e19]/10 to-[#c48e19]/5 border-[#c48e19]/20">
                       <CardHeader>
