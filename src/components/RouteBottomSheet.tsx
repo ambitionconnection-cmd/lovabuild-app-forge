@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { saveRoute, printRoute, shareRoute } from '@/lib/routeActions';
-import { Navigation, Save, Printer, Share2, X, GripVertical, Trash2, MapPin, ChevronUp } from 'lucide-react';
+import { Navigation, Save, Printer, Share2, X, GripVertical, Trash2, MapPin, ChevronUp, Lock, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProUpgradeModal } from '@/components/ProUpgradeModal';
 import {
@@ -262,8 +262,15 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
               <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleSave}>
                 <Save className="w-3 h-3 mr-1" /> Save
               </Button>
-              <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handlePrint}>
-                <Printer className="w-3 h-3 mr-1" /> Print
+              <Button
+                variant="outline"
+                size="sm"
+                className={`flex-1 border-[#2D2D2D]/15 text-xs h-8 ${!isPro ? 'opacity-50 cursor-not-allowed text-muted-foreground' : 'text-[#4A4A4A] hover:bg-[#2D2D2D]/5'}`}
+                onClick={() => { if (!isPro) { setShowProModal(true); } else { handlePrint(); } }}
+              >
+                {isPro ? <Printer className="w-3 h-3 mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
+                Print
+                {!isPro && <span className="ml-1 px-1 py-px rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none">PRO</span>}
               </Button>
               <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleShare}>
                 <Share2 className="w-3 h-3 mr-1" /> Share
