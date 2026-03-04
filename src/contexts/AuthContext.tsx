@@ -8,6 +8,9 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isPro: boolean;
+  subscriptionEnd: string | null;
+  checkSubscription: () => Promise<void>;
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
@@ -23,7 +26,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = React.useState<User | null>(null);
   const [session, setSession] = React.useState<Session | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [isPro, setIsPro] = React.useState(false);
+  const [subscriptionEnd, setSubscriptionEnd] = React.useState<string | null>(null);
   const navigate = useNavigate();
+
+  const checkSubscription = React.useCallback(async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("check-subscription");
+      if (error) {
+        console.error("Subscription check error:", error);
+        return;
+      }
+      setIsPro(data?.subscribed ?? false);
+      setSubscriptionEnd(data?.subscription_end ?? null);
+    } catch (err) {
+      console.error("Subscription check failed:", err);
+    }
+  }, []);
 
   React.useEffect(() => {
     // Set up auth state listener
@@ -32,6 +51,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Check subscription on login
+        if (session?.user) {
+          setTimeout(() => checkSubscription(), 0);
+        } else {
+          setIsPro(false);
+          setSubscriptionEnd(null);
+        }
       }
     );
 
@@ -40,10 +67,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        setTimeout(() => checkSubscription(), 0);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [checkSubscription]);
+
+  // Periodic subscription check every 60 seconds
+  React.useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(checkSubscription, 60000);
+    return () => clearInterval(interval);
+  }, [user, checkSubscription]);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
     // Check password against breach database
@@ -54,14 +91,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (breachCheckResponse.error) {
         console.error('Breach check failed:', breachCheckResponse.error);
-        // Continue with signup if breach check fails (fail open)
       } else if (breachCheckResponse.data?.isBreached) {
         toast.error("This password has been found in a data breach. Please choose a different password for your security.");
         return { error: { message: 'Password compromised' } };
       }
     } catch (breachError) {
       console.error('Breach check error:', breachError);
-      // Continue with signup if breach check fails (fail open)
     }
 
     const redirectUrl = `${window.location.origin}/`;
@@ -94,7 +129,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (ipCheckResponse.data?.blocked) {
-        // Send security alert for IP lock
         try {
           await supabase.functions.invoke('send-security-alert', {
             body: {
@@ -114,7 +148,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (ipError) {
       console.error('IP rate limit check failed:', ipError);
-      // Continue with login even if IP check fails
     }
 
     // Check if account is locked
@@ -136,7 +169,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     if (error) {
-      // Log failed login attempt
       try {
         await supabase.functions.invoke('log-security-event', {
           body: {
@@ -148,7 +180,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (logError) {
         console.error('Failed to log security event:', logError);
       }
-      // Record IP-based failed attempt
       try {
         await supabase.functions.invoke('ip-rate-limit', {
           body: { action: 'record', success: false }
@@ -157,7 +188,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Failed to record IP attempt:', ipError);
       }
 
-      // Record email-based failed attempt
       const currentAttempts = (attemptData?.attempts || 0) + 1;
       const shouldLock = currentAttempts >= 5;
       
@@ -181,7 +211,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (shouldLock) {
-        // Log account lockout
         try {
           await supabase.functions.invoke('log-security-event', {
             body: {
@@ -194,7 +223,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.error('Failed to log security event:', logError);
         }
 
-        // Send security alert email
         try {
           await supabase.functions.invoke('send-security-alert', {
             body: {
@@ -230,7 +258,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Failed to log security event:', logError);
     }
 
-    // Record successful IP attempt and reset email attempts
     try {
       await supabase.functions.invoke('ip-rate-limit', {
         body: { action: 'record', success: true }
@@ -275,6 +302,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
+    setIsPro(false);
+    setSubscriptionEnd(null);
     toast.success("Signed out successfully");
     navigate("/auth");
   };
@@ -294,7 +323,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updatePassword = async (newPassword: string) => {
-    // Check password against breach database
     try {
       const breachCheckResponse = await supabase.functions.invoke('check-password-breach', {
         body: { password: newPassword }
@@ -302,14 +330,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (breachCheckResponse.error) {
         console.error('Breach check failed:', breachCheckResponse.error);
-        // Continue with password update if breach check fails (fail open)
       } else if (breachCheckResponse.data?.isBreached) {
         toast.error("This password has been found in a data breach. Please choose a different password for your security.");
         return { error: { message: 'Password compromised' } };
       }
     } catch (breachError) {
       console.error('Breach check error:', breachError);
-      // Continue with password update if breach check fails (fail open)
     }
 
     const { error } = await supabase.auth.updateUser({
@@ -347,7 +373,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider value={{ 
       user, 
       session, 
-      loading, 
+      loading,
+      isPro,
+      subscriptionEnd,
+      checkSubscription,
       signUp, 
       signIn, 
       signInWithGoogle, 
