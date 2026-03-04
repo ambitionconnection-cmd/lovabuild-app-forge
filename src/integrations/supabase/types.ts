@@ -139,6 +139,47 @@ export type Database = {
           },
         ]
       }
+      brand_requests: {
+        Row: {
+          admin_note: string | null
+          brand_name: string
+          created_at: string
+          id: string
+          post_id: string | null
+          requested_by: string
+          resolved_at: string | null
+          status: string
+        }
+        Insert: {
+          admin_note?: string | null
+          brand_name: string
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          requested_by: string
+          resolved_at?: string | null
+          status?: string
+        }
+        Update: {
+          admin_note?: string | null
+          brand_name?: string
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          requested_by?: string
+          resolved_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_requests_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "street_spotted_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           affiliate_url: string | null
