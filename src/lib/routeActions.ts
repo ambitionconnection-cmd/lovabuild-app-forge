@@ -66,8 +66,39 @@ export const saveRoute = async (
   }
 };
 
+// ==================== HELPERS ====================
+const haversineDistance = (
+  lat1: number, lon1: number, lat2: number, lon2: number
+): number => {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+const formatWalkTime = (km: number): string => {
+  const mins = Math.round(km / 0.08); // ~5 km/h walking
+  if (mins < 60) return `${mins} min walk`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m > 0 ? `${h}h ${m}min walk` : `${h}h walk`;
+};
+
+const formatDriveTime = (km: number): string => {
+  const mins = Math.round(km / 0.5); // ~30 km/h city driving
+  if (mins < 60) return `${mins} min drive`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m > 0 ? `${h}h ${m}min drive` : `${h}h drive`;
+};
+
 // ==================== PRINT ====================
-export const printRoute = (
+export const printRoute = async (
   stops: RouteStop[],
   userLocation: { lat: number; lng: number } | null
 ) => {
@@ -76,79 +107,231 @@ export const printRoute = (
     return;
   }
 
+  toast.info('Generating your route PDF…');
+
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
 
-  // Header
+  // ── Header ──
   doc.setFillColor(3, 3, 4);
-  doc.rect(0, 0, pageWidth, 35, 'F');
+  doc.rect(0, 0, pageWidth, 38, 'F');
   doc.setTextColor(173, 58, 73); // #AD3A49
-  doc.setFontSize(24);
+  doc.setFontSize(26);
   doc.setFont('helvetica', 'bold');
-  doc.text('FLYAF', 15, 20);
-  doc.setTextColor(195, 201, 201); // #C3C9C9
-  doc.setFontSize(10);
-  doc.text('Never miss a drop. Never miss a shop.', 15, 28);
-
-  // Route title
-  doc.setTextColor(30, 30, 30);
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  const dateStr = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  doc.text(`Your Route — ${dateStr}`, 15, 48);
-
-  // Stops count
-  doc.setFontSize(10);
+  doc.text('FLYAF', margin, 18);
+  doc.setTextColor(195, 201, 201);
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(100, 100, 100);
-  doc.text(`${stops.length} stop${stops.length > 1 ? 's' : ''}`, 15, 55);
+  doc.text('Never miss a drop. Never miss a shop.', margin, 26);
+  const dateStr = new Date().toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  });
+  doc.setTextColor(120, 120, 120);
+  doc.setFontSize(8);
+  doc.text(dateStr, margin, 33);
 
-  // Stops list
-  let y = 68;
+  let y = 46;
+
+  // ── Static Map ──
+  const validStops = stops.filter(s => s.latitude && s.longitude);
+  if (validStops.length > 0) {
+    try {
+      const token = 'pk.eyJ1IjoiY2hyaXMtY2FybG9zIiwiYSI6ImNtaWM3MDhpbTBxbHMyanM2ZXdscjZndGoifQ.OhI-E76ufbnm3pQdVzalNQ';
+      const pins = validStops
+        .map((s, i) => `pin-s-${i + 1}+C4956A(${s.longitude},${s.latitude})`)
+        .join(',');
+
+      // Add user location pin if available
+      const userPin = userLocation
+        ? `pin-s-star+00BCD4(${userLocation.lng},${userLocation.lat}),`
+        : '';
+
+      // Auto-fit bounding box
+      const allLats = validStops.map(s => s.latitude!);
+      const allLngs = validStops.map(s => s.longitude!);
+      if (userLocation) {
+        allLats.push(userLocation.lat);
+        allLngs.push(userLocation.lng);
+      }
+      const pad = 0.01;
+      const bbox = [
+        Math.min(...allLngs) - pad,
+        Math.min(...allLats) - pad,
+        Math.max(...allLngs) + pad,
+        Math.max(...allLats) + pad,
+      ].join(',');
+
+      const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/${userPin}${pins}/[${bbox}]/560x260@2x?access_token=${token}&logo=false&attribution=false`;
+
+      const img = await fetch(mapUrl)
+        .then(r => r.blob())
+        .then(blob => new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        }));
+
+      const mapHeight = 55;
+      doc.addImage(img, 'PNG', margin, y, contentWidth, mapHeight);
+
+      // Map border
+      doc.setDrawColor(60, 60, 60);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(margin, y, contentWidth, mapHeight, 2, 2, 'S');
+      y += mapHeight + 6;
+    } catch (e) {
+      console.warn('Map image failed, skipping:', e);
+    }
+  }
+
+  // ── Route Summary Card ──
+  let totalDistance = 0;
+  const legDistances: number[] = [];
+
+  // Calculate from user location to first stop
+  if (userLocation && validStops.length > 0) {
+    const d = haversineDistance(
+      userLocation.lat, userLocation.lng,
+      validStops[0].latitude!, validStops[0].longitude!
+    );
+    legDistances.push(d);
+    totalDistance += d;
+  }
+
+  // Calculate between consecutive stops
+  for (let i = 0; i < validStops.length - 1; i++) {
+    const d = haversineDistance(
+      validStops[i].latitude!, validStops[i].longitude!,
+      validStops[i + 1].latitude!, validStops[i + 1].longitude!
+    );
+    legDistances.push(d);
+    totalDistance += d;
+  }
+
+  // Summary box
+  doc.setFillColor(30, 30, 30);
+  doc.roundedRect(margin, y, contentWidth, 18, 2, 2, 'F');
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(196, 149, 106); // #C4956A
+  doc.text(`${stops.length} STOP${stops.length > 1 ? 'S' : ''}`, margin + 6, y + 8);
+  doc.setTextColor(200, 200, 200);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`•  ${totalDistance.toFixed(1)} km total`, margin + 40, y + 8);
+  doc.text(`•  ${formatWalkTime(totalDistance)}`, margin + 80, y + 8);
+  doc.text(`•  ${formatDriveTime(totalDistance)}`, margin + 120, y + 8);
+
+  // Cities covered
+  const cities = [...new Set(stops.map(s => s.city).filter(Boolean))];
+  if (cities.length > 0) {
+    doc.setFontSize(7);
+    doc.setTextColor(140, 140, 140);
+    doc.text(`Cities: ${cities.join(', ')}`, margin + 6, y + 14);
+  }
+  y += 24;
+
+  // ── Starting Point ──
+  if (userLocation) {
+    doc.setFillColor(0, 188, 212, 0.15);
+    doc.roundedRect(margin, y, contentWidth, 10, 1.5, 1.5, 'F');
+    doc.setFillColor(0, 188, 212);
+    doc.circle(margin + 6, y + 5, 2.5, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'bold');
+    doc.text('★', margin + 5, y + 6.5);
+    doc.setTextColor(0, 188, 212);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Your Location (Start)', margin + 14, y + 6.5);
+    y += 14;
+  }
+
+  // ── Stops List ──
+  let legIndex = 0;
   stops.forEach((stop, index) => {
-    if (y > 260) {
+    // Page break check
+    if (y > 255) {
       doc.addPage();
       y = 20;
     }
 
+    // Leg distance connector
+    const hasLeg = userLocation ? legIndex < legDistances.length : index > 0 && legIndex < legDistances.length;
+    if (hasLeg) {
+      const legDist = legDistances[legIndex];
+      // Dotted line
+      doc.setDrawColor(80, 80, 80);
+      doc.setLineDashPattern([1, 1.5], 0);
+      doc.line(margin + 6, y - 2, margin + 6, y + 3);
+      doc.setLineDashPattern([], 0);
+      // Leg info
+      doc.setFontSize(7);
+      doc.setTextColor(140, 140, 140);
+      doc.text(`↓ ${legDist.toFixed(1)} km · ${formatWalkTime(legDist)}`, margin + 14, y + 1);
+      y += 6;
+      legIndex++;
+    }
+
+    // Stop card background
+    doc.setFillColor(22, 22, 24);
+    doc.roundedRect(margin, y, contentWidth, 16, 1.5, 1.5, 'F');
+
     // Stop number circle
-    doc.setFillColor(196, 149, 106); // #C4956A
-    doc.circle(22, y - 2, 4, 'F');
+    doc.setFillColor(196, 149, 106);
+    doc.circle(margin + 6, y + 8, 3.5, 'F');
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
-    doc.text(`${index + 1}`, 22, y - 1, { align: 'center' });
+    doc.text(`${index + 1}`, margin + 6, y + 9.5, { align: 'center' });
 
     // Shop name
-    doc.setTextColor(30, 30, 30);
-    doc.setFontSize(12);
+    doc.setTextColor(240, 240, 240);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text(stop.name || 'Unknown Shop', 32, y);
+    const name = stop.name || 'Unknown Shop';
+    doc.text(name.length > 35 ? name.substring(0, 35) + '…' : name, margin + 14, y + 7);
 
     // Address
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(9);
+    doc.setTextColor(140, 140, 140);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     const address = [stop.address, stop.city].filter(Boolean).join(', ');
-    doc.text(address || 'No address', 32, y + 6);
+    doc.text(address || 'No address available', margin + 14, y + 12.5);
 
-    // Divider line
-    y += 14;
-    doc.setDrawColor(220, 220, 220);
-    doc.line(32, y, pageWidth - 15, y);
-    y += 10;
+    y += 20;
   });
 
-  // Footer
+  // ── Tips Section ──
+  if (y > 245) { doc.addPage(); y = 20; }
+  y += 4;
+  doc.setFillColor(196, 149, 106, 0.1);
+  doc.roundedRect(margin, y, contentWidth, 22, 2, 2, 'F');
+  doc.setTextColor(196, 149, 106);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('💡 Route Tips', margin + 6, y + 7);
+  doc.setTextColor(160, 160, 160);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('• Check opening hours before visiting — some shops have limited weekend hours', margin + 6, y + 13);
+  doc.text('• Walking distances are approximate straight-line estimates', margin + 6, y + 18);
+  y += 28;
+
+  // ── Footer ──
+  if (y > 270) { doc.addPage(); y = 20; }
+  doc.setDrawColor(50, 50, 50);
+  doc.line(margin, y, pageWidth - margin, y);
   y += 5;
-  if (y > 270) {
-    doc.addPage();
-    y = 20;
-  }
-  doc.setTextColor(150, 150, 150);
-  doc.setFontSize(8);
-  doc.text('Route powered by FLYAF — flyaf.app', 15, y);
-  doc.text(`Generated ${new Date().toLocaleString('en-GB')}`, 15, y + 5);
+  doc.setTextColor(100, 100, 100);
+  doc.setFontSize(7);
+  doc.text('Route powered by FLYAF — flyaf.app', margin, y);
+  doc.text(`Generated ${new Date().toLocaleString('en-GB')}`, margin, y + 4);
+  doc.setTextColor(196, 149, 106);
+  doc.text('flyaf.app', pageWidth - margin - 15, y);
 
   // Open in new tab
   const pdfBlob = doc.output('blob');
