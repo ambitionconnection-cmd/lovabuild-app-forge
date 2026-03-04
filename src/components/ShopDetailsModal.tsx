@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tables } from "@/integrations/supabase/types";
 import { MapPin, Phone, Mail, ExternalLink, Clock, Navigation, Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
+import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 
 interface ShopDetailsModalProps {
   shop: Tables<'shops_public'> | null;
@@ -24,19 +26,25 @@ export const ShopDetailsModal = ({
   isInJourney = false,
 }: ShopDetailsModalProps) => {
   const { isFavorite, toggleFavorite } = useFavorites('shop');
+  const [showProModal, setShowProModal] = useState(false);
 
   if (!shop) return null;
 
   const openingHours = shop.opening_hours as Record<string, string> | null;
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold">{shop.name}</DialogTitle>
             <button
-              onClick={() => shop.id && toggleFavorite(shop.id)}
+              onClick={async () => {
+                if (!shop.id) return;
+                const result = await toggleFavorite(shop.id);
+                if (result === 'limit_reached') setShowProModal(true);
+              }}
               className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors"
             >
               <Heart className={`w-5 h-5 ${shop.id && isFavorite(shop.id) ? 'fill-[#AD3A49] text-[#AD3A49]' : 'text-muted-foreground'}`} />
@@ -166,5 +174,7 @@ export const ShopDetailsModal = ({
         </div>
       </DialogContent>
     </Dialog>
+    <ProUpgradeModal open={showProModal} onOpenChange={setShowProModal} trigger="favourites" />
+    </>
   );
 };

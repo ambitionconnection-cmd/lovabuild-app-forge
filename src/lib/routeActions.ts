@@ -14,17 +14,29 @@ interface RouteStop {
 // ==================== SAVE ====================
 export const saveRoute = async (
   stops: RouteStop[],
-  userLocation: { lat: number; lng: number } | null
-) => {
+  userLocation: { lat: number; lng: number } | null,
+  isPro?: boolean
+): Promise<'saved' | 'limit_reached' | 'error'> => {
   if (stops.length === 0) {
     toast.error('No stops to save');
-    return;
+    return 'error';
   }
 
   // Check if user is logged in
   const { data: { user } } = await supabase.auth.getUser();
 
   if (user) {
+    // Check route limit for free users
+    if (!isPro) {
+      const { count } = await supabase
+        .from('saved_routes')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if ((count ?? 0) >= 2) {
+        return 'limit_reached';
+      }
+    }
+
     // Save to Supabase
     const routeName = `Route - ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
     const { error } = await (supabase.from('saved_routes') as any).insert({
@@ -43,8 +55,10 @@ export const saveRoute = async (
     if (error) {
       console.error('Save error:', error);
       toast.error('Failed to save route');
+      return 'error';
     } else {
       toast.success(`Route saved as "${routeName}"`);
+      return 'saved';
     }
   } else {
     // Save to localStorage for non-logged-in users
@@ -67,6 +81,7 @@ export const saveRoute = async (
     toast.success(`Route saved as "${routeName}"`, {
       description: 'Sign in to sync routes across devices',
     });
+    return 'saved';
   }
 };
 

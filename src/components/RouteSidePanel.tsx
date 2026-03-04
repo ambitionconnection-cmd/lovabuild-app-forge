@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Navigation, Trash2, X, Save, Printer, Share2, GripVertical } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { ProUpgradeModal } from '@/components/ProUpgradeModal';
 import {
   DndContext,
   closestCenter,
@@ -81,8 +83,11 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
   calculateDistance,
   onReorderStops,
 }) => {
+  const { isPro } = useAuth();
+  const [showProModal, setShowProModal] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
   return (
+    <>
     <div className="hidden lg:flex absolute top-16 left-4 z-10 w-80 max-h-[calc(100vh-120px)] flex-col bg-background/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl overflow-hidden">
       {/* Header */}
       <div className="flex-shrink-0 p-4 border-b border-white/5">
@@ -112,7 +117,10 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             variant="outline"
             size="sm"
             className="flex-1 h-8 text-xs border-white/10"
-            onClick={() => saveRoute(journeyStops, userLocation)}
+            onClick={async () => {
+              const result = await saveRoute(journeyStops, userLocation, isPro);
+              if (result === 'limit_reached') setShowProModal(true);
+            }}
           >
             <Save className="w-3 h-3 mr-1" />
             Save
@@ -200,5 +208,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
         </div>
       )}
     </div>
+    <ProUpgradeModal open={showProModal} onOpenChange={setShowProModal} trigger="routes" />
+    </>
   );
 };

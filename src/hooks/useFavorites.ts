@@ -5,10 +5,11 @@ import { toast } from "sonner";
 import haptic from "@/lib/haptics";
 import { useNavigate } from "react-router-dom";
 
+const FREE_FAVORITES_LIMIT = 8;
 type FavoriteType = "brand" | "shop";
 
 export function useFavorites(type: FavoriteType) {
-  const { user } = useAuth();
+  const { user, isPro } = useAuth();
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,7 @@ export function useFavorites(type: FavoriteType) {
   };
 
   const toggleFavorite = useCallback(
-    async (id: string) => {
+    async (id: string): Promise<'toggled' | 'limit_reached' | void> => {
       if (!user) {
         haptic.warning();
         toast.error(`Please sign in to favorite ${type}s`);
@@ -62,6 +63,11 @@ export function useFavorites(type: FavoriteType) {
       }
 
       const isFav = favorites.has(id);
+
+      // Check limit for free users when adding
+      if (!isFav && !isPro && favorites.size >= FREE_FAVORITES_LIMIT) {
+        return 'limit_reached';
+      }
 
       try {
         if (type === "brand") {
@@ -113,7 +119,7 @@ export function useFavorites(type: FavoriteType) {
         toast.error(`Failed to update favorite`);
       }
     },
-    [user, favorites, type, navigate]
+    [user, favorites, type, navigate, isPro]
   );
 
   const isFavorite = useCallback(

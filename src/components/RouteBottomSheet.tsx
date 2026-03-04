@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { saveRoute, printRoute, shareRoute } from '@/lib/routeActions';
 import { Navigation, Save, Printer, Share2, X, GripVertical, Trash2, MapPin, ChevronUp } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { ProUpgradeModal } from '@/components/ProUpgradeModal';
 import {
   DndContext,
   closestCenter,
@@ -172,8 +174,14 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
     return `${Math.round(distance)}km`;
   };
 
-  const handleSave = () => {
-    saveRoute(journeyStops, userLocation);
+  const [showProModal, setShowProModal] = useState(false);
+  const { isPro } = useAuth();
+
+  const handleSave = async () => {
+    const result = await saveRoute(journeyStops, userLocation, isPro);
+    if (result === 'limit_reached') {
+      setShowProModal(true);
+    }
   };
   const handlePrint = () => {
     printRoute(journeyStops, userLocation);
@@ -345,6 +353,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
           </div>
         </ScrollArea>
       </Card>
+      <ProUpgradeModal open={showProModal} onOpenChange={setShowProModal} trigger="routes" />
     </div>
   );
 };
