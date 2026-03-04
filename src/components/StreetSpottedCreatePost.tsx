@@ -23,6 +23,8 @@ const STYLE_TAG_OPTIONS = [
   "casual", "sportswear", "grunge", "preppy"
 ];
 
+const MAX_STYLE_TAGS = 3;
+
 const resizeImage = (file: File, maxWidth: number): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -61,6 +63,8 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
   const [brandSearch, setBrandSearch] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [requestedBrands, setRequestedBrands] = useState<string[]>([]);
+  const [customTagInput, setCustomTagInput] = useState("");
+  const [showCustomTagInput, setShowCustomTagInput] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -81,9 +85,21 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
     haptic.selection();
     setSelectedStyles(prev => {
       if (prev.includes(style)) return prev.filter(s => s !== style);
-      if (prev.length >= 3) { toast.info(t("hot.maxStyleTags")); return prev; }
+      if (prev.length >= MAX_STYLE_TAGS) { toast.info(t("hot.maxStyleTags")); return prev; }
       return [...prev, style];
     });
+  };
+
+  const handleAddCustomTag = () => {
+    const raw = customTagInput.trim().replace(/^#/, "").trim().toLowerCase();
+    if (!raw || raw.length < 2) return;
+    const tag = `#${raw}`;
+    if (selectedStyles.includes(tag)) { toast.info("Tag already added"); return; }
+    if (selectedStyles.length >= MAX_STYLE_TAGS) { toast.info(t("hot.maxStyleTags")); return; }
+    haptic.selection();
+    setSelectedStyles(prev => [...prev, tag]);
+    setCustomTagInput("");
+    setShowCustomTagInput(false);
   };
 
   const handleRequestBrand = () => {
@@ -252,7 +268,55 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
                 {style}
               </Badge>
             ))}
+            {/* Custom tags the user already added */}
+            {selectedStyles.filter(s => s.startsWith("#")).map(tag => (
+              <Badge
+                key={tag}
+                variant="default"
+                className="cursor-pointer text-xs gap-1"
+                onClick={() => toggleStyle(tag)}
+              >
+                {tag} <X className="w-3 h-3" />
+              </Badge>
+            ))}
+            {/* "Other" toggle */}
+            <Badge
+              variant={showCustomTagInput ? "secondary" : "outline"}
+              className="cursor-pointer text-xs border-dashed"
+              onClick={() => {
+                if (selectedStyles.length >= MAX_STYLE_TAGS && !showCustomTagInput) {
+                  toast.info(t("hot.maxStyleTags"));
+                  return;
+                }
+                setShowCustomTagInput(prev => !prev);
+              }}
+            >
+              <Plus className="w-3 h-3 mr-0.5" /> other
+            </Badge>
           </div>
+          {/* Custom tag input */}
+          {showCustomTagInput && (
+            <div className="mt-2 flex gap-2 items-center">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">#</span>
+                <Input
+                  placeholder="yourtag"
+                  value={customTagInput}
+                  onChange={e => setCustomTagInput(e.target.value.replace(/\s/g, ""))}
+                  onKeyDown={e => e.key === "Enter" && handleAddCustomTag()}
+                  maxLength={24}
+                  className="h-8 pl-7 text-sm"
+                  autoFocus
+                />
+              </div>
+              <Button type="button" size="sm" variant="outline" className="h-8 px-3" onClick={handleAddCustomTag}>
+                Add
+              </Button>
+            </div>
+          )}
+          <p className="text-[10px] text-muted-foreground mt-1">
+            Pick up to 3 — tap "other" to create your own #tag
+          </p>
         </div>
 
         {/* Brand tags */}
