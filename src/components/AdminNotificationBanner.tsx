@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare, Eye, Inbox, AlertTriangle } from "lucide-react";
+import { MessageSquare, Eye, Inbox, AlertTriangle, CheckCircle } from "lucide-react";
 
 interface NotificationCounts {
   unresolvedContacts: number;
@@ -57,7 +57,7 @@ export function AdminNotificationBanner({ onNavigate }: AdminNotificationBannerP
 
   const total = counts.unresolvedContacts + counts.pendingPosts + counts.pendingBrandRequests;
 
-  if (loading || total === 0) return null;
+  if (loading) return null;
 
   const items = [
     {
@@ -84,7 +84,23 @@ export function AdminNotificationBanner({ onNavigate }: AdminNotificationBannerP
       tab: "brand-requests",
       color: "bg-purple-500",
     },
-  ].filter((item) => item.count > 0);
+  ];
+
+  const activeItems = items.filter((item) => item.count > 0);
+
+  if (total === 0) {
+    return (
+      <Card className="mb-6 border-green-500/30 bg-green-500/5">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <span className="text-sm font-semibold text-green-600">All Clear</span>
+            <span className="text-sm text-muted-foreground">— No pending items require your attention</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="mb-6 border-amber-500/30 bg-amber-500/5">
@@ -95,7 +111,7 @@ export function AdminNotificationBanner({ onNavigate }: AdminNotificationBannerP
           <Badge variant="destructive" className="text-xs">{total}</Badge>
         </div>
         <div className="flex flex-wrap gap-3">
-          {items.map((item) => {
+          {activeItems.map((item) => {
             const Icon = item.icon;
             return (
               <button
