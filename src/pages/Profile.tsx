@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,12 +49,13 @@ interface NotificationPreferences {
 }
 
 const Profile = () => {
-  const { user, signOut, updatePassword } = useAuth();
+  const { user, signOut, updatePassword, isPro, checkSubscription } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = React.useState(false);
   const [isAvatarUploading, setIsAvatarUploading] = React.useState(false);
   const [profile, setProfile] = React.useState<any>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
   const avatarInputRef = React.useRef<HTMLInputElement>(null);
   const [notificationPrefs, setNotificationPrefs] = React.useState<NotificationPreferences>({
     drop_reminders: true,
@@ -83,6 +85,11 @@ const Profile = () => {
   React.useEffect(() => {
     if (user) {
       loadProfile();
+      // Check subscription on page load (e.g. after returning from Stripe checkout)
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('subscription') === 'success') {
+        checkSubscription();
+      }
     } else {
       navigate('/auth');
     }
@@ -248,7 +255,7 @@ const Profile = () => {
     }
   };
 
-  const isProActive = profile?.is_pro && (!profile?.pro_expires_at || new Date(profile.pro_expires_at) > new Date());
+  const isProActive = isPro || (profile?.is_pro && (!profile?.pro_expires_at || new Date(profile.pro_expires_at) > new Date()));
 
   if (!user) {
     return null;
@@ -365,7 +372,7 @@ const Profile = () => {
                             <Input placeholder="Your name" {...field} />
                           </FormControl>
                           <FormDescription>
-                            This is your public display name on HEARDROP
+                            This is your public display name on FLYAF
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -403,7 +410,7 @@ const Profile = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Email Notifications</CardTitle>
-                    <CardDescription>Manage which emails you receive from HEARDROP</CardDescription>
+                    <CardDescription>Manage which emails you receive from FLYAF</CardDescription>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => navigate("/notifications")}>
                     <History className="w-4 h-4 mr-2" />
@@ -630,16 +637,16 @@ const Profile = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Subscription Status</CardTitle>
-                <CardDescription>Manage your HEARDROP PRO subscription</CardDescription>
+                <CardDescription>Manage your FLYAF Pro subscription</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {isProActive ? (
                   <>
                     <Alert className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/50">
                       <Crown className="h-4 w-4 text-yellow-500" />
-                      <AlertTitle className="text-yellow-700 dark:text-yellow-300">PRO Member</AlertTitle>
+                      <AlertTitle className="text-yellow-700 dark:text-yellow-300">FLYAF Pro Member</AlertTitle>
                       <AlertDescription className="text-yellow-600 dark:text-yellow-400">
-                        You have access to all premium features including exclusive drops and early access
+                        You have access to all premium features — unlimited routes, favourites, PDF export & Pro badge
                       </AlertDescription>
                     </Alert>
 
@@ -661,26 +668,42 @@ const Profile = () => {
                     </div>
 
                     <div className="pt-4">
-                      <h4 className="font-semibold mb-3">PRO Benefits</h4>
+                      <h4 className="font-semibold mb-3">Your Pro Benefits</h4>
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          Access to exclusive PRO-only drops
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#c48e19]" />
+                          Unlimited saved routes
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          Early access to new releases
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#c48e19]" />
+                          Unlimited favourites
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          Priority notifications for favorite brands
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#c48e19]" />
+                          Print/PDF route export
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          Exclusive discounts and offers
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#c48e19]" />
+                          Pro badge on profile & posts
                         </li>
                       </ul>
                     </div>
+
+                    <Button
+                      variant="outline"
+                      className="w-full mt-4"
+                      onClick={async () => {
+                        try {
+                          const { data, error } = await supabase.functions.invoke("customer-portal");
+                          if (error) throw error;
+                          if (data?.url) window.open(data.url, "_blank");
+                        } catch {
+                          toast.error("Unable to open subscription management");
+                        }
+                      }}
+                    >
+                      Manage Subscription
+                    </Button>
                   </>
                 ) : (
                   <>
@@ -688,47 +711,29 @@ const Profile = () => {
                       <AlertCircle className="h-4 w-4" />
                       <AlertTitle>Free Plan</AlertTitle>
                       <AlertDescription>
-                        You're currently on the free plan. Upgrade to PRO for exclusive features!
+                        You're on the free plan. Upgrade to FLYAF Pro for the full experience!
                       </AlertDescription>
                     </Alert>
 
-                    <Card className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20">
+                    <Card className="bg-gradient-to-br from-[#c48e19]/10 to-[#c48e19]/5 border-[#c48e19]/20">
                       <CardHeader>
                         <div className="flex items-center justify-between">
                           <CardTitle className="flex items-center gap-2">
-                            <Crown className="w-5 h-5 text-yellow-500" />
-                            HEARDROP PRO
+                            <Crown className="w-5 h-5 text-[#c48e19]" />
+                            FLYAF Pro
                           </CardTitle>
-                          <Badge variant="secondary">Coming Soon</Badge>
+                          <Badge className="bg-[#c48e19] text-black">From £2.99/mo</Badge>
                         </div>
-                        <CardDescription>Unlock premium features and exclusive content</CardDescription>
+                        <CardDescription>Unlimited routes, favourites, PDF export & Pro badge</CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-                            Access to exclusive PRO-only drops
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-                            Early access to new releases
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-                            Priority notifications for favorite brands
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-                            Exclusive discounts and offers
-                          </div>
-                        </div>
-                        <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600" disabled>
+                      <CardContent>
+                        <Button 
+                          className="w-full bg-[#c48e19] hover:bg-[#b07d15] text-black font-bold"
+                          onClick={() => setShowUpgradeModal(true)}
+                        >
                           <Crown className="w-4 h-4 mr-2" />
-                          Upgrade to PRO
+                          Upgrade to Pro
                         </Button>
-                        <p className="text-xs text-center text-muted-foreground">
-                          PRO subscriptions coming soon
-                        </p>
                       </CardContent>
                     </Card>
                   </>
@@ -738,6 +743,7 @@ const Profile = () => {
           </TabsContent>
         </Tabs>
       </main>
+      <ProUpgradeModal open={showUpgradeModal} onOpenChange={setShowUpgradeModal} />
     </div>
   );
 };
