@@ -9,7 +9,7 @@ export const ContactAndShareSection = () => {
 
   const handleShare = (platform: string) => {
     const url = window.location.origin;
-    const text = "Check out HEARDROP - Your Global Guide to Streetwear!";
+    const text = "Check out FLYAF - Your Global Guide to Streetwear!";
     
     let shareUrl = "";
     
@@ -62,7 +62,7 @@ export const ContactAndShareSection = () => {
                 <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
               </div>
               <div className="flex-1">
-                <h3 className="text-base sm:text-xl font-bold mb-1 sm:mb-2">Share HEARDROP</h3>
+                <h3 className="text-base sm:text-xl font-bold mb-1 sm:mb-2">Share FLYAF</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                   Spread the word about your favorite streetwear guide!
                 </p>

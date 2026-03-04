@@ -89,10 +89,10 @@ export const printRoute = (
   doc.setTextColor(173, 58, 73); // #AD3A49
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.text('HEARDROP', 15, 20);
+  doc.text('FLYAF', 15, 20);
   doc.setTextColor(195, 201, 201); // #C3C9C9
   doc.setFontSize(10);
-  doc.text('Never miss a drop again.', 15, 28);
+  doc.text('Never miss a drop. Never miss a shop.', 15, 28);
 
   // Route title
   doc.setTextColor(30, 30, 30);
@@ -215,13 +215,13 @@ export const shareRoute = async (
 
   const shareUrl = `${window.location.origin}/route/${code}`;
   const stopNames = stops.map((s, i) => `${i + 1}. ${s.name}`).join('\n');
-  const shareText = `My HEARDROP Route:\n${stopNames}\n\nFollow the route: ${shareUrl}`;
+  const shareText = `My FLYAF Route:\n${stopNames}\n\nFollow the route: ${shareUrl}`;
 
   // Try native share (mobile)
   if (navigator.share) {
     try {
       await navigator.share({
-        title: 'My HEARDROP Route',
+        title: 'My FLYAF Route',
         text: shareText,
         url: shareUrl,
       });
