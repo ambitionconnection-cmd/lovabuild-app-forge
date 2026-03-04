@@ -460,13 +460,13 @@ export default function Admin() {
         <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
         
         <div className="flex-1">
-          <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <header className="sticky top-14 lg:top-14 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex h-16 items-center gap-4 px-6">
               <SidebarTrigger />
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/more')}
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
