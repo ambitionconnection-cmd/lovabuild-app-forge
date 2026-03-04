@@ -16,7 +16,7 @@ export const saveRoute = async (
   stops: RouteStop[],
   userLocation: { lat: number; lng: number } | null,
   isPro?: boolean
-): Promise<'saved' | 'limit_reached' | 'error'> => {
+): Promise<'saved' | 'limit_reached' | 'error' | 'sign_in_required'> => {
   if (stops.length === 0) {
     toast.error('No stops to save');
     return 'error';
@@ -61,27 +61,8 @@ export const saveRoute = async (
       return 'saved';
     }
   } else {
-    // Save to localStorage for non-logged-in users
-    const savedRoutes = JSON.parse(localStorage.getItem('flyaf_saved_routes') || '[]');
-    const routeName = `Route - ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-    savedRoutes.push({
-      id: crypto.randomUUID(),
-      name: routeName,
-      stops: stops.map(s => ({
-        id: s.id,
-        name: s.name,
-        address: s.address,
-        city: s.city,
-        latitude: s.latitude,
-        longitude: s.longitude,
-      })),
-      created_at: new Date().toISOString(),
-    });
-    localStorage.setItem('flyaf_saved_routes', JSON.stringify(savedRoutes));
-    toast.success(`Route saved as "${routeName}"`, {
-      description: 'Sign in to sync routes across devices',
-    });
-    return 'saved';
+    // User not signed in — require sign-in
+    return 'sign_in_required';
   }
 };
 
