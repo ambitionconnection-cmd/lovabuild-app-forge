@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ShopEditModal } from "./ShopEditModal";
@@ -15,24 +15,26 @@ import type { Tables } from "@/integrations/supabase/types";
 type Shop = Tables<"shops">;
 type Brand = Tables<"brands">;
 
+interface BrandGroup {
+  brandId: string | null;
+  brandName: string;
+  shops: Shop[];
+}
+
 export const ShopManagement = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [filteredShops, setFilteredShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingShop, setEditingShop] = useState<Shop | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingShop, setDeletingShop] = useState<Shop | null>(null);
   const [selectedShops, setSelectedShops] = useState<Set<string>>(new Set());
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchData();
   }, []);
-
-  useEffect(() => {
-    filterShops();
-  }, [searchQuery, shops]);
 
   const fetchData = async () => {
     try {
@@ -40,10 +42,8 @@ export const ShopManagement = () => {
         supabase.from("shops").select("*").order("name"),
         supabase.from("brands").select("*").order("name"),
       ]);
-
       if (shopsResult.error) throw shopsResult.error;
       if (brandsResult.error) throw brandsResult.error;
-
       setShops(shopsResult.data || []);
       setBrands(brandsResult.data || []);
     } catch (error: any) {
@@ -54,27 +54,72 @@ export const ShopManagement = () => {
     }
   };
 
-  const filterShops = () => {
-    if (!searchQuery) {
-      setFilteredShops(shops);
-      return;
-    }
-
+  const filteredShops = useMemo(() => {
+    if (!searchQuery) return shops;
     const query = searchQuery.toLowerCase();
-    const filtered = shops.filter(
+    return shops.filter(
       (shop) =>
         shop.name.toLowerCase().includes(query) ||
         shop.city.toLowerCase().includes(query) ||
         shop.country.toLowerCase().includes(query) ||
         shop.address.toLowerCase().includes(query)
     );
-    setFilteredShops(filtered);
-  };
+  }, [searchQuery, shops]);
+
+  const isSearching = searchQuery.length > 0;
+
+  const brandGroups = useMemo((): BrandGroup[] => {
+    const groupMap = new Map<string, Shop[]>();
+    const ungrouped: Shop[] = [];
+
+    for (const shop of filteredShops) {
+      if (shop.brand_id) {
+        const existing = groupMap.get(shop.brand_id) || [];
+        existing.push(shop);
+        groupMap.set(shop.brand_id, existing);
+      } else {
+        ungrouped.push(shop);
+      }
+    }
+
+    const groups: BrandGroup[] = [];
+
+    // Brand groups with 2+ shops get collapsible rows
+    const sortedEntries = Array.from(groupMap.entries()).sort((a, b) => {
+      const nameA = getBrandName(a[0]);
+      const nameB = getBrandName(b[0]);
+      return nameA.localeCompare(nameB);
+    });
+
+    for (const [brandId, brandShops] of sortedEntries) {
+      groups.push({
+        brandId,
+        brandName: getBrandName(brandId),
+        shops: brandShops.sort((a, b) => a.name.localeCompare(b.name)),
+      });
+    }
+
+    // Ungrouped shops (no brand) as individual items
+    for (const shop of ungrouped) {
+      groups.push({ brandId: null, brandName: "-", shops: [shop] });
+    }
+
+    return groups;
+  }, [filteredShops, brands]);
 
   const getBrandName = (brandId: string | null) => {
     if (!brandId) return "-";
     const brand = brands.find((b) => b.id === brandId);
     return brand?.name || "-";
+  };
+
+  const toggleGroup = (key: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   };
 
   const handleEdit = (shop: Shop) => {
@@ -89,23 +134,12 @@ export const ShopManagement = () => {
 
   const handleDelete = async () => {
     if (!deletingShop) return;
-
     try {
-      const { error } = await supabase
-        .from("shops")
-        .delete()
-        .eq("id", deletingShop.id);
-
+      const { error } = await supabase.from("shops").delete().eq("id", deletingShop.id);
       if (error) throw error;
-
-      // Log admin action
       await supabase.functions.invoke("log-security-event", {
-        body: {
-          eventType: "shop_deleted",
-          eventData: { shop_id: deletingShop.id, shop_name: deletingShop.name },
-        },
+        body: { eventType: "shop_deleted", eventData: { shop_id: deletingShop.id, shop_name: deletingShop.name } },
       });
-
       toast.success("Shop deleted successfully");
       fetchData();
     } catch (error: any) {
@@ -119,11 +153,8 @@ export const ShopManagement = () => {
   const toggleSelectShop = (shopId: string) => {
     setSelectedShops((prev) => {
       const next = new Set(prev);
-      if (next.has(shopId)) {
-        next.delete(shopId);
-      } else {
-        next.add(shopId);
-      }
+      if (next.has(shopId)) next.delete(shopId);
+      else next.add(shopId);
       return next;
     });
   };
@@ -138,22 +169,15 @@ export const ShopManagement = () => {
 
   const handleBulkActivate = async (activate: boolean) => {
     if (selectedShops.size === 0) return;
-
     try {
       const { error } = await supabase
         .from("shops")
         .update({ is_active: activate })
         .in("id", Array.from(selectedShops));
-
       if (error) throw error;
-
       await supabase.functions.invoke("log-security-event", {
-        body: {
-          eventType: "shops_bulk_update",
-          eventData: { count: selectedShops.size, is_active: activate },
-        },
+        body: { eventType: "shops_bulk_update", eventData: { count: selectedShops.size, is_active: activate } },
       });
-
       toast.success(`${selectedShops.size} shop(s) ${activate ? "activated" : "deactivated"}`);
       setSelectedShops(new Set());
       fetchData();
@@ -162,6 +186,37 @@ export const ShopManagement = () => {
       toast.error(error.message || "Failed to update shops");
     }
   };
+
+  const renderShopRow = (shop: Shop, indent = false) => (
+    <TableRow key={shop.id}>
+      <TableCell>
+        <Checkbox checked={selectedShops.has(shop.id)} onCheckedChange={() => toggleSelectShop(shop.id)} />
+      </TableCell>
+      <TableCell className={`font-medium ${indent ? "pl-8" : ""}`}>{shop.name}</TableCell>
+      <TableCell>{getBrandName(shop.brand_id)}</TableCell>
+      <TableCell>{shop.city}</TableCell>
+      <TableCell>{shop.country}</TableCell>
+      <TableCell className="max-w-xs truncate">{shop.address}</TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Badge variant={shop.is_active ? "default" : "secondary"}>
+            {shop.is_active ? "Active" : "Inactive"}
+          </Badge>
+          {shop.is_unique_shop && <Badge variant="outline">Unique</Badge>}
+        </div>
+      </TableCell>
+      <TableCell className="text-right">
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => handleEdit(shop)}>
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setDeletingShop(shop)}>
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
 
   if (loading) {
     return (
@@ -238,50 +293,49 @@ export const ShopManagement = () => {
                       No shops found
                     </TableCell>
                   </TableRow>
+                ) : isSearching ? (
+                  // Flat list when searching
+                  filteredShops.map((shop) => renderShopRow(shop))
                 ) : (
-                  filteredShops.map((shop) => (
-                    <TableRow key={shop.id}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedShops.has(shop.id)}
-                          onCheckedChange={() => toggleSelectShop(shop.id)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">{shop.name}</TableCell>
-                      <TableCell>{getBrandName(shop.brand_id)}</TableCell>
-                      <TableCell>{shop.city}</TableCell>
-                      <TableCell>{shop.country}</TableCell>
-                      <TableCell className="max-w-xs truncate">{shop.address}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Badge variant={shop.is_active ? "default" : "secondary"}>
-                            {shop.is_active ? "Active" : "Inactive"}
-                          </Badge>
-                          {shop.is_unique_shop && (
-                            <Badge variant="outline">Unique</Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(shop)}
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeletingShop(shop)}
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  // Grouped view
+                  brandGroups.map((group) => {
+                    const groupKey = group.brandId || `ungrouped-${group.shops[0]?.id}`;
+                    const isMulti = group.shops.length > 1;
+                    const isExpanded = expandedGroups.has(groupKey);
+
+                    if (!isMulti) {
+                      // Single shop or no brand — render directly
+                      return renderShopRow(group.shops[0]);
+                    }
+
+                    // Collapsible brand group
+                    return (
+                      <>
+                        <TableRow
+                          key={`group-${groupKey}`}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => toggleGroup(groupKey)}
+                        >
+                          <TableCell>
+                            {isExpanded ? (
+                              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                            )}
+                          </TableCell>
+                          <TableCell colSpan={6} className="font-semibold">
+                            {group.brandName}
+                            <Badge variant="secondary" className="ml-2">
+                              {group.shops.length} shops
+                            </Badge>
+                          </TableCell>
+                          <TableCell />
+                        </TableRow>
+                        {isExpanded &&
+                          group.shops.map((shop) => renderShopRow(shop, true))}
+                      </>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
@@ -309,8 +363,7 @@ export const ShopManagement = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Shop</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deletingShop?.name}"? This action cannot be
-              undone.
+              Are you sure you want to delete "{deletingShop?.name}"? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
