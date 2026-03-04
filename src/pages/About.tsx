@@ -48,7 +48,7 @@ const About = () => {
             <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">A Note From Our Founder</h3>
             <div className="space-y-3 border-l-2 border-[#AD3A49]/40 pl-4">
               <p className="text-sm text-foreground/60 leading-relaxed italic">
-                "I spent 10 years working the door at the biggest streetwear shops in London. I was there for the queues, the infamous 'bricks'—usually with a black coffee in one hand and a toothpick in the other.
+                "I spent 10 years working the door at the biggest streetwear shops in London. I was there for the queues, the wild drops and the infamous 'brick'.
               </p>
               <p className="text-sm text-foreground/60 leading-relaxed italic">
                 Working security, I saw how many people missed out on their favourite brands simply because they were around the corner. Interesting shops are always clustered together, but you need to know where to look. I built FLYAF to bridge that gap."
