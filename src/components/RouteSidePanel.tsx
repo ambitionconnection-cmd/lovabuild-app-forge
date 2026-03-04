@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Navigation, Trash2, X, Save, Printer, Share2, GripVertical } from 'lucide-react';
+import { Navigation, Trash2, X, Save, Printer, Share2, GripVertical, Lock, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProUpgradeModal } from '@/components/ProUpgradeModal';
 import {
@@ -133,11 +133,12 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 h-8 text-xs border-white/10"
-            onClick={() => printRoute(journeyStops, userLocation)}
+            className={`flex-1 h-8 text-xs border-white/10 ${!isPro ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => { if (!isPro) { setShowProModal(true); } else { printRoute(journeyStops, userLocation); } }}
           >
-            <Printer className="w-3 h-3 mr-1" />
+            {isPro ? <Printer className="w-3 h-3 mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
             Print
+            {!isPro && <span className="ml-1 px-1 py-px rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none">PRO</span>}
           </Button>
           <Button
             variant="outline"
