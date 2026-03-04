@@ -1,4 +1,4 @@
-import { Shield, Lock, FileText, Users, Store, Package, Calendar, Mail, Clock, Image, ChevronRight, MessageSquare, Download, Eye, Star, Layers, Archive } from "lucide-react";
+import { Shield, Lock, FileText, Users, Store, Package, Calendar, Mail, Clock, Image, ChevronRight, MessageSquare, Download, Eye, Star, Layers, Archive, Gift } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -55,6 +55,13 @@ const navGroups = [
       { title: "Media Library", value: "media", icon: Image },
       { title: "AI Image Generator", value: "brand-images", icon: Image },
       { title: "Image Archive", value: "image-archive", icon: Archive },
+    ],
+  },
+  {
+    label: "Growth",
+    icon: Gift,
+    items: [
+      { title: "Ambassador Codes", value: "ambassador-codes", icon: Gift },
     ],
   },
   {

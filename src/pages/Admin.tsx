@@ -31,6 +31,7 @@ import { AdminStatsCards } from '@/components/AdminStatsCards';
 import { FeaturedBrandManagement } from '@/components/FeaturedBrandManagement';
 import { CollectionManagement } from '@/components/CollectionManagement';
 import { ImageArchiveManagement } from '@/components/ImageArchiveManagement';
+import { AmbassadorCodeManagement } from '@/components/AmbassadorCodeManagement';
 
 interface LoginAttempt {
   id: string;
@@ -720,6 +721,10 @@ export default function Admin() {
 
             {activeTab === "image-archive" && (
               <ImageArchiveManagement />
+            )}
+
+            {activeTab === "ambassador-codes" && (
+              <AmbassadorCodeManagement />
             )}
 
             {activeTab === "data-exports" && (

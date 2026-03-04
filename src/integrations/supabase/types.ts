@@ -62,6 +62,39 @@ export type Database = {
           },
         ]
       }
+      ambassador_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          max_uses: number
+          note: string | null
+          pro_duration_days: number | null
+          uses_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+          note?: string | null
+          pro_duration_days?: number | null
+          uses_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+          note?: string | null
+          pro_duration_days?: number | null
+          uses_count?: number
+        }
+        Relationships: []
+      }
       brand_radar_items: {
         Row: {
           brand_id: string
@@ -162,6 +195,35 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      code_redemptions: {
+        Row: {
+          code_id: string
+          id: string
+          redeemed_at: string
+          user_id: string
+        }
+        Insert: {
+          code_id: string
+          id?: string
+          redeemed_at?: string
+          user_id: string
+        }
+        Update: {
+          code_id?: string
+          id?: string
+          redeemed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "code_redemptions_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: false
+            referencedRelation: "ambassador_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       collections: {
         Row: {
@@ -486,6 +548,7 @@ export type Database = {
           created_at: string | null
           display_name: string | null
           id: string
+          is_founding_member: boolean
           is_pro: boolean | null
           notification_preferences: Json | null
           pro_expires_at: string | null
@@ -496,6 +559,7 @@ export type Database = {
           created_at?: string | null
           display_name?: string | null
           id: string
+          is_founding_member?: boolean
           is_pro?: boolean | null
           notification_preferences?: Json | null
           pro_expires_at?: string | null
@@ -506,6 +570,7 @@ export type Database = {
           created_at?: string | null
           display_name?: string | null
           id?: string
+          is_founding_member?: boolean
           is_pro?: boolean | null
           notification_preferences?: Json | null
           pro_expires_at?: string | null

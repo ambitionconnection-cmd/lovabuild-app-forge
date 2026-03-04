@@ -55,6 +55,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Check subscription on login
         if (session?.user) {
           setTimeout(() => checkSubscription(), 0);
+          // Check if founding member on first login
+          if (event === 'SIGNED_IN') {
+            setTimeout(async () => {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('is_founding_member')
+                .eq('id', session.user.id)
+                .maybeSingle();
+              if (profile?.is_founding_member) {
+                toast.success("You're one of FLYAF's first 500 members. Welcome to Pro, on us for 3 months. 🏆");
+              }
+            }, 500);
+          }
         } else {
           setIsPro(false);
           setSubscriptionEnd(null);
