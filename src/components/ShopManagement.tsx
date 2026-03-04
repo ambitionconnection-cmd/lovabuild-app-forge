@@ -68,6 +68,12 @@ export const ShopManagement = () => {
 
   const isSearching = searchQuery.length > 0;
 
+  const getBrandName = (brandId: string | null) => {
+    if (!brandId) return "-";
+    const brand = brands.find((b) => b.id === brandId);
+    return brand?.name || "-";
+  };
+
   const brandGroups = useMemo((): BrandGroup[] => {
     const groupMap = new Map<string, Shop[]>();
     const ungrouped: Shop[] = [];
@@ -84,7 +90,6 @@ export const ShopManagement = () => {
 
     const groups: BrandGroup[] = [];
 
-    // Brand groups with 2+ shops get collapsible rows
     const sortedEntries = Array.from(groupMap.entries()).sort((a, b) => {
       const nameA = getBrandName(a[0]);
       const nameB = getBrandName(b[0]);
@@ -99,19 +104,12 @@ export const ShopManagement = () => {
       });
     }
 
-    // Ungrouped shops (no brand) as individual items
     for (const shop of ungrouped) {
       groups.push({ brandId: null, brandName: "-", shops: [shop] });
     }
 
     return groups;
   }, [filteredShops, brands]);
-
-  const getBrandName = (brandId: string | null) => {
-    if (!brandId) return "-";
-    const brand = brands.find((b) => b.id === brandId);
-    return brand?.name || "-";
-  };
 
   const toggleGroup = (key: string) => {
     setExpandedGroups((prev) => {
