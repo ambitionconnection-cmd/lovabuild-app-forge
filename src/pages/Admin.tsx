@@ -33,6 +33,8 @@ import { CollectionManagement } from '@/components/CollectionManagement';
 import { ImageArchiveManagement } from '@/components/ImageArchiveManagement';
 import { AmbassadorCodeManagement } from '@/components/AmbassadorCodeManagement';
 import { BrandRequestsQueue } from '@/components/BrandRequestsQueue';
+import { AdminNotificationBanner } from '@/components/AdminNotificationBanner';
+import { UserAnalytics } from '@/components/UserAnalytics';
 
 interface LoginAttempt {
   id: string;
@@ -482,6 +484,7 @@ export default function Admin() {
           </header>
 
           <main className="p-6">
+            <AdminNotificationBanner onNavigate={setActiveTab} />
             <AdminStatsCards
               totalBrands={stats.totalBrands}
               totalShops={stats.totalShops}
@@ -734,6 +737,10 @@ export default function Admin() {
 
             {activeTab === "data-exports" && (
               <DataExports />
+            )}
+
+            {activeTab === "user-analytics" && (
+              <UserAnalytics />
             )}
           </main>
         </div>
