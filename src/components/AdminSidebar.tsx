@@ -1,4 +1,4 @@
-import { Shield, Lock, FileText, Users, Store, Package, Calendar, Mail, Clock, Image, ChevronRight, MessageSquare, Download, Eye, Star, Layers, Archive, Gift, Inbox } from "lucide-react";
+import { Shield, Lock, FileText, Users, Store, Package, Calendar, Mail, Clock, Image, ChevronRight, MessageSquare, Download, Eye, Star, Layers, Archive, Gift, Inbox, Bell } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -46,6 +46,7 @@ const navGroups = [
     items: [
       { title: "Contact Messages", value: "contact-messages", icon: MessageSquare },
       { title: "Email Analytics", value: "analytics", icon: Mail },
+      { title: "Email Notifications", value: "email-notifications", icon: Bell },
       { title: "Scheduled Exports", value: "scheduled", icon: Clock },
     ],
   },

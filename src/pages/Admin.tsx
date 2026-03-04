@@ -35,6 +35,7 @@ import { AmbassadorCodeManagement } from '@/components/AmbassadorCodeManagement'
 import { BrandRequestsQueue } from '@/components/BrandRequestsQueue';
 import { AdminNotificationBanner } from '@/components/AdminNotificationBanner';
 import { UserAnalytics } from '@/components/UserAnalytics';
+import { AdminNotificationPreferences } from '@/components/AdminNotificationPreferences';
 
 interface LoginAttempt {
   id: string;
@@ -476,7 +477,7 @@ export default function Admin() {
               </div>
               <Button
                 variant="default"
-                onClick={() => navigate('/analytics')}
+                onClick={() => setActiveTab('user-analytics')}
               >
                 View Analytics
               </Button>
@@ -741,6 +742,10 @@ export default function Admin() {
 
             {activeTab === "user-analytics" && (
               <UserAnalytics />
+            )}
+
+            {activeTab === "email-notifications" && (
+              <AdminNotificationPreferences />
             )}
           </main>
         </div>
