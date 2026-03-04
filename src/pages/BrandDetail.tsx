@@ -248,11 +248,11 @@ const BrandDetail = () => {
 
       <main className="container mx-auto px-3 py-4 space-y-4">
         {/* Brand Hero Card */}
-        <Card className="overflow-hidden bg-gradient-to-br from-muted/50 via-card to-muted/30 animate-scale-in">
+        <Card className="overflow-hidden bg-gradient-to-br from-muted/50 via-card to-muted/30 border-primary/20 animate-scale-in">
           <CardContent className="p-4">
             <div className="flex flex-col items-center gap-4">
               {/* Logo */}
-              <div className="w-32 h-32 rounded-2xl bg-logo-bg border border-border/50 flex items-center justify-center overflow-hidden shadow-lg animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
+              <div className="w-32 h-32 rounded-2xl bg-logo-bg border-2 border-primary/30 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/10 animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
                 {brand.logo_url ? (
                   <img src={brand.logo_url} alt={brand.name} className="max-w-full max-h-full object-contain p-2" />
                 ) : (
@@ -266,7 +266,7 @@ const BrandDetail = () => {
                   {brand.country && (
                     <span className="text-xl" title={brand.country}>{getCountryFlag(brand.country)}</span>
                   )}
-                  <h2 className="text-xl font-bold uppercase tracking-wide">{brand.name}</h2>
+                  <h2 className="text-xl font-bold uppercase tracking-wide text-primary">{brand.name}</h2>
                 </div>
                 {brand.description && (
                   <p className="text-sm text-muted-foreground mt-2 max-w-md">{brand.description}</p>
@@ -334,10 +334,10 @@ const BrandDetail = () => {
 
         {/* Brand History */}
         {brand.history && (
-          <Card className="animate-fade-in" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm uppercase tracking-wide">About</CardTitle>
+                <CardTitle className="text-sm uppercase tracking-wide text-primary">About</CardTitle>
                 {showTranslate && (
                   <button onClick={() => openTranslate(brand.history!)} className="flex items-center gap-1 px-2 py-1 rounded-full hover:bg-muted transition-colors text-muted-foreground" title={t('shops.translate')}>
                     <Languages className="w-4 h-4" />
@@ -353,10 +353,10 @@ const BrandDetail = () => {
         )}
 
         {/* Upcoming Drops */}
-        <Card className="animate-fade-in" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
+        <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm uppercase tracking-wide">Upcoming Drops</CardTitle>
+              <CardTitle className="text-sm uppercase tracking-wide text-primary">Upcoming Drops</CardTitle>
               <Badge variant="secondary" className="text-xs">{drops.length}</Badge>
             </div>
           </CardHeader>
@@ -398,10 +398,10 @@ const BrandDetail = () => {
         </Card>
 
         {/* Shops */}
-        <Card className="animate-fade-in" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
+        <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm uppercase tracking-wide">Stores</CardTitle>
+              <CardTitle className="text-sm uppercase tracking-wide text-primary">Stores</CardTitle>
               <Badge variant="secondary" className="text-xs">{shops.length}</Badge>
             </div>
           </CardHeader>
@@ -441,9 +441,9 @@ const BrandDetail = () => {
 
         {/* Similar Brands */}
         {similarBrands.length > 0 && (
-          <Card className="animate-fade-in" style={{ animationDelay: '300ms', animationFillMode: 'backwards' }}>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '300ms', animationFillMode: 'backwards' }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm uppercase tracking-wide">Similar To {brand.name}</CardTitle>
+              <CardTitle className="text-sm uppercase tracking-wide text-primary">Similar To {brand.name}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-2">

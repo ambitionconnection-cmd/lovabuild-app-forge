@@ -378,13 +378,13 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                     <div className="flex items-start justify-between gap-2 overflow-visible">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h4 className={`font-semibold text-sm truncate ${isSelected || inJourney ? 'text-foreground' : ''}`}>{shop.name}</h4>
+                          <h4 className={`font-semibold text-sm truncate ${isSelected ? 'text-gray-900' : inJourney ? 'text-gray-900' : ''}`}>{shop.name}</h4>
                         </div>
-                        <p className={`text-xs mt-0.5 truncate ${isSelected || inJourney ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
+                        <p className={`text-xs mt-0.5 truncate ${isSelected || inJourney ? 'text-gray-600' : 'text-muted-foreground'}`}>
                           {shop.address}, {shop.city}
                         </p>
                         {distance !== null && (
-                          <p className={`text-xs font-medium mt-1 ${isSelected || inJourney ? 'text-primary' : 'text-primary'}`}>
+                          <p className={`text-xs font-medium mt-1 ${isSelected || inJourney ? 'text-gray-700' : 'text-primary'}`}>
                             {formatDistance(distance)} {t('shops.away')}
                           </p>
                         )}
