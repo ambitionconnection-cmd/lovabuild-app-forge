@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
+import QRCode from 'qrcode';
 import { toast } from 'sonner';
 
 interface RouteStop {
@@ -305,11 +306,36 @@ export const printRoute = async (
     y += 20;
   });
 
-  // ── Tips Section ──
-  if (y > 245) { doc.addPage(); y = 20; }
+  // ── Create shared route for QR code ──
+  let shareUrl = `${window.location.origin}`;
+  try {
+    const code = generateCode();
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await (supabase.from('shared_routes') as any).insert({
+      code,
+      stops: stops.map(s => ({
+        id: s.id, name: s.name, address: s.address,
+        city: s.city, latitude: s.latitude, longitude: s.longitude,
+      })),
+      created_by: user?.id || null,
+    });
+    if (!error) {
+      shareUrl = `${window.location.origin}/route/${code}`;
+    }
+  } catch (e) {
+    console.warn('Could not create share link for QR:', e);
+  }
+
+  // ── QR Code + Tips Side by Side ──
+  if (y > 230) { doc.addPage(); y = 20; }
   y += 4;
+
+  const qrSize = 30;
+  const tipsWidth = contentWidth - qrSize - 10;
+
+  // Tips box (left side)
   doc.setFillColor(196, 149, 106, 0.1);
-  doc.roundedRect(margin, y, contentWidth, 22, 2, 2, 'F');
+  doc.roundedRect(margin, y, tipsWidth, 34, 2, 2, 'F');
   doc.setTextColor(196, 149, 106);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
@@ -317,9 +343,28 @@ export const printRoute = async (
   doc.setTextColor(160, 160, 160);
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
-  doc.text('• Check opening hours before visiting — some shops have limited weekend hours', margin + 6, y + 13);
-  doc.text('• Walking distances are approximate straight-line estimates', margin + 6, y + 18);
-  y += 28;
+  doc.text('• Check opening hours before visiting', margin + 6, y + 14);
+  doc.text('• Walking distances are straight-line estimates', margin + 6, y + 19);
+  doc.text('• Scan the QR code to open this route', margin + 6, y + 24);
+  doc.text('  on your phone with live navigation', margin + 6, y + 29);
+
+  // QR code (right side)
+  try {
+    const qrDataUrl = await QRCode.toDataURL(shareUrl, {
+      width: 300,
+      margin: 1,
+      color: { dark: '#C4956A', light: '#16161800' },
+    });
+    const qrX = margin + tipsWidth + 6;
+    doc.addImage(qrDataUrl, 'PNG', qrX, y, qrSize, qrSize);
+    doc.setTextColor(140, 140, 140);
+    doc.setFontSize(6);
+    doc.text('Scan to open route', qrX + qrSize / 2, y + qrSize + 4, { align: 'center' });
+  } catch (e) {
+    console.warn('QR generation failed:', e);
+  }
+
+  y += 40;
 
   // ── Footer ──
   if (y > 270) { doc.addPage(); y = 20; }
