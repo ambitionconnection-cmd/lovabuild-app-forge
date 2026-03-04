@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notification_preferences: {
+        Row: {
+          admin_id: string
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          notify_brand_requests: boolean
+          notify_contact_messages: boolean
+          notify_new_signups: boolean
+          notify_pending_posts: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          notify_brand_requests?: boolean
+          notify_contact_messages?: boolean
+          notify_new_signups?: boolean
+          notify_pending_posts?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          notify_brand_requests?: boolean
+          notify_contact_messages?: boolean
+          notify_new_signups?: boolean
+          notify_pending_posts?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       affiliate_analytics: {
         Row: {
           created_at: string
