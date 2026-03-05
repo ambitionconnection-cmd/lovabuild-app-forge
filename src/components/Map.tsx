@@ -908,7 +908,7 @@ const Map: React.FC<MapProps> = ({
             filter: ['!', ['has', 'point_count']],
             layout: {
               'text-field': ['get', 'name'],
-              'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+              'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
               'text-size': [
                 'interpolate', ['linear'], ['zoom'],
                 12, 10,
