@@ -1,4 +1,5 @@
 import { Heart, User, Mail, Info, Bell, Shield, ChevronRight, Globe } from "lucide-react";
+import urbanBg from "@/assets/urban-bg.jpg";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -84,12 +85,14 @@ const More = () => {
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col">
-      <div className="flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16 lg:px-12">
+      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${urbanBg})` }} />
+      <div className="absolute inset-0 bg-background/70" />
+      <div className="relative flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16 lg:px-12">
         <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-wider uppercase">{t('nav.more')}</h1>
         <p className="text-sm lg:text-base text-white/40 mt-1">{t('more.subtitle')}</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 lg:px-12 pb-20">
+      <div className="relative flex-1 overflow-y-auto px-4 lg:px-12 pb-20">
         <div className="space-y-1 lg:max-w-2xl">
           {visibleItems.map((item) => {
             const Icon = item.icon;
