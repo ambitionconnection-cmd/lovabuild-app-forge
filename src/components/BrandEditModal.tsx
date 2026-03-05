@@ -44,6 +44,7 @@ export const BrandEditModal = ({ brand, isOpen, onClose, onSuccess }: BrandEditM
     banner_url: null,
     category: null,
     is_active: true,
+    brand_tier: "established" as any,
   });
   const [saving, setSaving] = useState(false);
 
@@ -64,6 +65,7 @@ export const BrandEditModal = ({ brand, isOpen, onClose, onSuccess }: BrandEditM
         banner_url: null,
         category: null,
         is_active: true,
+        brand_tier: "established" as any,
       });
     }
   }, [brand, isOpen]);
@@ -290,6 +292,22 @@ export const BrandEditModal = ({ brand, isOpen, onClose, onSuccess }: BrandEditM
               value={formData.history || ""}
               onChange={(e) => setFormData({ ...formData, history: e.target.value })}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="brand_tier">Brand Tier</Label>
+            <Select
+              value={(formData as any).brand_tier || "established"}
+              onValueChange={(value) => setFormData({ ...formData, brand_tier: value as any })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select tier" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="established">Established</SelectItem>
+                <SelectItem value="emerging">New Wave (Emerging)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex items-center space-x-2">
