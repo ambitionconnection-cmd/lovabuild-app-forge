@@ -5,42 +5,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Upload, Search, Trash2, Copy, Image as ImageIcon, Loader2, FileUp } from "lucide-react";
+import { Upload, Search, Trash2, Copy, Image as ImageIcon, Loader2, FileUp, Store } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Brand = Tables<"brands">;
+type Shop = Tables<"shops">;
 
 export const MediaManagement = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadType, setUploadType] = useState<"logo" | "banner">("logo");
+  const [uploadType, setUploadType] = useState<"logo" | "banner" | "shop">("logo");
   const [newUrl, setNewUrl] = useState("");
-  const [deletingImage, setDeletingImage] = useState<{ brand: Brand; type: "logo" | "banner" } | null>(null);
+  const [deletingImage, setDeletingImage] = useState<{ brand?: Brand; shop?: Shop; type: "logo" | "banner" | "shop" } | null>(null);
   const [uploadMode, setUploadMode] = useState<"url" | "file">("file");
   const [isDragging, setIsDragging] = useState(false);
+  const [mediaTab, setMediaTab] = useState<"brands" | "shops">("brands");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetchBrands();
+    fetchData();
   }, []);
 
-  const fetchBrands = async () => {
+  const fetchData = async () => {
     try {
-      const { data, error } = await supabase
-        .from("brands")
-        .select("*")
-        .order("name");
-
-      if (error) throw error;
-      setBrands(data || []);
+      const [brandsResult, shopsResult] = await Promise.all([
+        supabase.from("brands").select("*").order("name"),
+        supabase.from("shops").select("*").order("name"),
+      ]);
+      if (brandsResult.error) throw brandsResult.error;
+      if (shopsResult.error) throw shopsResult.error;
+      setBrands(brandsResult.data || []);
+      setShops(shopsResult.data || []);
     } catch (error: any) {
-      console.error("Error fetching brands:", error);
-      toast.error("Failed to load brands");
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -50,8 +55,14 @@ export const MediaManagement = () => {
     brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const filteredShops = shops.filter((shop) =>
+    shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    shop.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    shop.country.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleFileUpload = async (file: File) => {
-    if (!selectedBrand) return;
+    if (!selectedBrand && !selectedShop) return;
     
     setUploading(true);
     try {
@@ -66,8 +77,10 @@ export const MediaManagement = () => {
         throw new Error('File size must be less than 5MB');
       }
 
-      const fileName = `${selectedBrand.slug}-${uploadType}-${Date.now()}.${fileExt}`;
-      const filePath = `${uploadType}s/${fileName}`;
+      const slug = selectedBrand?.slug || selectedShop?.slug || 'item';
+      const folder = uploadType === "shop" ? "shops" : `${uploadType}s`;
+      const fileName = `${slug}-${uploadType}-${Date.now()}.${fileExt}`;
+      const filePath = `${folder}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('brand-images')
@@ -82,7 +95,11 @@ export const MediaManagement = () => {
         .from('brand-images')
         .getPublicUrl(filePath);
 
-      await handleUrlUpdate(selectedBrand, uploadType, publicUrl);
+      if (selectedBrand) {
+        await handleBrandUrlUpdate(selectedBrand, uploadType as "logo" | "banner", publicUrl);
+      } else if (selectedShop) {
+        await handleShopUrlUpdate(selectedShop, publicUrl);
+      }
     } catch (error: any) {
       console.error("Error uploading file:", error);
       toast.error(error.message || "Failed to upload file");
@@ -114,7 +131,7 @@ export const MediaManagement = () => {
     }
   };
 
-  const handleUrlUpdate = async (brand: Brand, type: "logo" | "banner", url: string) => {
+  const handleBrandUrlUpdate = async (brand: Brand, type: "logo" | "banner", url: string) => {
     try {
       const updateData = type === "logo" ? { logo_url: url || null } : { banner_url: url || null };
       
@@ -125,16 +142,28 @@ export const MediaManagement = () => {
 
       if (error) throw error;
 
-      await supabase.functions.invoke("log-security-event", {
-        body: {
-          eventType: `brand_${type}_updated`,
-          eventData: { brand_id: brand.id, brand_name: brand.name, new_url: url },
-        },
-      });
-
       toast.success(`${type === "logo" ? "Logo" : "Banner"} updated for ${brand.name}`);
-      fetchBrands();
+      fetchData();
       setSelectedBrand(null);
+      setNewUrl("");
+    } catch (error: any) {
+      console.error("Error updating image:", error);
+      toast.error(error.message || "Failed to update image");
+    }
+  };
+
+  const handleShopUrlUpdate = async (shop: Shop, url: string) => {
+    try {
+      const { error } = await supabase
+        .from("shops")
+        .update({ image_url: url || null })
+        .eq("id", shop.id);
+
+      if (error) throw error;
+
+      toast.success(`Image updated for ${shop.name}`);
+      fetchData();
+      setSelectedShop(null);
       setNewUrl("");
     } catch (error: any) {
       console.error("Error updating image:", error);
@@ -146,24 +175,23 @@ export const MediaManagement = () => {
     if (!deletingImage) return;
 
     try {
-      const updateData = deletingImage.type === "logo" ? { logo_url: null } : { banner_url: null };
-      
-      const { error } = await supabase
-        .from("brands")
-        .update(updateData)
-        .eq("id", deletingImage.brand.id);
-
-      if (error) throw error;
-
-      await supabase.functions.invoke("log-security-event", {
-        body: {
-          eventType: `brand_${deletingImage.type}_deleted`,
-          eventData: { brand_id: deletingImage.brand.id, brand_name: deletingImage.brand.name },
-        },
-      });
-
-      toast.success(`${deletingImage.type === "logo" ? "Logo" : "Banner"} removed from ${deletingImage.brand.name}`);
-      fetchBrands();
+      if (deletingImage.brand) {
+        const updateData = deletingImage.type === "logo" ? { logo_url: null } : { banner_url: null };
+        const { error } = await supabase
+          .from("brands")
+          .update(updateData)
+          .eq("id", deletingImage.brand.id);
+        if (error) throw error;
+        toast.success(`${deletingImage.type === "logo" ? "Logo" : "Banner"} removed from ${deletingImage.brand.name}`);
+      } else if (deletingImage.shop) {
+        const { error } = await supabase
+          .from("shops")
+          .update({ image_url: null })
+          .eq("id", deletingImage.shop.id);
+        if (error) throw error;
+        toast.success(`Image removed from ${deletingImage.shop.name}`);
+      }
+      fetchData();
     } catch (error: any) {
       console.error("Error deleting image:", error);
       toast.error(error.message || "Failed to delete image");
@@ -176,6 +204,10 @@ export const MediaManagement = () => {
     navigator.clipboard.writeText(url);
     toast.success("URL copied to clipboard");
   };
+
+  const isUploadDialogOpen = !!(selectedBrand || selectedShop);
+  const uploadDialogName = selectedBrand?.name || selectedShop?.name || "";
+  const uploadDialogLabel = selectedBrand ? (uploadType === "logo" ? "Update Logo" : "Update Banner") : "Update Image";
 
   const BrandImageCard = ({ brand }: { brand: Brand }) => (
     <div className="border rounded-lg p-4 space-y-4 bg-background">
@@ -196,7 +228,6 @@ export const MediaManagement = () => {
                 className="w-full h-full object-contain p-2"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
-                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
                 }}
               />
             ) : (
@@ -213,6 +244,7 @@ export const MediaManagement = () => {
               className="flex-1 text-xs"
               onClick={() => {
                 setSelectedBrand(brand);
+                setSelectedShop(null);
                 setUploadType("logo");
                 setNewUrl(brand.logo_url || "");
               }}
@@ -221,18 +253,10 @@ export const MediaManagement = () => {
             </Button>
             {brand.logo_url && (
               <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(brand.logo_url!)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(brand.logo_url!)}>
                   <Copy className="w-3 h-3" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeletingImage({ brand, type: "logo" })}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ brand, type: "logo" })}>
                   <Trash2 className="w-3 h-3 text-destructive" />
                 </Button>
               </>
@@ -267,6 +291,7 @@ export const MediaManagement = () => {
               className="flex-1 text-xs"
               onClick={() => {
                 setSelectedBrand(brand);
+                setSelectedShop(null);
                 setUploadType("banner");
                 setNewUrl(brand.banner_url || "");
               }}
@@ -275,23 +300,70 @@ export const MediaManagement = () => {
             </Button>
             {brand.banner_url && (
               <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(brand.banner_url!)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(brand.banner_url!)}>
                   <Copy className="w-3 h-3" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeletingImage({ brand, type: "banner" })}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ brand, type: "banner" })}>
                   <Trash2 className="w-3 h-3 text-destructive" />
                 </Button>
               </>
             )}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ShopImageCard = ({ shop }: { shop: Shop }) => (
+    <div className="border rounded-lg p-4 space-y-4 bg-background">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-lg">{shop.name}</h3>
+        <span className="text-xs text-muted-foreground">{shop.city}, {shop.country}</span>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">Shop Image</Label>
+        <div className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center border">
+          {shop.image_url ? (
+            <img
+              src={shop.image_url}
+              alt={`${shop.name}`}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+          ) : (
+            <div className="flex flex-col items-center text-muted-foreground">
+              <Store className="w-8 h-8 mb-1" />
+              <span className="text-xs">No image</span>
+            </div>
+          )}
+        </div>
+        <div className="flex gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 text-xs"
+            onClick={() => {
+              setSelectedShop(shop);
+              setSelectedBrand(null);
+              setUploadType("shop");
+              setNewUrl(shop.image_url || "");
+            }}
+          >
+            {shop.image_url ? "Replace" : "Add"}
+          </Button>
+          {shop.image_url && (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(shop.image_url!)}>
+                <Copy className="w-3 h-3" />
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ shop, type: "shop" })}>
+                <Trash2 className="w-3 h-3 text-destructive" />
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -319,78 +391,114 @@ export const MediaManagement = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search brands..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList>
-              <TabsTrigger value="all">All Brands ({brands.length})</TabsTrigger>
-              <TabsTrigger value="missing-logo">
-                Missing Logo ({brands.filter((b) => !b.logo_url).length})
-              </TabsTrigger>
-              <TabsTrigger value="missing-banner">
-                Missing Banner ({brands.filter((b) => !b.banner_url).length})
-              </TabsTrigger>
+          {/* Top-level Brands / Shops toggle */}
+          <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); setSearchQuery(""); }}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="brands">Brands ({brands.length})</TabsTrigger>
+              <TabsTrigger value="shops">Shops ({shops.length})</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all" className="mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
-                {filteredBrands.map((brand) => (
-                  <BrandImageCard key={brand.id} brand={brand} />
-                ))}
+            <div className="flex gap-4 mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={mediaTab === "brands" ? "Search brands..." : "Search shops..."}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <TabsContent value="brands">
+              <Tabs defaultValue="all" className="w-full">
+                <TabsList>
+                  <TabsTrigger value="all">All Brands ({brands.length})</TabsTrigger>
+                  <TabsTrigger value="missing-logo">
+                    Missing Logo ({brands.filter((b) => !b.logo_url).length})
+                  </TabsTrigger>
+                  <TabsTrigger value="missing-banner">
+                    Missing Banner ({brands.filter((b) => !b.banner_url).length})
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="all" className="mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                    {filteredBrands.map((brand) => (
+                      <BrandImageCard key={brand.id} brand={brand} />
+                    ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="missing-logo" className="mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                    {filteredBrands.filter((b) => !b.logo_url).map((brand) => (
+                      <BrandImageCard key={brand.id} brand={brand} />
+                    ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="missing-banner" className="mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                    {filteredBrands.filter((b) => !b.banner_url).map((brand) => (
+                      <BrandImageCard key={brand.id} brand={brand} />
+                    ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              <div className="text-sm text-muted-foreground mt-4">
+                Showing {filteredBrands.length} of {brands.length} brands
               </div>
             </TabsContent>
 
-            <TabsContent value="missing-logo" className="mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
-                {filteredBrands
-                  .filter((b) => !b.logo_url)
-                  .map((brand) => (
-                    <BrandImageCard key={brand.id} brand={brand} />
-                  ))}
-              </div>
-            </TabsContent>
+            <TabsContent value="shops">
+              <Tabs defaultValue="all" className="w-full">
+                <TabsList>
+                  <TabsTrigger value="all">All Shops ({shops.length})</TabsTrigger>
+                  <TabsTrigger value="missing-image">
+                    Missing Image ({shops.filter((s) => !s.image_url).length})
+                  </TabsTrigger>
+                </TabsList>
 
-            <TabsContent value="missing-banner" className="mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
-                {filteredBrands
-                  .filter((b) => !b.banner_url)
-                  .map((brand) => (
-                    <BrandImageCard key={brand.id} brand={brand} />
-                  ))}
+                <TabsContent value="all" className="mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                    {filteredShops.map((shop) => (
+                      <ShopImageCard key={shop.id} shop={shop} />
+                    ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="missing-image" className="mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                    {filteredShops.filter((s) => !s.image_url).map((shop) => (
+                      <ShopImageCard key={shop.id} shop={shop} />
+                    ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              <div className="text-sm text-muted-foreground mt-4">
+                Showing {filteredShops.length} of {shops.length} shops
               </div>
             </TabsContent>
           </Tabs>
-
-          <div className="text-sm text-muted-foreground">
-            Showing {filteredBrands.length} of {brands.length} brands
-          </div>
         </CardContent>
       </Card>
 
-      {/* URL Update Dialog */}
-      <AlertDialog open={!!selectedBrand} onOpenChange={() => { setSelectedBrand(null); setNewUrl(""); setUploadMode("file"); }}>
+      {/* Upload Dialog */}
+      <AlertDialog open={isUploadDialogOpen} onOpenChange={() => { setSelectedBrand(null); setSelectedShop(null); setNewUrl(""); setUploadMode("file"); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {uploadType === "logo" ? "Update Logo" : "Update Banner"} for {selectedBrand?.name}
+              {uploadDialogLabel} for {uploadDialogName}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Upload an image file or enter a URL for the new {uploadType}.
+              Upload an image file or enter a URL.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Toggle between upload modes */}
             <div className="flex gap-2">
               <Button
                 variant={uploadMode === "file" ? "default" : "outline"}
@@ -462,17 +570,14 @@ export const MediaManagement = () => {
               <div className="space-y-2">
                 <Label>Image URL</Label>
                 <Input
-                  placeholder={`/brands/${selectedBrand?.slug || "brand"}-${uploadType}.png`}
+                  placeholder="https://example.com/image.png"
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">
-                  For local images, use paths like: /brands/brand-name-logo.png
-                </p>
               </div>
             )}
 
-            {(newUrl || uploadMode === "url") && newUrl && (
+            {uploadMode === "url" && newUrl && (
               <div className="space-y-2">
                 <Label>Preview</Label>
                 <div className="border rounded-lg p-2 bg-muted">
@@ -493,7 +598,10 @@ export const MediaManagement = () => {
             <AlertDialogCancel onClick={() => { setNewUrl(""); setUploadMode("file"); }}>Cancel</AlertDialogCancel>
             {uploadMode === "url" && (
               <AlertDialogAction
-                onClick={() => selectedBrand && handleUrlUpdate(selectedBrand, uploadType, newUrl)}
+                onClick={() => {
+                  if (selectedBrand) handleBrandUrlUpdate(selectedBrand, uploadType as "logo" | "banner", newUrl);
+                  else if (selectedShop) handleShopUrlUpdate(selectedShop, newUrl);
+                }}
                 disabled={!newUrl}
               >
                 Save
@@ -507,10 +615,9 @@ export const MediaManagement = () => {
       <AlertDialog open={!!deletingImage} onOpenChange={() => setDeletingImage(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {deletingImage?.type}</AlertDialogTitle>
+            <AlertDialogTitle>Delete {deletingImage?.type === "shop" ? "image" : deletingImage?.type}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove the {deletingImage?.type} from {deletingImage?.brand.name}?
-              This will clear the URL reference but won't delete the actual file.
+              Are you sure you want to remove this image from {deletingImage?.brand?.name || deletingImage?.shop?.name}?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

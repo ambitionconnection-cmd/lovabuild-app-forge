@@ -287,7 +287,7 @@ const Directions = () => {
       const brand = brands.find(b => b.id === e.detail.brandId);
       if (brand) {
         saveMapPosition();
-        navigate(`/brand/${brand.slug}`);
+        navigate(`/brand/${brand.slug}`, { state: { from: '/directions' } });
       }
     };
     
