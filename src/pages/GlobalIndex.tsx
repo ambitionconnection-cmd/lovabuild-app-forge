@@ -261,7 +261,7 @@ const GlobalIndex = () => {
             }`}
           >
             <Crown className="w-3.5 h-3.5" />
-            Established
+            {t('brands.tierEstablished')}
           </button>
           <button
             onClick={() => setActiveTier("emerging")}
@@ -272,7 +272,7 @@ const GlobalIndex = () => {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            New Wave
+            {t('brands.tierNewWave')}
           </button>
           {activeTier === "emerging" && (
             <button
@@ -287,13 +287,13 @@ const GlobalIndex = () => {
         {/* Acceptance Criteria Banner */}
         {showCriteria && activeTier === "emerging" && (
           <div className="mb-2 p-3 rounded-xl bg-gradient-to-r from-[#8B6DAF]/10 to-[#AD3A49]/10 border border-[#8B6DAF]/20 text-xs space-y-1.5">
-            <p className="font-semibold text-[#8B6DAF]">🎯 To be featured as a New Wave brand:</p>
+            <p className="font-semibold text-[#8B6DAF]">{t('brands.criteriaTitle')}</p>
             <ul className="space-y-1 text-muted-foreground pl-4">
-              <li>• 1,000+ followers on Instagram or TikTok</li>
-              <li>• At least one web or social media presence</li>
-              <li>• Real physical products created & sold (no dropshipping)</li>
+              <li>• {t('brands.criteria1')}</li>
+              <li>• {t('brands.criteria2')}</li>
+              <li>• {t('brands.criteria3')}</li>
             </ul>
-            <p className="text-muted-foreground/70 italic">Submit your brand via the Contact page →</p>
+            <p className="text-muted-foreground/70 italic">{t('brands.criteriaSubmit')}</p>
           </div>
         )}
 

@@ -218,7 +218,14 @@
     "clear": "Effacer",
     "failedToLoad": "Échec du chargement des marques",
     "failedToAdd": "Échec de l'ajout aux favoris",
-    "failedToRemove": "Échec de la suppression des favoris"
+    "failedToRemove": "Échec de la suppression des favoris",
+    "tierEstablished": "Établies",
+    "tierNewWave": "Nouvelle Vague",
+    "criteriaTitle": "🎯 Pour figurer en tant que marque Nouvelle Vague :",
+    "criteria1": "1 000+ abonnés sur Instagram ou TikTok",
+    "criteria2": "Au moins une présence web ou sur les réseaux sociaux",
+    "criteria3": "Produits physiques réels créés et vendus (pas de dropshipping)",
+    "criteriaSubmit": "Soumettez votre marque via la page Contact →"
   },
   "myHeardrop": {
     "title": "MON FLYAF",

@@ -219,7 +219,14 @@
     "clear": "Clear",
     "failedToLoad": "Failed to load brands",
     "failedToAdd": "Failed to add favorite",
-    "failedToRemove": "Failed to remove favorite"
+    "failedToRemove": "Failed to remove favorite",
+    "tierEstablished": "Established",
+    "tierNewWave": "New Wave",
+    "criteriaTitle": "🎯 To be featured as a New Wave brand:",
+    "criteria1": "1,000+ followers on Instagram or TikTok",
+    "criteria2": "At least one web or social media presence",
+    "criteria3": "Real physical products created & sold (no dropshipping)",
+    "criteriaSubmit": "Submit your brand via the Contact page →"
   },
   "myHeardrop": {
     "title": "MY FLYAF",

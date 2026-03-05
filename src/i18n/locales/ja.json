@@ -218,7 +218,14 @@
     "clear": "クリア",
     "failedToLoad": "ブランドの読み込みに失敗しました",
     "failedToAdd": "お気に入りの追加に失敗しました",
-    "failedToRemove": "お気に入りの削除に失敗しました"
+    "failedToRemove": "お気に入りの削除に失敗しました",
+    "tierEstablished": "定番ブランド",
+    "tierNewWave": "ニューウェーブ",
+    "criteriaTitle": "🎯 ニューウェーブブランドとして掲載されるには：",
+    "criteria1": "InstagramまたはTikTokで1,000人以上のフォロワー",
+    "criteria2": "ウェブまたはSNSでの存在が1つ以上",
+    "criteria3": "実際に製造・販売されている商品（ドロップシッピング不可）",
+    "criteriaSubmit": "お問い合わせページからブランドを申請 →"
   },
   "myHeardrop": {
     "title": "マイ FLYAF",
