@@ -245,66 +245,75 @@ const Index = () => {
         </section>
 
         {/* Popular Brands */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h3 className="text-lg font-bold uppercase tracking-wide">
-                {t("home.popularBrands")}
-              </h3>
-              <p className="text-xs text-muted-foreground">{t("home.popularBrandsDesc")}</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs h-8"
-              onClick={() => navigate("/global-index")}
-            >
-              {t("home.viewAll")}
-            </Button>
-          </div>
+        <section className="relative rounded-xl overflow-hidden">
+          {/* Background image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${urbanBg})` }}
+          />
+          <div className="absolute inset-0 bg-background/80" />
 
-          {brandsLoading ? (
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="p-2">
-                    <div className="aspect-square bg-muted rounded-md mb-1" />
-                    <div className="h-2 bg-muted rounded" />
-                  </CardContent>
-                </Card>
-              ))}
+          <div className="relative p-3">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="text-lg font-bold uppercase tracking-wide">
+                  {t("home.popularBrands")}
+                </h3>
+                <p className="text-xs text-muted-foreground">{t("home.popularBrandsDesc")}</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs h-8"
+                onClick={() => navigate("/global-index")}
+              >
+                {t("home.viewAll")}
+              </Button>
             </div>
-          ) : popularBrands.length === 0 ? (
-            <Card>
-              <CardContent className="py-6 text-center text-muted-foreground text-sm">
-                {t("home.noBrands")}
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-              {popularBrands.map((brand) => (
-                <Card
-                  key={brand.id}
-                  className="hover:scale-[1.02] transition-transform cursor-pointer bg-card/80"
-                  onClick={() => navigate(`/global-index?highlight=${brand.id}`)}
-                >
-                  <CardContent className="p-2">
-                    <div className="aspect-square bg-logo-bg rounded-md mb-1 flex items-center justify-center overflow-hidden border border-border">
-                      <BrandLogo brand={brand} />
-                    </div>
-                    <p className="font-medium text-[10px] text-center line-clamp-1">
-                      {brand.name}
-                    </p>
-                    {brand.category && (
-                      <p className="text-xs text-muted-foreground text-center capitalize">
-                        {brand.category}
+
+            {brandsLoading ? (
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <Card key={i} className="animate-pulse">
+                    <CardContent className="p-2">
+                      <div className="aspect-square bg-muted rounded-md mb-1" />
+                      <div className="h-2 bg-muted rounded" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : popularBrands.length === 0 ? (
+              <Card>
+                <CardContent className="py-6 text-center text-muted-foreground text-sm">
+                  {t("home.noBrands")}
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                {popularBrands.map((brand) => (
+                  <Card
+                    key={brand.id}
+                    className="hover:scale-[1.02] transition-transform cursor-pointer bg-card"
+                    onClick={() => navigate(`/global-index?highlight=${brand.id}`)}
+                  >
+                    <CardContent className="p-2">
+                      <div className="aspect-square bg-logo-bg rounded-md mb-1 flex items-center justify-center overflow-hidden border border-border">
+                        <BrandLogo brand={brand} />
+                      </div>
+                      <p className="font-medium text-[10px] text-center line-clamp-1">
+                        {brand.name}
                       </p>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                      {brand.category && (
+                        <p className="text-xs text-muted-foreground text-center capitalize">
+                          {brand.category}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         </section>
 
         {/* Nearby Shops */}
