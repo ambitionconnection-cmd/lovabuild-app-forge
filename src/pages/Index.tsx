@@ -245,15 +245,8 @@ const Index = () => {
         </section>
 
         {/* Popular Brands */}
-        <section className="relative rounded-xl overflow-hidden">
-          {/* Background image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${urbanBg})` }}
-          />
-          <div className="absolute inset-0 bg-background/80" />
-
-          <div className="relative p-3">
+        <section>
+          <div className="p-3">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="text-lg font-bold uppercase tracking-wide">
