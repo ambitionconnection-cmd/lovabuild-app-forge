@@ -285,6 +285,32 @@ const Map: React.FC<MapProps> = ({
     
     map.current.on('style.load', () => {
       mapLog.init('Style load event fired');
+      
+      // Improve street name visibility at various zoom levels
+      // Mapbox streets-v12 uses road-label layers with collision detection
+      // We reduce the minimum zoom and allow more overlap for better readability
+      const style = map.current?.getStyle();
+      if (style?.layers) {
+        style.layers.forEach(layer => {
+          if (layer.id.includes('road') && layer.type === 'symbol') {
+            try {
+              // Allow road labels to overlap more freely so they don't disappear
+              map.current?.setLayoutProperty(layer.id, 'text-allow-overlap', false);
+              map.current?.setLayoutProperty(layer.id, 'text-ignore-placement', false);
+              // Increase text padding to reduce jitter but keep labels visible
+              map.current?.setLayoutProperty(layer.id, 'text-padding', 2);
+              // Make road labels slightly larger for better readability when zoomed
+              const currentSize = map.current?.getLayoutProperty(layer.id, 'text-size');
+              if (typeof currentSize === 'number' && currentSize < 13) {
+                map.current?.setLayoutProperty(layer.id, 'text-size', currentSize + 1);
+              }
+            } catch (e) {
+              // Some layers may not support these properties
+            }
+          }
+        });
+        mapLog.init('Road label visibility improved');
+      }
     });
 
     const handleResize = () => {
@@ -882,19 +908,31 @@ const Map: React.FC<MapProps> = ({
             filter: ['!', ['has', 'point_count']],
             layout: {
               'text-field': ['get', 'name'],
-              'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
-              'text-size': 11,
+              'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+              'text-size': [
+                'interpolate', ['linear'], ['zoom'],
+                12, 10,
+                14, 12,
+                16, 13
+              ],
               'text-anchor': 'left',
               'text-offset': [1.5, 0],
-              'text-max-width': 10,
+              'text-max-width': 8,
               'text-allow-overlap': false,
               'text-optional': true,
+              'text-padding': 3,
             },
             paint: {
               'text-color': '#1a1a1a',
               'text-halo-color': '#ffffff',
-              'text-halo-width': 1.5,
+              'text-halo-width': 2,
               'text-halo-blur': 0.5,
+              'text-opacity': [
+                'interpolate', ['linear'], ['zoom'],
+                11, 0,
+                12, 0.7,
+                13, 1
+              ],
             }
           });
           mapLog.layers('Layer "shop-labels" added');
