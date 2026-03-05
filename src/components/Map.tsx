@@ -996,20 +996,18 @@ const Map: React.FC<MapProps> = ({
     ensureMapReadyThenUpdate();
   }, [shops]);
 
-  // Update highlighted shop styling - target logo marker DOM elements
+  // Update highlighted shop styling - target the logo-marker div directly
   useEffect(() => {
     // Reset all markers to default style
     Object.entries(logoMarkersRef.current).forEach(([id, marker]) => {
       const el = marker.getElement();
-      if (el) {
-        const markerDiv = el.querySelector('.logo-marker') as HTMLElement || el.firstChild as HTMLElement;
-        if (markerDiv) {
-          markerDiv.style.border = '3px solid white';
-          markerDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-          markerDiv.style.transform = 'scale(1)';
-          markerDiv.style.transition = 'all 0.2s ease';
-        }
-      }
+      if (!el) return;
+      // The logo-marker class is on the first child of the mapbox wrapper div
+      const markerDiv = el.querySelector('.logo-marker') as HTMLElement || el;
+      markerDiv.style.border = '3px solid white';
+      markerDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+      markerDiv.style.zIndex = '';
+      markerDiv.style.transition = 'border 0.2s ease, box-shadow 0.2s ease';
     });
 
     // Highlight the selected marker
@@ -1017,13 +1015,11 @@ const Map: React.FC<MapProps> = ({
       const marker = logoMarkersRef.current[highlightedShopId];
       const el = marker.getElement();
       if (el) {
-        const markerDiv = el.querySelector('.logo-marker') as HTMLElement || el.firstChild as HTMLElement;
-        if (markerDiv) {
-          markerDiv.style.border = '3px solid hsl(0, 85%, 55%)';
-          markerDiv.style.boxShadow = '0 0 0 2px hsl(0, 85%, 55%), 0 0 12px rgba(220, 50, 50, 0.5)';
-          markerDiv.style.transform = 'scale(1.15)';
-          markerDiv.style.transition = 'all 0.2s ease';
-        }
+        const markerDiv = el.querySelector('.logo-marker') as HTMLElement || el;
+        markerDiv.style.border = '3px solid hsl(0, 85%, 50%)';
+        markerDiv.style.boxShadow = '0 0 8px rgba(220, 50, 50, 0.6)';
+        markerDiv.style.zIndex = '10';
+        markerDiv.style.transition = 'border 0.2s ease, box-shadow 0.2s ease';
       }
     }
   }, [highlightedShopId]);
