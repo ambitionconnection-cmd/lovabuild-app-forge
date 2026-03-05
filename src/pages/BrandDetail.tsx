@@ -259,9 +259,9 @@ const BrandDetail = () => {
         {/* Brand Hero Card */}
         <Card className="overflow-hidden bg-gradient-to-br from-[#A3A39E]/15 via-card to-[#A3A39E]/10 border-[#A3A39E]/30 animate-scale-in">
           <CardContent className="p-4">
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:gap-8">
               {/* Logo */}
-              <div className="w-32 h-32 rounded-2xl bg-logo-bg border-2 border-primary/30 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/10 animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
+              <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-2xl bg-logo-bg border-2 border-primary/30 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/10 animate-scale-in flex-shrink-0" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
                 {brand.logo_url ? (
                   <img src={brand.logo_url} alt={brand.name} className="max-w-full max-h-full object-contain p-2" />
                 ) : (
@@ -269,73 +269,74 @@ const BrandDetail = () => {
                 )}
               </div>
 
-              {/* Name and Country */}
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  {brand.country && (
-                    <span className="text-xl" title={brand.country}>{getCountryFlag(brand.country)}</span>
+              {/* Name, Country, CTA, Social — stacked on right for desktop */}
+              <div className="flex flex-col items-center gap-3 lg:items-start lg:flex-1">
+                <div className="text-center lg:text-left">
+                  <div className="flex items-center justify-center lg:justify-start gap-2">
+                    {brand.country && (
+                      <span className="text-xl" title={brand.country}>{getCountryFlag(brand.country)}</span>
+                    )}
+                    <h2 className="text-xl font-bold uppercase tracking-wide text-[#c48e19]">{brand.name}</h2>
+                  </div>
+                  {brand.description && (
+                    <p className="text-sm text-muted-foreground mt-2 max-w-md">{brand.description}</p>
                   )}
-                  <h2 className="text-xl font-bold uppercase tracking-wide text-[#c48e19]">{brand.name}</h2>
                 </div>
-                {brand.description && (
-                  <p className="text-sm text-muted-foreground mt-2 max-w-md">{brand.description}</p>
-                )}
-              </div>
 
-              {/* Shop Online CTA */}
-              {brand.affiliate_url && (
-                <Button
-                  className="w-full max-w-xs bg-[#C4956A] hover:bg-[#C4956A]/80 text-white font-semibold h-11"
-                  onClick={() => {
-                    window.open(brand.affiliate_url!, '_blank');
-                    // Track click (fire-and-forget)
-                    supabase.from('affiliate_analytics' as any).insert({
-                      drop_id: brand.id, // reusing field for brand tracking
-                      event_type: 'shop_online_click',
-                      user_id: user?.id || null,
-                    }).then(() => {});
-                  }}
-                >
-                  <ShoppingBag className="w-4 h-4 mr-2" />
-                  Shop Online
-                </Button>
-              )}
+                {/* Shop Online CTA */}
+                {brand.affiliate_url && (
+                  <Button
+                    className="w-full max-w-xs bg-[#C4956A] hover:bg-[#C4956A]/80 text-white font-semibold h-11"
+                    onClick={() => {
+                      window.open(brand.affiliate_url!, '_blank');
+                      supabase.from('affiliate_analytics' as any).insert({
+                        drop_id: brand.id,
+                        event_type: 'shop_online_click',
+                        user_id: user?.id || null,
+                      }).then(() => {});
+                    }}
+                  >
+                    <ShoppingBag className="w-4 h-4 mr-2" />
+                    Shop Online
+                  </Button>
+                )}
 
-              {/* Social Links */}
-              <div className="flex flex-wrap justify-center gap-2">
-                {brand.official_website && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-9"
-                    onClick={() => window.open(brand.official_website!, '_blank')}
-                  >
-                    <ExternalLink className="w-4 h-4 mr-1.5" />
-                    Website
-                  </Button>
-                )}
-                {brand.instagram_url && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-9"
-                    onClick={() => window.open(brand.instagram_url!, '_blank')}
-                  >
-                    <Instagram className="w-4 h-4 mr-1.5" />
-                    Instagram
-                  </Button>
-                )}
-                {brand.tiktok_url && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-9"
-                    onClick={() => window.open(brand.tiktok_url!, '_blank')}
-                  >
-                    <TikTokIcon className="w-4 h-4 mr-1.5" />
-                    TikTok
-                  </Button>
-                )}
+                {/* Social Links */}
+                <div className="flex flex-wrap justify-center lg:justify-start gap-2">
+                  {brand.official_website && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-9"
+                      onClick={() => window.open(brand.official_website!, '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-1.5" />
+                      Website
+                    </Button>
+                  )}
+                  {brand.instagram_url && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-9"
+                      onClick={() => window.open(brand.instagram_url!, '_blank')}
+                    >
+                      <Instagram className="w-4 h-4 mr-1.5" />
+                      Instagram
+                    </Button>
+                  )}
+                  {brand.tiktok_url && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-9"
+                      onClick={() => window.open(brand.tiktok_url!, '_blank')}
+                    >
+                      <TikTokIcon className="w-4 h-4 mr-1.5" />
+                      TikTok
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
