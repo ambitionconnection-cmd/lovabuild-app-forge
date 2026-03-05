@@ -85,8 +85,8 @@ const More = () => {
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col">
-      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${urbanBg})` }} />
-      <div className="absolute inset-0 bg-background/70" />
+      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${urbanBg})` }} />
+      <div className="absolute inset-0 bg-background/80" />
       <div className="relative flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16 lg:px-12">
         <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-wider uppercase">{t('nav.more')}</h1>
         <p className="text-sm lg:text-base text-white/40 mt-1">{t('more.subtitle')}</p>
