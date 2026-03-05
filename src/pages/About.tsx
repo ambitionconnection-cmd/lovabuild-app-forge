@@ -1,9 +1,11 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import founderAvatar from "@/assets/founder-avatar.jpg";
 
 const About = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col">
@@ -13,9 +15,9 @@ const About = () => {
           className="mb-3 text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          {t("common.back")}
         </button>
-        <h1 className="text-2xl lg:text-4xl font-bold text-foreground tracking-wider uppercase">About FLYAF</h1>
+        <h1 className="text-2xl lg:text-4xl font-bold text-foreground tracking-wider uppercase">{t("about.title")}</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 lg:px-12 pb-24">
@@ -29,12 +31,10 @@ const About = () => {
 
           {/* The Mission */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">The Mission</h3>
+            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">{t("about.missionTitle")}</h3>
             <p className="text-sm text-foreground/70 leading-relaxed">
-              <strong className="text-foreground">
-                FLYAF is the streetwear discovery platform that puts every shop and brand on your map.
-              </strong>{" "}
-              We help you find the stores that matter, whether you're exploring a new city or planning a weekend route.
+              <strong className="text-foreground">{t("about.missionBold")}</strong>{" "}
+              {t("about.missionText")}
             </p>
           </div>
 
@@ -42,16 +42,13 @@ const About = () => {
 
           {/* Founder Note */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">A Note From Our Founder</h3>
+            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">{t("about.founderTitle")}</h3>
             <div className="space-y-3 border-l-2 border-[#AD3A49]/40 pl-4">
               <p className="text-sm text-foreground/60 leading-relaxed italic">
-                "I spent 10 years working the door at the biggest streetwear shops in London. I was there for the
-                queues, the wild drops and the infamous 'brick'.
+                {t("about.founderQuote1")}
               </p>
               <p className="text-sm text-foreground/60 leading-relaxed italic">
-                Working security, I saw how many people missed out on their favourite brands simply because they were
-                around the corner. Interesting shops are always clustered together, but you need to know where to look.
-                I built FLYAF to bridge that gap."
+                {t("about.founderQuote2")}
               </p>
             </div>
           </div>
@@ -60,27 +57,19 @@ const About = () => {
 
           {/* How it Works */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">How it Works</h3>
+            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">{t("about.howItWorksTitle")}</h3>
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-foreground font-medium">Explore</p>
-                <p className="text-xs text-foreground/50">
-                  Use the interactive map to discover 200+ shops across 12+ cities, with real-time brand pins and
-                  distances.
-                </p>
+                <p className="text-sm text-foreground font-medium">{t("about.exploreLabel")}</p>
+                <p className="text-xs text-foreground/50">{t("about.exploreDesc")}</p>
               </div>
               <div>
-                <p className="text-sm text-foreground font-medium">Plan</p>
-                <p className="text-xs text-foreground/50">
-                  Build a custom route on your desktop, then walk it on your phone. Never miss a store again.
-                </p>
+                <p className="text-sm text-foreground font-medium">{t("about.planLabel")}</p>
+                <p className="text-xs text-foreground/50">{t("about.planDesc")}</p>
               </div>
               <div>
-                <p className="text-sm text-foreground font-medium">Connect</p>
-                <p className="text-xs text-foreground/50">
-                  Post your 'fit checks' to the HOT feed, tag the brands you're wearing, and see what the culture is
-                  wearing from Paris to Tokyo.
-                </p>
+                <p className="text-sm text-foreground font-medium">{t("about.connectLabel")}</p>
+                <p className="text-xs text-foreground/50">{t("about.connectDesc")}</p>
               </div>
             </div>
           </div>
@@ -89,22 +78,17 @@ const About = () => {
 
           {/* Built for the Culture */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">Built for the Culture</h3>
-            <p className="text-sm text-foreground/70 leading-relaxed">
-              FLYAF was born from a simple frustration: streetwear shops are everywhere but hard to find. We aren't a
-              faceless tech company; we're built by people who spent a decade in the street of London.
-            </p>
+            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">{t("about.cultureTitle")}</h3>
+            <p className="text-sm text-foreground/70 leading-relaxed">{t("about.cultureText")}</p>
             <div className="space-y-2">
               <p className="text-sm text-foreground/60">
-                <strong className="text-foreground">Global Reach:</strong> 150+ brands, 200+ shops, 12+ cities.
+                <strong className="text-foreground">{t("about.globalReachLabel")}</strong> {t("about.globalReachDesc")}
               </p>
               <p className="text-sm text-foreground/60">
-                <strong className="text-foreground">Your Language:</strong> Navigate in 8 languages, including Japanese,
-                Chinese, and Korean.
+                <strong className="text-foreground">{t("about.languageLabel")}</strong> {t("about.languageDesc")}
               </p>
               <p className="text-sm text-foreground/60">
-                <strong className="text-foreground">Community First:</strong> A dedicated space to discover and be
-                discovered.
+                <strong className="text-foreground">{t("about.communityLabel")}</strong> {t("about.communityDesc")}
               </p>
             </div>
           </div>
@@ -113,16 +97,13 @@ const About = () => {
 
           {/* Get in Touch */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">Get In Touch</h3>
-            <p className="text-sm text-foreground/70 leading-relaxed">
-              Got feedback, want to submit a brand, or interested in becoming a FLYAF Ambassador? We'd love to hear from
-              you.
-            </p>
+            <h3 className="text-sm font-semibold text-[#C4956A] uppercase tracking-wider">{t("about.getInTouchTitle")}</h3>
+            <p className="text-sm text-foreground/70 leading-relaxed">{t("about.getInTouchText")}</p>
             <button
               onClick={() => navigate("/contact")}
               className="text-sm bg-[#AD3A49] hover:bg-[#AD3A49]/80 text-white px-5 py-2.5 rounded-lg transition-colors font-medium"
             >
-              Contact Us / Join the Community
+              {t("about.contactButton")}
             </button>
           </div>
 
