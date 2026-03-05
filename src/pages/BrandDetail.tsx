@@ -19,6 +19,7 @@ import haptic from "@/lib/haptics";
 import { useLocation } from "react-router-dom";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useTranslation } from "react-i18next";
+import urbanBg from "@/assets/urban-bg.jpg";
 
 const BrandDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -257,8 +258,10 @@ const BrandDetail = () => {
 
       <main className="container mx-auto px-3 py-4 lg:pt-8 space-y-4">
         {/* Brand Hero Card */}
-        <Card className="overflow-hidden bg-gradient-to-br from-[#A3A39E]/15 via-card to-[#A3A39E]/10 border-[#A3A39E]/30 animate-scale-in">
-          <CardContent className="p-4 lg:p-6">
+        <Card className="overflow-hidden border-[#A3A39E]/30 animate-scale-in relative">
+          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${urbanBg})` }} />
+          <div className="absolute inset-0 bg-background/80" />
+          <CardContent className="p-4 lg:p-6 relative">
             <div className="flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-center lg:gap-12">
               {/* Logo */}
               <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-2xl bg-logo-bg border-2 border-primary/30 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/10 animate-scale-in flex-shrink-0" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
@@ -406,11 +409,13 @@ const BrandDetail = () => {
 
         {/* Similar Brands */}
         {similarBrands.length > 0 && (
-          <Card className="animate-fade-in border-[#A3A39E]/30 bg-[#A3A39E]/10" style={{ animationDelay: '300ms', animationFillMode: 'backwards' }}>
-            <CardHeader className="pb-2">
+          <Card className="animate-fade-in border-[#A3A39E]/30 relative overflow-hidden" style={{ animationDelay: '300ms', animationFillMode: 'backwards' }}>
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${urbanBg})` }} />
+            <div className="absolute inset-0 bg-background/80" />
+            <CardHeader className="pb-2 relative">
               <CardTitle className="text-sm uppercase tracking-wide text-[#c48e19] font-bold">Similar To {brand.name}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
                 {similarBrands.map((b) => (
                   <div
