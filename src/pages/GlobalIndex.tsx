@@ -23,6 +23,7 @@ const GlobalIndex = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const highlightId = searchParams.get('highlight');
+  const scrollTarget = searchParams.get('scroll');
   const [brands, setBrands] = useState<Tables<'brands'>[]>([]);
   const [filteredBrands, setFilteredBrands] = useState<Tables<'brands'>[]>([]);
   const [favoriteBrands, setFavoriteBrands] = useState<Set<string>>(new Set());
@@ -47,20 +48,22 @@ const GlobalIndex = () => {
     }
   }, [user]);
 
-  // Scroll to highlighted brand after loading
+  // Scroll restoration or highlight after loading
   useEffect(() => {
-    if (!loading && highlightId) {
-      // Small delay to ensure DOM is ready
+    if (!loading && scrollTarget) {
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(scrollTarget, 10));
+      }, 50);
+    } else if (!loading && highlightId) {
       setTimeout(() => {
         const element = document.querySelector(`[data-brand-id="${highlightId}"]`);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Clear highlight after animation
           setTimeout(() => setHighlightedBrand(null), 2000);
         }
       }, 100);
     }
-  }, [loading, highlightId]);
+  }, [loading, highlightId, scrollTarget]);
 
   const fetchBrands = async () => {
     const { data, error } = await supabase
@@ -365,7 +368,7 @@ const GlobalIndex = () => {
                   highlightedBrand === brand.id ? 'ring-2 ring-[#AD3A49] ring-offset-1 ring-offset-background' : ''
                 }`}
                 style={{ animationDelay: `${Math.min(index * 30, 200)}ms`, animationFillMode: 'backwards' }}
-                onClick={() => navigate(`/brand/${brand.slug}`)}
+                onClick={() => navigate(`/brand/${brand.slug}`, { state: { from: `/global-index?scroll=${window.scrollY}` } })}
               >
                 {/* Logo */}
                 <div className="w-14 h-14 rounded-xl bg-logo-bg border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0 p-1.5">

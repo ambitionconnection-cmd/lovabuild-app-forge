@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, ExternalLink, Instagram, Store, MapPin, Calendar, Clock, ShoppingBag, Flag, Languages } from "lucide-react";
+import { ArrowLeft, Heart, ExternalLink, Instagram, Store, MapPin, ShoppingBag, Flag, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,7 +16,7 @@ import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { toast } from "sonner";
 import { getCountryFlag } from "@/lib/countryFlags";
 import haptic from "@/lib/haptics";
-import { format } from "date-fns";
+import { useLocation } from "react-router-dom";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useTranslation } from "react-i18next";
 
@@ -24,10 +24,12 @@ const BrandDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { user, isPro } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPage = (location.state as any)?.from || null;
   
   const [brand, setBrand] = useState<Tables<'brands'> | null>(null);
   const [shops, setShops] = useState<Tables<'shops'>[]>([]);
-  const [drops, setDrops] = useState<(Tables<'drops'> & { brands?: { name: string } | null })[]>([]);
+  
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
@@ -70,21 +72,14 @@ const BrandDetail = () => {
 
     setBrand(brandData);
 
-    // Fetch shops, drops, and favorite status in parallel
-    const [shopsResult, dropsResult, favoriteResult] = await Promise.all([
+    // Fetch shops and favorite status in parallel
+    const [shopsResult, favoriteResult] = await Promise.all([
       supabase
         .from('shops')
         .select('*')
         .eq('brand_id', brandData.id)
         .eq('is_active', true)
         .order('name'),
-      supabase
-        .from('drops')
-        .select('*, brands(name)')
-        .eq('brand_id', brandData.id)
-        .gte('release_date', new Date().toISOString())
-        .order('release_date', { ascending: true })
-        .limit(5),
       user ? supabase
         .from('user_favorite_brands')
         .select('id')
@@ -94,7 +89,6 @@ const BrandDetail = () => {
     ]);
 
     if (!shopsResult.error) setShops(shopsResult.data || []);
-    if (!dropsResult.error) setDrops(dropsResult.data || []);
     if (favoriteResult.data) setIsFavorite(true);
 
     // Fetch similar brands (same category or country, excluding current)
@@ -216,7 +210,7 @@ const BrandDetail = () => {
               variant="ghost" 
               size="icon" 
               className="h-8 w-8"
-              onClick={() => navigate(-1)}
+              onClick={() => fromPage ? navigate(fromPage) : navigate(-1)}
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
@@ -244,7 +238,7 @@ const BrandDetail = () => {
               variant="ghost" 
               size="icon" 
               className="h-8 w-8 hover:scale-110 active:scale-95 transition-transform"
-              onClick={() => navigate(-1)}
+              onClick={() => fromPage ? navigate(fromPage) : navigate(-1)}
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
@@ -366,51 +360,6 @@ const BrandDetail = () => {
             </CardContent>
           </Card>
         )}
-
-        {/* Upcoming Drops */}
-        <Card className="animate-fade-in border-[#A3A39E]/30 bg-[#A3A39E]/10" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm uppercase tracking-wide text-[#c48e19] font-bold">Upcoming Drops</CardTitle>
-              <Badge variant="secondary" className="text-xs">{drops.length}</Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {drops.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No upcoming drops</p>
-            ) : (
-              <div className="space-y-3">
-                {drops.map((drop) => (
-                  <div
-                    key={drop.id}
-                    className="flex items-center gap-3 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
-                    onClick={() => navigate('/drops')}
-                  >
-                    <div className="w-12 h-12 rounded-lg bg-card border overflow-hidden flex-shrink-0">
-                      {drop.image_url ? (
-                        <img src={drop.image_url} alt={drop.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Calendar className="w-5 h-5 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium line-clamp-1">{drop.title}</p>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        {format(new Date(drop.release_date), 'MMM d, yyyy')}
-                      </div>
-                    </div>
-                    <Badge variant={drop.status === 'live' ? 'default' : 'secondary'} className="text-xs">
-                      {drop.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
         {/* Shops */}
         <Card className="animate-fade-in border-[#A3A39E]/30 bg-[#A3A39E]/10" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
