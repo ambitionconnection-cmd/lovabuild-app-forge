@@ -218,7 +218,14 @@
     "clear": "지우기",
     "failedToLoad": "브랜드 로딩 실패",
     "failedToAdd": "즐겨찾기 추가 실패",
-    "failedToRemove": "즐겨찾기 제거 실패"
+    "failedToRemove": "즐겨찾기 제거 실패",
+    "tierEstablished": "기성 브랜드",
+    "tierNewWave": "뉴 웨이브",
+    "criteriaTitle": "🎯 뉴 웨이브 브랜드로 등재되려면:",
+    "criteria1": "Instagram 또는 TikTok 팔로워 1,000명 이상",
+    "criteria2": "웹 또는 소셜 미디어 존재 최소 1개",
+    "criteria3": "실제 제작 및 판매되는 물리적 제품 (드롭쉬핑 불가)",
+    "criteriaSubmit": "문의 페이지에서 브랜드를 제출하세요 →"
   },
   "myHeardrop": {
     "title": "마이 FLYAF",

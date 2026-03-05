@@ -218,7 +218,14 @@
     "clear": "清除",
     "failedToLoad": "品牌加载失败",
     "failedToAdd": "收藏失败",
-    "failedToRemove": "取消收藏失败"
+    "failedToRemove": "取消收藏失败",
+    "tierEstablished": "知名品牌",
+    "tierNewWave": "新浪潮",
+    "criteriaTitle": "🎯 成为新浪潮品牌的条件：",
+    "criteria1": "Instagram 或 TikTok 粉丝 1,000+",
+    "criteria2": "至少有一个网站或社交媒体存在",
+    "criteria3": "实际创造和销售的实物产品（非代发货）",
+    "criteriaSubmit": "通过联系页面提交您的品牌 →"
   },
   "myHeardrop": {
     "title": "我的 FLYAF",
