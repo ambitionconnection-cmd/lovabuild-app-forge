@@ -75,6 +75,7 @@ const Map: React.FC<MapProps> = ({
   const [loadingMessage, setLoadingMessage] = useState('Initializing map...');
   const [showTooltip, setShowTooltip] = useState(false);
   const [debugStats, setDebugStats] = useState({ shopsTotal: 0, shopsVisible: 0, sourceReady: false });
+  const [markersVersion, setMarkersVersion] = useState(0);
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const logoMarkersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
   const shopsRef = useRef(shops);
@@ -919,6 +920,7 @@ const Map: React.FC<MapProps> = ({
           });
           
           mapLog.layers('Logo markers added:', Object.keys(logoMarkersRef.current).length);
+          setMarkersVersion(v => v + 1);
         }
 
         setDebugStats(prev => ({ ...prev, sourceReady: true }));
@@ -1022,7 +1024,7 @@ const Map: React.FC<MapProps> = ({
         markerDiv.style.transition = 'border 0.2s ease, box-shadow 0.2s ease';
       }
     }
-  }, [highlightedShopId]);
+  }, [highlightedShopId, markersVersion]);
 
   // Recenter on user location
   const handleRecenter = useCallback(() => {
