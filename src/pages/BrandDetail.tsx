@@ -44,7 +44,7 @@ const BrandDetail = () => {
   const openTranslate = (text: string) => {
     const langMap: Record<string, string> = { fr: 'fr', ja: 'ja', ko: 'ko', th: 'th', 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW' };
     const tl = langMap[i18n.language] || 'en';
-    window.open(`https://translate.google.com/?sl=en&tl=${tl}&text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://translate.google.com/m?sl=en&tl=${tl}&q=${encodeURIComponent(text)}`, '_blank');
   };
 
   useEffect(() => {
