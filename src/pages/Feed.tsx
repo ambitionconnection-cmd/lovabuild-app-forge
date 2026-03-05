@@ -7,8 +7,8 @@ import { StreetSpottedFeed } from "@/components/StreetSpottedFeed";
 const Feed = () => {
   return (
     <div className="relative min-h-screen bg-background pb-20 pt-0 lg:pt-14 animate-fade-in">
-      <div className="fixed inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: `url(${urbanBg})` }} />
-      <div className="fixed inset-0 bg-background/75" />
+      <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${urbanBg})` }} />
+      <div className="fixed inset-0 bg-background/80" />
       {/* Header */}
       <header className="relative sticky top-0 lg:top-14 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto px-3 py-2 flex items-center gap-3">
