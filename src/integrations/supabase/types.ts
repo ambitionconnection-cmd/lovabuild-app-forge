@@ -223,6 +223,7 @@ export type Database = {
         Row: {
           affiliate_url: string | null
           banner_url: string | null
+          brand_tier: Database["public"]["Enums"]["brand_tier"]
           category: Database["public"]["Enums"]["category_type"] | null
           country: string | null
           created_at: string | null
@@ -241,6 +242,7 @@ export type Database = {
         Insert: {
           affiliate_url?: string | null
           banner_url?: string | null
+          brand_tier?: Database["public"]["Enums"]["brand_tier"]
           category?: Database["public"]["Enums"]["category_type"] | null
           country?: string | null
           created_at?: string | null
@@ -259,6 +261,7 @@ export type Database = {
         Update: {
           affiliate_url?: string | null
           banner_url?: string | null
+          brand_tier?: Database["public"]["Enums"]["brand_tier"]
           category?: Database["public"]["Enums"]["category_type"] | null
           country?: string | null
           created_at?: string | null
@@ -1217,6 +1220,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      brand_tier: "established" | "emerging"
       category_type:
         | "streetwear"
         | "sneakers"
@@ -1359,6 +1363,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      brand_tier: ["established", "emerging"],
       category_type: [
         "streetwear",
         "sneakers",

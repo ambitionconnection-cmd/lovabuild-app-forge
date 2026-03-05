@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ProUpgradeModal } from "@/components/ProUpgradeModal";
-import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X, Layers } from "lucide-react";
+import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X, Layers, Sparkles, Crown, Info } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,8 @@ const GlobalIndex = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [highlightedBrand, setHighlightedBrand] = useState<string | null>(highlightId);
   const [showProModal, setShowProModal] = useState(false);
+  const [activeTier, setActiveTier] = useState<"established" | "emerging">("established");
+  const [showCriteria, setShowCriteria] = useState(false);
 
   // Fetch brands and user favorites
   useEffect(() => {
@@ -101,6 +103,9 @@ const GlobalIndex = () => {
   useEffect(() => {
     let filtered = brands;
 
+    // Filter by tier
+    filtered = filtered.filter(brand => (brand as any).brand_tier === activeTier);
+
     // Filter by favorites first if enabled
     if (showFavoritesOnly) {
       filtered = filtered.filter(brand => favoriteBrands.has(brand.id));
@@ -135,7 +140,7 @@ const GlobalIndex = () => {
     });
 
     setFilteredBrands(sorted);
-  }, [searchQuery, selectedCountry, selectedCategory, sortBy, brands, showFavoritesOnly, favoriteBrands]);
+  }, [searchQuery, selectedCountry, selectedCategory, sortBy, brands, showFavoritesOnly, favoriteBrands, activeTier]);
 
   // Get unique countries from brands
   const countries = Array.from(new Set(brands.map(brand => brand.country).filter(Boolean))).sort();
@@ -244,8 +249,55 @@ const GlobalIndex = () => {
         </div>
       </header>
       
-      {/* Sticky Filter Section */}
-      <div className="sticky top-[49px] z-40 bg-background/95 backdrop-blur-sm border-b border-border/30 pb-2 pt-2 px-3">
+      {/* Tier Toggle */}
+      <div className="sticky top-[49px] z-40 bg-background/95 backdrop-blur-sm border-b border-border/30 px-3 pt-2">
+        <div className="flex items-center gap-1.5 mb-2">
+          <button
+            onClick={() => setActiveTier("established")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+              activeTier === "established"
+                ? "bg-gradient-to-r from-[#C4956A] to-[#D4A574] text-black shadow-lg shadow-[#C4956A]/25"
+                : "bg-muted/40 text-muted-foreground hover:bg-muted/60"
+            }`}
+          >
+            <Crown className="w-3.5 h-3.5" />
+            Established
+          </button>
+          <button
+            onClick={() => setActiveTier("emerging")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+              activeTier === "emerging"
+                ? "bg-gradient-to-r from-[#8B6DAF] to-[#AD3A49] text-white shadow-lg shadow-[#AD3A49]/25"
+                : "bg-muted/40 text-muted-foreground hover:bg-muted/60"
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            New Wave
+          </button>
+          {activeTier === "emerging" && (
+            <button
+              onClick={() => setShowCriteria(!showCriteria)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center bg-muted/40 hover:bg-muted/60 transition-colors flex-shrink-0"
+            >
+              <Info className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          )}
+        </div>
+
+        {/* Acceptance Criteria Banner */}
+        {showCriteria && activeTier === "emerging" && (
+          <div className="mb-2 p-3 rounded-xl bg-gradient-to-r from-[#8B6DAF]/10 to-[#AD3A49]/10 border border-[#8B6DAF]/20 text-xs space-y-1.5">
+            <p className="font-semibold text-[#8B6DAF]">🎯 To be featured as a New Wave brand:</p>
+            <ul className="space-y-1 text-muted-foreground pl-4">
+              <li>• 1,000+ followers on Instagram or TikTok</li>
+              <li>• At least one web or social media presence</li>
+              <li>• Real physical products created & sold (no dropshipping)</li>
+            </ul>
+            <p className="text-muted-foreground/70 italic">Submit your brand via the Contact page →</p>
+          </div>
+        )}
+
+      <div className="pb-2">
         <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
           {/* Search bar always visible */}
           <div className="flex items-center gap-2">
@@ -345,6 +397,7 @@ const GlobalIndex = () => {
             </div>
           </CollapsibleContent>
         </Collapsible>
+      </div>
       </div>
 
       <main className="container mx-auto px-3 py-4">

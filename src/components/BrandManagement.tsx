@@ -213,7 +213,8 @@ export const BrandManagement = () => {
                   <TableHead>Name</TableHead>
                   <TableHead>Country</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Instagram</TableHead>
+                  <TableHead>Tier</TableHead>
+                   <TableHead>Instagram</TableHead>
                   <TableHead>Website</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -222,7 +223,7 @@ export const BrandManagement = () => {
               <TableBody>
                 {filteredBrands.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="text-center text-muted-foreground">
                       No brands found
                     </TableCell>
                   </TableRow>
@@ -243,6 +244,11 @@ export const BrandManagement = () => {
                         ) : (
                           "-"
                         )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={(brand as any).brand_tier === "emerging" ? "default" : "outline"}>
+                          {(brand as any).brand_tier === "emerging" ? "New Wave" : "Established"}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         {brand.instagram_url ? (
