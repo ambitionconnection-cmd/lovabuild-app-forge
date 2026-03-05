@@ -1,13 +1,16 @@
 import { ArrowLeft, Flame } from "lucide-react";
+import urbanBg from "@/assets/urban-bg.jpg";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { StreetSpottedFeed } from "@/components/StreetSpottedFeed";
 
 const Feed = () => {
   return (
-    <div className="min-h-screen bg-background pb-20 pt-0 lg:pt-14 animate-fade-in">
+    <div className="relative min-h-screen bg-background pb-20 pt-0 lg:pt-14 animate-fade-in">
+      <div className="fixed inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: `url(${urbanBg})` }} />
+      <div className="fixed inset-0 bg-background/75" />
       {/* Header */}
-      <header className="sticky top-0 lg:top-14 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+      <header className="relative sticky top-0 lg:top-14 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto px-3 py-2 flex items-center gap-3">
           <Link to="/">
             <Button variant="ghost" size="icon" className="h-8 w-8 hover:scale-110 active:scale-95 transition-transform">
@@ -22,7 +25,7 @@ const Feed = () => {
       </header>
 
       {/* Street Spotted Feed */}
-      <div className="mt-0 pt-3">
+      <div className="relative mt-0 pt-3">
         <StreetSpottedFeed />
       </div>
     </div>

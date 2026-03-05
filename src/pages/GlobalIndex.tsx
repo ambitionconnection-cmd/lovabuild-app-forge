@@ -17,6 +17,7 @@ import { getCountryFlag } from "@/lib/countryFlags";
 import { useTranslation } from "react-i18next";
 import haptic from "@/lib/haptics";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import urbanBg from "@/assets/urban-bg.jpg";
 
 const GlobalIndex = () => {
   const { user, isPro } = useAuth();
@@ -228,7 +229,9 @@ const GlobalIndex = () => {
 
   return (
     <>
-    <div className="min-h-screen bg-background pb-20 animate-fade-in">
+    <div className="relative min-h-screen bg-background pb-20 animate-fade-in">
+      <div className="fixed inset-0 bg-cover bg-center opacity-[0.07]" style={{ backgroundImage: `url(${urbanBg})` }} />
+      <div className="fixed inset-0 bg-background/90" />
       <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
         <div className="container mx-auto px-3 py-2 flex items-center gap-3">
           <Link to="/">
