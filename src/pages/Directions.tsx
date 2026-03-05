@@ -582,6 +582,7 @@ const Directions = () => {
                     brands={brands}
                     onShopClick={(shop) => {
                       setSelectedShop(shop);
+                      setHighlightedShopId(shop.id);
                     }}
                     selectedShop={selectedShop}
                     journeyStops={journeyStops}
