@@ -255,11 +255,11 @@ const BrandDetail = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-3 py-4 space-y-4">
+      <main className="container mx-auto px-3 py-4 lg:pt-8 space-y-4">
         {/* Brand Hero Card */}
         <Card className="overflow-hidden bg-gradient-to-br from-[#A3A39E]/15 via-card to-[#A3A39E]/10 border-[#A3A39E]/30 animate-scale-in">
-          <CardContent className="p-4">
-            <div className="flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:gap-8">
+          <CardContent className="p-4 lg:p-6">
+            <div className="flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-center lg:gap-12">
               {/* Logo */}
               <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-2xl bg-logo-bg border-2 border-primary/30 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/10 animate-scale-in flex-shrink-0" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
                 {brand.logo_url ? (
