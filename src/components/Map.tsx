@@ -996,29 +996,35 @@ const Map: React.FC<MapProps> = ({
     ensureMapReadyThenUpdate();
   }, [shops]);
 
-  // Update highlighted shop styling
+  // Update highlighted shop styling - target logo marker DOM elements
   useEffect(() => {
-    if (!map.current || !map.current.isStyleLoaded()) return;
-    
-    if (map.current.getLayer('unclustered-point')) {
-      map.current.setPaintProperty('unclustered-point', 'circle-radius', [
-        'case',
-        ['==', ['get', 'id'], highlightedShopId || ''],
-        22,
-        16
-      ]);
-      map.current.setPaintProperty('unclustered-point', 'circle-stroke-width', [
-        'case',
-        ['==', ['get', 'id'], highlightedShopId || ''],
-        5,
-        3
-      ]);
-      map.current.setPaintProperty('unclustered-point', 'circle-stroke-color', [
-        'case',
-        ['==', ['get', 'id'], highlightedShopId || ''],
-        'hsl(0, 0%, 100%)',
-        'hsl(209, 40%, 96%)'
-      ]);
+    // Reset all markers to default style
+    Object.entries(logoMarkersRef.current).forEach(([id, marker]) => {
+      const el = marker.getElement();
+      if (el) {
+        const markerDiv = el.querySelector('.logo-marker') as HTMLElement || el.firstChild as HTMLElement;
+        if (markerDiv) {
+          markerDiv.style.border = '3px solid white';
+          markerDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+          markerDiv.style.transform = 'scale(1)';
+          markerDiv.style.transition = 'all 0.2s ease';
+        }
+      }
+    });
+
+    // Highlight the selected marker
+    if (highlightedShopId && logoMarkersRef.current[highlightedShopId]) {
+      const marker = logoMarkersRef.current[highlightedShopId];
+      const el = marker.getElement();
+      if (el) {
+        const markerDiv = el.querySelector('.logo-marker') as HTMLElement || el.firstChild as HTMLElement;
+        if (markerDiv) {
+          markerDiv.style.border = '3px solid hsl(0, 85%, 55%)';
+          markerDiv.style.boxShadow = '0 0 0 2px hsl(0, 85%, 55%), 0 0 12px rgba(220, 50, 50, 0.5)';
+          markerDiv.style.transform = 'scale(1.15)';
+          markerDiv.style.transition = 'all 0.2s ease';
+        }
+      }
     }
   }, [highlightedShopId]);
 

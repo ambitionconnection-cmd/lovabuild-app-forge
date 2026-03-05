@@ -394,10 +394,10 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                         <div className="flex gap-1 flex-shrink-0">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button
+                          <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-7 w-7 p-0 hover:bg-primary/10"
+                                className={`h-7 w-7 p-0 ${isSelected || inJourney ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-primary/10'}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onOpenDetails(shop);
@@ -417,7 +417,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-7 w-7 p-0 hover:bg-green-500/10 hover:text-green-600"
+                                  className={`h-7 w-7 p-0 ${isSelected || inJourney ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-green-500/10 hover:text-green-600'}`}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     haptic.light();
@@ -444,7 +444,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-7 w-7 p-0 hover:bg-directions/10 hover:text-directions"
+                                  className={`h-7 w-7 p-0 ${isSelected ? 'hover:bg-gray-200 text-red-600' : 'hover:bg-directions/10 hover:text-directions'}`}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     onAddToJourney(shop);
