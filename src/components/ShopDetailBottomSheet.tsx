@@ -32,6 +32,7 @@ interface ShopDetailBottomSheetProps {
   onClose: () => void;
   onAddToJourney: (shop: ShopType) => void;
   onGetDirections: (shop: ShopType) => void;
+  onOpenShopDetails?: (shop: ShopType) => void;
   isInJourney: boolean;
   userLocation: { lat: number; lng: number } | null;
   calculateDistance: (lat: number, lng: number) => string;
@@ -47,6 +48,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
   onClose,
   onAddToJourney,
   onGetDirections,
+  onOpenShopDetails,
   isInJourney,
   userLocation,
   calculateDistance,
@@ -278,22 +280,35 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
             </div>
           )}
 
-          {/* View Brand Page button */}
-          {brand?.slug && (
-            <div className="px-4 py-2">
+          {/* View Shop Detail + Brand Page buttons */}
+          <div className="px-4 py-2 flex gap-2">
+            <Button
+              onClick={() => {
+                haptic.light();
+                if (onOpenShopDetails) {
+                  onOpenShopDetails(shop);
+                }
+              }}
+              variant="outline"
+              className="flex-1 h-10 text-sm font-semibold border-white/10 text-[#C3C9C9] hover:bg-white/5"
+            >
+              <MapPin className="w-4 h-4 mr-1.5" />
+              {t('shops.details', 'Shop Detail')}
+            </Button>
+            {brand?.slug && (
               <Button
                 onClick={() => {
                   haptic.light();
                   navigate(`/brand/${brand.slug}`);
                 }}
                 variant="outline"
-                className="w-full h-10 text-sm font-semibold border-white/10 text-[#C3C9C9] hover:bg-white/5"
+                className="flex-1 h-10 text-sm font-semibold border-white/10 text-[#C3C9C9] hover:bg-white/5"
               >
                 <BookOpen className="w-4 h-4 mr-1.5" />
-                View Full Brand Page
+                {t('shops.viewBrand', 'Brand Info')}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Divider */}
           <div className="mx-4 border-t border-white/5 my-2" />
