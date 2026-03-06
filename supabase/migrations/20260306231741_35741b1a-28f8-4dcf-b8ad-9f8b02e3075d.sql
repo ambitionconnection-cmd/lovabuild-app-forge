@@ -1,0 +1,1 @@
+ALTER VIEW public.shops_public SET (security_invoker = on);

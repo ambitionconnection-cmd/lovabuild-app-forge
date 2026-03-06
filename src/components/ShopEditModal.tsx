@@ -33,6 +33,7 @@ export const ShopEditModal = ({ shop, brands, isOpen, onClose, onSuccess }: Shop
     phone: null,
     email: null,
     official_site: null,
+    instagram_url: null,
     latitude: null,
     longitude: null,
     description: null,
@@ -66,6 +67,7 @@ export const ShopEditModal = ({ shop, brands, isOpen, onClose, onSuccess }: Shop
         phone: null,
         email: null,
         official_site: null,
+        instagram_url: null,
         latitude: null,
         longitude: null,
         description: null,
@@ -274,6 +276,17 @@ export const ShopEditModal = ({ shop, brands, isOpen, onClose, onSuccess }: Shop
                 onChange={(e) => setFormData({ ...formData, official_site: e.target.value })}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="instagram_url">Instagram URL</Label>
+            <Input
+              id="instagram_url"
+              type="url"
+              placeholder="https://instagram.com/shopname"
+              value={formData.instagram_url || ""}
+              onChange={(e) => setFormData({ ...formData, instagram_url: e.target.value })}
+            />
           </div>
 
           <div className="space-y-2">
