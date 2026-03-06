@@ -191,7 +191,18 @@ export const MediaManagement = () => {
         if (error) throw error;
         toast.success(`Image removed from ${deletingImage.shop.name}`);
       }
-      fetchData();
+      // Update state locally to preserve scroll position
+      if (deletingImage.brand) {
+        setBrands(prev => prev.map(b => 
+          b.id === deletingImage.brand!.id 
+            ? { ...b, ...(deletingImage.type === "logo" ? { logo_url: null } : { banner_url: null }) }
+            : b
+        ));
+      } else if (deletingImage.shop) {
+        setShops(prev => prev.map(s => 
+          s.id === deletingImage.shop!.id ? { ...s, image_url: null } : s
+        ));
+      }
     } catch (error: any) {
       console.error("Error deleting image:", error);
       toast.error(error.message || "Failed to delete image");
