@@ -429,6 +429,27 @@ const MyHeardrop = () => {
                             </p>
                           )}
                         </div>
+                        {/* Start Route button */}
+                        <Button
+                          className="w-full mt-3 bg-[#C4956A] hover:bg-[#C4956A]/90 text-white font-bold uppercase tracking-wider text-xs"
+                          onClick={() => {
+                            // Load the saved route into the active route
+                            const stopsJson = JSON.stringify(route.stops);
+                            sessionStorage.setItem('flyaf_route_stops', stopsJson);
+                            localStorage.setItem('flyaf_route_stops', stopsJson);
+                            // Navigate to map and switch to route mode
+                            navigate('/');
+                            setTimeout(() => {
+                              window.dispatchEvent(new CustomEvent('switchToRouteMode'));
+                              window.dispatchEvent(new CustomEvent('reopenRouteSheet'));
+                            }, 300);
+                            toast.success(`Route "${route.name}" loaded — let's go!`);
+                            haptic.success();
+                          }}
+                        >
+                          <Navigation className="w-4 h-4 mr-2" />
+                          Start This Route
+                        </Button>
                       </CardContent>
                     </Card>
                   ))}
