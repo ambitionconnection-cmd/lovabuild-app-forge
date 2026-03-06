@@ -732,7 +732,7 @@ const Map: React.FC<MapProps> = ({
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         pointer-events: none;
         overflow: hidden;
-        background-color: hsl(271, 85%, 65%);
+        background-color: #CDAA7D;
         display: flex;
         align-items: center;
         justify-content: center;
