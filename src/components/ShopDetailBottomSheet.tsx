@@ -284,7 +284,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
               <Button
                 onClick={() => {
                   haptic.light();
-                  navigate(`/brand/${brand.slug}`, { state: { from: 'map' } });
+                  navigate(`/brand/${brand.slug}`);
                 }}
                 variant="outline"
                 className="w-full h-10 text-sm font-semibold border-white/10 text-[#C3C9C9] hover:bg-white/5"
