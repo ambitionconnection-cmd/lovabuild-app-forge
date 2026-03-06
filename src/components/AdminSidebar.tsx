@@ -55,7 +55,7 @@ const navGroups = [
     icon: Image,
     items: [
       { title: "Media Library", value: "media", icon: Image },
-      { title: "AI Image Generator", value: "brand-images", icon: Image },
+      
       { title: "Image Archive", value: "image-archive", icon: Archive },
     ],
   },

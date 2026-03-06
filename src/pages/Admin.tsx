@@ -676,12 +676,6 @@ export default function Admin() {
               <ContactManagement />
             )}
 
-            {activeTab === "brand-images" && (
-              <BrandImageGenerator 
-                brands={brands} 
-                onComplete={fetchAttempts} 
-              />
-            )}
 
             {activeTab === "brands" && (
               <div className="space-y-6">
