@@ -277,6 +277,17 @@ export const ShopEditModal = ({ shop, brands, isOpen, onClose, onSuccess }: Shop
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="instagram_url">Instagram URL</Label>
+            <Input
+              id="instagram_url"
+              type="url"
+              placeholder="https://instagram.com/shopname"
+              value={formData.instagram_url || ""}
+              onChange={(e) => setFormData({ ...formData, instagram_url: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select
               value={formData.category || "__none__"}
