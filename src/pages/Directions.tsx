@@ -706,7 +706,14 @@ const Directions = () => {
                   <RouteSidePanel
                     journeyStops={journeyStops}
                     onRemoveStop={(id) => setJourneyStops(prev => prev.filter(s => s.id !== id))}
-                    onClearAll={() => setJourneyStops([])}
+                    onClearAll={() => {
+                      setJourneyStops([]);
+                      setRouteInfo(null);
+                      sessionStorage.removeItem('flyaf_route_stops');
+                      localStorage.removeItem('flyaf_route_stops');
+                      setIsRouteMode(false);
+                      window.dispatchEvent(new CustomEvent('reopenShopsSheet'));
+                    }}
                     onReorderStops={(newStops) => setJourneyStops(newStops)}
                     onStartNavigation={() => {
                       const allWaypoints: string[] = [];
@@ -912,7 +919,14 @@ const Directions = () => {
         <RouteBottomSheet
           journeyStops={journeyStops}
           onRemoveStop={removeFromJourney}
-          onClearAll={() => setJourneyStops([])}
+          onClearAll={() => {
+            setJourneyStops([]);
+            setRouteInfo(null);
+            sessionStorage.removeItem('flyaf_route_stops');
+            localStorage.removeItem('flyaf_route_stops');
+            setIsRouteMode(false);
+            window.dispatchEvent(new CustomEvent('reopenShopsSheet'));
+          }}
           onReorderStops={(newStops) => setJourneyStops(newStops)}
           onStartNavigation={() => {
             const allWaypoints: string[] = [];
