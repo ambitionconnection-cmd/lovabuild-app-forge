@@ -925,8 +925,8 @@ const Map: React.FC<MapProps> = ({
             paint: {
               'text-color': '#1a1a1a',
               'text-halo-color': '#ffffff',
-              'text-halo-width': 2,
-              'text-halo-blur': 0.5,
+              'text-halo-width': 1,
+              'text-halo-blur': 0.3,
               'text-opacity': [
                 'interpolate', ['linear'], ['zoom'],
                 11, 0,
