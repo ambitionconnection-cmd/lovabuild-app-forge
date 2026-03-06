@@ -139,7 +139,13 @@ export const ShopManagement = () => {
         body: { eventType: "shop_deleted", eventData: { shop_id: deletingShop.id, shop_name: deletingShop.name } },
       });
       toast.success("Shop deleted successfully");
-      fetchData();
+      // Update state locally to preserve scroll position
+      setShops(prev => prev.filter(s => s.id !== deletingShop.id));
+      setSelectedShops(prev => {
+        const next = new Set(prev);
+        next.delete(deletingShop.id);
+        return next;
+      });
     } catch (error: any) {
       console.error("Error deleting shop:", error);
       toast.error(error.message || "Failed to delete shop");
