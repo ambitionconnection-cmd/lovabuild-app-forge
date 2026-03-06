@@ -32,6 +32,7 @@ interface ShopDetailBottomSheetProps {
   onClose: () => void;
   onAddToJourney: (shop: ShopType) => void;
   onGetDirections: (shop: ShopType) => void;
+  onOpenShopDetails?: (shop: ShopType) => void;
   isInJourney: boolean;
   userLocation: { lat: number; lng: number } | null;
   calculateDistance: (lat: number, lng: number) => string;
@@ -47,6 +48,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
   onClose,
   onAddToJourney,
   onGetDirections,
+  onOpenShopDetails,
   isInJourney,
   userLocation,
   calculateDistance,
@@ -283,9 +285,9 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
             <Button
               onClick={() => {
                 haptic.light();
-                onClose();
-                // Trigger the shop details modal via a custom event
-                window.dispatchEvent(new CustomEvent('open-shop-detail-modal', { detail: shop }));
+                if (onOpenShopDetails) {
+                  onOpenShopDetails(shop);
+                }
               }}
               variant="outline"
               className="flex-1 h-10 text-sm font-semibold border-white/10 text-[#C3C9C9] hover:bg-white/5"

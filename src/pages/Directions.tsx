@@ -968,6 +968,7 @@ const Directions = () => {
             onClose={() => { setSelectedShopForDetails(null); setDetailsModalOpen(false); }}
             onAddToJourney={addToJourney}
             onGetDirections={getDirections}
+            onOpenShopDetails={openShopDetails}
             isInJourney={isInJourney(selectedShopForDetails.id)}
             userLocation={userLocation}
             calculateDistance={(lat: number, lng: number) => {
