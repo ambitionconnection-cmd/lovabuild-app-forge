@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { X, Globe, Instagram, MapPin, Navigation, Plus, ExternalLink, Languages, Heart } from 'lucide-react';
+import { X, Globe, Instagram, MapPin, Navigation, Plus, ExternalLink, Languages, Heart, BookOpen } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
 import { ProUpgradeModal } from '@/components/ProUpgradeModal';
 import { Tables } from '@/integrations/supabase/types';
@@ -51,6 +52,7 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
   calculateDistance,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites('shop');
   const [showProModal, setShowProModal] = useState(false);
   const [sheetState, setSheetState] = useState<'expanded' | 'full'>('expanded');
@@ -273,6 +275,23 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
                   🌍 {brand.country}
                 </Badge>
               )}
+            </div>
+          )}
+
+          {/* View Brand Page button */}
+          {brand?.slug && (
+            <div className="px-4 py-2">
+              <Button
+                onClick={() => {
+                  haptic.light();
+                  navigate(`/brand/${brand.slug}`, { state: { from: 'map' } });
+                }}
+                variant="outline"
+                className="w-full h-10 text-sm font-semibold border-white/10 text-[#C3C9C9] hover:bg-white/5"
+              >
+                <BookOpen className="w-4 h-4 mr-1.5" />
+                View Full Brand Page
+              </Button>
             </div>
           )}
 
