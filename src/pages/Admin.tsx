@@ -12,7 +12,7 @@ import { format } from 'date-fns';
 import { AuditLogExportFilters, ExportFilters } from '@/components/AuditLogExportFilters';
 import { ScheduledExportManager } from '@/components/ScheduledExportManager';
 import { EmailAnalytics } from '@/components/EmailAnalytics';
-import { BrandImageGenerator } from '@/components/BrandImageGenerator';
+
 import { SpotModerationQueue } from '@/components/SpotModerationQueue';
 import { ContactManagement } from '@/components/ContactManagement';
 import { BrandManagement } from '@/components/BrandManagement';
