@@ -796,6 +796,7 @@ export type Database = {
           email: string | null
           id: string
           image_url: string | null
+          instagram_url: string | null
           is_active: boolean | null
           is_unique_shop: boolean | null
           latitude: number | null
@@ -818,6 +819,7 @@ export type Database = {
           email?: string | null
           id?: string
           image_url?: string | null
+          instagram_url?: string | null
           is_active?: boolean | null
           is_unique_shop?: boolean | null
           latitude?: number | null
@@ -840,6 +842,7 @@ export type Database = {
           email?: string | null
           id?: string
           image_url?: string | null
+          instagram_url?: string | null
           is_active?: boolean | null
           is_unique_shop?: boolean | null
           latitude?: number | null

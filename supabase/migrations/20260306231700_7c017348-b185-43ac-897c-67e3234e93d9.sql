@@ -1,0 +1,1 @@
+ALTER TABLE public.shops ADD COLUMN instagram_url text DEFAULT NULL;
