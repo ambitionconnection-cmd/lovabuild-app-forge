@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { showUndoToast } from "@/hooks/useAdminUndo";
 import { BrandEditModal } from "./BrandEditModal";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -77,7 +78,7 @@ export const BrandManagement = () => {
 
   const handleDelete = async () => {
     if (!deletingBrand) return;
-
+    const brandSnapshot = { ...deletingBrand };
     try {
       const { error } = await supabase
         .from("brands")
@@ -86,7 +87,6 @@ export const BrandManagement = () => {
 
       if (error) throw error;
 
-      // Log admin action
       await supabase.functions.invoke("log-security-event", {
         body: {
           eventType: "brand_deleted",
@@ -94,7 +94,13 @@ export const BrandManagement = () => {
         },
       });
 
-      toast.success("Brand deleted successfully");
+      showUndoToast({
+        message: `"${brandSnapshot.name}" deleted`,
+        table: "brands",
+        undoData: brandSnapshot,
+        undoType: "reinsert",
+        onUndo: () => fetchBrands(),
+      });
       fetchBrands();
     } catch (error: any) {
       console.error("Error deleting brand:", error);
@@ -126,12 +132,13 @@ export const BrandManagement = () => {
 
   const handleBulkActivate = async (activate: boolean) => {
     if (selectedBrands.size === 0) return;
-
+    const ids = Array.from(selectedBrands);
+    const previousStates = brands.filter(b => ids.includes(b.id)).map(b => ({ id: b.id, is_active: b.is_active }));
     try {
       const { error } = await supabase
         .from("brands")
         .update({ is_active: activate })
-        .in("id", Array.from(selectedBrands));
+        .in("id", ids);
 
       if (error) throw error;
 
@@ -142,9 +149,17 @@ export const BrandManagement = () => {
         },
       });
 
-      toast.success(`${selectedBrands.size} brand(s) ${activate ? "activated" : "deactivated"}`);
+      const count = selectedBrands.size;
       setSelectedBrands(new Set());
       fetchBrands();
+      showUndoToast({
+        message: `${count} brand(s) ${activate ? "activated" : "deactivated"}`,
+        table: "brands",
+        undoData: previousStates,
+        undoType: "update",
+        updateColumn: "is_active",
+        onUndo: () => fetchBrands(),
+      });
     } catch (error: any) {
       console.error("Error updating brands:", error);
       toast.error(error.message || "Failed to update brands");
