@@ -52,6 +52,7 @@ export const StreetSpottedFeed = () => {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   // Filters
   const [brandFilter, setBrandFilter] = useState<string | null>(null);
