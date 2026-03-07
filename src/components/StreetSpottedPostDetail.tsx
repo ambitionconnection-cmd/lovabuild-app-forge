@@ -24,6 +24,7 @@ interface Post {
   like_count: number;
   user_liked: boolean;
   display_name: string | null;
+  avatar_url: string | null;
   style_tags: string[];
   is_sponsored: boolean;
   instagram_handle?: string | null;
