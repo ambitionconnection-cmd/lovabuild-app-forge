@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import { showUndoToast } from "@/hooks/useAdminUndo";
 import { CheckCircle, XCircle, Mail, Calendar, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 
@@ -85,7 +86,14 @@ export const ContactManagement = () => {
         .update({ is_resolved: !currentStatus })
         .eq('id', id);
       if (error) throw error;
-      toast.success(`Message marked as ${!currentStatus ? 'resolved' : 'unresolved'}`);
+      showUndoToast({
+        message: `Message marked as ${!currentStatus ? 'resolved' : 'unresolved'}`,
+        table: "contact_submissions",
+        undoData: { id, is_resolved: currentStatus },
+        undoType: "update",
+        updateColumn: "is_resolved",
+        onUndo: () => fetchSubmissions(),
+      });
       fetchSubmissions();
     } catch (error) {
       toast.error('Failed to update message status');

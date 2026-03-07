@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { showUndoToast } from "@/hooks/useAdminUndo";
 import { Check, X, Loader2, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 
@@ -46,6 +47,8 @@ export const BrandRequestsQueue = () => {
   useEffect(() => { fetchRequests(); }, [filter]);
 
   const updateStatus = async (id: string, status: string) => {
+    const prev = requests.find(r => r.id === id);
+    const previousStatus = prev?.status || "pending";
     const { error } = await supabase
       .from("brand_requests")
       .update({ status, resolved_at: new Date().toISOString() } as any)
@@ -54,7 +57,25 @@ export const BrandRequestsQueue = () => {
     if (error) {
       toast.error("Failed to update request");
     } else {
-      toast.success(`Request ${status}`);
+      toast.success(`Request ${status}`, {
+        duration: 8000,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            try {
+              const { error: undoError } = await supabase
+                .from("brand_requests")
+                .update({ status: previousStatus, resolved_at: null } as any)
+                .eq("id", id);
+              if (undoError) throw undoError;
+              toast.success("Action undone");
+              fetchRequests();
+            } catch (e: any) {
+              toast.error("Undo failed: " + (e.message || "Unknown error"));
+            }
+          },
+        },
+      });
       fetchRequests();
     }
   };

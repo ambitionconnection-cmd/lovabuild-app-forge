@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type TableName = "shops" | "brands" | "drops";
+type TableName = "shops" | "brands" | "drops" | "contact_submissions" | "brand_requests";
 
 /**
  * Shows a success toast with an "Undo" action button.
