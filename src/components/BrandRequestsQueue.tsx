@@ -48,6 +48,7 @@ export const BrandRequestsQueue = () => {
 
   const updateStatus = async (id: string, status: string) => {
     const prev = requests.find(r => r.id === id);
+    const previousStatus = prev?.status || "pending";
     const { error } = await supabase
       .from("brand_requests")
       .update({ status, resolved_at: new Date().toISOString() } as any)
@@ -56,13 +57,24 @@ export const BrandRequestsQueue = () => {
     if (error) {
       toast.error("Failed to update request");
     } else {
-      showUndoToast({
-        message: `Request ${status}`,
-        table: "brand_requests",
-        undoData: { id, status: prev?.status || "pending", resolved_at: null },
-        undoType: "update",
-        updateColumn: "status",
-        onUndo: () => fetchRequests(),
+      toast.success(`Request ${status}`, {
+        duration: 8000,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            try {
+              const { error: undoError } = await supabase
+                .from("brand_requests")
+                .update({ status: previousStatus, resolved_at: null } as any)
+                .eq("id", id);
+              if (undoError) throw undoError;
+              toast.success("Action undone");
+              fetchRequests();
+            } catch (e: any) {
+              toast.error("Undo failed: " + (e.message || "Unknown error"));
+            }
+          },
+        },
       });
       fetchRequests();
     }
