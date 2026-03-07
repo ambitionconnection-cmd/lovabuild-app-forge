@@ -1,8 +1,10 @@
 import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
@@ -50,10 +52,11 @@ interface Props {
   onNavigate?: (post: Post) => void;
 }
 
-const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean }) => {
+const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext, onUserClick }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean; onUserClick?: (userId: string) => void }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
 
   const handleDownload = async () => {
     try {
