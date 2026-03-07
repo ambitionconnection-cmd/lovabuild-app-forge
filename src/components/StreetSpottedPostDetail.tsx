@@ -150,31 +150,30 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
               <Flame className={cn("w-5 h-5", post.user_liked && "fill-orange-400")} />
               {post.like_count > 0 && <span>{post.like_count}</span>}
             </button>
-            {user && post.user_id === user.id && (
+            {(isAdmin || (user && post.user_id === user.id)) && (
               <button onClick={handleDownload} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
                 <Download className="w-4 h-4" />
               </button>
             )}
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {post.display_name && (
+            <button
+              onClick={() => onUserClick?.(post.user_id)}
+              className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+            >
+              <Avatar className="w-5 h-5">
+                <AvatarImage src={post.avatar_url || undefined} />
+                <AvatarFallback className="text-[8px]">
+                  {post.display_name?.charAt(0)?.toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
               <span className="font-medium flex items-center gap-1">
-                {post.display_name}
+                {post.display_name || "User"}
                 {post.is_pro && (
                   <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[8px] font-bold leading-none">PRO</span>
                 )}
               </span>
-            )}
-            {post.instagram_handle && (
-              <a href={`https://instagram.com/${post.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[#C4956A] hover:underline">
-                <Instagram className="w-3 h-3" />@{post.instagram_handle.replace('@', '')}
-              </a>
-            )}
-            {post.tiktok_handle && (
-              <a href={`https://tiktok.com/@${post.tiktok_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[#C4956A] hover:underline">
-                <TikTokIcon className="w-3 h-3" />@{post.tiktok_handle.replace('@', '')}
-              </a>
-            )}
+            </button>
             <span>·</span>
             <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
           </div>
