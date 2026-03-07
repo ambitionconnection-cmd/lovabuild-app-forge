@@ -61,7 +61,15 @@ const ProfileContent = ({ userId, onClose, onPostClick }: Omit<UserProfileCardPr
       ]);
 
       if (profileRes.data) {
-        setProfile(profileRes.data as unknown as UserProfile);
+        const profileData = profileRes.data as unknown as UserProfile;
+        
+        // Fetch email if user has show_email enabled
+        if (profileData.show_email) {
+          const { data: emailData } = await supabase.rpc("get_user_email_if_public", { _user_id: userId });
+          if (emailData) profileData.email = emailData;
+        }
+        
+        setProfile(profileData);
       }
 
       // Get like counts for posts
