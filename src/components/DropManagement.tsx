@@ -9,6 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
+import { toast as sonnerToast } from 'sonner';
+import { showUndoToast } from '@/hooks/useAdminUndo';
 import { Search, Plus, Edit, Trash2, Loader2 } from 'lucide-react';
 import { DropEditModal } from './DropEditModal';
 import type { Tables } from '@/integrations/supabase/types';
@@ -63,7 +65,7 @@ export function DropManagement() {
 
   const handleDelete = async () => {
     if (!deletingDrop) return;
-
+    const dropSnapshot = { ...deletingDrop };
     try {
       const { error } = await supabase
         .from('drops')
@@ -72,13 +74,15 @@ export function DropManagement() {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Drop deleted successfully",
-      });
-
       fetchData();
       setDeletingDrop(null);
+      showUndoToast({
+        message: `"${dropSnapshot.title}" deleted`,
+        table: "drops",
+        undoData: dropSnapshot,
+        undoType: "reinsert",
+        onUndo: () => fetchData(),
+      });
     } catch (error: any) {
       console.error('Error deleting drop:', error);
       toast({
