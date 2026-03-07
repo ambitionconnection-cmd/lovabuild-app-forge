@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Download, Loader2, Users, Store, FileSpreadsheet } from 'lucide-react';
 import { exportBrandsCSV, exportShopsCSV, exportShopsSummaryCSV } from '@/lib/csvExport';
+import { exportUsersCSV } from '@/lib/csvExportUsers';
 
 export function DataExports() {
   const [loadingBrands, setLoadingBrands] = useState(false);
   const [loadingShops, setLoadingShops] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   const handleExportBrands = async () => {
     setLoadingBrands(true);
@@ -52,6 +54,20 @@ export function DataExports() {
     }
   };
 
+  const handleExportUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const result = await exportUsersCSV();
+      if (result.success) {
+        toast.success(`Exported ${result.count} users to CSV`);
+      } else {
+        toast.error(`Failed to export users: ${result.error}`);
+      }
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -64,7 +80,7 @@ export function DataExports() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {/* Brands Export */}
           <Card className="border-dashed">
             <CardHeader className="pb-3">
@@ -166,6 +182,41 @@ export function DataExports() {
                   <Download className="h-4 w-4 mr-2" />
                 )}
                 Export Summary CSV
+              </Button>
+            </CardContent>
+          </Card>
+          {/* Users Export */}
+          <Card className="border-dashed">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Users className="h-4 w-4 text-primary" />
+                Users Export
+              </CardTitle>
+              <CardDescription className="text-xs">
+                All users with profile data, social handles, and activity
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xs text-muted-foreground mb-3 space-y-1">
+                <p><strong>Columns:</strong></p>
+                <ul className="list-disc list-inside">
+                  <li>Display Name, Bio</li>
+                  <li>Instagram, TikTok</li>
+                  <li>Pro/Founding status</li>
+                  <li>Posts, Followers, Following</li>
+                </ul>
+              </div>
+              <Button 
+                onClick={handleExportUsers} 
+                disabled={loadingUsers}
+                className="w-full"
+              >
+                {loadingUsers ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                Export Users CSV
               </Button>
             </CardContent>
           </Card>
