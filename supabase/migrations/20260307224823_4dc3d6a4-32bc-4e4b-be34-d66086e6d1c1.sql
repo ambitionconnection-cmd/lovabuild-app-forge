@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN show_email boolean NOT NULL DEFAULT false;

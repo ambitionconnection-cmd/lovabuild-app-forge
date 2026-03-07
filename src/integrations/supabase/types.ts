@@ -637,6 +637,7 @@ export type Database = {
           is_pro: boolean | null
           notification_preferences: Json | null
           pro_expires_at: string | null
+          show_email: boolean
           show_instagram: boolean
           show_tiktok: boolean
           tiktok_handle: string | null
@@ -653,6 +654,7 @@ export type Database = {
           is_pro?: boolean | null
           notification_preferences?: Json | null
           pro_expires_at?: string | null
+          show_email?: boolean
           show_instagram?: boolean
           show_tiktok?: boolean
           tiktok_handle?: string | null
@@ -669,6 +671,7 @@ export type Database = {
           is_pro?: boolean | null
           notification_preferences?: Json | null
           pro_expires_at?: string | null
+          show_email?: boolean
           show_instagram?: boolean
           show_tiktok?: boolean
           tiktok_handle?: string | null
