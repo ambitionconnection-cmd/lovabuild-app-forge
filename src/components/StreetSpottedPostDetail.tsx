@@ -50,6 +50,7 @@ interface Props {
   onToggleLike: (postId: string) => void;
   posts?: Post[];
   onNavigate?: (post: Post) => void;
+  onUserClick?: (userId: string) => void;
 }
 
 const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext, onUserClick }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean; onUserClick?: (userId: string) => void }) => {
@@ -280,7 +281,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
   );
 };
 
-export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate }: Props) => {
+export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate, onUserClick }: Props) => {
   const isMobile = useIsMobile();
 
   const currentIndex = posts.findIndex(p => p.id === post.id);
@@ -309,7 +310,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, p
     return (
       <Drawer open onOpenChange={(open) => !open && onClose()}>
         <DrawerContent className="max-h-[90vh]">
-          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} />
+          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} />
         </DrawerContent>
       </Drawer>
     );
@@ -318,7 +319,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, p
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg p-0 overflow-hidden">
-        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} />
+        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} />
       </DialogContent>
     </Dialog>
   );
