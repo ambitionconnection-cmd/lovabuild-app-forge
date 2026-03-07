@@ -1,8 +1,10 @@
 import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +26,7 @@ interface Post {
   like_count: number;
   user_liked: boolean;
   display_name: string | null;
+  avatar_url: string | null;
   style_tags: string[];
   is_sponsored: boolean;
   instagram_handle?: string | null;
@@ -47,12 +50,14 @@ interface Props {
   onToggleLike: (postId: string) => void;
   posts?: Post[];
   onNavigate?: (post: Post) => void;
+  onUserClick?: (userId: string) => void;
 }
 
-const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean }) => {
+const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext, onUserClick }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean; onUserClick?: (userId: string) => void }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
 
   const handleDownload = async () => {
     try {
@@ -146,31 +151,30 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
               <Flame className={cn("w-5 h-5", post.user_liked && "fill-orange-400")} />
               {post.like_count > 0 && <span>{post.like_count}</span>}
             </button>
-            {user && post.user_id === user.id && (
+            {(isAdmin || (user && post.user_id === user.id)) && (
               <button onClick={handleDownload} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
                 <Download className="w-4 h-4" />
               </button>
             )}
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {post.display_name && (
+            <button
+              onClick={() => onUserClick?.(post.user_id)}
+              className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+            >
+              <Avatar className="w-5 h-5">
+                <AvatarImage src={post.avatar_url || undefined} />
+                <AvatarFallback className="text-[8px]">
+                  {post.display_name?.charAt(0)?.toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
               <span className="font-medium flex items-center gap-1">
-                {post.display_name}
+                {post.display_name || "User"}
                 {post.is_pro && (
                   <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[8px] font-bold leading-none">PRO</span>
                 )}
               </span>
-            )}
-            {post.instagram_handle && (
-              <a href={`https://instagram.com/${post.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[#C4956A] hover:underline">
-                <Instagram className="w-3 h-3" />@{post.instagram_handle.replace('@', '')}
-              </a>
-            )}
-            {post.tiktok_handle && (
-              <a href={`https://tiktok.com/@${post.tiktok_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[#C4956A] hover:underline">
-                <TikTokIcon className="w-3 h-3" />@{post.tiktok_handle.replace('@', '')}
-              </a>
-            )}
+            </button>
             <span>·</span>
             <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
           </div>
@@ -277,7 +281,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
   );
 };
 
-export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate }: Props) => {
+export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate, onUserClick }: Props) => {
   const isMobile = useIsMobile();
 
   const currentIndex = posts.findIndex(p => p.id === post.id);
@@ -306,7 +310,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, p
     return (
       <Drawer open onOpenChange={(open) => !open && onClose()}>
         <DrawerContent className="max-h-[90vh]">
-          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} />
+          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} />
         </DrawerContent>
       </Drawer>
     );
@@ -315,7 +319,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, p
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg p-0 overflow-hidden">
-        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} />
+        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} />
       </DialogContent>
     </Dialog>
   );

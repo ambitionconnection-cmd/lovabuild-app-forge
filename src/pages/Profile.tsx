@@ -14,7 +14,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, User, Lock, CreditCard, Shield, Calendar, Mail, Crown, AlertCircle, Bell, History, Upload } from "lucide-react";
+import { ArrowLeft, User, Lock, CreditCard, Shield, Calendar, Mail, Crown, AlertCircle, Bell, History, Upload, Instagram } from "lucide-react";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -26,7 +28,11 @@ import { RedeemCodeCard } from "@/components/RedeemCodeCard";
 
 const profileSchema = z.object({
   display_name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
-  avatar_url: z.string().optional().or(z.literal("")),
+  bio: z.string().max(280).optional().or(z.literal("")),
+  instagram_handle: z.string().max(50).optional().or(z.literal("")),
+  tiktok_handle: z.string().max(50).optional().or(z.literal("")),
+  show_instagram: z.boolean(),
+  show_tiktok: z.boolean(),
 });
 
 const passwordSchema = z.object({
@@ -71,7 +77,11 @@ const Profile = () => {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       display_name: "",
-      avatar_url: "",
+      bio: "",
+      instagram_handle: "",
+      tiktok_handle: "",
+      show_instagram: true,
+      show_tiktok: true,
     },
   });
 
@@ -114,7 +124,11 @@ const Profile = () => {
     setProfile(data);
     profileForm.reset({
       display_name: data.display_name || "",
-      avatar_url: data.avatar_url || "",
+      bio: (data as any).bio || "",
+      instagram_handle: (data as any).instagram_handle || "",
+      tiktok_handle: (data as any).tiktok_handle || "",
+      show_instagram: (data as any).show_instagram ?? true,
+      show_tiktok: (data as any).show_tiktok ?? true,
     });
     
     // Load notification preferences
@@ -132,9 +146,13 @@ const Profile = () => {
       .from("profiles")
       .update({
         display_name: data.display_name,
-        avatar_url: data.avatar_url || null,
+        bio: data.bio || null,
+        instagram_handle: data.instagram_handle || null,
+        tiktok_handle: data.tiktok_handle || null,
+        show_instagram: data.show_instagram,
+        show_tiktok: data.show_tiktok,
         updated_at: new Date().toISOString(),
-      })
+      } as any)
       .eq("id", user.id);
 
     if (error) {
@@ -381,20 +399,76 @@ const Profile = () => {
                     />
                     <FormField
                       control={profileForm.control}
-                      name="avatar_url"
+                      name="bio"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Avatar URL</FormLabel>
+                          <FormLabel>Bio</FormLabel>
                           <FormControl>
-                            <Input placeholder="https://example.com/avatar.jpg" {...field} />
+                            <Textarea placeholder="Tell us about your style..." maxLength={280} className="resize-none h-20" {...field} />
                           </FormControl>
                           <FormDescription>
-                            Enter a URL to your profile picture
+                            Short description visible on your profile card (max 280 chars)
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    <Separator />
+                    <p className="text-sm font-semibold">Social Handles</p>
+
+                    <FormField
+                      control={profileForm.control}
+                      name="instagram_handle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-1.5"><Instagram className="w-4 h-4" /> Instagram</FormLabel>
+                          <FormControl>
+                            <Input placeholder="@yourhandle" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="show_instagram"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <FormLabel className="text-sm text-muted-foreground">Show Instagram on profile card</FormLabel>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={profileForm.control}
+                      name="tiktok_handle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-1.5"><TikTokIcon className="w-4 h-4" /> TikTok</FormLabel>
+                          <FormControl>
+                            <Input placeholder="@yourhandle" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="show_tiktok"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <FormLabel className="text-sm text-muted-foreground">Show TikTok on profile card</FormLabel>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
                     <Button type="submit" disabled={isLoading}>
                       {isLoading ? "Saving..." : "Save Changes"}
                     </Button>

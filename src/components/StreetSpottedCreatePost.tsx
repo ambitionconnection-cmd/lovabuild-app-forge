@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { X, Camera, Check, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -65,6 +65,17 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
   const [requestedBrands, setRequestedBrands] = useState<string[]>([]);
   const [customTagInput, setCustomTagInput] = useState("");
   const [showCustomTagInput, setShowCustomTagInput] = useState(false);
+
+  // Auto-fill social handles from user profile
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("instagram_handle, tiktok_handle").eq("id", user.id).single().then(({ data }) => {
+      if (data) {
+        if ((data as any).instagram_handle) setInstagramHandle((data as any).instagram_handle);
+        if ((data as any).tiktok_handle) setTiktokHandle((data as any).tiktok_handle);
+      }
+    });
+  }, [user]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

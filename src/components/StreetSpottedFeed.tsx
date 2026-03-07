@@ -6,11 +6,13 @@ import { useBrands } from "@/hooks/useBrands";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import haptic from "@/lib/haptics";
 import { StreetSpottedCreatePost } from "./StreetSpottedCreatePost";
 import { StreetSpottedPostDetail } from "./StreetSpottedPostDetail";
+import { UserProfileCard } from "./UserProfileCard";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -27,6 +29,7 @@ interface Post {
   like_count: number;
   user_liked: boolean;
   display_name: string | null;
+  avatar_url: string | null;
   style_tags: string[];
   is_sponsored: boolean;
   instagram_handle?: string | null;
@@ -49,6 +52,7 @@ export const StreetSpottedFeed = () => {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   // Filters
   const [brandFilter, setBrandFilter] = useState<string | null>(null);
@@ -79,7 +83,7 @@ export const StreetSpottedFeed = () => {
         user
           ? supabase.from("street_spotted_likes").select("post_id").in("post_id", postIds).eq("user_id", user.id)
           : Promise.resolve({ data: [] }),
-        supabase.from("profiles").select("id, display_name, is_pro").in("id", [...new Set(postsData.map(p => p.user_id))]),
+        supabase.from("profiles").select("id, display_name, is_pro, avatar_url").in("id", [...new Set(postsData.map(p => p.user_id))]),
       ]);
 
       const brandMap = new Map<string, string[]>();
@@ -96,9 +100,9 @@ export const StreetSpottedFeed = () => {
 
       const userLikedSet = new Set((userLikesRes.data || []).map((l: any) => l.post_id));
 
-      const profileMap = new Map<string, { display_name: string | null; is_pro: boolean }>();
+      const profileMap = new Map<string, { display_name: string | null; is_pro: boolean; avatar_url: string | null }>();
       (profilesRes.data || []).forEach((p: any) => {
-        profileMap.set(p.id, { display_name: p.display_name, is_pro: p.is_pro || false });
+        profileMap.set(p.id, { display_name: p.display_name, is_pro: p.is_pro || false, avatar_url: p.avatar_url || null });
       });
 
       const enrichedPosts: Post[] = postsData.map(p => ({
@@ -107,6 +111,7 @@ export const StreetSpottedFeed = () => {
         like_count: likeCountMap.get(p.id) || 0,
         user_liked: userLikedSet.has(p.id),
         display_name: profileMap.get(p.user_id)?.display_name || null,
+        avatar_url: profileMap.get(p.user_id)?.avatar_url || null,
         is_pro: profileMap.get(p.user_id)?.is_pro || false,
         style_tags: (p as any).style_tags || [],
         is_sponsored: (p as any).is_sponsored || false,
@@ -434,7 +439,16 @@ export const StreetSpottedFeed = () => {
                     <Flame className={cn("w-4 h-4", post.user_liked && "fill-orange-400")} />
                     {post.like_count > 0 && post.like_count}
                   </button>
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setProfileUserId(post.user_id); }}
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Avatar className="w-4 h-4">
+                      <AvatarImage src={post.avatar_url || undefined} />
+                      <AvatarFallback className="text-[6px]">
+                        {post.display_name?.charAt(0)?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
                     {post.display_name && (
                       <span className="font-medium flex items-center gap-0.5 truncate max-w-[60px]">
                         {post.display_name}
@@ -443,14 +457,7 @@ export const StreetSpottedFeed = () => {
                         )}
                       </span>
                     )}
-                    {(post.city || post.country) && (
-                      <>
-                        {post.display_name && <span>·</span>}
-                        <MapPin className="w-2.5 h-2.5" />
-                        <span className="truncate max-w-[60px]">{post.city || post.country}</span>
-                      </>
-                    )}
-                  </div>
+                  </button>
                 </div>
               </div>
             );
@@ -485,6 +492,16 @@ export const StreetSpottedFeed = () => {
           onToggleLike={toggleLike}
           posts={filteredPosts}
           onNavigate={(post) => setSelectedPost(post)}
+          onUserClick={(userId) => { setSelectedPost(null); setProfileUserId(userId); }}
+        />
+      )}
+
+      {/* User Profile Card */}
+      {profileUserId && (
+        <UserProfileCard
+          userId={profileUserId}
+          open={!!profileUserId}
+          onClose={() => setProfileUserId(null)}
         />
       )}
     </div>
