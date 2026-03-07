@@ -628,35 +628,50 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string | null
           display_name: string | null
           id: string
+          instagram_handle: string | null
           is_founding_member: boolean
           is_pro: boolean | null
           notification_preferences: Json | null
           pro_expires_at: string | null
+          show_instagram: boolean
+          show_tiktok: boolean
+          tiktok_handle: string | null
           updated_at: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
           display_name?: string | null
           id: string
+          instagram_handle?: string | null
           is_founding_member?: boolean
           is_pro?: boolean | null
           notification_preferences?: Json | null
           pro_expires_at?: string | null
+          show_instagram?: boolean
+          show_tiktok?: boolean
+          tiktok_handle?: string | null
           updated_at?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
           display_name?: string | null
           id?: string
+          instagram_handle?: string | null
           is_founding_member?: boolean
           is_pro?: boolean | null
           notification_preferences?: Json | null
           pro_expires_at?: string | null
+          show_instagram?: boolean
+          show_tiktok?: boolean
+          tiktok_handle?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1095,6 +1110,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
