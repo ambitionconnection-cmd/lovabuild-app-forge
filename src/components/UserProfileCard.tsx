@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { X, Instagram, UserPlus, UserCheck, Camera, Download } from "lucide-react";
+import { X, Instagram, UserPlus, UserCheck, Camera, Download, Mail } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +31,9 @@ interface UserProfile {
   tiktok_handle: string | null;
   show_instagram: boolean;
   show_tiktok: boolean;
+  show_email: boolean;
   is_pro: boolean;
+  email?: string | null;
 }
 
 interface UserPost {
@@ -53,13 +55,21 @@ const ProfileContent = ({ userId, onClose, onPostClick }: Omit<UserProfileCardPr
     setLoading(true);
     try {
       const [profileRes, postsRes, followCountRes] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, avatar_url, bio, instagram_handle, tiktok_handle, show_instagram, show_tiktok, is_pro").eq("id", userId).single(),
+        supabase.from("profiles").select("id, display_name, avatar_url, bio, instagram_handle, tiktok_handle, show_instagram, show_tiktok, show_email, is_pro").eq("id", userId).single(),
         supabase.from("street_spotted_posts").select("id, image_url, created_at").eq("user_id", userId).eq("status", "approved").order("created_at", { ascending: false }).limit(30),
         supabase.from("user_follows").select("id", { count: "exact" }).eq("following_id", userId),
       ]);
 
       if (profileRes.data) {
-        setProfile(profileRes.data as unknown as UserProfile);
+        const profileData = profileRes.data as unknown as UserProfile;
+        
+        // Fetch email if user has show_email enabled
+        if (profileData.show_email) {
+          const { data: emailData } = await supabase.rpc("get_user_email_if_public", { _user_id: userId });
+          if (emailData) profileData.email = emailData;
+        }
+        
+        setProfile(profileData);
       }
 
       // Get like counts for posts
@@ -182,6 +192,15 @@ const ProfileContent = ({ userId, onClose, onPostClick }: Omit<UserProfileCardPr
                 >
                   <TikTokIcon className="w-3.5 h-3.5" />
                   @{profile.tiktok_handle.replace("@", "")}
+                </a>
+              )}
+              {profile.show_email && profile.email && (
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  {profile.email}
                 </a>
               )}
             </div>

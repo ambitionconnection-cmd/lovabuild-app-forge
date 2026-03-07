@@ -33,6 +33,7 @@ const profileSchema = z.object({
   tiktok_handle: z.string().max(50).optional().or(z.literal("")),
   show_instagram: z.boolean(),
   show_tiktok: z.boolean(),
+  show_email: z.boolean(),
 });
 
 const passwordSchema = z.object({
@@ -82,6 +83,7 @@ const Profile = () => {
       tiktok_handle: "",
       show_instagram: true,
       show_tiktok: true,
+      show_email: false,
     },
   });
 
@@ -129,6 +131,7 @@ const Profile = () => {
       tiktok_handle: (data as any).tiktok_handle || "",
       show_instagram: (data as any).show_instagram ?? true,
       show_tiktok: (data as any).show_tiktok ?? true,
+      show_email: (data as any).show_email ?? false,
     });
     
     // Load notification preferences
@@ -151,6 +154,7 @@ const Profile = () => {
         tiktok_handle: data.tiktok_handle || null,
         show_instagram: data.show_instagram,
         show_tiktok: data.show_tiktok,
+        show_email: data.show_email,
         updated_at: new Date().toISOString(),
       } as any)
       .eq("id", user.id);
@@ -462,6 +466,25 @@ const Profile = () => {
                       render={({ field }) => (
                         <FormItem className="flex items-center justify-between space-y-0">
                           <FormLabel className="text-sm text-muted-foreground">Show TikTok on profile card</FormLabel>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <Separator />
+                    <p className="text-sm font-semibold">Privacy</p>
+
+                    <FormField
+                      control={profileForm.control}
+                      name="show_email"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div>
+                            <FormLabel className="text-sm flex items-center gap-1.5"><Mail className="w-4 h-4" /> Show email on profile card</FormLabel>
+                            <p className="text-xs text-muted-foreground mt-0.5">Off by default for privacy</p>
+                          </div>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
