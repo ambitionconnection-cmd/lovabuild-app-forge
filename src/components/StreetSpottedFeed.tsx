@@ -439,7 +439,16 @@ export const StreetSpottedFeed = () => {
                     <Flame className={cn("w-4 h-4", post.user_liked && "fill-orange-400")} />
                     {post.like_count > 0 && post.like_count}
                   </button>
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setProfileUserId(post.user_id); }}
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Avatar className="w-4 h-4">
+                      <AvatarImage src={post.avatar_url || undefined} />
+                      <AvatarFallback className="text-[6px]">
+                        {post.display_name?.charAt(0)?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
                     {post.display_name && (
                       <span className="font-medium flex items-center gap-0.5 truncate max-w-[60px]">
                         {post.display_name}
@@ -448,14 +457,7 @@ export const StreetSpottedFeed = () => {
                         )}
                       </span>
                     )}
-                    {(post.city || post.country) && (
-                      <>
-                        {post.display_name && <span>·</span>}
-                        <MapPin className="w-2.5 h-2.5" />
-                        <span className="truncate max-w-[60px]">{post.city || post.country}</span>
-                      </>
-                    )}
-                  </div>
+                  </button>
                 </div>
               </div>
             );
@@ -490,6 +492,16 @@ export const StreetSpottedFeed = () => {
           onToggleLike={toggleLike}
           posts={filteredPosts}
           onNavigate={(post) => setSelectedPost(post)}
+          onUserClick={(userId) => { setSelectedPost(null); setProfileUserId(userId); }}
+        />
+      )}
+
+      {/* User Profile Card */}
+      {profileUserId && (
+        <UserProfileCard
+          userId={profileUserId}
+          open={!!profileUserId}
+          onClose={() => setProfileUserId(null)}
         />
       )}
     </div>
