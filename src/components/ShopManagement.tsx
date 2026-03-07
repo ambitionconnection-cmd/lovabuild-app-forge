@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, Pencil, Trash2, Search, ChevronDown, ChevronRight } from "lucide-react";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { showUndoToast } from "@/hooks/useAdminUndo";
 import { ShopEditModal } from "./ShopEditModal";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -132,19 +132,25 @@ export const ShopManagement = () => {
 
   const handleDelete = async () => {
     if (!deletingShop) return;
+    const shopSnapshot = { ...deletingShop };
     try {
       const { error } = await supabase.from("shops").delete().eq("id", deletingShop.id);
       if (error) throw error;
       await supabase.functions.invoke("log-security-event", {
         body: { eventType: "shop_deleted", eventData: { shop_id: deletingShop.id, shop_name: deletingShop.name } },
       });
-      toast.success("Shop deleted successfully");
-      // Update state locally to preserve scroll position
       setShops(prev => prev.filter(s => s.id !== deletingShop.id));
       setSelectedShops(prev => {
         const next = new Set(prev);
         next.delete(deletingShop.id);
         return next;
+      });
+      showUndoToast({
+        message: `"${shopSnapshot.name}" deleted`,
+        table: "shops",
+        undoData: shopSnapshot,
+        undoType: "reinsert",
+        onUndo: () => fetchData(),
       });
     } catch (error: any) {
       console.error("Error deleting shop:", error);
@@ -173,18 +179,28 @@ export const ShopManagement = () => {
 
   const handleBulkActivate = async (activate: boolean) => {
     if (selectedShops.size === 0) return;
+    const ids = Array.from(selectedShops);
+    const previousStates = shops.filter(s => ids.includes(s.id)).map(s => ({ id: s.id, is_active: s.is_active }));
     try {
       const { error } = await supabase
         .from("shops")
         .update({ is_active: activate })
-        .in("id", Array.from(selectedShops));
+        .in("id", ids);
       if (error) throw error;
       await supabase.functions.invoke("log-security-event", {
         body: { eventType: "shops_bulk_update", eventData: { count: selectedShops.size, is_active: activate } },
       });
-      toast.success(`${selectedShops.size} shop(s) ${activate ? "activated" : "deactivated"}`);
+      const count = selectedShops.size;
       setSelectedShops(new Set());
       fetchData();
+      showUndoToast({
+        message: `${count} shop(s) ${activate ? "activated" : "deactivated"}`,
+        table: "shops",
+        undoData: previousStates,
+        undoType: "update",
+        updateColumn: "is_active",
+        onUndo: () => fetchData(),
+      });
     } catch (error: any) {
       console.error("Error updating shops:", error);
       toast.error(error.message || "Failed to update shops");
