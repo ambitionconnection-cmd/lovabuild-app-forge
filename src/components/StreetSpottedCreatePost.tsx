@@ -190,6 +190,11 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
         await supabase.from("brand_requests").insert(brandRequests as any);
       }
 
+      // Auto-trigger AI outfit detection (fire-and-forget)
+      supabase.functions.invoke("detect-outfit-items", {
+        body: { postId: post.id, imageUrl: urlData.publicUrl },
+      }).catch(err => console.warn("Auto-detect failed (non-blocking):", err));
+
       haptic.success();
       toast.success(t("hot.spotSubmitted"));
       onPostCreated();
