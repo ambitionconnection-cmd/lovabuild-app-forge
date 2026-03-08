@@ -28,20 +28,30 @@ export const ImageArchiveManagement = () => {
 
   const archiveThreshold = subMonths(new Date(), 6);
 
-  const fetchOldImages = async () => {
+  const fetchArchivedImages = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    // Fetch both explicitly archived posts AND posts older than 6 months
+    const { data: archivedData } = await supabase
+      .from("street_spotted_posts")
+      .select("id, image_url, caption, city, country, created_at, status, user_id")
+      .eq("status", "archived")
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    const { data: oldData } = await supabase
       .from("street_spotted_posts")
       .select("id, image_url, caption, city, country, created_at, status, user_id")
       .lt("created_at", archiveThreshold.toISOString())
+      .neq("status", "archived")
       .order("created_at", { ascending: true })
       .limit(200);
 
-    if (error) {
-      console.error("Error fetching archived images:", error);
-      toast.error("Failed to load archived images");
-    }
-    setImages((data as ArchivedImage[]) || []);
+    const allImages = [...(archivedData || []), ...(oldData || [])];
+    // Deduplicate by id
+    const seen = new Set<string>();
+    const unique = allImages.filter(i => { if (seen.has(i.id)) return false; seen.add(i.id); return true; });
+
+    setImages(unique as ArchivedImage[]);
     setSelected(new Set());
     setLoading(false);
   };

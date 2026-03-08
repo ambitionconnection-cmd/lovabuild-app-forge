@@ -168,6 +168,20 @@ export const StreetSpottedFeed = () => {
     fetchPosts();
   };
 
+  const handleArchive = async (postId: string) => {
+    const { error } = await supabase
+      .from("street_spotted_posts")
+      .update({ status: "archived" } as any)
+      .eq("id", postId);
+    if (error) {
+      toast.error("Failed to archive post");
+      return;
+    }
+    toast.success("Post moved to Image Archive");
+    setPosts(prev => prev.filter(p => p.id !== postId));
+    setSelectedPost(null);
+  };
+
   // Apply filters
   let filteredPosts = posts;
 
@@ -502,6 +516,7 @@ export const StreetSpottedFeed = () => {
           posts={filteredPosts}
           onNavigate={(post) => setSelectedPost(post)}
           onUserClick={(userId) => { setSelectedPost(null); setProfileUserId(userId); }}
+          onArchive={handleArchive}
         />
       )}
 
