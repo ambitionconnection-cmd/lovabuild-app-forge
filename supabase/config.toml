@@ -18,3 +18,6 @@ verify_jwt = false
 [functions.brand-radar-fetch]
 verify_jwt = false
 
+[functions.detect-outfit-items]
+verify_jwt = false
+
