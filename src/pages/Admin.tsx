@@ -36,6 +36,7 @@ import { BrandRequestsQueue } from '@/components/BrandRequestsQueue';
 import { AdminNotificationBanner } from '@/components/AdminNotificationBanner';
 import { UserAnalytics } from '@/components/UserAnalytics';
 import { AdminNotificationPreferences } from '@/components/AdminNotificationPreferences';
+import { ShopThisFitAnalytics } from '@/components/ShopThisFitAnalytics';
 
 interface LoginAttempt {
   id: string;
@@ -740,6 +741,10 @@ export default function Admin() {
 
             {activeTab === "email-notifications" && (
               <AdminNotificationPreferences />
+            )}
+
+            {activeTab === "stf-analytics" && (
+              <ShopThisFitAnalytics />
             )}
           </main>
         </div>
