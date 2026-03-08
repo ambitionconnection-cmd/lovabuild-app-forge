@@ -802,6 +802,53 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_this_fit_clicks: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          item_brand: string
+          item_category: string
+          item_model: string
+          platform: string
+          post_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          item_brand: string
+          item_category: string
+          item_model: string
+          platform: string
+          post_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          item_brand?: string
+          item_category?: string
+          item_model?: string
+          platform?: string
+          post_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_this_fit_clicks_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "street_spotted_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shops: {
         Row: {
           address: string
