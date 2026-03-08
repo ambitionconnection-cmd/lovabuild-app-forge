@@ -306,7 +306,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
   );
 };
 
-export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate, onUserClick }: Props) => {
+export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate, onUserClick, onArchive }: Props) => {
   const isMobile = useIsMobile();
 
   const currentIndex = posts.findIndex(p => p.id === post.id);
@@ -335,7 +335,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, p
     return (
       <Drawer open onOpenChange={(open) => !open && onClose()}>
         <DrawerContent className="max-h-[90vh]">
-          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} />
+          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} onArchive={onArchive} />
         </DrawerContent>
       </Drawer>
     );
@@ -344,7 +344,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, p
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg p-0 overflow-hidden">
-        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} />
+        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} onArchive={onArchive} />
       </DialogContent>
     </Dialog>
   );
