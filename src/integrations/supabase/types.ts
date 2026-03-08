@@ -950,6 +950,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          detected_items: Json | null
           id: string
           image_url: string
           instagram_handle: string | null
@@ -964,6 +965,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          detected_items?: Json | null
           id?: string
           image_url: string
           instagram_handle?: string | null
@@ -978,6 +980,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          detected_items?: Json | null
           id?: string
           image_url?: string
           instagram_handle?: string | null

@@ -1,0 +1,1 @@
+ALTER TABLE public.street_spotted_posts ADD COLUMN detected_items jsonb DEFAULT '[]'::jsonb;

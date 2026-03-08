@@ -1,91 +1,57 @@
 
 
-# AI-Powered Outfit Detection for HOT Section — Analysis & Plan
+## What Can Be Automated vs. What Needs Manual Work
 
-## Cost & Feasibility Analysis
+### Fully Automatable
 
-### How it works
-Lovable AI (powered by Gemini) is already available in your project — no third-party API key needed. Gemini 2.5 Flash excels at image-text tasks and is the cheapest multimodal option.
+**1. First 500 Users → 3-Month Free Pro**
+- Add a DB trigger on the `profiles` table: when a new profile is created, count total profiles. If count <= 500, automatically set `is_pro = true` and `pro_expires_at = now() + 3 months`.
+- No manual work needed. Every new signup is automatically checked and granted Pro if they're within the first 500.
+- The "founding member" messaging can be shown conditionally on the frontend based on a `is_founding_member` flag or by checking if `pro_expires_at` is set without a Stripe subscription.
 
-### Cost estimates (Gemini 2.5 Flash via Lovable AI)
-- **Per image analysis**: ~$0.001–0.003 (one image + structured prompt)
-- **100 photos/month**: ~$0.10–0.30/month
-- **1,000 photos/month**: ~$1–3/month
-- **10,000 photos/month**: ~$10–30/month
+**2. After User #500 → Standard Freemium**
+- This happens automatically once the trigger stops granting Pro (count > 500). No code change needed at that point — the existing paywall logic already works for non-Pro users.
 
-**Verdict: At these prices, automatic detection on ALL uploads is completely viable** — even at 1,000+ photos/month, the cost is negligible. There is no reason to limit it to admin-selected photos only.
+**3. Admin Pro Bypass**
+- Update `check-subscription` edge function: if the user has the `admin` role in `user_roles`, return `subscribed: true` regardless of Stripe status. This fixes your inability to test Print and other Pro features.
 
-### Recommendation
-**Run AI detection automatically on every photo submission**, then present results to the admin in the moderation queue for review before approval. This gives you the best of both worlds: zero manual effort + admin oversight.
+### Requires Manual Action (by you, once)
 
----
-
-## UI Recommendation: Option 2 (Inline Collapsible)
-
-Option 2 is better because:
-- No extra navigation step — users stay in context
-- Higher conversion rate (fewer clicks to buy)
-- Works naturally on mobile (accordion/expandable section)
-- The "Shop the Look" section already exists — we just enhance it with AI-detected items
-
-The implementation: Below the photo, a collapsible **"SHOP THIS FIT"** section shows each detected item (hat, top, trousers, shoes, accessories) with brand + model name and "Buy on StockX" / "Buy on GOAT" buttons with pre-filled search queries.
+**4. Ambassador Permanent Pro**
+- Create an `ambassador_codes` table with redeemable codes that grant permanent Pro (no expiry).
+- You generate codes in the admin panel and send them to your 50-100 contacts.
+- They redeem during signup or on their profile page → `is_pro = true`, `pro_expires_at = null` (permanent).
+- The code generation and redemption is automated; you just need to distribute the codes manually.
 
 ---
 
 ## Implementation Plan
 
-### 1. Database: Add `detected_items` column to `street_spotted_posts`
-A JSONB column storing the AI detection results:
-```json
-[
-  {"category": "shoes", "brand": "Nike", "model": "Air Force 1 '07", "confidence": 0.92},
-  {"category": "top", "brand": "Off-White", "model": "Diag Stripe Hoodie", "confidence": 0.85},
-  {"category": "scarf", "brand": "Off-White", "model": "Industrial Scarf", "confidence": 0.88}
-]
-```
+### Step 1: Admin Pro bypass
+Modify the `check-subscription` edge function to check `user_roles` for admin role. If admin, return `subscribed: true`. Single file change.
 
-### 2. Backend function: `detect-outfit-items`
-An edge function that:
-- Takes an image URL
-- Calls Gemini 2.5 Flash with a structured prompt asking it to identify each clothing item (category, brand, model, confidence 0-1)
-- Uses tool calling for structured JSON output
-- Only returns items with confidence >= 0.75
-- Saves results to the `detected_items` column
+### Step 2: Auto-Pro for first 500 users
+- DB migration: modify the `handle_new_user()` trigger function to count profiles and set `is_pro`/`pro_expires_at` when count <= 500.
+- Add a `is_founding_member` boolean column to `profiles` (default false) so we can show the special "founding member" message.
+- Frontend: after signup, if user's profile has `is_founding_member = true`, show a welcome toast: "You're one of FLYAF's first 500 members. Welcome to Pro, on us for 3 months."
 
-### 3. Admin Moderation Queue Enhancement
-- **Auto-trigger**: When a photo is submitted, the edge function runs automatically (or the admin can trigger it manually via a "Detect Items" button)
-- Show detected items as editable tags in the moderation card
-- Admin can edit/remove/add items before approving
-- Detected brand names auto-populate the brand tags
+### Step 3: Ambassador code system
+- DB migration: create `ambassador_codes` table (code, max_uses, uses_count, grants_permanent_pro, is_active) and `code_redemptions` table (code_id, user_id, redeemed_at).
+- Admin panel: new section to generate/manage ambassador codes.
+- Frontend: "Have a code?" input on the Auth page or Profile page. On redemption, set `is_pro = true` and `pro_expires_at = null`.
+- RLS: admins can manage codes; authenticated users can redeem.
 
-### 4. User-facing: "SHOP THIS FIT" collapsible section
-- Appears below the post image in `StreetSpottedPostDetail`
-- Each detected item shown as a card with category icon, brand, and model
-- Two buttons per item: **StockX** and **GOAT** with pre-filled search URLs
-- Collapsed by default, expands with a tap
+### Step 4: Founding member messaging
+- Update the Pro upgrade modal to show "You're one of FLYAF's first 500" for founding members approaching expiry.
+- Show a subtle badge or note on the profile for founding members.
 
-### 5. Affiliate link format
-- StockX: `https://stockx.com/search?s={brand}+{model}`
-- GOAT: `https://www.goat.com/search?query={brand}+{model}`
+### Summary of effort
 
----
-
-## Files to create/modify
-
-| File | Action |
-|------|--------|
-| `supabase/migrations/...` | Add `detected_items jsonb` column |
-| `supabase/functions/detect-outfit-items/index.ts` | New edge function for AI detection |
-| `src/components/SpotModerationQueue.tsx` | Add "Detect Items" button + editable results |
-| `src/components/StreetSpottedPostDetail.tsx` | Add "SHOP THIS FIT" collapsible section |
-| `src/components/StreetSpottedFeed.tsx` | Pass `detected_items` data through |
-
----
-
-## Summary
-
-- **Cost**: Negligible (~$1-3/month for 1,000 photos) — auto-detect everything
-- **UI**: Option 2 (inline collapsible "SHOP THIS FIT")
-- **Confidence threshold**: 75%
-- **Flow**: Photo uploaded → AI auto-detects → Admin reviews/edits in moderation queue → Approves → Users see shoppable items
+| Feature | Automated? | Your manual work |
+|---------|-----------|-----------------|
+| First 500 → 3mo Pro | Fully automatic | None |
+| After #500 → freemium | Fully automatic | None |
+| Admin bypass | Fully automatic | None |
+| Ambassador codes | Code auto-redeems | You distribute ~50-100 codes to contacts |
+| Ambassador brief | N/A | You send the message (we can draft it) |
 

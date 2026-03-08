@@ -13,6 +13,14 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { ShopThisFit } from "./ShopThisFit";
+
+interface DetectedItem {
+  category: string;
+  brand: string;
+  model: string;
+  confidence: number;
+}
 
 interface Post {
   id: string;
@@ -32,6 +40,7 @@ interface Post {
   instagram_handle?: string | null;
   tiktok_handle?: string | null;
   is_pro: boolean;
+  detected_items?: DetectedItem[];
 }
 
 interface Brand {
@@ -274,6 +283,12 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
                 </div>
               ))}
             </div>
+          </div>
+        )}
+        {/* SHOP THIS FIT - AI detected items */}
+        {post.detected_items && post.detected_items.length > 0 && (
+          <div className="pt-2 border-t border-border/50">
+            <ShopThisFit items={post.detected_items} />
           </div>
         )}
       </div>
