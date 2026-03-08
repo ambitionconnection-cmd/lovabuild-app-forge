@@ -57,7 +57,7 @@ export const ImageArchiveManagement = () => {
   };
 
   useEffect(() => {
-    fetchOldImages();
+    fetchArchivedImages();
   }, []);
 
   const toggleSelect = (id: string) => {
