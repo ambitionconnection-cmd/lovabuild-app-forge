@@ -28,26 +28,36 @@ export const ImageArchiveManagement = () => {
 
   const archiveThreshold = subMonths(new Date(), 6);
 
-  const fetchOldImages = async () => {
+  const fetchArchivedImages = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    // Fetch both explicitly archived posts AND posts older than 6 months
+    const { data: archivedData } = await supabase
+      .from("street_spotted_posts")
+      .select("id, image_url, caption, city, country, created_at, status, user_id")
+      .eq("status", "archived")
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    const { data: oldData } = await supabase
       .from("street_spotted_posts")
       .select("id, image_url, caption, city, country, created_at, status, user_id")
       .lt("created_at", archiveThreshold.toISOString())
+      .neq("status", "archived")
       .order("created_at", { ascending: true })
       .limit(200);
 
-    if (error) {
-      console.error("Error fetching archived images:", error);
-      toast.error("Failed to load archived images");
-    }
-    setImages((data as ArchivedImage[]) || []);
+    const allImages = [...(archivedData || []), ...(oldData || [])];
+    // Deduplicate by id
+    const seen = new Set<string>();
+    const unique = allImages.filter(i => { if (seen.has(i.id)) return false; seen.add(i.id); return true; });
+
+    setImages(unique as ArchivedImage[]);
     setSelected(new Set());
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchOldImages();
+    fetchArchivedImages();
   }, []);
 
   const toggleSelect = (id: string) => {
@@ -161,7 +171,7 @@ export const ImageArchiveManagement = () => {
       if (error) throw error;
 
       toast.success(`Deleted ${selected.size} archived images`);
-      fetchOldImages();
+      fetchArchivedImages();
     } catch (err) {
       console.error("Bulk delete failed:", err);
       toast.error("Failed to delete some images");
@@ -185,11 +195,11 @@ export const ImageArchiveManagement = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Archive className="h-5 w-5" />
-          Image Archive (6+ months old)
+          Image Archive
         </CardTitle>
         <CardDescription>
-          {images.length} image{images.length !== 1 ? "s" : ""} older than 6 months.
-          Download and/or delete to free up storage.
+          {images.length} image{images.length !== 1 ? "s" : ""} — archived from feed + older than 6 months.
+          Download and/or delete permanently to free up storage.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -217,7 +227,7 @@ export const ImageArchiveManagement = () => {
             {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Delete ({selected.size})
           </Button>
-          <Button variant="ghost" size="sm" onClick={fetchOldImages} className="ml-auto gap-1.5">
+          <Button variant="ghost" size="sm" onClick={fetchArchivedImages} className="ml-auto gap-1.5">
             <RefreshCw className="h-4 w-4" /> Refresh
           </Button>
         </div>

@@ -1,4 +1,4 @@
-import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram } from "lucide-react";
+import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram, Archive } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -60,9 +60,10 @@ interface Props {
   posts?: Post[];
   onNavigate?: (post: Post) => void;
   onUserClick?: (userId: string) => void;
+  onArchive?: (postId: string) => void;
 }
 
-const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext, onUserClick }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean; onUserClick?: (userId: string) => void }) => {
+const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext, onUserClick, onArchive }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean; onUserClick?: (userId: string) => void; onArchive?: (postId: string) => void }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -163,6 +164,15 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
             {(isAdmin || (user && post.user_id === user.id)) && (
               <button onClick={handleDownload} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
                 <Download className="w-4 h-4" />
+              </button>
+            )}
+            {isAdmin && onArchive && (
+              <button
+                onClick={() => onArchive(post.id)}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                title="Archive (remove from feed)"
+              >
+                <Archive className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -296,7 +306,7 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
   );
 };
 
-export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate, onUserClick }: Props) => {
+export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, posts = [], onNavigate, onUserClick, onArchive }: Props) => {
   const isMobile = useIsMobile();
 
   const currentIndex = posts.findIndex(p => p.id === post.id);
@@ -325,7 +335,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, p
     return (
       <Drawer open onOpenChange={(open) => !open && onClose()}>
         <DrawerContent className="max-h-[90vh]">
-          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} />
+          <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} onArchive={onArchive} />
         </DrawerContent>
       </Drawer>
     );
@@ -334,7 +344,7 @@ export const StreetSpottedPostDetail = ({ post, brands, onClose, onToggleLike, p
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg p-0 overflow-hidden">
-        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} />
+        <PostContent post={post} brands={brands} onClose={onClose} onToggleLike={onToggleLike} onPrev={goToPrev} onNext={goToNext} hasPrev={hasPrev} hasNext={hasNext} onUserClick={onUserClick} onArchive={onArchive} />
       </DialogContent>
     </Dialog>
   );
