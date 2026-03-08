@@ -1,4 +1,4 @@
-import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram, Archive } from "lucide-react";
+import { Flame, MapPin, X, ExternalLink, ChevronLeft, ChevronRight, Download, Instagram, Archive } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
