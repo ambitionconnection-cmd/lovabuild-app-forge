@@ -166,6 +166,15 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
                 <Download className="w-4 h-4" />
               </button>
             )}
+            {isAdmin && onArchive && (
+              <button
+                onClick={() => onArchive(post.id)}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                title="Archive (remove from feed)"
+              >
+                <Archive className="w-4 h-4" />
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <button
