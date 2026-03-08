@@ -195,11 +195,11 @@ export const ImageArchiveManagement = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Archive className="h-5 w-5" />
-          Image Archive (6+ months old)
+          Image Archive
         </CardTitle>
         <CardDescription>
-          {images.length} image{images.length !== 1 ? "s" : ""} older than 6 months.
-          Download and/or delete to free up storage.
+          {images.length} image{images.length !== 1 ? "s" : ""} — archived from feed + older than 6 months.
+          Download and/or delete permanently to free up storage.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
