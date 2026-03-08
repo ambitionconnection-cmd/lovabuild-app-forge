@@ -171,7 +171,7 @@ export const ImageArchiveManagement = () => {
       if (error) throw error;
 
       toast.success(`Deleted ${selected.size} archived images`);
-      fetchOldImages();
+      fetchArchivedImages();
     } catch (err) {
       console.error("Bulk delete failed:", err);
       toast.error("Failed to delete some images");
@@ -227,7 +227,7 @@ export const ImageArchiveManagement = () => {
             {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Delete ({selected.size})
           </Button>
-          <Button variant="ghost" size="sm" onClick={fetchOldImages} className="ml-auto gap-1.5">
+          <Button variant="ghost" size="sm" onClick={fetchArchivedImages} className="ml-auto gap-1.5">
             <RefreshCw className="h-4 w-4" /> Refresh
           </Button>
         </div>
