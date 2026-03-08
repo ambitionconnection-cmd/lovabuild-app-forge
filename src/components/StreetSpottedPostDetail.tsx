@@ -1,4 +1,4 @@
-import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram, Archive } from "lucide-react";
+import { Flame, MapPin, X, ExternalLink, ChevronLeft, ChevronRight, Download, Instagram, Archive } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -244,61 +244,10 @@ const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasP
           </div>
         )}
 
-        {/* Shop the Look */}
-        {postBrands.length > 0 && (
-          <div className="space-y-2 pt-2 border-t border-border/50">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <ShoppingBag className="w-3.5 h-3.5" />
-              {t("hot.shopTheLook")}
-            </p>
-            <div className="grid gap-2">
-              {postBrands.map(brand => (
-                <div key={brand.id} className="flex flex-wrap gap-1.5">
-                  {(brand as any).affiliate_url && (
-                    <a
-                      href={(brand as any).affiliate_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
-                    >
-                      Shop {brand.name} <ExternalLink className="w-3 h-3" />
-                    </a>
-                  )}
-                  {brand.official_website && (
-                    <a
-                      href={brand.official_website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/80 transition-colors"
-                    >
-                      {t("hot.visitStore")} <ExternalLink className="w-3 h-3" />
-                    </a>
-                  )}
-                  <a
-                    href={`https://stockx.com/search?s=${encodeURIComponent(brand.name)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/80 transition-colors"
-                  >
-                    StockX <ExternalLink className="w-3 h-3" />
-                  </a>
-                  <a
-                    href={`https://www.goat.com/search?query=${encodeURIComponent(brand.name)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/80 transition-colors"
-                  >
-                    GOAT <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
         {/* SHOP THIS FIT - AI detected items */}
         {post.detected_items && post.detected_items.length > 0 && (
           <div className="pt-2 border-t border-border/50">
-            <ShopThisFit items={post.detected_items} />
+            <ShopThisFit items={post.detected_items} postId={post.id} />
           </div>
         )}
       </div>

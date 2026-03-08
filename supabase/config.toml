@@ -21,3 +21,6 @@ verify_jwt = false
 [functions.detect-outfit-items]
 verify_jwt = false
 
+[functions.track-stf-click]
+verify_jwt = false
+
