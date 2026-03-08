@@ -17,6 +17,13 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
+interface DetectedItem {
+  category: string;
+  brand: string;
+  model: string;
+  confidence: number;
+}
+
 interface Post {
   id: string;
   user_id: string;
@@ -35,6 +42,7 @@ interface Post {
   instagram_handle?: string | null;
   tiktok_handle?: string | null;
   is_pro: boolean;
+  detected_items?: DetectedItem[];
 }
 
 const STYLE_TAG_OPTIONS = [
@@ -117,6 +125,7 @@ export const StreetSpottedFeed = () => {
         is_sponsored: (p as any).is_sponsored || false,
         instagram_handle: (p as any).instagram_handle || null,
         tiktok_handle: (p as any).tiktok_handle || null,
+        detected_items: (p as any).detected_items || [],
       }));
 
       setPosts(enrichedPosts);
