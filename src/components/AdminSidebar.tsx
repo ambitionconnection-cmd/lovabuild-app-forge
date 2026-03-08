@@ -1,4 +1,4 @@
-import { Shield, Lock, FileText, Users, Store, Package, Calendar, Mail, Clock, Image, ChevronRight, MessageSquare, Download, Eye, Star, Layers, Archive, Gift, Inbox, Bell } from "lucide-react";
+import { Shield, Lock, FileText, Users, Store, Package, Calendar, Mail, Clock, Image, ChevronRight, MessageSquare, Download, Eye, Star, Layers, Archive, Gift, Inbox, Bell, ShoppingBag } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -71,6 +71,7 @@ const navGroups = [
     icon: Download,
     items: [
       { title: "User Analytics", value: "user-analytics", icon: Users },
+      { title: "Shop This Fit", value: "stf-analytics", icon: ShoppingBag },
       { title: "Data Exports", value: "data-exports", icon: Download },
     ],
   },
