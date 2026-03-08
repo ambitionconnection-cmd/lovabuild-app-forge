@@ -1,4 +1,4 @@
-import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram } from "lucide-react";
+import { Flame, MapPin, X, ExternalLink, ShoppingBag, ChevronLeft, ChevronRight, Download, Instagram, Archive } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -60,9 +60,10 @@ interface Props {
   posts?: Post[];
   onNavigate?: (post: Post) => void;
   onUserClick?: (userId: string) => void;
+  onArchive?: (postId: string) => void;
 }
 
-const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext, onUserClick }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean; onUserClick?: (userId: string) => void }) => {
+const PostContent = ({ post, brands, onClose, onToggleLike, onPrev, onNext, hasPrev, hasNext, onUserClick, onArchive }: Props & { onPrev?: () => void; onNext?: () => void; hasPrev: boolean; hasNext: boolean; onUserClick?: (userId: string) => void; onArchive?: (postId: string) => void }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
