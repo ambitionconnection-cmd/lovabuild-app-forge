@@ -43,8 +43,7 @@ export const ShopThisFit = ({ items, postId }: Props) => {
     encodeURIComponent(`${item.brand} ${item.model}`);
 
   const trackClick = (item: DetectedItem, platform: "stockx" | "goat") => {
-    // Fire-and-forget tracking
-    supabase.functions.invoke("track-affiliate-analytics", {
+    supabase.functions.invoke("track-stf-click", {
       body: {
         event_type: "shop_this_fit_click",
         platform,
