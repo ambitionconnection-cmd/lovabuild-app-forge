@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ShoppingBag, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useTranslation } from "react-i18next";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DetectedItem {
   category: string;
@@ -13,6 +13,7 @@ interface DetectedItem {
 
 interface Props {
   items: DetectedItem[];
+  postId: string;
 }
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -33,14 +34,27 @@ const CATEGORY_EMOJI: Record<string, string> = {
   other: "👔",
 };
 
-export const ShopThisFit = ({ items }: Props) => {
-  const { t } = useTranslation();
+export const ShopThisFit = ({ items, postId }: Props) => {
   const [open, setOpen] = useState(false);
 
   if (!items || items.length === 0) return null;
 
   const buildSearchQuery = (item: DetectedItem) =>
     encodeURIComponent(`${item.brand} ${item.model}`);
+
+  const trackClick = (item: DetectedItem, platform: "stockx" | "goat") => {
+    // Fire-and-forget tracking
+    supabase.functions.invoke("track-affiliate-analytics", {
+      body: {
+        event_type: "shop_this_fit_click",
+        platform,
+        post_id: postId,
+        item_brand: item.brand,
+        item_model: item.model,
+        item_category: item.category,
+      },
+    }).catch(() => {});
+  };
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -81,7 +95,7 @@ export const ShopThisFit = ({ items }: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-semibold hover:bg-primary/20 transition-colors"
-                onClick={e => e.stopPropagation()}
+                onClick={e => { e.stopPropagation(); trackClick(item, "stockx"); }}
               >
                 StockX <ExternalLink className="w-2.5 h-2.5" />
               </a>
@@ -90,7 +104,7 @@ export const ShopThisFit = ({ items }: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-foreground text-[10px] font-semibold hover:bg-muted/80 transition-colors"
-                onClick={e => e.stopPropagation()}
+                onClick={e => { e.stopPropagation(); trackClick(item, "goat"); }}
               >
                 GOAT <ExternalLink className="w-2.5 h-2.5" />
               </a>
