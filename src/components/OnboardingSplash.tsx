@@ -15,6 +15,7 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       bgColor: "bg-[#4ECDC4]/10",
       title: t('onboarding.slide1Title'),
       description: t('onboarding.slide1Desc'),
+      bgImage: "/onboarding/slide-1.jpg",
     },
     {
       icon: Flame,
@@ -22,6 +23,7 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       bgColor: "bg-[#C4956A]/10",
       title: t('onboarding.slide2Title'),
       description: t('onboarding.slide2Desc'),
+      bgImage: "/onboarding/slide-2.png",
     },
     {
       icon: Heart,
@@ -29,6 +31,7 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       bgColor: "bg-[#AD3A49]/10",
       title: t('onboarding.slide3Title'),
       description: t('onboarding.slide3Desc'),
+      bgImage: "/onboarding/slide-3.jpg",
     },
   ];
 
@@ -49,17 +52,25 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
   const isLast = currentSlide === slides.length - 1;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center px-8">
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-8">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-all duration-500"
+        style={{ backgroundImage: `url(${slide.bgImage})` }}
+      />
+      {/* Overlay matching More page opacity */}
+      <div className="absolute inset-0 bg-background/80" />
+
       {/* Skip button */}
       <button
         onClick={handleSkip}
-        className="absolute top-6 right-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="relative z-10 absolute top-6 right-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         {t('onboarding.skip')}
       </button>
 
       {/* Logo */}
-      <div className="mb-12 flex flex-col items-center">
+      <div className="relative z-10 mb-12 flex flex-col items-center">
         <img src={flyafLogo} alt="FLYAF" className="h-16 mb-2" />
         <p className="text-[10px] tracking-[0.2em] text-[#AD3A49] text-center mt-1 font-bold">
           {t('onboarding.tagline')}
@@ -67,7 +78,7 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       </div>
 
       {/* Slide content */}
-      <div className="flex flex-col items-center text-center max-w-sm">
+      <div className="relative z-10 flex flex-col items-center text-center max-w-sm">
         <div className={`w-20 h-20 rounded-2xl ${slide.bgColor} flex items-center justify-center mb-6`}>
           <Icon className={`w-10 h-10 ${slide.color}`} />
         </div>
@@ -76,7 +87,7 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       </div>
 
       {/* Dots */}
-      <div className="flex gap-2 mt-10">
+      <div className="relative z-10 flex gap-2 mt-10">
         {slides.map((_, i) => (
           <button
             key={i}
@@ -91,7 +102,7 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       {/* Button */}
       <Button
         onClick={handleNext}
-        className="mt-8 w-full max-w-xs bg-[#AD3A49] hover:bg-[#AD3A49]/80 text-white font-semibold"
+        className="relative z-10 mt-8 w-full max-w-xs bg-[#AD3A49] hover:bg-[#AD3A49]/80 text-white font-semibold"
       >
         {isLast ? t('onboarding.getStarted') : t('onboarding.next')}
       </Button>

@@ -1,5 +1,6 @@
 import { Heart, User, Mail, Info, Bell, Shield, ChevronRight, Globe } from "lucide-react";
 import urbanBg from "@/assets/urban-bg.jpg";
+import flyafLogo from "@/assets/flyaf-logo.svg";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -87,9 +88,12 @@ const More = () => {
     <div className="fixed inset-0 bg-background flex flex-col">
       <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${urbanBg})` }} />
       <div className="absolute inset-0 bg-background/80" />
-      <div className="relative flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16 lg:px-12">
-        <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-wider uppercase">{t('nav.more')}</h1>
-        <p className="text-sm lg:text-base text-white/40 mt-1">{t('more.subtitle')}</p>
+      <div className="relative flex-shrink-0 px-5 pt-5 pb-4 lg:pt-16 lg:px-12 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-wider uppercase">{t('nav.more')}</h1>
+          <p className="text-sm lg:text-base text-white/40 mt-1">{t('more.subtitle')}</p>
+        </div>
+        <img src={flyafLogo} alt="FLYAF" className="h-8 mt-1 lg:hidden" />
       </div>
 
       <div className="relative flex-1 overflow-y-auto px-4 lg:px-12 pb-20">
