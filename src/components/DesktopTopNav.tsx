@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Map, Route, Globe, Flame, MoreHorizontal } from "lucide-react";
+import flyafLogo from "@/assets/flyaf-logo.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -51,10 +52,8 @@ export const DesktopTopNav = () => {
     <nav className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-12 bg-black/95 backdrop-blur-lg border-b border-white/10 items-center px-6">
       {/* Logo - left */}
       <div className="flex items-center gap-2 mr-8">
-        <div className="w-6 h-6 rounded border border-[#AD3A49]/50 flex items-center justify-center">
-          <span className="text-[#AD3A49] font-bold text-xs">H</span>
-        </div>
-        <span className="text-white font-bold text-sm tracking-wider">HEARDROP</span>
+        <img src={flyafLogo} alt="FLYAF" className="h-7" />
+        <span className="text-white font-bold text-sm tracking-[0.3em]">FLYAF</span>
       </div>
 
       {/* Nav tabs - centered */}
