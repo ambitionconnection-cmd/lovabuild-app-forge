@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MapPin, Flame, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import flyafLogo from "@/assets/flyaf-logo.svg";
 
 const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -58,9 +59,9 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       </button>
 
       {/* Logo */}
-      <div className="mb-12">
-        <h1 className="text-2xl font-black tracking-[0.3em] text-[#C3C9C9]">FLYAF</h1>
-        <p className="text-[10px] tracking-[0.2em] text-[#AD3A49] text-center mt-1">
+      <div className="mb-12 flex flex-col items-center">
+        <img src={flyafLogo} alt="FLYAF" className="h-16 mb-2" />
+        <p className="text-[10px] tracking-[0.2em] text-[#AD3A49] text-center mt-1 font-bold">
           {t('onboarding.tagline')}
         </p>
       </div>
