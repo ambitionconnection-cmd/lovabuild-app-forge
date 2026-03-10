@@ -284,8 +284,8 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                 <div className="w-12 h-12 rounded-full bg-[#2D2D2D]/5 border border-[#2D2D2D]/15 flex items-center justify-center mb-3">
                   <Navigation className="w-6 h-6 text-[#AAAAAA]" />
                 </div>
-                <p className="text-[#5A5A5A] text-sm font-medium">No stops yet</p>
-                <p className="text-[#8A8A8A] text-xs mt-1">Tap shops on the map and add them to your route</p>
+                <p className="text-[#5A5A5A] text-sm font-medium">{t('route.noStops')}</p>
+                <p className="text-[#8A8A8A] text-xs mt-1">{t('route.noStopsHint')}</p>
               </div>
             ) : (
               <>
