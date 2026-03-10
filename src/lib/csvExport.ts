@@ -16,6 +16,8 @@ interface ShopExport {
   country: string;
   city: string;
   address: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 // Extract handle from URL
