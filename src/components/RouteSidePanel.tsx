@@ -149,7 +149,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             onClick={() => shareRoute(journeyStops, userLocation)}
           >
             <Share2 className="w-3 h-3 mr-1" />
-            Share
+            {t('route.share')}
           </Button>
         </div>
       </div>
