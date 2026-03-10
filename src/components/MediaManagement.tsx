@@ -539,6 +539,14 @@ export const MediaManagement = () => {
                   </div>
                 </TabsContent>
 
+                <TabsContent value="missing-logo" className="mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                    {filteredShops.filter((s) => !s.logo_url).map((shop) => (
+                      <ShopImageCard key={shop.id} shop={shop} />
+                    ))}
+                  </div>
+                </TabsContent>
+
                 <TabsContent value="missing-image" className="mt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
                     {filteredShops.filter((s) => !s.image_url).map((shop) => (
