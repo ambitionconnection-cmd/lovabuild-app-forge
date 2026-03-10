@@ -123,8 +123,8 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
               const result = await saveRoute(journeyStops, userLocation, isPro);
               if (result === 'limit_reached') setShowProModal(true);
               else if (result === 'sign_in_required') {
-                toast.info('Sign in to save your routes', {
-                  action: { label: 'Sign In', onClick: () => window.location.href = '/auth' },
+                toast.info(t('route.signInToSaveShort'), {
+                  action: { label: t('route.signIn'), onClick: () => window.location.href = '/auth' },
                 });
               }
             }}
