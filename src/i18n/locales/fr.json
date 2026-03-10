@@ -475,5 +475,26 @@
     "sortBy": "Trier par",
     "country": "Pays",
     "toggleFilters": "Basculer les filtres"
+  },
+  "route": {
+    "title": "Itinéraire",
+    "save": "Enregistrer",
+    "print": "Imprimer",
+    "share": "Partager",
+    "noStops": "Aucun arrêt",
+    "noStopsHint": "Appuyez sur les boutiques sur la carte pour les ajouter à votre itinéraire",
+    "noStopsHintDesktop": "Cliquez sur les épingles de la carte pour ajouter des boutiques à votre itinéraire",
+    "startNavigation": "Démarrer la navigation",
+    "clearRoute": "Effacer l'itinéraire",
+    "clear": "Effacer",
+    "yourLocation": "Votre position",
+    "distance": "Distance",
+    "walking": "À pied",
+    "stops": "Arrêts",
+    "signInRequired": "Connexion requise",
+    "signInToSave": "Créez un compte ou connectez-vous pour sauvegarder vos itinéraires.",
+    "signIn": "Se connecter",
+    "signInToSaveShort": "Connectez-vous pour sauvegarder vos itinéraires",
+    "kmAway": "km"
   }
 }

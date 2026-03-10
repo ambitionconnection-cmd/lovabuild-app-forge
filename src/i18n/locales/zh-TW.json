@@ -475,5 +475,26 @@
     "sortBy": "排序方式",
     "country": "國家",
     "toggleFilters": "切換篩選"
+  },
+  "route": {
+    "title": "路線",
+    "save": "儲存",
+    "print": "列印",
+    "share": "分享",
+    "noStops": "尚無停靠點",
+    "noStopsHint": "點擊地圖上的店鋪添加到您的路線中",
+    "noStopsHintDesktop": "點擊地圖上的圖釘將店鋪新增到路線",
+    "startNavigation": "開始導航",
+    "clearRoute": "清除路線",
+    "clear": "清除",
+    "yourLocation": "您的位置",
+    "distance": "距離",
+    "walking": "步行",
+    "stops": "停靠點",
+    "signInRequired": "需要登入",
+    "signInToSave": "建立帳戶或登入以儲存您的路線。",
+    "signIn": "登入",
+    "signInToSaveShort": "登入以儲存您的路線",
+    "kmAway": "公里"
   }
 }

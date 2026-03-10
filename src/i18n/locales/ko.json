@@ -475,5 +475,26 @@
     "sortBy": "정렬 기준",
     "country": "국가",
     "toggleFilters": "필터 전환"
+  },
+  "route": {
+    "title": "경로",
+    "save": "저장",
+    "print": "인쇄",
+    "share": "공유",
+    "noStops": "아직 정류장이 없습니다",
+    "noStopsHint": "지도에서 매장을 탭하여 경로에 추가하세요",
+    "noStopsHintDesktop": "지도의 핀을 클릭하여 매장을 경로에 추가하세요",
+    "startNavigation": "내비게이션 시작",
+    "clearRoute": "경로 삭제",
+    "clear": "삭제",
+    "yourLocation": "현재 위치",
+    "distance": "거리",
+    "walking": "도보",
+    "stops": "정류장",
+    "signInRequired": "로그인 필요",
+    "signInToSave": "경로를 저장하려면 계정을 만들거나 로그인하세요.",
+    "signIn": "로그인",
+    "signInToSaveShort": "경로를 저장하려면 로그인하세요",
+    "kmAway": "km 떨어짐"
   }
 }

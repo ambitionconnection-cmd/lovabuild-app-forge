@@ -475,5 +475,26 @@
     "sortBy": "並べ替え",
     "country": "国",
     "toggleFilters": "フィルター切替"
+  },
+  "route": {
+    "title": "ルート",
+    "save": "保存",
+    "print": "印刷",
+    "share": "共有",
+    "noStops": "まだ停留所がありません",
+    "noStopsHint": "地図上のショップをタップしてルートに追加",
+    "noStopsHintDesktop": "地図上のピンをクリックしてショップをルートに追加",
+    "startNavigation": "ナビ開始",
+    "clearRoute": "ルートをクリア",
+    "clear": "クリア",
+    "yourLocation": "現在地",
+    "distance": "距離",
+    "walking": "徒歩",
+    "stops": "停留所",
+    "signInRequired": "ログインが必要です",
+    "signInToSave": "ルートを保存するにはアカウントを作成またはログインしてください。",
+    "signIn": "ログイン",
+    "signInToSaveShort": "ルートを保存するにはログインしてください",
+    "kmAway": "km先"
   }
 }

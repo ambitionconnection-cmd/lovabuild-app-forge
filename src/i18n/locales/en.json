@@ -478,5 +478,26 @@
     "sortBy": "Sort by",
     "country": "Country",
     "toggleFilters": "Toggle filters"
+  },
+  "route": {
+    "title": "Route",
+    "save": "Save",
+    "print": "Print",
+    "share": "Share",
+    "noStops": "No stops yet",
+    "noStopsHint": "Tap shops on the map and add them to your route",
+    "noStopsHintDesktop": "Click pins on the map to add shops to your route",
+    "startNavigation": "Start Navigation",
+    "clearRoute": "Clear Route",
+    "clear": "Clear",
+    "yourLocation": "Your Location",
+    "distance": "Distance",
+    "walking": "Walking",
+    "stops": "Stops",
+    "signInRequired": "Sign in required",
+    "signInToSave": "Create an account or sign in to save your routes.",
+    "signIn": "Sign In",
+    "signInToSaveShort": "Sign in to save your routes",
+    "kmAway": "km away"
   }
 }
