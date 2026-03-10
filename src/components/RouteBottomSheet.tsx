@@ -262,7 +262,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
             {/* Action buttons */}
             <div className="flex gap-2">
               <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleSave}>
-                <Save className="w-3 h-3 mr-1" /> Save
+                <Save className="w-3 h-3 mr-1" /> {t('route.save')}
               </Button>
               <Button
                 variant="outline"
