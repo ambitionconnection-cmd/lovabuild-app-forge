@@ -294,7 +294,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-[#C4956A]/10 border border-[#C4956A]/20">
                     <div className="text-center flex-1">
                       <p className="text-[#C4956A] font-bold text-sm">{(routeInfo.distance / 1000).toFixed(1)}km</p>
-                      <p className="text-[#6A6A6A] text-[10px]">Distance</p>
+                      <p className="text-[#6A6A6A] text-[10px]">{t('route.distance')}</p>
                     </div>
                     <div className="w-px h-8 bg-white/10" />
                     <div className="text-center flex-1">
