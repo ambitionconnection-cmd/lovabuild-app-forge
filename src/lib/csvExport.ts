@@ -148,6 +148,8 @@ export const exportShopsCSV = async (): Promise<{ success: boolean; count: numbe
       country: shop.country,
       city: shop.city,
       address: shop.address,
+      latitude: shop.latitude ?? null,
+      longitude: shop.longitude ?? null,
     }));
 
     // Generate CSV
