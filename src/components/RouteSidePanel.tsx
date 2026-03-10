@@ -96,7 +96,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Navigation className="w-4 h-4 text-[#C4956A]" />
-            <span className="font-bold text-sm uppercase tracking-wider text-[#C4956A]">Route</span>
+            <span className="font-bold text-sm uppercase tracking-wider text-[#C4956A]">{t('route.title')}</span>
             <Badge variant="secondary" className="text-xs bg-[#C4956A]/10 text-[#C4956A] border-[#C4956A]/20">
               {journeyStops.length}
             </Badge>
