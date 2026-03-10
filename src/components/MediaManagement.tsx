@@ -21,9 +21,9 @@ export const MediaManagement = () => {
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadType, setUploadType] = useState<"logo" | "banner" | "shop">("logo");
+  const [uploadType, setUploadType] = useState<"logo" | "banner" | "shop" | "shop-logo">("logo");
   const [newUrl, setNewUrl] = useState("");
-  const [deletingImage, setDeletingImage] = useState<{ brand?: Brand; shop?: Shop; type: "logo" | "banner" | "shop" } | null>(null);
+  const [deletingImage, setDeletingImage] = useState<{ brand?: Brand; shop?: Shop; type: "logo" | "banner" | "shop" | "shop-logo" } | null>(null);
   const [uploadMode, setUploadMode] = useState<"url" | "file">("file");
   const [isDragging, setIsDragging] = useState(false);
   const [mediaTab, setMediaTab] = useState<"brands" | "shops">("brands");
