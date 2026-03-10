@@ -16,6 +16,9 @@ const getDebugMode = () => {
 
 const DEBUG_MAP = getDebugMode();
 
+// Module-level flag: skip full overlay after first successful load
+let hasLoadedOnce = false;
+
 // Debug logger with emoji prefixes
 const mapLog = {
   init: (...args: any[]) => DEBUG_MAP && console.log('🗺️ [Init]', ...args),
