@@ -693,7 +693,7 @@ export const MediaManagement = () => {
       <AlertDialog open={!!deletingImage} onOpenChange={() => setDeletingImage(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {deletingImage?.type === "shop" ? "image" : deletingImage?.type}</AlertDialogTitle>
+            <AlertDialogTitle>Delete {deletingImage?.type === "shop" ? "image" : deletingImage?.type === "shop-logo" ? "logo" : deletingImage?.type}</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to remove this image from {deletingImage?.brand?.name || deletingImage?.shop?.name}?
             </AlertDialogDescription>
