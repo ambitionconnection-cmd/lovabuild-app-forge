@@ -185,9 +185,9 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
       setShowProModal(true);
     } else if (result === 'sign_in_required') {
       toast({
-        title: 'Sign in required',
-        description: 'Create an account or sign in to save your routes.',
-        action: <Button size="sm" variant="default" onClick={() => window.location.href = '/auth'}>Sign In</Button>,
+        title: t('route.signInRequired'),
+        description: t('route.signInToSave'),
+        action: <Button size="sm" variant="default" onClick={() => window.location.href = '/auth'}>{t('route.signIn')}</Button>,
       });
     }
   };
