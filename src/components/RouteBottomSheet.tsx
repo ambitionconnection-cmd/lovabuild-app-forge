@@ -304,7 +304,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                     <div className="w-px h-8 bg-white/10" />
                     <div className="text-center flex-1">
                       <p className="text-[#C4956A] font-bold text-sm">{journeyStops.length}</p>
-                      <p className="text-[#6A6A6A] text-[10px]">Stops</p>
+                      <p className="text-[#6A6A6A] text-[10px]">{t('route.stops')}</p>
                     </div>
                   </div>
                 )}
