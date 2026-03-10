@@ -202,7 +202,9 @@ export const MediaManagement = () => {
         ));
       } else if (deletingImage.shop) {
         setShops(prev => prev.map(s => 
-          s.id === deletingImage.shop!.id ? { ...s, image_url: null } : s
+          s.id === deletingImage.shop!.id 
+            ? { ...s, ...(deletingImage.type === "shop-logo" ? { logo_url: null } : { image_url: null }) }
+            : s
         ));
       }
     } catch (error: any) {
