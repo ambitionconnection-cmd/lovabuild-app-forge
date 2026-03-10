@@ -315,7 +315,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                     <div className="w-6 h-6 rounded-full bg-[#AD3A49] flex items-center justify-center flex-shrink-0">
                       <Navigation className="w-3 h-3 text-[#2D2D2D]" />
                     </div>
-                    <p className="text-[#2D2D2D]/70 text-xs font-medium">Your Location</p>
+                    <p className="text-[#2D2D2D]/70 text-xs font-medium">{t('route.yourLocation')}</p>
                   </div>
                 )}
 
