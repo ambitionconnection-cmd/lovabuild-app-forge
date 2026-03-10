@@ -130,7 +130,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             }}
           >
             <Save className="w-3 h-3 mr-1" />
-            Save
+            {t('route.save')}
           </Button>
           <Button
             variant="outline"
