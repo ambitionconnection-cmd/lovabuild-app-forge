@@ -227,7 +227,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <Navigation className="w-4 h-4 text-[#C4956A] flex-shrink-0" />
               <span className="font-bold text-sm uppercase tracking-wider text-[#C4956A]">
-                Route
+                {t('route.title')}
               </span>
               <Badge variant="secondary" className="text-xs bg-[#C4956A]/10 text-[#C4956A] border-[#C4956A]/20">
                 {journeyStops.length}
