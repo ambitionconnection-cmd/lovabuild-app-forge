@@ -185,12 +185,13 @@ export const MediaManagement = () => {
         if (error) throw error;
         toast.success(`${deletingImage.type === "logo" ? "Logo" : "Banner"} removed from ${deletingImage.brand.name}`);
       } else if (deletingImage.shop) {
+        const updateData = deletingImage.type === "shop-logo" ? { logo_url: null } : { image_url: null };
         const { error } = await supabase
           .from("shops")
-          .update({ image_url: null })
+          .update(updateData)
           .eq("id", deletingImage.shop.id);
         if (error) throw error;
-        toast.success(`Image removed from ${deletingImage.shop.name}`);
+        toast.success(`${deletingImage.type === "shop-logo" ? "Logo" : "Image"} removed from ${deletingImage.shop.name}`);
       }
       // Update state locally to preserve scroll position
       if (deletingImage.brand) {
