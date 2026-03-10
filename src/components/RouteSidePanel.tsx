@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Navigation, Trash2, X, Save, Printer, Share2, GripVertical, Lock, Crown } from 'lucide-react';
@@ -84,6 +85,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
   onReorderStops,
 }) => {
   const { isPro } = useAuth();
+  const { t } = useTranslation();
   const [showProModal, setShowProModal] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
   return (
@@ -94,7 +96,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Navigation className="w-4 h-4 text-[#C4956A]" />
-            <span className="font-bold text-sm uppercase tracking-wider text-[#C4956A]">Route</span>
+            <span className="font-bold text-sm uppercase tracking-wider text-[#C4956A]">{t('route.title')}</span>
             <Badge variant="secondary" className="text-xs bg-[#C4956A]/10 text-[#C4956A] border-[#C4956A]/20">
               {journeyStops.length}
             </Badge>
@@ -107,7 +109,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
               className="text-xs text-destructive hover:text-destructive/80 h-7 px-2"
             >
               <Trash2 className="w-3 h-3 mr-1" />
-              Clear
+              {t('route.clear')}
             </Button>
           )}
         </div>
@@ -121,14 +123,14 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
               const result = await saveRoute(journeyStops, userLocation, isPro);
               if (result === 'limit_reached') setShowProModal(true);
               else if (result === 'sign_in_required') {
-                toast.info('Sign in to save your routes', {
-                  action: { label: 'Sign In', onClick: () => window.location.href = '/auth' },
+                toast.info(t('route.signInToSaveShort'), {
+                  action: { label: t('route.signIn'), onClick: () => window.location.href = '/auth' },
                 });
               }
             }}
           >
             <Save className="w-3 h-3 mr-1" />
-            Save
+            {t('route.save')}
           </Button>
           <Button
             variant="outline"
@@ -137,7 +139,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             onClick={() => { if (!isPro) { setShowProModal(true); } else { printRoute(journeyStops, userLocation); } }}
           >
             {isPro ? <Printer className="w-3 h-3 mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
-            Print
+            {t('route.print')}
             {!isPro && <span className="ml-1 px-1 py-px rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none">PRO</span>}
           </Button>
           <Button
@@ -147,7 +149,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             onClick={() => shareRoute(journeyStops, userLocation)}
           >
             <Share2 className="w-3 h-3 mr-1" />
-            Share
+            {t('route.share')}
           </Button>
         </div>
       </div>
@@ -157,15 +159,15 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
         {journeyStops.length === 0 ? (
           <div className="p-6 text-center">
             <Navigation className="w-8 h-8 text-[#C4956A]/30 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">No stops yet</p>
-            <p className="text-xs text-muted-foreground/60 mt-1">Click pins on the map to add shops to your route</p>
+            <p className="text-sm text-muted-foreground">{t('route.noStops')}</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">{t('route.noStopsHintDesktop')}</p>
           </div>
         ) : (
           <div className="p-2">
             {userLocation && (
               <div className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground">
                 <div className="w-2 h-2 rounded-full bg-cyan-400" />
-                Your Location
+                {t('route.yourLocation')}
               </div>
             )}
             <DndContext
@@ -209,7 +211,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             className="w-full h-10 bg-[#C4956A] hover:bg-[#C4956A]/80 text-white font-semibold"
           >
             <Navigation className="w-4 h-4 mr-2" />
-            Start Navigation
+            {t('route.startNavigation')}
           </Button>
         </div>
       )}

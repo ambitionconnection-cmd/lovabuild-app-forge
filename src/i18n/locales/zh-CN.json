@@ -475,5 +475,26 @@
     "sortBy": "排序方式",
     "country": "国家",
     "toggleFilters": "切换筛选"
+  },
+  "route": {
+    "title": "路线",
+    "save": "保存",
+    "print": "打印",
+    "share": "分享",
+    "noStops": "暂无停靠点",
+    "noStopsHint": "点击地图上的店铺添加到您的路线中",
+    "noStopsHintDesktop": "点击地图上的图钉将店铺添加到路线",
+    "startNavigation": "开始导航",
+    "clearRoute": "清除路线",
+    "clear": "清除",
+    "yourLocation": "您的位置",
+    "distance": "距离",
+    "walking": "步行",
+    "stops": "停靠点",
+    "signInRequired": "需要登录",
+    "signInToSave": "创建账户或登录以保存您的路线。",
+    "signIn": "登录",
+    "signInToSaveShort": "登录以保存您的路线",
+    "kmAway": "公里"
   }
 }

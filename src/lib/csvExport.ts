@@ -16,6 +16,8 @@ interface ShopExport {
   country: string;
   city: string;
   address: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 // Extract handle from URL
@@ -111,7 +113,7 @@ export const exportShopsCSV = async (): Promise<{ success: boolean; count: numbe
     // Fetch all active shops with brand info
     const { data: shops, error: shopsError } = await supabase
       .from('shops')
-      .select('id, name, brand_id, country, city, address')
+      .select('id, name, brand_id, country, city, address, latitude, longitude')
       .eq('is_active', true)
       .order('country')
       .order('city');
@@ -146,10 +148,12 @@ export const exportShopsCSV = async (): Promise<{ success: boolean; count: numbe
       country: shop.country,
       city: shop.city,
       address: shop.address,
+      latitude: shop.latitude ?? null,
+      longitude: shop.longitude ?? null,
     }));
 
     // Generate CSV
-    const headers = ['Brand Name', 'Total Brand Shops', 'Shop Name', 'Country', 'City', 'Address'];
+    const headers = ['Brand Name', 'Total Brand Shops', 'Shop Name', 'Country', 'City', 'Address', 'Latitude', 'Longitude'];
     const rows = exportData.map(shop => [
       `"${shop.brand_name.replace(/"/g, '""')}"`,
       shop.brand_shop_count.toString(),
@@ -157,6 +161,8 @@ export const exportShopsCSV = async (): Promise<{ success: boolean; count: numbe
       `"${shop.country.replace(/"/g, '""')}"`,
       `"${shop.city.replace(/"/g, '""')}"`,
       `"${shop.address.replace(/"/g, '""')}"`,
+      shop.latitude !== null ? shop.latitude.toString() : '',
+      shop.longitude !== null ? shop.longitude.toString() : '',
     ]);
 
     const csvContent = [

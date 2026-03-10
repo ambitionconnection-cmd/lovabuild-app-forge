@@ -16,6 +16,9 @@ const getDebugMode = () => {
 
 const DEBUG_MAP = getDebugMode();
 
+// Module-level flag: skip full overlay after first successful load
+let hasLoadedOnce = false;
+
 // Debug logger with emoji prefixes
 const mapLog = {
   init: (...args: any[]) => DEBUG_MAP && console.log('🗺️ [Init]', ...args),
@@ -71,8 +74,9 @@ const Map: React.FC<MapProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-  const [isLoadingShops, setIsLoadingShops] = useState(true);
-  const [loadingMessage, setLoadingMessage] = useState('Initializing map...');
+  const [isLoadingShops, setIsLoadingShops] = useState(!hasLoadedOnce);
+  const [loadingMessage, setLoadingMessage] = useState(hasLoadedOnce ? '' : 'Initializing map...');
+  const [showFullOverlay, setShowFullOverlay] = useState(!hasLoadedOnce);
   const [showTooltip, setShowTooltip] = useState(false);
   const [debugStats, setDebugStats] = useState({ shopsTotal: 0, shopsVisible: 0, sourceReady: false });
   const [markersVersion, setMarkersVersion] = useState(0);
@@ -976,10 +980,12 @@ const Map: React.FC<MapProps> = ({
         }
 
         setIsLoadingShops(false);
+        hasLoadedOnce = true;
         mapLog.shops('✅ Shops data updated successfully');
       } catch (error) {
         mapLog.error('Error adding map layers:', error);
         setIsLoadingShops(false);
+        hasLoadedOnce = true;
       }
     };
 
@@ -1100,6 +1106,7 @@ const Map: React.FC<MapProps> = ({
         isLoading={isLoadingShops} 
         shopsCount={shops.length}
         message={loadingMessage}
+        minimal={!showFullOverlay}
       />
       
       {/* Recenter button - rendered via parent wrapper */}

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { saveRoute, printRoute, shareRoute } from '@/lib/routeActions';
 import { Navigation, Save, Printer, Share2, X, GripVertical, Trash2, MapPin, ChevronUp, Lock, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -90,6 +91,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
   routeInfo,
   onReorderStops,
 }) => {
+  const { t } = useTranslation();
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -183,9 +185,9 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
       setShowProModal(true);
     } else if (result === 'sign_in_required') {
       toast({
-        title: 'Sign in required',
-        description: 'Create an account or sign in to save your routes.',
-        action: <Button size="sm" variant="default" onClick={() => window.location.href = '/auth'}>Sign In</Button>,
+        title: t('route.signInRequired'),
+        description: t('route.signInToSave'),
+        action: <Button size="sm" variant="default" onClick={() => window.location.href = '/auth'}>{t('route.signIn')}</Button>,
       });
     }
   };
@@ -225,7 +227,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <Navigation className="w-4 h-4 text-[#C4956A] flex-shrink-0" />
               <span className="font-bold text-sm uppercase tracking-wider text-[#C4956A]">
-                Route
+                {t('route.title')}
               </span>
               <Badge variant="secondary" className="text-xs bg-[#C4956A]/10 text-[#C4956A] border-[#C4956A]/20">
                 {journeyStops.length}
@@ -260,7 +262,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
             {/* Action buttons */}
             <div className="flex gap-2">
               <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleSave}>
-                <Save className="w-3 h-3 mr-1" /> Save
+                <Save className="w-3 h-3 mr-1" /> {t('route.save')}
               </Button>
               <Button
                 variant="outline"
@@ -269,11 +271,11 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                 onClick={() => { if (!isPro) { setShowProModal(true); } else { handlePrint(); } }}
               >
                 {isPro ? <Printer className="w-3 h-3 mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
-                Print
+                {t('route.print')}
                 {!isPro && <span className="ml-1 px-1 py-px rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none">PRO</span>}
               </Button>
               <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleShare}>
-                <Share2 className="w-3 h-3 mr-1" /> Share
+                <Share2 className="w-3 h-3 mr-1" /> {t('route.share')}
               </Button>
             </div>
 
@@ -282,8 +284,8 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                 <div className="w-12 h-12 rounded-full bg-[#2D2D2D]/5 border border-[#2D2D2D]/15 flex items-center justify-center mb-3">
                   <Navigation className="w-6 h-6 text-[#AAAAAA]" />
                 </div>
-                <p className="text-[#5A5A5A] text-sm font-medium">No stops yet</p>
-                <p className="text-[#8A8A8A] text-xs mt-1">Tap shops on the map and add them to your route</p>
+                <p className="text-[#5A5A5A] text-sm font-medium">{t('route.noStops')}</p>
+                <p className="text-[#8A8A8A] text-xs mt-1">{t('route.noStopsHint')}</p>
               </div>
             ) : (
               <>
@@ -292,17 +294,17 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-[#C4956A]/10 border border-[#C4956A]/20">
                     <div className="text-center flex-1">
                       <p className="text-[#C4956A] font-bold text-sm">{(routeInfo.distance / 1000).toFixed(1)}km</p>
-                      <p className="text-[#6A6A6A] text-[10px]">Distance</p>
+                      <p className="text-[#6A6A6A] text-[10px]">{t('route.distance')}</p>
                     </div>
                     <div className="w-px h-8 bg-white/10" />
                     <div className="text-center flex-1">
                       <p className="text-[#C4956A] font-bold text-sm">{Math.round(routeInfo.duration / 60)}min</p>
-                      <p className="text-[#6A6A6A] text-[10px]">Walking</p>
+                      <p className="text-[#6A6A6A] text-[10px]">{t('route.walking')}</p>
                     </div>
                     <div className="w-px h-8 bg-white/10" />
                     <div className="text-center flex-1">
                       <p className="text-[#C4956A] font-bold text-sm">{journeyStops.length}</p>
-                      <p className="text-[#6A6A6A] text-[10px]">Stops</p>
+                      <p className="text-[#6A6A6A] text-[10px]">{t('route.stops')}</p>
                     </div>
                   </div>
                 )}
@@ -313,7 +315,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                     <div className="w-6 h-6 rounded-full bg-[#AD3A49] flex items-center justify-center flex-shrink-0">
                       <Navigation className="w-3 h-3 text-[#2D2D2D]" />
                     </div>
-                    <p className="text-[#2D2D2D]/70 text-xs font-medium">Your Location</p>
+                    <p className="text-[#2D2D2D]/70 text-xs font-medium">{t('route.yourLocation')}</p>
                   </div>
                 )}
 
@@ -348,7 +350,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                   onClick={onStartNavigation}
                 >
                   <Navigation className="w-4 h-4 mr-2" />
-                  Start Navigation
+                  {t('route.startNavigation')}
                 </Button>
 
                 {/* Clear all */}
@@ -359,7 +361,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                   onClick={onClearAll}
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
-                  Clear Route
+                  {t('route.clearRoute')}
                 </Button>
               </>
             )}
