@@ -350,7 +350,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                   onClick={onStartNavigation}
                 >
                   <Navigation className="w-4 h-4 mr-2" />
-                  Start Navigation
+                  {t('route.startNavigation')}
                 </Button>
 
                 {/* Clear all */}
