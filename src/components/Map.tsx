@@ -787,7 +787,8 @@ const Map: React.FC<MapProps> = ({
         features: shopsWithCoords.map(shop => {
           // Find the brand to get logo_url
         const brand = shop.brand_id ? brandsRef.current.find(b => b.id === shop.brand_id) : null;
-        const logoUrl = brand?.logo_url || shop.image_url || null;
+        const shopLogoUrl = (shop as any).logo_url || null;
+        const logoUrl = brand?.logo_url || shopLogoUrl || shop.image_url || null;
     
         return {
           type: 'Feature' as const,
