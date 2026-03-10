@@ -109,7 +109,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
               className="text-xs text-destructive hover:text-destructive/80 h-7 px-2"
             >
               <Trash2 className="w-3 h-3 mr-1" />
-              Clear
+              {t('route.clear')}
             </Button>
           )}
         </div>
