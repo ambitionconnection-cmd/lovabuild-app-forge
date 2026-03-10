@@ -523,6 +523,9 @@ export const MediaManagement = () => {
               <Tabs defaultValue="all" className="w-full">
                 <TabsList>
                   <TabsTrigger value="all">All Shops ({shops.length})</TabsTrigger>
+                  <TabsTrigger value="missing-logo">
+                    Missing Logo ({shops.filter((s) => !s.logo_url).length})
+                  </TabsTrigger>
                   <TabsTrigger value="missing-image">
                     Missing Image ({shops.filter((s) => !s.image_url).length})
                   </TabsTrigger>
