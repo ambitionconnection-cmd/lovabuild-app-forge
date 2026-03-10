@@ -1106,6 +1106,7 @@ const Map: React.FC<MapProps> = ({
         isLoading={isLoadingShops} 
         shopsCount={shops.length}
         message={loadingMessage}
+        minimal={!showFullOverlay}
       />
       
       {/* Recenter button - rendered via parent wrapper */}

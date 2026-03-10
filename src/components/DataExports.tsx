@@ -137,6 +137,7 @@ export function DataExports() {
                   <li>Total Brand Shops</li>
                   <li>Shop Name</li>
                   <li>Country, City, Address</li>
+                  <li>Latitude, Longitude</li>
                 </ul>
               </div>
               <Button 

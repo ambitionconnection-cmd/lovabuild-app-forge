@@ -153,7 +153,7 @@ export const exportShopsCSV = async (): Promise<{ success: boolean; count: numbe
     }));
 
     // Generate CSV
-    const headers = ['Brand Name', 'Total Brand Shops', 'Shop Name', 'Country', 'City', 'Address'];
+    const headers = ['Brand Name', 'Total Brand Shops', 'Shop Name', 'Country', 'City', 'Address', 'Latitude', 'Longitude'];
     const rows = exportData.map(shop => [
       `"${shop.brand_name.replace(/"/g, '""')}"`,
       shop.brand_shop_count.toString(),
@@ -161,6 +161,8 @@ export const exportShopsCSV = async (): Promise<{ success: boolean; count: numbe
       `"${shop.country.replace(/"/g, '""')}"`,
       `"${shop.city.replace(/"/g, '""')}"`,
       `"${shop.address.replace(/"/g, '""')}"`,
+      shop.latitude !== null ? shop.latitude.toString() : '',
+      shop.longitude !== null ? shop.longitude.toString() : '',
     ]);
 
     const csvContent = [
