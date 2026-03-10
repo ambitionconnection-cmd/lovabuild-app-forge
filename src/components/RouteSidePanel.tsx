@@ -85,6 +85,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
   onReorderStops,
 }) => {
   const { isPro } = useAuth();
+  const { t } = useTranslation();
   const [showProModal, setShowProModal] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
   return (
