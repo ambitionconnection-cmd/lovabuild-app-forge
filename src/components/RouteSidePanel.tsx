@@ -211,7 +211,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             className="w-full h-10 bg-[#C4956A] hover:bg-[#C4956A]/80 text-white font-semibold"
           >
             <Navigation className="w-4 h-4 mr-2" />
-            Start Navigation
+            {t('route.startNavigation')}
           </Button>
         </div>
       )}
