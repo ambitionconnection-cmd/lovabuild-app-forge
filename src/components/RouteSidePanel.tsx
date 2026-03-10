@@ -139,7 +139,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             onClick={() => { if (!isPro) { setShowProModal(true); } else { printRoute(journeyStops, userLocation); } }}
           >
             {isPro ? <Printer className="w-3 h-3 mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
-            Print
+            {t('route.print')}
             {!isPro && <span className="ml-1 px-1 py-px rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none">PRO</span>}
           </Button>
           <Button
