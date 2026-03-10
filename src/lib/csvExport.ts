@@ -113,7 +113,7 @@ export const exportShopsCSV = async (): Promise<{ success: boolean; count: numbe
     // Fetch all active shops with brand info
     const { data: shops, error: shopsError } = await supabase
       .from('shops')
-      .select('id, name, brand_id, country, city, address')
+      .select('id, name, brand_id, country, city, address, latitude, longitude')
       .eq('is_active', true)
       .order('country')
       .order('city');
