@@ -222,7 +222,9 @@ export const MediaManagement = () => {
 
   const isUploadDialogOpen = !!(selectedBrand || selectedShop);
   const uploadDialogName = selectedBrand?.name || selectedShop?.name || "";
-  const uploadDialogLabel = selectedBrand ? (uploadType === "logo" ? "Update Logo" : "Update Banner") : "Update Image";
+  const uploadDialogLabel = selectedBrand 
+    ? (uploadType === "logo" ? "Update Logo" : "Update Banner") 
+    : (uploadType === "shop-logo" ? "Update Logo" : "Update Image");
 
   const BrandImageCard = ({ brand }: { brand: Brand }) => (
     <div className="border rounded-lg p-4 space-y-4 bg-background">
