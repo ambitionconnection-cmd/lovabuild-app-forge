@@ -152,16 +152,17 @@ export const MediaManagement = () => {
     }
   };
 
-  const handleShopUrlUpdate = async (shop: Shop, url: string) => {
+  const handleShopUrlUpdate = async (shop: Shop, url: string, field: "image" | "logo" = "image") => {
     try {
+      const updateData = field === "logo" ? { logo_url: url || null } : { image_url: url || null };
       const { error } = await supabase
         .from("shops")
-        .update({ image_url: url || null })
+        .update(updateData)
         .eq("id", shop.id);
 
       if (error) throw error;
 
-      toast.success(`Image updated for ${shop.name}`);
+      toast.success(`${field === "logo" ? "Logo" : "Image"} updated for ${shop.name}`);
       fetchData();
       setSelectedShop(null);
       setNewUrl("");
