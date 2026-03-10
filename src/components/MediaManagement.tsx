@@ -678,7 +678,7 @@ export const MediaManagement = () => {
               <AlertDialogAction
                 onClick={() => {
                   if (selectedBrand) handleBrandUrlUpdate(selectedBrand, uploadType as "logo" | "banner", newUrl);
-                  else if (selectedShop) handleShopUrlUpdate(selectedShop, newUrl);
+                  else if (selectedShop) handleShopUrlUpdate(selectedShop, newUrl, uploadType === "shop-logo" ? "logo" : "image");
                 }}
                 disabled={!newUrl}
               >
