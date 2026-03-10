@@ -980,10 +980,12 @@ const Map: React.FC<MapProps> = ({
         }
 
         setIsLoadingShops(false);
+        hasLoadedOnce = true;
         mapLog.shops('✅ Shops data updated successfully');
       } catch (error) {
         mapLog.error('Error adding map layers:', error);
         setIsLoadingShops(false);
+        hasLoadedOnce = true;
       }
     };
 
