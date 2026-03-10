@@ -309,14 +309,31 @@ export const ShopEditModal = ({ shop, brands, isOpen, onClose, onSuccess }: Shop
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL</Label>
-            <Input
-              id="image_url"
-              type="url"
-              value={formData.image_url || ""}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="logo_url">Logo URL (for map pin)</Label>
+              <Input
+                id="logo_url"
+                type="url"
+                placeholder="Logo displayed on map pin"
+                value={(formData as any).logo_url || ""}
+                onChange={(e) => setFormData({ ...formData, logo_url: e.target.value } as any)}
+              />
+              {(formData as any).logo_url && (
+                <div className="w-10 h-10 rounded-full border-2 border-border overflow-hidden bg-muted">
+                  <img src={(formData as any).logo_url} alt="Logo preview" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="image_url">Image URL (banner/photo)</Label>
+              <Input
+                id="image_url"
+                type="url"
+                value={formData.image_url || ""}
+                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

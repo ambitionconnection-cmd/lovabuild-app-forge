@@ -949,7 +949,8 @@ const Map: React.FC<MapProps> = ({
                     // Create logo markers for each shop
           shopsWithCoords.forEach(shop => {
             const brand = shop.brand_id ? brandsRef.current.find(b => b.id === shop.brand_id) : null;
-            const logoUrl = brand?.logo_url || null;
+            const shopLogoUrl = (shop as any).logo_url || null;
+            const logoUrl = brand?.logo_url || shopLogoUrl || null;
             
             const el = createLogoMarkerElement(shop, logoUrl);
             
