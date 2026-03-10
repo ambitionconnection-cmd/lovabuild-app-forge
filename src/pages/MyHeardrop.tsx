@@ -271,7 +271,7 @@ const MyHeardrop = () => {
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {favoriteBrands.map((brand) => (
-                    <Card key={brand.id} className="overflow-hidden">
+                    <Card key={brand.id} className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/brand/${brand.slug}`)}>
                       <CardContent className="p-2">
                         <div className="flex items-center gap-2 mb-1">
                           <div className="w-8 h-8 rounded bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -293,7 +293,7 @@ const MyHeardrop = () => {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6"
-                            onClick={() => removeFavoriteBrand(brand.favoriteId)}
+                            onClick={(e) => { e.stopPropagation(); removeFavoriteBrand(brand.favoriteId); }}
                           >
                             <Trash2 className="w-3 h-3 text-destructive" />
                           </Button>
