@@ -15,6 +15,7 @@ const CITIES: City[] = [
   { name: "Los Angeles", center: [-118.2437, 34.0522], zoom: 11 },
   { name: "Shanghai", center: [121.4737, 31.2304], zoom: 12 },
   { name: "Beijing", center: [116.4074, 39.9042], zoom: 12 },
+  { name: "Bangkok", center: [100.5018, 13.7563], zoom: 13 },
 ];
 
 interface CityChipProps {
