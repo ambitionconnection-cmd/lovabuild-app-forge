@@ -275,7 +275,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
                 {!isPro && <span className="ml-1 px-1 py-px rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none">PRO</span>}
               </Button>
               <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleShare}>
-                <Share2 className="w-3 h-3 mr-1" /> Share
+                <Share2 className="w-3 h-3 mr-1" /> {t('route.share')}
               </Button>
             </div>
 
