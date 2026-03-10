@@ -159,8 +159,8 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
         {journeyStops.length === 0 ? (
           <div className="p-6 text-center">
             <Navigation className="w-8 h-8 text-[#C4956A]/30 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">No stops yet</p>
-            <p className="text-xs text-muted-foreground/60 mt-1">Click pins on the map to add shops to your route</p>
+            <p className="text-sm text-muted-foreground">{t('route.noStops')}</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">{t('route.noStopsHintDesktop')}</p>
           </div>
         ) : (
           <div className="p-2">
