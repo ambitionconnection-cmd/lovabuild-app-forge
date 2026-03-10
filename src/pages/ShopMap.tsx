@@ -43,6 +43,7 @@ const COUNTRY_TO_CONTINENT: Record<string, string> = {
   "Malaysia": "asia",
   "Indonesia": "asia",
   "Vietnam": "asia",
+  "Thailand": "asia",
 };
 
 const ShopMap = () => {
