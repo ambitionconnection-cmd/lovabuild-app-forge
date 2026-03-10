@@ -98,7 +98,7 @@ export const MediaManagement = () => {
       if (selectedBrand) {
         await handleBrandUrlUpdate(selectedBrand, uploadType as "logo" | "banner", publicUrl);
       } else if (selectedShop) {
-        await handleShopUrlUpdate(selectedShop, publicUrl);
+        await handleShopUrlUpdate(selectedShop, publicUrl, uploadType === "shop-logo" ? "logo" : "image");
       }
     } catch (error: any) {
       console.error("Error uploading file:", error);
