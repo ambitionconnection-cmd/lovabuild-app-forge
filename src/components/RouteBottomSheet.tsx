@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { saveRoute, printRoute, shareRoute } from '@/lib/routeActions';
 import { Navigation, Save, Printer, Share2, X, GripVertical, Trash2, MapPin, ChevronUp, Lock, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
