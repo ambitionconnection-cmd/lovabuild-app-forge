@@ -31,7 +31,7 @@ interface ParsedBrand {
   isDuplicate: boolean;
 }
 
-const VALID_CATEGORIES = ['streetwear', 'sneakers', 'accessories', 'luxury', 'vintage', 'sportswear', 'contemporary', 'techwear', 'outdoor', 'heritage', 'designer', 'skate'];
+const VALID_CATEGORIES = ['streetwear', 'sneakers', 'accessories', 'luxury', 'vintage', 'sportswear', 'contemporary', 'techwear', 'outdoor', 'heritage', 'designer', 'skate', 'underground', 'gothic'];
 
 export function BulkBrandImport({ onImportComplete }: { onImportComplete: () => void }) {
   const [parsedBrands, setParsedBrands] = useState<ParsedBrand[]>([]);

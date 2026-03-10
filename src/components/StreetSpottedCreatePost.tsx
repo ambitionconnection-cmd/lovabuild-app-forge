@@ -20,7 +20,7 @@ interface Props {
 const STYLE_TAG_OPTIONS = [
   "streetwear", "techwear", "vintage", "minimalist", "y2k",
   "gorpcore", "workwear", "avant-garde", "skate", "luxury",
-  "casual", "sportswear", "grunge", "preppy"
+  "casual", "sportswear", "grunge", "preppy", "underground", "gothic"
 ];
 
 const MAX_STYLE_TAGS = 3;

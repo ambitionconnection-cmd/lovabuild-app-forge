@@ -1,93 +1,57 @@
 
 
-# Underground Fashion: Add Brands & Shops from PDF
+## What Can Be Automated vs. What Needs Manual Work
 
-## Tag Analysis
+### Fully Automatable
 
-After examining the PDF, the brands span **punk**, **goth**, **rager** (dark hype streetwear), **gothic lolita**, **kawaii**, **latex/fetish**, and **dark luxury**. The two best umbrella terms that cover the vast majority are:
+**1. First 500 Users → 3-Month Free Pro**
+- Add a DB trigger on the `profiles` table: when a new profile is created, count total profiles. If count <= 500, automatically set `is_pro = true` and `pro_expires_at = now() + 3 months`.
+- No manual work needed. Every new signup is automatically checked and granted Pro if they're within the first 500.
+- The "founding member" messaging can be shown conditionally on the frontend based on a `is_founding_member` flag or by checking if `pro_expires_at` is set without a Stripe subscription.
 
-1. **`underground`** -- covers punk, goth, dark streetwear, alternative, fetish, occult, dark luxury (Rick Owens, Chrome Hearts, Ann Demeulemeester), and rager brands (Hellstar, Sp5der, Vlone, Warren Lotas, Revenge). This is the term used in the PDF title itself.
+**2. After User #500 → Standard Freemium**
+- This happens automatically once the trigger stops granting Pro (count > 500). No code change needed at that point — the existing paywall logic already works for non-Pro users.
 
-2. **`gothic`** -- covers Gothic Lolita, Elegant Gothic Aristocrat, dark romantic, visual kei, and classic goth brands. Many of the Japanese brands (Baby TSSB, Atelier Pierrot, Moi-même-Moitié, h.NAOTO, Angelic Pretty, Metamorphose, Putumayo, Innocent World) fit this more specifically.
+**3. Admin Pro Bypass**
+- Update `check-subscription` edge function: if the user has the `admin` role in `user_roles`, return `subscribed: true` regardless of Stripe status. This fixes your inability to test Print and other Pro features.
 
-These two new values will be added to the `category_type` enum in the database, making them available for filtering in the Index page, HOT style tags, and shop/brand management.
+### Requires Manual Action (by you, once)
 
----
-
-## Schema Change
-
-Add two new values to the `category_type` enum:
-```sql
-ALTER TYPE public.category_type ADD VALUE 'underground';
-ALTER TYPE public.category_type ADD VALUE 'gothic';
-```
-
-Also add `"underground"` and `"gothic"` to the `STYLE_TAG_OPTIONS` array in `StreetSpottedCreatePost.tsx` so users can tag HOT posts with these styles.
-
-Update `BulkBrandImport.tsx` `VALID_CATEGORIES` to include the new values.
+**4. Ambassador Permanent Pro**
+- Create an `ambassador_codes` table with redeemable codes that grant permanent Pro (no expiry).
+- You generate codes in the admin panel and send them to your 50-100 contacts.
+- They redeem during signup or on their profile page → `is_pro = true`, `pro_expires_at = null` (permanent).
+- The code generation and redemption is automated; you just need to distribute the codes manually.
 
 ---
 
-## Brands to INSERT (new only, 32 brands)
+## Implementation Plan
 
-Skipping: Supreme, Rick Owens, Chrome Hearts, Pleasures, Undercover, Wasted Paris, Wasted Youth (already exist).
+### Step 1: Admin Pro bypass
+Modify the `check-subscription` edge function to check `user_roles` for admin role. If admin, return `subscribed: true`. Single file change.
 
-| Brand | Category | Country |
-|-------|----------|---------|
-| Vivienne Westwood | underground | United Kingdom |
-| Dr. Martens | underground | United Kingdom |
-| Killstar | gothic | United Kingdom |
-| Disturbia | gothic | United Kingdom |
-| Boy London | underground | United Kingdom |
-| Cyberdog | underground | United Kingdom |
-| Atsuko Kudo | underground | United Kingdom |
-| Necessary Evil | gothic | United Kingdom |
-| Attitude Clothing | gothic | United Kingdom |
-| Ann Demeulemeester | underground | Belgium |
-| Gallery Dept | underground | United States |
-| Vlone | underground | United States |
-| Hellstar | underground | United States |
-| Sp5der | underground | United States |
-| Warren Lotas | underground | United States |
-| Revenge | underground | United States |
-| Blackcraft Cult | gothic | United States |
-| Strange Cvlt | gothic | United States |
-| Kreepsville 666 | gothic | United States |
-| Hysteric Glamour | underground | Japan |
-| h.NAOTO | gothic | Japan |
-| Sex Pot ReVeNGe | gothic | Japan |
-| Baby, The Stars Shine Bright | gothic | Japan |
-| Alice and the Pirates | gothic | Japan |
-| Atelier Pierrot | gothic | Japan |
-| Moi-même-Moitié | gothic | Japan |
-| 6%DokiDoki | gothic | Japan |
-| Candy Stripper | underground | Japan |
-| Angelic Pretty | gothic | Japan |
-| Metamorphose temps de fille | gothic | Japan |
-| Putumayo | gothic | Japan |
-| Innocent World | gothic | Japan |
+### Step 2: Auto-Pro for first 500 users
+- DB migration: modify the `handle_new_user()` trigger function to count profiles and set `is_pro`/`pro_expires_at` when count <= 500.
+- Add a `is_founding_member` boolean column to `profiles` (default false) so we can show the special "founding member" message.
+- Frontend: after signup, if user's profile has `is_founding_member = true`, show a welcome toast: "You're one of FLYAF's first 500 members. Welcome to Pro, on us for 3 months."
 
----
+### Step 3: Ambassador code system
+- DB migration: create `ambassador_codes` table (code, max_uses, uses_count, grants_permanent_pro, is_active) and `code_redemptions` table (code_id, user_id, redeemed_at).
+- Admin panel: new section to generate/manage ambassador codes.
+- Frontend: "Have a code?" input on the Auth page or Profile page. On redemption, set `is_pro = true` and `pro_expires_at = null`.
+- RLS: admins can manage codes; authenticated users can redeem.
 
-## Shops to INSERT (new only, ~40 shops)
+### Step 4: Founding member messaging
+- Update the Pro upgrade modal to show "You're one of FLYAF's first 500" for founding members approaching expiry.
+- Show a subtle badge or note on the profile for founding members.
 
-Skipping: DSM New York, GR8 Harajuku, Rokit Brick Lane, Beyond Retro (already exist). Will insert all others including flagship stores for new brands (Vivienne Westwood World's End, Dr. Martens Camden, etc.) and independent shops (Trash and Vaudeville, Pentagramme, Darkland Paris, etc.).
+### Summary of effort
 
----
-
-## Code Changes
-
-| File | Change |
-|------|--------|
-| `src/components/StreetSpottedCreatePost.tsx` | Add `"underground"`, `"gothic"` to `STYLE_TAG_OPTIONS` |
-| `src/components/BulkBrandImport.tsx` | Add `"underground"`, `"gothic"` to `VALID_CATEGORIES` |
-
----
-
-## Execution Order
-
-1. Database migration: add enum values
-2. Database inserts: brands (32 rows)
-3. Database inserts: shops (~40 rows)
-4. Code changes: update tag/category arrays
+| Feature | Automated? | Your manual work |
+|---------|-----------|-----------------|
+| First 500 → 3mo Pro | Fully automatic | None |
+| After #500 → freemium | Fully automatic | None |
+| Admin bypass | Fully automatic | None |
+| Ambassador codes | Code auto-redeems | You distribute ~50-100 codes to contacts |
+| Ambassador brief | N/A | You send the message (we can draft it) |
 
