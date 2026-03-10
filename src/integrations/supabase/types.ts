@@ -1237,6 +1237,7 @@ export type Database = {
           is_active: boolean | null
           is_unique_shop: boolean | null
           latitude: number | null
+          logo_url: string | null
           longitude: number | null
           name: string | null
           official_site: string | null
@@ -1258,6 +1259,7 @@ export type Database = {
           is_active?: boolean | null
           is_unique_shop?: boolean | null
           latitude?: number | null
+          logo_url?: string | null
           longitude?: number | null
           name?: string | null
           official_site?: string | null
@@ -1279,6 +1281,7 @@ export type Database = {
           is_active?: boolean | null
           is_unique_shop?: boolean | null
           latitude?: number | null
+          logo_url?: string | null
           longitude?: number | null
           name?: string | null
           official_site?: string | null
