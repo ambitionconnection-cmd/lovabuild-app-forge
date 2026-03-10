@@ -91,6 +91,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
   routeInfo,
   onReorderStops,
 }) => {
+  const { t } = useTranslation();
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
