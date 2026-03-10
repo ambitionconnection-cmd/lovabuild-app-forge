@@ -338,49 +338,99 @@ export const MediaManagement = () => {
         <span className="text-xs text-muted-foreground">{shop.city}, {shop.country}</span>
       </div>
 
-      <div className="space-y-2">
-        <Label className="text-sm font-medium">Shop Image</Label>
-        <div className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center border">
-          {shop.image_url ? (
-            <img
-              src={shop.image_url}
-              alt={`${shop.name}`}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
+      <div className="grid grid-cols-2 gap-4">
+        {/* Logo Section */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Logo</Label>
+          <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center border">
+            {shop.logo_url ? (
+              <img
+                src={shop.logo_url}
+                alt={`${shop.name} logo`}
+                className="w-full h-full object-contain p-2"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <div className="flex flex-col items-center text-muted-foreground">
+                <ImageIcon className="w-8 h-8 mb-1" />
+                <span className="text-xs">No logo</span>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 text-xs"
+              onClick={() => {
+                setSelectedShop(shop);
+                setSelectedBrand(null);
+                setUploadType("shop-logo");
+                setNewUrl(shop.logo_url || "");
               }}
-            />
-          ) : (
-            <div className="flex flex-col items-center text-muted-foreground">
-              <Store className="w-8 h-8 mb-1" />
-              <span className="text-xs">No image</span>
-            </div>
-          )}
+            >
+              {shop.logo_url ? "Replace" : "Add"}
+            </Button>
+            {shop.logo_url && (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(shop.logo_url!)}>
+                  <Copy className="w-3 h-3" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ shop, type: "shop-logo" })}>
+                  <Trash2 className="w-3 h-3 text-destructive" />
+                </Button>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex gap-1">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 text-xs"
-            onClick={() => {
-              setSelectedShop(shop);
-              setSelectedBrand(null);
-              setUploadType("shop");
-              setNewUrl(shop.image_url || "");
-            }}
-          >
-            {shop.image_url ? "Replace" : "Add"}
-          </Button>
-          {shop.image_url && (
-            <>
-              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(shop.image_url!)}>
-                <Copy className="w-3 h-3" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ shop, type: "shop" })}>
-                <Trash2 className="w-3 h-3 text-destructive" />
-              </Button>
-            </>
-          )}
+
+        {/* Shop Image Section */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Shop Image</Label>
+          <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center border">
+            {shop.image_url ? (
+              <img
+                src={shop.image_url}
+                alt={`${shop.name}`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <div className="flex flex-col items-center text-muted-foreground">
+                <Store className="w-8 h-8 mb-1" />
+                <span className="text-xs">No image</span>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 text-xs"
+              onClick={() => {
+                setSelectedShop(shop);
+                setSelectedBrand(null);
+                setUploadType("shop");
+                setNewUrl(shop.image_url || "");
+              }}
+            >
+              {shop.image_url ? "Replace" : "Add"}
+            </Button>
+            {shop.image_url && (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(shop.image_url!)}>
+                  <Copy className="w-3 h-3" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ shop, type: "shop" })}>
+                  <Trash2 className="w-3 h-3 text-destructive" />
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
