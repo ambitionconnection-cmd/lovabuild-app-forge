@@ -167,7 +167,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
             {userLocation && (
               <div className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground">
                 <div className="w-2 h-2 rounded-full bg-cyan-400" />
-                Your Location
+                {t('route.yourLocation')}
               </div>
             )}
             <DndContext
