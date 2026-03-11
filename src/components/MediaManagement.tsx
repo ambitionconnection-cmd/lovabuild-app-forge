@@ -54,15 +54,32 @@ export const MediaManagement = () => {
     }
   };
 
-  const filteredBrands = brands.filter((brand) =>
-    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Derive unique country lists for dropdowns
+  const brandCountries = [...new Set(brands.map(b => b.country).filter(Boolean) as string[])].sort();
+  const shopCountries = [...new Set(shops.map(s => s.country).filter(Boolean) as string[])].sort();
+  const brandCategories = [...new Set(brands.map(b => b.category).filter(Boolean) as string[])].sort();
 
-  const filteredShops = shops.filter((shop) =>
-    shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shop.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shop.country.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBrands = brands.filter((brand) => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q || 
+      brand.name.toLowerCase().includes(q) ||
+      (brand.country?.toLowerCase().includes(q)) ||
+      (brand.category?.toLowerCase().includes(q));
+    const matchesCountry = countryFilter === "all" || brand.country === countryFilter;
+    const matchesCategory = categoryFilter === "all" || brand.category === categoryFilter;
+    return matchesSearch && matchesCountry && matchesCategory;
+  });
+
+  const filteredShops = shops.filter((shop) => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q ||
+      shop.name.toLowerCase().includes(q) ||
+      shop.city.toLowerCase().includes(q) ||
+      shop.country.toLowerCase().includes(q);
+    const matchesCountry = countryFilter === "all" || shop.country === countryFilter;
+    const matchesCategory = categoryFilter === "all" || shop.category === categoryFilter;
+    return matchesSearch && matchesCountry && matchesCategory;
+  });
 
   const handleFileUpload = async (file: File) => {
     if (!selectedBrand && !selectedShop) return;
