@@ -1,57 +1,36 @@
 
 
-## What Can Be Automated vs. What Needs Manual Work
+## Coordinate Precision Fix — 146 Shops
 
-### Fully Automatable
+### Current State
+- **260 shops** have genuine 7-8 digit precision (accurate to ~1m)
+- **146 shops** have only 5 significant digits padded with trailing zeros (accurate to ~110m) — enough to land on the wrong side of a street or the wrong building entirely
+- Examples: `51.50843000` (5 real digits) vs `51.51276110` (8 real digits)
 
-**1. First 500 Users → 3-Month Free Pro**
-- Add a DB trigger on the `profiles` table: when a new profile is created, count total profiles. If count <= 500, automatically set `is_pro = true` and `pro_expires_at = now() + 3 months`.
-- No manual work needed. Every new signup is automatically checked and granted Pro if they're within the first 500.
-- The "founding member" messaging can be shown conditionally on the frontend based on a `is_founding_member` flag or by checking if `pro_expires_at` is set without a Stripe subscription.
+### Root Cause
+The previous Mapbox batch geocode returned lower-precision results for some addresses (especially in Asia and for market/mall locations). The trailing zeros masked this.
 
-**2. After User #500 → Standard Freemium**
-- This happens automatically once the trigger stops granting Pro (count > 500). No code change needed at that point — the existing paywall logic already works for non-Pro users.
+### Plan — Use Existing Mapbox API (No New Keys Needed)
 
-**3. Admin Pro Bypass**
-- Update `check-subscription` edge function: if the user has the `admin` role in `user_roles`, return `subscribed: true` regardless of Stripe status. This fixes your inability to test Print and other Pro features.
+**Step 1: Create a batch re-geocode edge function**
+- New edge function `batch-precision-geocode` that:
+  - Queries only the 146 shops with padded coordinates (trailing `000`)
+  - For each, calls Mapbox Geocoding API with a more specific query string (including street number + city + country)
+  - Only updates if the new result has more significant digits than the current value
+  - Adds a 200ms delay between calls to respect rate limits
+  - Returns a report of what changed vs what stayed the same
 
-### Requires Manual Action (by you, once)
+**Step 2: Run it and generate an audit report**
+- Execute the function, capture results
+- Generate a CSV/markdown report showing before/after coordinates for review
+- Flag any shops where Mapbox still returns low precision (these would need manual correction from Google Maps)
 
-**4. Ambassador Permanent Pro**
-- Create an `ambassador_codes` table with redeemable codes that grant permanent Pro (no expiry).
-- You generate codes in the admin panel and send them to your 50-100 contacts.
-- They redeem during signup or on their profile page → `is_pro = true`, `pro_expires_at = null` (permanent).
-- The code generation and redemption is automated; you just need to distribute the codes manually.
+**Step 3: Manual fallback for stubborn cases**
+- For shops Mapbox can't resolve precisely (markets, malls, small shops), the admin UI already accepts 8+ digit coordinates — those can be entered manually from Google Maps
 
----
+### Cost & Risk
+- **Cost**: Zero. Mapbox free tier includes 100,000 geocode requests/month. We need 146.
+- **Risk**: Low. We only overwrite if the new coordinate has higher precision. Original values preserved in the audit report.
 
-## Implementation Plan
-
-### Step 1: Admin Pro bypass
-Modify the `check-subscription` edge function to check `user_roles` for admin role. If admin, return `subscribed: true`. Single file change.
-
-### Step 2: Auto-Pro for first 500 users
-- DB migration: modify the `handle_new_user()` trigger function to count profiles and set `is_pro`/`pro_expires_at` when count <= 500.
-- Add a `is_founding_member` boolean column to `profiles` (default false) so we can show the special "founding member" message.
-- Frontend: after signup, if user's profile has `is_founding_member = true`, show a welcome toast: "You're one of FLYAF's first 500 members. Welcome to Pro, on us for 3 months."
-
-### Step 3: Ambassador code system
-- DB migration: create `ambassador_codes` table (code, max_uses, uses_count, grants_permanent_pro, is_active) and `code_redemptions` table (code_id, user_id, redeemed_at).
-- Admin panel: new section to generate/manage ambassador codes.
-- Frontend: "Have a code?" input on the Auth page or Profile page. On redemption, set `is_pro = true` and `pro_expires_at = null`.
-- RLS: admins can manage codes; authenticated users can redeem.
-
-### Step 4: Founding member messaging
-- Update the Pro upgrade modal to show "You're one of FLYAF's first 500" for founding members approaching expiry.
-- Show a subtle badge or note on the profile for founding members.
-
-### Summary of effort
-
-| Feature | Automated? | Your manual work |
-|---------|-----------|-----------------|
-| First 500 → 3mo Pro | Fully automatic | None |
-| After #500 → freemium | Fully automatic | None |
-| Admin bypass | Fully automatic | None |
-| Ambassador codes | Code auto-redeems | You distribute ~50-100 codes to contacts |
-| Ambassador brief | N/A | You send the message (we can draft it) |
+No database schema changes. No new API keys. No UI changes needed (the text input fix from earlier already supports full precision entry).
 
