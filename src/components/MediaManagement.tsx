@@ -181,7 +181,10 @@ export const MediaManagement = () => {
       if (error) throw error;
 
       toast.success(`${type === "logo" ? "Logo" : "Banner"} updated for ${brand.name}`);
-      fetchData();
+      // Update local state to preserve scroll position
+      setBrands(prev => prev.map(b => 
+        b.id === brand.id ? { ...b, ...updateData } : b
+      ));
       setSelectedBrand(null);
       setNewUrl("");
     } catch (error: any) {
