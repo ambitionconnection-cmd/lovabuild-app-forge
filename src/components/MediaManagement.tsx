@@ -204,7 +204,10 @@ export const MediaManagement = () => {
       if (error) throw error;
 
       toast.success(`${field === "logo" ? "Logo" : "Image"} updated for ${shop.name}`);
-      fetchData();
+      // Update local state to preserve scroll position
+      setShops(prev => prev.map(s => 
+        s.id === shop.id ? { ...s, ...updateData } : s
+      ));
       setSelectedShop(null);
       setNewUrl("");
     } catch (error: any) {
