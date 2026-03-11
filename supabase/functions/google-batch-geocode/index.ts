@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
     const results: Array<Record<string, unknown>> = []
     let updated = 0, skipped = 0, failed = 0, wouldUpdate = 0
 
-    for (const shop of targetShops) {
+    for (const shop of batchShops) {
       const oldLat = Number(shop.latitude)
       const oldLng = Number(shop.longitude)
       const oldPrecision = Math.min(countSignificantDecimals(oldLat), countSignificantDecimals(oldLng))
