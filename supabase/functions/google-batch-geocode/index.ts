@@ -73,7 +73,6 @@ Deno.serve(async (req) => {
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-    // Allow service role key directly
     const token = authHeader.replace('Bearer ', '')
     const isServiceRole = token === supabaseServiceKey
 
@@ -81,7 +80,6 @@ Deno.serve(async (req) => {
       const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
         global: { headers: { Authorization: authHeader } }
       })
-
       const { data: { user }, error: userError } = await supabaseAuth.auth.getUser()
       if (userError || !user) {
         return new Response(
@@ -89,14 +87,8 @@ Deno.serve(async (req) => {
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
-
       const { data: roleData } = await supabaseAuth
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle()
-
+        .from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').maybeSingle()
       if (!roleData) {
         return new Response(
           JSON.stringify({ error: 'Admin access required' }),
@@ -106,20 +98,24 @@ Deno.serve(async (req) => {
     }
 
     const googleApiKey = Deno.env.get('GOOGLE_MAPS_API_KEY')
-    if (!googleApiKey) {
-      throw new Error('GOOGLE_MAPS_API_KEY not configured')
-    }
+    if (!googleApiKey) throw new Error('GOOGLE_MAPS_API_KEY not configured')
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Parse optional body params
     let dryRun = false
+    let auditAll = false
+    let excludeCountries: string[] = []
+    let batchOffset = 0
+    let batchSize = 80
     try {
       const body = await req.json()
       dryRun = body?.dry_run === true
-    } catch { /* no body is fine */ }
+      auditAll = body?.audit_all === true
+      excludeCountries = body?.exclude_countries || []
+      batchOffset = body?.offset || 0
+      batchSize = body?.batch_size || 80
+    } catch { /* no body */ }
 
-    // Fetch all active shops with coordinates
     const { data: shops, error: fetchError } = await supabase
       .from('shops')
       .select('id, name, address, city, country, latitude, longitude')
@@ -135,48 +131,37 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Filter to low-precision shops (≤5 significant decimals)
-    const lowPrecisionShops = shops.filter(shop => {
+    // Filter by precision unless audit_all, and exclude specified countries
+    let targetShops = auditAll ? shops : shops.filter(shop => {
       const latPrec = countSignificantDecimals(Number(shop.latitude))
       const lngPrec = countSignificantDecimals(Number(shop.longitude))
       return latPrec <= 5 || lngPrec <= 5
     })
 
-    console.log(`Found ${lowPrecisionShops.length} low-precision shops out of ${shops.length} total`)
+    // Exclude countries (e.g. China)
+    const excludedShops = targetShops.filter(s =>
+      excludeCountries.some(c => s.country.toLowerCase().includes(c.toLowerCase()))
+    )
+    targetShops = targetShops.filter(s =>
+      !excludeCountries.some(c => s.country.toLowerCase().includes(c.toLowerCase()))
+    )
 
-    const results: Array<{
-      name: string
-      city: string
-      country: string
-      status: string
-      old_lat: number
-      old_lng: number
-      new_lat?: number
-      new_lng?: number
-      old_precision: number
-      new_precision?: number
-      google_type?: string
-    }> = []
+    console.log(`Total eligible: ${targetShops.length}, excluded: ${excludedShops.length}. Processing batch offset=${batchOffset}, size=${batchSize}`)
 
-    let updated = 0
-    let skipped = 0
-    let failed = 0
-    let improved_but_dry = 0
+    const batchShops = targetShops.slice(batchOffset, batchOffset + batchSize)
+    const hasMore = batchOffset + batchSize < targetShops.length
+    const results: Array<Record<string, unknown>> = []
+    let updated = 0, skipped = 0, failed = 0, wouldUpdate = 0
 
-    for (const shop of lowPrecisionShops) {
+    for (const shop of batchShops) {
       const oldLat = Number(shop.latitude)
       const oldLng = Number(shop.longitude)
-      const oldLatPrec = countSignificantDecimals(oldLat)
-      const oldLngPrec = countSignificantDecimals(oldLng)
-      const oldPrecision = Math.min(oldLatPrec, oldLngPrec)
+      const oldPrecision = Math.min(countSignificantDecimals(oldLat), countSignificantDecimals(oldLng))
 
       const result = await googleGeocode(shop.address, shop.city, shop.country, googleApiKey)
 
       if (!result) {
-        results.push({
-          name: shop.name, city: shop.city, country: shop.country,
-          status: 'geocode_failed', old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision,
-        })
+        results.push({ name: shop.name, city: shop.city, country: shop.country, status: 'geocode_failed', old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision })
         failed++
         await new Promise(r => setTimeout(r, 100))
         continue
@@ -184,66 +169,32 @@ Deno.serve(async (req) => {
 
       if (result.precision > oldPrecision) {
         if (dryRun) {
-          results.push({
-            name: shop.name, city: shop.city, country: shop.country,
-            status: 'would_update',
-            old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision,
-            new_lat: result.lat, new_lng: result.lng, new_precision: result.precision,
-            google_type: result.type,
-          })
-          improved_but_dry++
+          results.push({ name: shop.name, city: shop.city, country: shop.country, status: 'would_update', old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision, new_lat: result.lat, new_lng: result.lng, new_precision: result.precision, google_type: result.type })
+          wouldUpdate++
         } else {
-          const { error: updateError } = await supabase
-            .from('shops')
-            .update({ latitude: result.lat, longitude: result.lng })
-            .eq('id', shop.id)
-
+          const { error: updateError } = await supabase.from('shops').update({ latitude: result.lat, longitude: result.lng }).eq('id', shop.id)
           if (updateError) {
-            results.push({
-              name: shop.name, city: shop.city, country: shop.country,
-              status: 'update_failed',
-              old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision,
-              new_lat: result.lat, new_lng: result.lng, new_precision: result.precision,
-              google_type: result.type,
-            })
+            results.push({ name: shop.name, city: shop.city, country: shop.country, status: 'update_failed', old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision, new_lat: result.lat, new_lng: result.lng, new_precision: result.precision, google_type: result.type })
             failed++
           } else {
-            results.push({
-              name: shop.name, city: shop.city, country: shop.country,
-              status: 'updated',
-              old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision,
-              new_lat: result.lat, new_lng: result.lng, new_precision: result.precision,
-              google_type: result.type,
-            })
+            results.push({ name: shop.name, city: shop.city, country: shop.country, status: 'updated', old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision, new_lat: result.lat, new_lng: result.lng, new_precision: result.precision, google_type: result.type })
             updated++
           }
         }
       } else {
-        results.push({
-          name: shop.name, city: shop.city, country: shop.country,
-          status: 'skipped_no_improvement',
-          old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision,
-          new_lat: result.lat, new_lng: result.lng, new_precision: result.precision,
-          google_type: result.type,
-        })
+        results.push({ name: shop.name, city: shop.city, country: shop.country, status: 'already_precise', old_lat: oldLat, old_lng: oldLng, old_precision: oldPrecision, new_lat: result.lat, new_lng: result.lng, new_precision: result.precision, google_type: result.type })
         skipped++
       }
 
-      // 100ms delay to stay within Google rate limits
       await new Promise(r => setTimeout(r, 100))
     }
 
     return new Response(
       JSON.stringify({
         dry_run: dryRun,
-        summary: {
-          total_shops: shops.length,
-          total_low_precision: lowPrecisionShops.length,
-          updated,
-          skipped,
-          failed,
-          ...(dryRun ? { would_update: improved_but_dry } : {}),
-        },
+        audit_all: auditAll,
+        summary: { total_shops: shops.length, total_eligible: targetShops.length, excluded: excludedShops.length, batch_offset: batchOffset, batch_processed: batchShops.length, has_more: hasMore, next_offset: hasMore ? batchOffset + batchSize : null, updated, skipped, failed, ...(dryRun ? { would_update: wouldUpdate } : {}) },
+        excluded_shops: excludedShops.map(s => ({ name: s.name, city: s.city, country: s.country, latitude: s.latitude, longitude: s.longitude })),
         results,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
