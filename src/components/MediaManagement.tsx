@@ -479,22 +479,51 @@ export const MediaManagement = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Top-level Brands / Shops toggle */}
-          <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); setSearchQuery(""); }}>
+            <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); setSearchQuery(""); setCountryFilter("all"); setCategoryFilter("all"); }}>
             <TabsList className="mb-4">
               <TabsTrigger value="brands">Brands ({brands.length})</TabsTrigger>
               <TabsTrigger value="shops">Shops ({shops.length})</TabsTrigger>
             </TabsList>
 
-            <div className="flex gap-4 mb-4">
-              <div className="relative flex-1">
+            <div className="flex flex-wrap gap-2 mb-4">
+              <div className="relative flex-1 min-w-[180px]">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder={mediaTab === "brands" ? "Search brands..." : "Search shops..."}
+                  placeholder={mediaTab === "brands" ? "Search brands..." : "Search shops by name, city..."}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
+              <Select value={countryFilter} onValueChange={setCountryFilter}>
+                <SelectTrigger className="w-[160px]">
+                  <Filter className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Countries</SelectItem>
+                  {(mediaTab === "brands" ? brandCountries : shopCountries).map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-[160px]">
+                  <Filter className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {(mediaTab === "brands" ? brandCategories : [...new Set(shops.map(s => s.category).filter(Boolean) as string[])].sort()).map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(countryFilter !== "all" || categoryFilter !== "all" || searchQuery) && (
+                <Button variant="ghost" size="sm" onClick={() => { setSearchQuery(""); setCountryFilter("all"); setCategoryFilter("all"); }} className="gap-1">
+                  <X className="w-3.5 h-3.5" /> Clear
+                </Button>
+              )}
             </div>
 
             <TabsContent value="brands">
