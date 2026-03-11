@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "brands/*.png", "drops/*.jpg", "shops/*.jpg"],
       manifest: {
-        name: "HEARDROP - Streetwear Hub",
-        short_name: "HEARDROP",
+        name: "FLYAF - Streetwear Hub",
+        short_name: "FLYAF",
         description: "Discover the latest streetwear drops, find nearby shops, and stay connected with your favorite brands.",
         theme_color: "#000000",
         background_color: "#000000",
