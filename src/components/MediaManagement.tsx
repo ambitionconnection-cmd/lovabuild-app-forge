@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Upload, Search, Trash2, Copy, Image as ImageIcon, Loader2, FileUp, Store } from "lucide-react";
+import { Upload, Search, Trash2, Copy, Image as ImageIcon, Loader2, FileUp, Store, Filter, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -18,6 +19,8 @@ export const MediaManagement = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [countryFilter, setCountryFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -51,15 +54,32 @@ export const MediaManagement = () => {
     }
   };
 
-  const filteredBrands = brands.filter((brand) =>
-    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Derive unique country lists for dropdowns
+  const brandCountries = [...new Set(brands.map(b => b.country).filter(Boolean) as string[])].sort();
+  const shopCountries = [...new Set(shops.map(s => s.country).filter(Boolean) as string[])].sort();
+  const brandCategories = [...new Set(brands.map(b => b.category).filter(Boolean) as string[])].sort();
 
-  const filteredShops = shops.filter((shop) =>
-    shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shop.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shop.country.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBrands = brands.filter((brand) => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q || 
+      brand.name.toLowerCase().includes(q) ||
+      (brand.country?.toLowerCase().includes(q)) ||
+      (brand.category?.toLowerCase().includes(q));
+    const matchesCountry = countryFilter === "all" || brand.country === countryFilter;
+    const matchesCategory = categoryFilter === "all" || brand.category === categoryFilter;
+    return matchesSearch && matchesCountry && matchesCategory;
+  });
+
+  const filteredShops = shops.filter((shop) => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q ||
+      shop.name.toLowerCase().includes(q) ||
+      shop.city.toLowerCase().includes(q) ||
+      shop.country.toLowerCase().includes(q);
+    const matchesCountry = countryFilter === "all" || shop.country === countryFilter;
+    const matchesCategory = categoryFilter === "all" || shop.category === categoryFilter;
+    return matchesSearch && matchesCountry && matchesCategory;
+  });
 
   const handleFileUpload = async (file: File) => {
     if (!selectedBrand && !selectedShop) return;
@@ -459,22 +479,51 @@ export const MediaManagement = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Top-level Brands / Shops toggle */}
-          <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); setSearchQuery(""); }}>
+            <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); setSearchQuery(""); setCountryFilter("all"); setCategoryFilter("all"); }}>
             <TabsList className="mb-4">
               <TabsTrigger value="brands">Brands ({brands.length})</TabsTrigger>
               <TabsTrigger value="shops">Shops ({shops.length})</TabsTrigger>
             </TabsList>
 
-            <div className="flex gap-4 mb-4">
-              <div className="relative flex-1">
+            <div className="flex flex-wrap gap-2 mb-4">
+              <div className="relative flex-1 min-w-[180px]">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder={mediaTab === "brands" ? "Search brands..." : "Search shops..."}
+                  placeholder={mediaTab === "brands" ? "Search brands..." : "Search shops by name, city..."}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
+              <Select value={countryFilter} onValueChange={setCountryFilter}>
+                <SelectTrigger className="w-[160px]">
+                  <Filter className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Countries</SelectItem>
+                  {(mediaTab === "brands" ? brandCountries : shopCountries).map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-[160px]">
+                  <Filter className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {(mediaTab === "brands" ? brandCategories : [...new Set(shops.map(s => s.category).filter(Boolean) as string[])].sort()).map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(countryFilter !== "all" || categoryFilter !== "all" || searchQuery) && (
+                <Button variant="ghost" size="sm" onClick={() => { setSearchQuery(""); setCountryFilter("all"); setCategoryFilter("all"); }} className="gap-1">
+                  <X className="w-3.5 h-3.5" /> Clear
+                </Button>
+              )}
             </div>
 
             <TabsContent value="brands">
