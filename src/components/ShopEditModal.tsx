@@ -224,24 +224,36 @@ export const ShopEditModal = ({ shop, brands, isOpen, onClose, onSuccess }: Shop
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="latitude">Latitude</Label>
+              <Label htmlFor="latitude">Latitude (8+ decimals)</Label>
               <Input
                 id="latitude"
-                type="number"
-                step="0.000001"
-                value={formData.latitude || ""}
-                onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : null })}
+                type="text"
+                inputMode="decimal"
+                placeholder="e.g. 51.51397244"
+                value={formData.latitude !== null && formData.latitude !== undefined ? String(formData.latitude) : ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || val === '-' || /^-?\d*\.?\d*$/.test(val)) {
+                    setFormData({ ...formData, latitude: val === '' || val === '-' ? null : Number(val) });
+                  }
+                }}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="longitude">Longitude</Label>
+              <Label htmlFor="longitude">Longitude (8+ decimals)</Label>
               <Input
                 id="longitude"
-                type="number"
-                step="0.000001"
-                value={formData.longitude || ""}
-                onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : null })}
+                type="text"
+                inputMode="decimal"
+                placeholder="e.g. -0.13642089"
+                value={formData.longitude !== null && formData.longitude !== undefined ? String(formData.longitude) : ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || val === '-' || /^-?\d*\.?\d*$/.test(val)) {
+                    setFormData({ ...formData, longitude: val === '' || val === '-' ? null : Number(val) });
+                  }
+                }}
               />
             </div>
           </div>
