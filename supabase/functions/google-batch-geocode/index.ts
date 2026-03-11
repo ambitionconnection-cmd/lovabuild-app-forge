@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         dry_run: dryRun,
         audit_all: auditAll,
-        summary: { total_shops: shops.length, audited: targetShops.length, excluded: excludedShops.length, updated, skipped, failed, ...(dryRun ? { would_update: wouldUpdate } : {}) },
+        summary: { total_shops: shops.length, total_eligible: targetShops.length, excluded: excludedShops.length, batch_offset: batchOffset, batch_processed: batchShops.length, has_more: hasMore, next_offset: hasMore ? batchOffset + batchSize : null, updated, skipped, failed, ...(dryRun ? { would_update: wouldUpdate } : {}) },
         excluded_shops: excludedShops.map(s => ({ name: s.name, city: s.city, country: s.country, latitude: s.latitude, longitude: s.longitude })),
         results,
       }),
