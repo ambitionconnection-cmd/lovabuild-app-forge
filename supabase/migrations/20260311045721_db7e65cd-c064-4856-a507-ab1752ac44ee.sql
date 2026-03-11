@@ -1,0 +1,1 @@
+ALTER TYPE public.category_type ADD VALUE IF NOT EXISTS 'records';
