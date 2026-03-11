@@ -53,12 +53,17 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-8">
-      {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-all duration-500"
-        style={{ backgroundImage: `url(${slide.bgImage})` }}
-      />
-      {/* Overlay matching More page opacity */}
+      {/* Stacked background images for smooth crossfade */}
+      {slides.map((s, index) => (
+        <div
+          key={index}
+          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-500 ${
+            index === currentSlide ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{ backgroundImage: `url(${s.bgImage})` }}
+        />
+      ))}
+      {/* Overlay */}
       <div className="absolute inset-0 bg-background/80" />
 
       {/* Skip button */}
