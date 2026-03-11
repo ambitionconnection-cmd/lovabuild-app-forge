@@ -105,11 +105,15 @@ Deno.serve(async (req) => {
     let dryRun = false
     let auditAll = false
     let excludeCountries: string[] = []
+    let batchOffset = 0
+    let batchSize = 80
     try {
       const body = await req.json()
       dryRun = body?.dry_run === true
       auditAll = body?.audit_all === true
       excludeCountries = body?.exclude_countries || []
+      batchOffset = body?.offset || 0
+      batchSize = body?.batch_size || 80
     } catch { /* no body */ }
 
     const { data: shops, error: fetchError } = await supabase
