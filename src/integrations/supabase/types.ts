@@ -1338,6 +1338,7 @@ export type Database = {
         | "skate"
         | "underground"
         | "gothic"
+        | "records"
       drop_status: "upcoming" | "live" | "ended"
     }
     CompositeTypes: {
@@ -1483,6 +1484,7 @@ export const Constants = {
         "skate",
         "underground",
         "gothic",
+        "records",
       ],
       drop_status: ["upcoming", "live", "ended"],
     },
