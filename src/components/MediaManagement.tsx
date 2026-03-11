@@ -54,9 +54,22 @@ export const MediaManagement = () => {
     }
   };
 
-  // Derive unique country lists for dropdowns
-  const brandCountries = [...new Set(brands.map(b => b.country).filter(Boolean) as string[])].sort();
-  const shopCountries = [...new Set(shops.map(s => s.country).filter(Boolean) as string[])].sort();
+  // Normalize country names for consistent grouping
+  const normalizeCountry = (country: string): string => {
+    const map: Record<string, string> = {
+      "UK": "United Kingdom",
+      "uk": "United Kingdom",
+      "U.K.": "United Kingdom",
+      "USA": "United States",
+      "US": "United States",
+      "U.S.A.": "United States",
+    };
+    return map[country] || country;
+  };
+
+  // Derive unique country lists for dropdowns (normalized)
+  const brandCountries = [...new Set(brands.map(b => b.country ? normalizeCountry(b.country) : null).filter(Boolean) as string[])].sort();
+  const shopCountries = [...new Set(shops.map(s => s.country ? normalizeCountry(s.country) : null).filter(Boolean) as string[])].sort();
   const brandCategories = [...new Set(brands.map(b => b.category).filter(Boolean) as string[])].sort();
 
   const filteredBrands = brands.filter((brand) => {
@@ -64,8 +77,10 @@ export const MediaManagement = () => {
     const matchesSearch = !q || 
       brand.name.toLowerCase().includes(q) ||
       (brand.country?.toLowerCase().includes(q)) ||
-      (brand.category?.toLowerCase().includes(q));
-    const matchesCountry = countryFilter === "all" || brand.country === countryFilter;
+      (brand.category?.toLowerCase().includes(q)) ||
+      (brand.description?.toLowerCase().includes(q));
+    const normalizedBrandCountry = brand.country ? normalizeCountry(brand.country) : null;
+    const matchesCountry = countryFilter === "all" || normalizedBrandCountry === countryFilter;
     const matchesCategory = categoryFilter === "all" || brand.category === categoryFilter;
     return matchesSearch && matchesCountry && matchesCategory;
   });
@@ -75,8 +90,11 @@ export const MediaManagement = () => {
     const matchesSearch = !q ||
       shop.name.toLowerCase().includes(q) ||
       shop.city.toLowerCase().includes(q) ||
-      shop.country.toLowerCase().includes(q);
-    const matchesCountry = countryFilter === "all" || shop.country === countryFilter;
+      shop.country.toLowerCase().includes(q) ||
+      (shop.address?.toLowerCase().includes(q)) ||
+      (shop.description?.toLowerCase().includes(q));
+    const normalizedShopCountry = shop.country ? normalizeCountry(shop.country) : null;
+    const matchesCountry = countryFilter === "all" || normalizedShopCountry === countryFilter;
     const matchesCategory = categoryFilter === "all" || shop.category === categoryFilter;
     return matchesSearch && matchesCountry && matchesCategory;
   });
