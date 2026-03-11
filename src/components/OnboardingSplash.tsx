@@ -66,13 +66,6 @@ const OnboardingSplash = ({ onComplete }: { onComplete: () => void }) => {
       {/* Overlay */}
       <div className="absolute inset-0 bg-background/80" />
 
-      {/* Skip button */}
-      <button
-        onClick={handleSkip}
-        className="relative z-10 absolute top-6 right-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        {t('onboarding.skip')}
-      </button>
 
       {/* Logo */}
       <div className="relative z-10 mb-12 flex flex-col items-center">
