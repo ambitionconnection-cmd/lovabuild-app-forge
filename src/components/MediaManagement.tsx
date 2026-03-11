@@ -19,7 +19,8 @@ export const MediaManagement = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [countryFilter, setCountryFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadType, setUploadType] = useState<"logo" | "banner" | "shop" | "shop-logo">("logo");
