@@ -146,8 +146,10 @@ Deno.serve(async (req) => {
       !excludeCountries.some(c => s.country.toLowerCase().includes(c.toLowerCase()))
     )
 
-    console.log(`Auditing ${targetShops.length} shops (excluded ${excludedShops.length} from ${excludeCountries.join(', ')})`)
+    console.log(`Total eligible: ${targetShops.length}, excluded: ${excludedShops.length}. Processing batch offset=${batchOffset}, size=${batchSize}`)
 
+    const batchShops = targetShops.slice(batchOffset, batchOffset + batchSize)
+    const hasMore = batchOffset + batchSize < targetShops.length
     const results: Array<Record<string, unknown>> = []
     let updated = 0, skipped = 0, failed = 0, wouldUpdate = 0
 
