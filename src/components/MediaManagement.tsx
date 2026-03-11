@@ -21,6 +21,7 @@ export const MediaManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [countryFilter, setCountryFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadType, setUploadType] = useState<"logo" | "banner" | "shop" | "shop-logo">("logo");
