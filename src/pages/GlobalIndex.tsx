@@ -139,7 +139,7 @@ const GlobalIndex = () => {
     });
 
     setFilteredBrands(sorted);
-  }, [searchQuery, selectedCountry, selectedCategory, sortBy, brands, showFavoritesOnly, favoriteBrands, activeTier]);
+  }, [searchQuery, selectedCountry, selectedCategories, sortBy, brands, showFavoritesOnly, favoriteBrands, activeTier]);
 
   // Get unique countries from brands
   const countries = Array.from(new Set(brands.map(brand => brand.country).filter(Boolean))).sort();
