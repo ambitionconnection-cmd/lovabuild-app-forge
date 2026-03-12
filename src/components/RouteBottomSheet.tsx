@@ -260,22 +260,22 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
         <ScrollArea className="flex-1 px-3">
           <div className="py-3 space-y-3">
             {/* Action buttons */}
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleSave}>
-                <Save className="w-3 h-3 mr-1" /> {t('route.save')}
+            <div className="flex gap-1.5">
+              <Button variant="outline" size="sm" className="flex-1 min-w-0 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-[10px] h-8 px-2" onClick={handleSave}>
+                <Save className="w-3 h-3 flex-shrink-0 mr-1" /> <span className="truncate">{t('route.save')}</span>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className={`flex-1 border-[#2D2D2D]/15 text-xs h-8 ${!isPro ? 'opacity-50 cursor-not-allowed text-muted-foreground' : 'text-[#4A4A4A] hover:bg-[#2D2D2D]/5'}`}
+                className={`flex-1 min-w-0 border-[#2D2D2D]/15 text-[10px] h-8 px-2 ${!isPro ? 'opacity-50 cursor-not-allowed text-muted-foreground' : 'text-[#4A4A4A] hover:bg-[#2D2D2D]/5'}`}
                 onClick={() => { if (!isPro) { setShowProModal(true); } else { handlePrint(); } }}
               >
-                {isPro ? <Printer className="w-3 h-3 mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
-                {t('route.print')}
-                {!isPro && <span className="ml-1 px-1 py-px rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none">PRO</span>}
+                {isPro ? <Printer className="w-3 h-3 flex-shrink-0 mr-1" /> : <Lock className="w-3 h-3 flex-shrink-0 mr-1" />}
+                <span className="truncate">{t('route.print')}</span>
+                {!isPro && <span className="ml-0.5 px-1 py-px rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[7px] font-bold leading-none flex-shrink-0">PRO</span>}
               </Button>
-              <Button variant="outline" size="sm" className="flex-1 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-xs h-8" onClick={handleShare}>
-                <Share2 className="w-3 h-3 mr-1" /> {t('route.share')}
+              <Button variant="outline" size="sm" className="flex-1 min-w-0 border-[#2D2D2D]/15 text-[#4A4A4A] hover:bg-[#2D2D2D]/5 text-[10px] h-8 px-2" onClick={handleShare}>
+                <Share2 className="w-3 h-3 flex-shrink-0 mr-1" /> <span className="truncate">{t('route.share')}</span>
               </Button>
             </div>
 
