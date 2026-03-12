@@ -1,7 +1,7 @@
 import { DesktopSidePanel } from "@/components/DesktopSidePanel";
 import { RouteSidePanel } from "@/components/RouteSidePanel";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move, MapPinOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
