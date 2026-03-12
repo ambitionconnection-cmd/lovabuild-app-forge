@@ -225,6 +225,35 @@ const Directions = () => {
     return R * c; // Distance in km
   };
 
+  const [locationDenied, setLocationDenied] = useState(() => {
+    return localStorage.getItem('flyaf_location_denied') === 'true';
+  });
+
+  // Retry location request
+  const retryLocationRequest = useCallback(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log('📍 Geolocation success - accuracy:', position.coords.accuracy, 'meters');
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setSortByDistance(true);
+        setLocationDenied(false);
+        localStorage.removeItem('flyaf_location_denied');
+      },
+      (error) => {
+        console.error('📍 Geolocation retry failed:', error.code, error.message);
+        if (error.code === 1) {
+          setLocationDenied(true);
+          localStorage.setItem('flyaf_location_denied', 'true');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
+    );
+  }, []);
+
   // Get user's location with HIGH ACCURACY
   useEffect(() => {
     if (navigator.geolocation) {
@@ -235,12 +264,18 @@ const Directions = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
-          setSortByDistance(true); // Auto-enable distance sorting when location is available
+          setSortByDistance(true);
+          setLocationDenied(false);
+          localStorage.removeItem('flyaf_location_denied');
         },
         (error) => {
           console.error('📍 Geolocation error:', error.code, error.message);
-          // Fallback: try again without high accuracy if it fails
-          if (error.code === error.TIMEOUT) {
+          if (error.code === 1) {
+            // PERMISSION_DENIED
+            setLocationDenied(true);
+            localStorage.setItem('flyaf_location_denied', 'true');
+          } else if (error.code === error.TIMEOUT) {
+            // Fallback: try again without high accuracy
             navigator.geolocation.getCurrentPosition(
               (position) => {
                 console.log('📍 Geolocation fallback success - accuracy:', position.coords.accuracy, 'meters');
@@ -258,9 +293,9 @@ const Directions = () => {
           }
         },
         {
-          enableHighAccuracy: true,  // CRITICAL: Request GPS-level accuracy
-          timeout: 15000,            // Wait up to 15 seconds for GPS fix
-          maximumAge: 30000          // Accept cached position up to 30 seconds old
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 30000
         }
       );
     }

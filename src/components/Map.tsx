@@ -279,12 +279,32 @@ const Map: React.FC<MapProps> = ({
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             handleGeolocationSuccess,
-            (err) => mapLog.warn('Geolocation error:', err.message),
+            (err) => {
+              mapLog.warn('Geolocation error:', err.message);
+              // CRITICAL FIX: Mark location as initialized even on denial
+              // so the map doesn't stay stuck waiting for location
+              hasInitializedLocation.current = true;
+              if (err.code === 1) {
+                // PERMISSION_DENIED - notify parent
+                mapLog.warn('Location permission denied by user');
+                localStorage.setItem('flyaf_location_denied', 'true');
+              }
+              // Signal no user location available
+              if (onUserLocationChange) {
+                onUserLocationChange(null);
+              }
+            },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
           );
         }
         map.current?.resize();
       }, 300);
+
+      // SAFETY TIMEOUT: Force-clear loading state after 8 seconds no matter what
+      setTimeout(() => {
+        setIsLoadingShops(false);
+        setShowFullOverlay(false);
+      }, 8000);
     });
     
     map.current.on('style.load', () => {

@@ -51,6 +51,12 @@ const menuItems: MenuItem[] = [
     path: "/about",
   },
   {
+    icon: Settings,
+    label: "settings",
+    description: "settingsDesc",
+    path: "/settings",
+  },
+  {
     icon: Shield,
     label: "adminDashboard",
     description: "adminDesc",

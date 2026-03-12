@@ -79,6 +79,7 @@ function App() {
               <Route path="/route" element={<RoutePage />} />
               <Route path="/more" element={<More />} />
               <Route path="/about" element={<About />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
              </Routes>
              <DesktopTopNav />
