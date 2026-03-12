@@ -121,6 +121,9 @@ const GlobalIndex = () => {
       );
     }
 
+    if (selectedCountry !== "all") {
+      filtered = filtered.filter(brand => brand.country === selectedCountry);
+    }
     if (selectedCategories.size > 0) {
       filtered = filtered.filter(brand => brand.category && selectedCategories.has(brand.category));
     }
