@@ -1,57 +1,71 @@
 
 
-## What Can Be Automated vs. What Needs Manual Work
+# Plan: Graceful Location Denial + Settings Page
 
-### Fully Automatable
+## Problem
+When a user denies location permission, the app gets stuck on the map loading spinner. Additionally, there's no way for users to manage preferences like units or re-enable location later.
 
-**1. First 500 Users → 3-Month Free Pro**
-- Add a DB trigger on the `profiles` table: when a new profile is created, count total profiles. If count <= 500, automatically set `is_pro = true` and `pro_expires_at = now() + 3 months`.
-- No manual work needed. Every new signup is automatically checked and granted Pro if they're within the first 500.
-- The "founding member" messaging can be shown conditionally on the frontend based on a `is_founding_member` flag or by checking if `pro_expires_at` is set without a Stripe subscription.
+## Recommendation: Option B (Allow entry with degraded map)
 
-**2. After User #500 → Standard Freemium**
-- This happens automatically once the trigger stops granting Pro (count > 500). No code change needed at that point — the existing paywall logic already works for non-Pro users.
-
-**3. Admin Pro Bypass**
-- Update `check-subscription` edge function: if the user has the `admin` role in `user_roles`, return `subscribed: true` regardless of Stripe status. This fixes your inability to test Print and other Pro features.
-
-### Requires Manual Action (by you, once)
-
-**4. Ambassador Permanent Pro**
-- Create an `ambassador_codes` table with redeemable codes that grant permanent Pro (no expiry).
-- You generate codes in the admin panel and send them to your 50-100 contacts.
-- They redeem during signup or on their profile page → `is_pro = true`, `pro_expires_at = null` (permanent).
-- The code generation and redemption is automated; you just need to distribute the codes manually.
+Option A (blocking entry) would lose users permanently — many deny location reflexively or accidentally. Option B is the standard pattern used by Google Maps, Citymapper, and every major map app: the app works, but location-dependent features show a prompt to enable it.
 
 ---
 
-## Implementation Plan
+## Part 1: Fix Location Denial Blocking the App
 
-### Step 1: Admin Pro bypass
-Modify the `check-subscription` edge function to check `user_roles` for admin role. If admin, return `subscribed: true`. Single file change.
+### Root Cause
+In `Map.tsx` line 279-285, geolocation error is silently logged but the loading overlay (`isLoadingShops`) depends on shops rendering, which works independently. However, the `Directions.tsx` geolocation call (line 228-267) has no proper fallback either. The actual stuck spinner likely comes from a timing issue where `hasInitializedLocation` never gets set to `true` when geolocation is denied, combined with possible map initialization delays.
 
-### Step 2: Auto-Pro for first 500 users
-- DB migration: modify the `handle_new_user()` trigger function to count profiles and set `is_pro`/`pro_expires_at` when count <= 500.
-- Add a `is_founding_member` boolean column to `profiles` (default false) so we can show the special "founding member" message.
-- Frontend: after signup, if user's profile has `is_founding_member = true`, show a welcome toast: "You're one of FLYAF's first 500 members. Welcome to Pro, on us for 3 months."
+### Changes
 
-### Step 3: Ambassador code system
-- DB migration: create `ambassador_codes` table (code, max_uses, uses_count, grants_permanent_pro, is_active) and `code_redemptions` table (code_id, user_id, redeemed_at).
-- Admin panel: new section to generate/manage ambassador codes.
-- Frontend: "Have a code?" input on the Auth page or Profile page. On redemption, set `is_pro = true` and `pro_expires_at = null`.
-- RLS: admins can manage codes; authenticated users can redeem.
+**`src/components/Map.tsx`**
+- In the geolocation error handler (around line 282), set `hasInitializedLocation.current = true` so the map proceeds without user location
+- Add a `locationDenied` state that gets set on geolocation error code `PERMISSION_DENIED`
+- Add a safety timeout (e.g. 8 seconds) that forces `setIsLoadingShops(false)` and `setShowFullOverlay(false)` if they haven't been cleared — prevents infinite spinner regardless of cause
+- Pass `locationDenied` status up via `onUserLocationChange(null)` callback
 
-### Step 4: Founding member messaging
-- Update the Pro upgrade modal to show "You're one of FLYAF's first 500" for founding members approaching expiry.
-- Show a subtle badge or note on the profile for founding members.
+**`src/pages/Directions.tsx`**
+- In the geolocation error handler (line 240-258), add handling for `error.code === 1` (PERMISSION_DENIED): set a `locationDenied` state
+- When `locationDenied` is true and user taps NEARBY or ROUTE tabs, show an overlay card: "Enable location access to use the map. You can change this in your browser settings." with a "Try Again" button that re-requests `navigator.geolocation`
+- The map still renders (centered on London or shop centroid) — just without the blue user dot and without distance sorting
 
-### Summary of effort
+**`src/components/MapLoadingOverlay.tsx`**
+- No changes needed — it already respects `isLoading` prop
 
-| Feature | Automated? | Your manual work |
-|---------|-----------|-----------------|
-| First 500 → 3mo Pro | Fully automatic | None |
-| After #500 → freemium | Fully automatic | None |
-| Admin bypass | Fully automatic | None |
-| Ambassador codes | Code auto-redeems | You distribute ~50-100 codes to contacts |
-| Ambassador brief | N/A | You send the message (we can draft it) |
+---
+
+## Part 2: Settings Page
+
+### New file: `src/pages/Settings.tsx`
+
+A clean settings page accessible from the More menu, containing:
+
+1. **Location Access** — Toggle (read-only display of current permission status via `navigator.permissions.query`). "Try Again" button if denied, which calls `navigator.geolocation.getCurrentPosition` to re-trigger the browser prompt
+2. **Distance Units** — Toggle between Metric (km) and Imperial (miles). Stored in `localStorage` key `flyaf_distance_unit`. Default: `metric`
+3. **Language** — Already exists as LanguageSwitcher, embed it here too for discoverability
+
+Currency is not recommended — the app doesn't display prices, so it would be a dead toggle with no function.
+
+### Integration
+- Add Settings route in `App.tsx`: `<Route path="/settings" element={<Settings />} />`
+- Add Settings menu item in `More.tsx` with a `Settings` (gear) icon
+- Update `Directions.tsx` distance display to read `localStorage` unit preference and convert km ↔ miles accordingly
+- Update `ShopsBottomSheet.tsx` and any other distance displays
+
+### localStorage keys
+- `flyaf_distance_unit`: `"metric"` | `"imperial"` (default: `"metric"`)
+- `flyaf_location_denied`: `"true"` | removed (tracks if user explicitly denied)
+
+---
+
+## Summary of files to create/edit
+
+| File | Action |
+|------|--------|
+| `src/components/Map.tsx` | Add geolocation denial handling, safety timeout |
+| `src/pages/Directions.tsx` | Add location-denied state, show prompt card |
+| `src/pages/Settings.tsx` | **Create** — Location, Units, Language settings |
+| `src/pages/More.tsx` | Add Settings link |
+| `src/App.tsx` | Add `/settings` route |
+| `src/i18n/locales/en.json` | Add settings translation keys |
 
