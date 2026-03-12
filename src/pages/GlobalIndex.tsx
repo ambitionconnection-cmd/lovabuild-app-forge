@@ -403,19 +403,19 @@ const GlobalIndex = () => {
                   <p className="text-xs text-muted-foreground">
                     {t('brands.brandsFound', { count: filteredBrands.length })}
                   </p>
-                  {(searchQuery || selectedCountry !== "all" || selectedCategory !== "all" || sortBy !== "name-asc" || showFavoritesOnly) && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground"
-                      onClick={() => {
-                        setSearchQuery("");
-                        setSelectedCountry("all");
-                        setSelectedCategory("all");
-                        setSortBy("name-asc");
-                        setShowFavoritesOnly(false);
-                      }}
-                    >
+                    {(searchQuery || selectedCountry !== "all" || selectedCategories.size > 0 || sortBy !== "name-asc" || showFavoritesOnly) && (
+                     <Button
+                       variant="ghost"
+                       size="sm"
+                       className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground"
+                       onClick={() => {
+                         setSearchQuery("");
+                         setSelectedCountry("all");
+                         setSelectedCategories(new Set());
+                         setSortBy("name-asc");
+                         setShowFavoritesOnly(false);
+                       }}
+                     >
                       <X className="w-3 h-3 mr-1" />
                       {t('brands.clear')}
                     </Button>
