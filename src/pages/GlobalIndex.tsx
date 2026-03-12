@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ProUpgradeModal } from "@/components/ProUpgradeModal";
-import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X, Layers, Sparkles, Crown, Info } from "lucide-react";
+import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X, Layers, Sparkles, Crown, Info, Check } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ShopListModal from "@/components/ShopListModal";
 import { Button } from "@/components/ui/button";
