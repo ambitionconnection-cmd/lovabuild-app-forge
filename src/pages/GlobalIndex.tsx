@@ -37,7 +37,8 @@ const GlobalIndex = () => {
   const [selectedBrandForShops, setSelectedBrandForShops] = useState<{ id: string; name: string } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [highlightedBrand, setHighlightedBrand] = useState<string | null>(highlightId);
   const [showProModal, setShowProModal] = useState(false);
   const [activeTier, setActiveTier] = useState<"established" | "emerging">("established");
