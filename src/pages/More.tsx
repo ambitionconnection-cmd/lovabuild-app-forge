@@ -1,4 +1,4 @@
-import { Heart, User, Mail, Info, Bell, Shield, ChevronRight, Globe } from "lucide-react";
+import { Heart, User, Mail, Info, Bell, Shield, ChevronRight, Globe, Settings } from "lucide-react";
 import urbanBg from "@/assets/urban-bg.jpg";
 import flyafLogo from "@/assets/flyaf-logo.svg";
 import { useNavigate } from "react-router-dom";
@@ -49,6 +49,12 @@ const menuItems: MenuItem[] = [
     label: "about",
     description: "aboutDesc",
     path: "/about",
+  },
+  {
+    icon: Settings,
+    label: "settings",
+    description: "settingsDesc",
+    path: "/settings",
   },
   {
     icon: Shield,

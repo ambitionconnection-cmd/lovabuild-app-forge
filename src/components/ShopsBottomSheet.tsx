@@ -235,8 +235,19 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
   }, [selectedShopId]);
   const heightPercent = getHeightPercent();
 
-  // Format distance for display
+  // Format distance for display, respecting user unit preference
   const formatDistance = (distance: number) => {
+    const unit = localStorage.getItem('flyaf_distance_unit') || 'metric';
+    if (unit === 'imperial') {
+      const miles = distance * 0.621371;
+      if (miles < 0.1) {
+        return `${Math.round(miles * 5280)}ft`;
+      } else if (miles < 10) {
+        return `${miles.toFixed(1)}mi`;
+      } else {
+        return `${Math.round(miles)}mi`;
+      }
+    }
     if (distance < 1) {
       return `${Math.round(distance * 1000)}m`;
     } else if (distance < 10) {

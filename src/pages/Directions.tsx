@@ -1,7 +1,7 @@
 import { DesktopSidePanel } from "@/components/DesktopSidePanel";
 import { RouteSidePanel } from "@/components/RouteSidePanel";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move, MapPinOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import ShopDetailBottomSheet from "@/components/ShopDetailBottomSheet";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import haptic from "@/lib/haptics";
+import { useTranslation } from "react-i18next";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useShopsCache } from "@/hooks/useShopsCache";
 import { CityChip } from "@/components/CityChip";
@@ -102,6 +103,7 @@ const Directions = () => {
   const [searchParams] = useSearchParams();
   const [isRouteMode, setIsRouteMode] = useState(searchParams.get('mode') === 'route');
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Listen for mode switches from tab bar (no remount)
   useEffect(() => {
@@ -225,6 +227,35 @@ const Directions = () => {
     return R * c; // Distance in km
   };
 
+  const [locationDenied, setLocationDenied] = useState(() => {
+    return localStorage.getItem('flyaf_location_denied') === 'true';
+  });
+
+  // Retry location request
+  const retryLocationRequest = useCallback(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log('📍 Geolocation success - accuracy:', position.coords.accuracy, 'meters');
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setSortByDistance(true);
+        setLocationDenied(false);
+        localStorage.removeItem('flyaf_location_denied');
+      },
+      (error) => {
+        console.error('📍 Geolocation retry failed:', error.code, error.message);
+        if (error.code === 1) {
+          setLocationDenied(true);
+          localStorage.setItem('flyaf_location_denied', 'true');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
+    );
+  }, []);
+
   // Get user's location with HIGH ACCURACY
   useEffect(() => {
     if (navigator.geolocation) {
@@ -235,12 +266,18 @@ const Directions = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
-          setSortByDistance(true); // Auto-enable distance sorting when location is available
+          setSortByDistance(true);
+          setLocationDenied(false);
+          localStorage.removeItem('flyaf_location_denied');
         },
         (error) => {
           console.error('📍 Geolocation error:', error.code, error.message);
-          // Fallback: try again without high accuracy if it fails
-          if (error.code === error.TIMEOUT) {
+          if (error.code === 1) {
+            // PERMISSION_DENIED
+            setLocationDenied(true);
+            localStorage.setItem('flyaf_location_denied', 'true');
+          } else if (error.code === error.TIMEOUT) {
+            // Fallback: try again without high accuracy
             navigator.geolocation.getCurrentPosition(
               (position) => {
                 console.log('📍 Geolocation fallback success - accuracy:', position.coords.accuracy, 'meters');
@@ -258,9 +295,9 @@ const Directions = () => {
           }
         },
         {
-          enableHighAccuracy: true,  // CRITICAL: Request GPS-level accuracy
-          timeout: 15000,            // Wait up to 15 seconds for GPS fix
-          maximumAge: 30000          // Accept cached position up to 30 seconds old
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 30000
         }
       );
     }
@@ -598,6 +635,30 @@ const Directions = () => {
                     onUserLocationChange={(loc) => setHasUserLocation(!!loc)}
                   />
                 </div>
+
+                {/* Location Denied Banner */}
+                {locationDenied && !userLocation && (
+                  <div className="absolute top-3 left-3 right-3 z-10">
+                    <Card className="bg-background/95 backdrop-blur-md border-destructive/30 shadow-lg">
+                      <CardContent className="p-3 flex items-start gap-3">
+                        <MapPinOff className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground">{t('settings.locationNeeded')}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{t('settings.locationNeededDesc')}</p>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="mt-2 text-xs h-7 border-destructive/30 hover:bg-destructive/10"
+                            onClick={retryLocationRequest}
+                          >
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {t('settings.enableLocation')}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
                 
                 {/* Journey Stops Overlay - Draggable floating panel */}
                 {journeyStops.length > 0 && (

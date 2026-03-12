@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound";
 import OnboardingSplash from "./components/OnboardingSplash";
 import More from "./pages/More";
 import About from "./pages/About";
+import Settings from "./pages/Settings";
 import RoutePage from "./pages/RoutePage";
 import SharedRoute from "./pages/SharedRoute";
 import Collections from "./pages/Collections";
@@ -78,6 +79,7 @@ function App() {
               <Route path="/route" element={<RoutePage />} />
               <Route path="/more" element={<More />} />
               <Route path="/about" element={<About />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
              </Routes>
              <DesktopTopNav />
