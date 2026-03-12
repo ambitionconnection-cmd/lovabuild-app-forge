@@ -20,6 +20,7 @@ import ShopDetailBottomSheet from "@/components/ShopDetailBottomSheet";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import haptic from "@/lib/haptics";
+import { useTranslation } from "react-i18next";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useShopsCache } from "@/hooks/useShopsCache";
 import { CityChip } from "@/components/CityChip";
