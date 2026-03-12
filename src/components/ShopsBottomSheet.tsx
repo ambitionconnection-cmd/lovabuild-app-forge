@@ -386,35 +386,37 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                     }`}
                     onClick={() => onShopClick(shop)}
                   >
-                    <div className="flex items-start justify-between gap-2 overflow-visible">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h4 className={`font-semibold text-sm truncate ${isSelected ? 'text-gray-900' : inJourney ? 'text-gray-900' : ''}`}>{shop.name}</h4>
-                        </div>
-                        <p className={`text-xs mt-0.5 truncate ${isSelected || inJourney ? 'text-gray-600' : 'text-muted-foreground'}`}>
-                          {shop.address}, {shop.city}
-                        </p>
-                        {distance !== null && (
-                          <p className={`text-xs font-medium mt-1 ${isSelected || inJourney ? 'text-gray-700' : 'text-primary'}`}>
-                            {formatDistance(distance)} {t('shops.away')}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h4 className={`font-semibold text-sm truncate ${isSelected ? 'text-gray-900' : inJourney ? 'text-gray-900' : ''}`}>{shop.name}</h4>
+                          </div>
+                          <p className={`text-xs mt-0.5 truncate ${isSelected || inJourney ? 'text-gray-600' : 'text-muted-foreground'}`}>
+                            {shop.address}, {shop.city}
                           </p>
-                        )}
+                          {distance !== null && (
+                            <p className={`text-xs font-medium mt-1 ${isSelected || inJourney ? 'text-gray-700' : 'text-primary'}`}>
+                              {formatDistance(distance)} {t('shops.away')}
+                            </p>
+                          )}
+                        </div>
                       </div>
                       
                       <TooltipProvider delayDuration={300}>
-                        <div className="flex gap-1 flex-shrink-0">
+                        <div className="flex gap-1.5 justify-end">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                          <Button
+                              <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-7 w-7 p-0 ${isSelected || inJourney ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-primary/10'}`}
+                                className={`h-8 w-8 p-0 ${isSelected || inJourney ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-primary/10'}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onOpenDetails(shop);
                                 }}
                               >
-                                <Info className="w-3.5 h-3.5" />
+                                <Info className="w-4 h-4" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent side="top" className="text-xs">
@@ -428,7 +430,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className={`h-7 w-7 p-0 ${isSelected || inJourney ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-green-500/10 hover:text-green-600'}`}
+                                  className={`h-8 w-8 p-0 ${isSelected || inJourney ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-green-500/10 hover:text-green-600'}`}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     haptic.light();
@@ -440,7 +442,7 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                                     window.open(url, '_blank');
                                   }}
                                 >
-                                  <ExternalLink className="w-3.5 h-3.5" />
+                                  <ExternalLink className="w-4 h-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent side="top" className="text-xs">
@@ -455,13 +457,13 @@ export const ShopsBottomSheet: React.FC<ShopsBottomSheetProps> = ({
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className={`h-7 w-7 p-0 ${isSelected ? 'hover:bg-gray-200 text-red-600' : 'hover:bg-directions/10 hover:text-directions'}`}
+                                  className={`h-8 w-8 p-0 ${isSelected ? 'hover:bg-gray-200 text-red-600' : 'hover:bg-directions/10 hover:text-directions'}`}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     onAddToJourney(shop);
                                   }}
                                 >
-                                  <Navigation className="w-3.5 h-3.5" />
+                                  <Navigation className="w-4 h-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent side="top" className="text-xs">
