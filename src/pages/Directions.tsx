@@ -635,6 +635,30 @@ const Directions = () => {
                     onUserLocationChange={(loc) => setHasUserLocation(!!loc)}
                   />
                 </div>
+
+                {/* Location Denied Banner */}
+                {locationDenied && !userLocation && (
+                  <div className="absolute top-3 left-3 right-3 z-10">
+                    <Card className="bg-background/95 backdrop-blur-md border-destructive/30 shadow-lg">
+                      <CardContent className="p-3 flex items-start gap-3">
+                        <MapPinOff className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground">{t('settings.locationNeeded')}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{t('settings.locationNeededDesc')}</p>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="mt-2 text-xs h-7 border-destructive/30 hover:bg-destructive/10"
+                            onClick={retryLocationRequest}
+                          >
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {t('settings.enableLocation')}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
                 
                 {/* Journey Stops Overlay - Draggable floating panel */}
                 {journeyStops.length > 0 && (
