@@ -316,21 +316,60 @@ const GlobalIndex = () => {
               </Button>
             </CollapsibleTrigger>
           </div>
-          {/* Category Chips */}
-          <div className="flex gap-1.5 overflow-x-auto pt-2 pb-1 scrollbar-hide">
-            {["all", "streetwear", "sneakers", "contemporary", "designer", "luxury", "techwear", "outdoor", "heritage", "skate", "accessories", "vintage", "sportswear"].map((cat) => (
+          {/* Category Multi-Select Dropdown */}
+          <div className="relative pt-2 pb-1">
+            <button
+              onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted text-xs font-medium transition-colors"
+            >
+              {selectedCategories.size === 0
+                ? t('categories.all')
+                : `${selectedCategories.size} ${selectedCategories.size === 1 ? 'tag' : 'tags'}`}
+              <ChevronDown className={`w-3 h-3 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {selectedCategories.size > 0 && (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`flex-shrink-0 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-[#AD3A49] text-white'
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                }`}
+                onClick={() => setSelectedCategories(new Set())}
+                className="ml-2 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
               >
-                {t(`categories.${cat}`)}
+                <X className="w-3 h-3 inline mr-0.5" />{t('brands.clear')}
               </button>
-            ))}
+            )}
+            {categoryDropdownOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setCategoryDropdownOpen(false)} />
+                <div className="absolute top-full left-0 mt-1 z-50 bg-card border border-border rounded-xl shadow-xl p-2 min-w-[240px] grid grid-cols-2 gap-1 max-h-[280px] overflow-y-auto">
+                  {["streetwear", "sneakers", "contemporary", "designer", "luxury", "techwear", "outdoor", "heritage", "skate", "accessories", "vintage", "sportswear", "underground", "gothic", "records"].map((cat) => {
+                    const isSelected = selectedCategories.has(cat);
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => {
+                          setSelectedCategories(prev => {
+                            const next = new Set(prev);
+                            if (next.has(cat)) next.delete(cat);
+                            else next.add(cat);
+                            return next;
+                          });
+                        }}
+                        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all text-left ${
+                          isSelected
+                            ? 'bg-[#AD3A49]/15 text-[#AD3A49] border border-[#AD3A49]/30'
+                            : 'bg-muted/30 text-muted-foreground hover:bg-muted/60 border border-transparent'
+                        }`}
+                      >
+                        <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 ${
+                          isSelected ? 'bg-[#AD3A49] border-[#AD3A49]' : 'border-muted-foreground/40'
+                        }`}>
+                          {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                        </div>
+                        {t(`categories.${cat}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
           <CollapsibleContent>
             <div className="space-y-3 pt-3">
