@@ -103,6 +103,7 @@ const Directions = () => {
   const [searchParams] = useSearchParams();
   const [isRouteMode, setIsRouteMode] = useState(searchParams.get('mode') === 'route');
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Listen for mode switches from tab bar (no remount)
   useEffect(() => {
