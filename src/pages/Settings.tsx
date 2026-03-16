@@ -209,12 +209,36 @@ const Settings = () => {
             </CardContent>
           </Card>
 
+          {/* Replay Tutorial */}
+          <Card className="bg-white/5 border-white/10">
+            <CardContent className="pt-4 pb-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  localStorage.removeItem('flyaf_onboarding_complete');
+                  setShowTutorial(true);
+                }}
+                className="w-full gap-2 border-white/10 text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <RotateCcw className="w-4 h-4" />
+                {t("settings.replayTutorial", "Replay app tutorial")}
+              </Button>
+            </CardContent>
+          </Card>
+
         </div>
 
         <div className="mt-8 pt-4 border-t border-white/5 text-center">
           <p className="text-white/20 text-xs">FLYAF v1.0</p>
         </div>
       </div>
+
+      {showTutorial && (
+        <OnboardingTutorial
+          forceShow
+          onComplete={() => setShowTutorial(false)}
+        />
+      )}
     </div>
   );
 };
