@@ -499,5 +499,26 @@
     "signIn": "登录",
     "signInToSaveShort": "登录以保存您的路线",
     "kmAway": "公里"
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "位置、单位和偏好",
+    "locationAccess": "位置访问",
+    "locationStatus": "当前状态",
+    "locationDesc": "附近商店和路线功能需要此权限",
+    "allowed": "已允许",
+    "denied": "已阻止",
+    "notSet": "未设置",
+    "locationDeniedHint": "位置已被阻止。请在浏览器设置中允许位置访问，然后重试。",
+    "retryLocation": "重试",
+    "locationGranted": "位置访问已授权！",
+    "distanceUnits": "距离单位",
+    "metric": "公制（公里）",
+    "imperial": "英制（英里）",
+    "metricDesc": "距离以公里和米显示",
+    "imperialDesc": "距离以英里和英尺显示",
+    "unitChanged": "距离单位已设为{{unit}}",
+    "language": "语言",
+    "replayTutorial": "重播应用教程"
   }
 }

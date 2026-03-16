@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, MapPin, Ruler, Globe, Settings as SettingsIcon, RotateCcw } from "lucide-react";
-import OnboardingTutorial from "@/components/OnboardingTutorial";
+
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ const Settings = () => {
     return (localStorage.getItem("flyaf_distance_unit") as DistanceUnit) || "metric";
   });
   const [locationStatus, setLocationStatus] = useState<LocationStatus>("unknown");
-  const [showTutorial, setShowTutorial] = useState(false);
+  
 
   // Check location permission status
   useEffect(() => {
@@ -216,7 +216,7 @@ const Settings = () => {
                 variant="outline"
                 onClick={() => {
                   localStorage.removeItem('flyaf_onboarding_complete');
-                  setShowTutorial(true);
+                  window.location.href = '/';
                 }}
                 className="w-full gap-2 border-white/10 text-white/70 hover:text-white hover:bg-white/10"
               >
@@ -233,12 +233,6 @@ const Settings = () => {
         </div>
       </div>
 
-      {showTutorial && (
-        <OnboardingTutorial
-          forceShow
-          onComplete={() => setShowTutorial(false)}
-        />
-      )}
     </div>
   );
 };
