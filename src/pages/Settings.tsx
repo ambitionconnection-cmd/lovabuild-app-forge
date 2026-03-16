@@ -233,12 +233,6 @@ const Settings = () => {
         </div>
       </div>
 
-      {showTutorial && (
-        <OnboardingTutorial
-          forceShow
-          onComplete={() => setShowTutorial(false)}
-        />
-      )}
     </div>
   );
 };
