@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, MapPin, Ruler, Globe, Settings as SettingsIcon, RotateCcw } from "lucide-react";
-import OnboardingTutorial from "@/components/OnboardingTutorial";
+
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
