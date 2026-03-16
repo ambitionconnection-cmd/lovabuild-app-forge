@@ -33,14 +33,7 @@ import Collections from "./pages/Collections";
 const queryClient = new QueryClient();
 
 function App() {
-  const [showOnboarding, setShowOnboarding] = React.useState(() => {
-    return !localStorage.getItem('flyaf_onboarding_done');
-  });
-
-  const handleOnboardingComplete = () => {
-    localStorage.setItem('flyaf_onboarding_done', 'true');
-    setShowOnboarding(false);
-  };
+  // OnboardingTutorial manages its own visibility via localStorage
 
   return (
     <QueryClientProvider client={queryClient}>
