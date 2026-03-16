@@ -652,6 +652,14 @@ const MyHeardrop = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {profileUserId && (
+        <UserProfileCard
+          userId={profileUserId}
+          open={!!profileUserId}
+          onClose={() => setProfileUserId(null)}
+        />
+      )}
     </div>
   );
 };
