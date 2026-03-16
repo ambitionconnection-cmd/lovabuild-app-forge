@@ -493,11 +493,12 @@ const Directions = () => {
     let filtered = shops;
 
     if (debouncedSearchQuery) {
+      const q = normalizeSearch(debouncedSearchQuery);
       filtered = filtered.filter(shop =>
-        shop.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        shop.address?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        shop.city?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        shop.country?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+        normalizeSearch(shop.name || '').includes(q) ||
+        normalizeSearch(shop.address || '').includes(q) ||
+        normalizeSearch(shop.city || '').includes(q) ||
+        normalizeSearch(shop.country || '').includes(q)
       );
     }
 

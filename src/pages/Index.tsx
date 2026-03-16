@@ -59,11 +59,11 @@ const Index = () => {
 
   const filteredDrops = useMemo(() => {
     if (!dropSearchQuery) return featuredDrops;
-    const searchLower = dropSearchQuery.toLowerCase();
+    const q = normalizeSearch(dropSearchQuery);
     return featuredDrops.filter(
       (drop) =>
-        drop.title.toLowerCase().includes(searchLower) ||
-        (drop.description?.toLowerCase().includes(searchLower) ?? false)
+        normalizeSearch(drop.title).includes(q) ||
+        normalizeSearch(drop.description || '').includes(q)
     );
   }, [featuredDrops, dropSearchQuery]);
 

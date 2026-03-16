@@ -132,7 +132,7 @@ export const StreetSpottedCreatePost = ({ onClose, onPostCreated }: Props) => {
   };
 
   const filteredBrands = brandSearch.trim().length >= 2
-    ? brands.filter(b => b.name.toLowerCase().includes(brandSearch.toLowerCase())).slice(0, 10)
+    ? brands.filter(b => normalizeSearch(b.name).includes(normalizeSearch(brandSearch))).slice(0, 10)
     : [];
 
   const showRequestButton = brandSearch.trim().length >= 2 && filteredBrands.length === 0;
