@@ -51,6 +51,7 @@ const MyHeardrop = () => {
   const [followedUsers, setFollowedUsers] = useState<FollowedUser[]>([]);
   const [recommendedBrands, setRecommendedBrands] = useState<Tables<'brands'>[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
