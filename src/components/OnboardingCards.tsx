@@ -213,11 +213,12 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
     opacity: animDir === 'out' ? 0 : 1,
   };
 
-  const logoStyle: React.CSSProperties = {
-    fontSize: 20, fontWeight: 900, fontStyle: 'italic',
-    background: 'linear-gradient(90deg,#e84020,#e8a020,#e04020)',
-    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
+  const overlayBg: React.CSSProperties = {
+    position: 'absolute', inset: 0,
+    background: 'rgba(0,0,0,0.80)',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    zIndex: 0,
   };
 
   // ══════════════════════════════════════════════════════════════════
