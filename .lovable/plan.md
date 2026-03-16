@@ -1,57 +1,89 @@
 
 
-## What Can Be Automated vs. What Needs Manual Work
+## Plan: 5 Tasks
 
-### Fully Automatable
+### 1. Add translations for Underground, Gothic, Record Shops
 
-**1. First 500 Users → 3-Month Free Pro**
-- Add a DB trigger on the `profiles` table: when a new profile is created, count total profiles. If count <= 500, automatically set `is_pro = true` and `pro_expires_at = now() + 3 months`.
-- No manual work needed. Every new signup is automatically checked and granted Pro if they're within the first 500.
-- The "founding member" messaging can be shown conditionally on the frontend based on a `is_founding_member` flag or by checking if `pro_expires_at` is set without a Stripe subscription.
+Add the three missing category keys to `fr.json`, `ja.json`, `ko.json`, `th.json`, `zh-CN.json`, and `zh-TW.json`:
 
-**2. After User #500 → Standard Freemium**
-- This happens automatically once the trigger stops granting Pro (count > 500). No code change needed at that point — the existing paywall logic already works for non-Pro users.
+| Key | FR | JA | KO | TH | ZH-CN | ZH-TW |
+|---|---|---|---|---|---|---|
+| underground | Underground | アンダーグラウンド | 언더그라운드 | อันเดอร์กราวด์ | 地下文化 | 地下文化 |
+| gothic | Gothique | ゴシック | 고딕 | โกธิค | 哥特 | 哥特 |
+| records | Disquaires | レコードショップ | 레코드숍 | ร้านแผ่นเสียง | 唱片店 | 唱片店 |
 
-**3. Admin Pro Bypass**
-- Update `check-subscription` edge function: if the user has the `admin` role in `user_roles`, return `subscribed: true` regardless of Stripe status. This fixes your inability to test Print and other Pro features.
-
-### Requires Manual Action (by you, once)
-
-**4. Ambassador Permanent Pro**
-- Create an `ambassador_codes` table with redeemable codes that grant permanent Pro (no expiry).
-- You generate codes in the admin panel and send them to your 50-100 contacts.
-- They redeem during signup or on their profile page → `is_pro = true`, `pro_expires_at = null` (permanent).
-- The code generation and redemption is automated; you just need to distribute the codes manually.
+**Files**: All 6 locale JSON files, adding 3 keys each in the `categories` section.
 
 ---
 
-## Implementation Plan
+### 2. Accent/symbol-insensitive search across all search bars
 
-### Step 1: Admin Pro bypass
-Modify the `check-subscription` edge function to check `user_roles` for admin role. If admin, return `subscribed: true`. Single file change.
+Create a shared `normalizeSearch` utility in `src/lib/utils.ts`:
 
-### Step 2: Auto-Pro for first 500 users
-- DB migration: modify the `handle_new_user()` trigger function to count profiles and set `is_pro`/`pro_expires_at` when count <= 500.
-- Add a `is_founding_member` boolean column to `profiles` (default false) so we can show the special "founding member" message.
-- Frontend: after signup, if user's profile has `is_founding_member = true`, show a welcome toast: "You're one of FLYAF's first 500 members. Welcome to Pro, on us for 3 months."
+```ts
+export function normalizeSearch(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+    .replace(/[-_&'.]/g, '')          // strip symbols
+    .toLowerCase();
+}
+```
 
-### Step 3: Ambassador code system
-- DB migration: create `ambassador_codes` table (code, max_uses, uses_count, grants_permanent_pro, is_active) and `code_redemptions` table (code_id, user_id, redeemed_at).
-- Admin panel: new section to generate/manage ambassador codes.
-- Frontend: "Have a code?" input on the Auth page or Profile page. On redemption, set `is_pro = true` and `pro_expires_at = null`.
-- RLS: admins can manage codes; authenticated users can redeem.
+Apply it in every `.filter(...)` search comparison:
+- `src/pages/GlobalIndex.tsx` (brand search, ~line 117-121)
+- `src/pages/Drops.tsx` (drop search)
+- `src/components/MediaManagement.tsx` (brand/shop search)
+- `src/components/BrandManagement.tsx`, `ShopManagement.tsx`, `DropManagement.tsx` (admin search bars)
+- Any other search inputs found
 
-### Step 4: Founding member messaging
-- Update the Pro upgrade modal to show "You're one of FLYAF's first 500" for founding members approaching expiry.
-- Show a subtle badge or note on the profile for founding members.
+---
 
-### Summary of effort
+### 3. Admin: Edit detected items on approved posts
 
-| Feature | Automated? | Your manual work |
-|---------|-----------|-----------------|
-| First 500 → 3mo Pro | Fully automatic | None |
-| After #500 → freemium | Fully automatic | None |
-| Admin bypass | Fully automatic | None |
-| Ambassador codes | Code auto-redeems | You distribute ~50-100 codes to contacts |
-| Ambassador brief | N/A | You send the message (we can draft it) |
+The current `SpotModerationQueue` only loads **pending** posts. We need a new admin component or section to manage **approved** posts' detected items.
+
+**Approach**: Add a new "Manage Approved Posts" section in the admin panel (new component `ApprovedPostsManager.tsx`) that:
+- Fetches approved `street_spotted_posts`
+- Shows each post with its image, caption, and editable detected items (same inline editing UI as SpotModerationQueue)
+- Allows adding/removing/editing items and saving via `supabase.update()`
+- Re-run AI detection button
+- Add as a new admin sidebar section
+
+**Files**: New `src/components/ApprovedPostsManager.tsx`, update `src/pages/Admin.tsx` and `src/components/AdminSidebar.tsx`.
+
+---
+
+### 4. 404 Link Audit
+
+After scanning all internal routes (`to=`, `navigate()`, `href=`) against the route definitions in `App.tsx`, **no broken internal links were found**. All navigation targets (`/`, `/auth`, `/global-index`, `/brand/:slug`, `/feed`, `/route`, `/more`, `/about`, `/settings`, `/contact`, `/collections`, `/profile`, `/admin`, `/analytics`, `/notifications`, `/my-heardrop`) have matching route definitions.
+
+No action needed here.
+
+---
+
+### 5. Nearby shop cards: Icons on distance line (Option B)
+
+Restructure the shop card in `ShopsBottomSheet.tsx` to remove the separate icon row and place the 3 action buttons inline with the distance text:
+
+```text
+Before:
+┌─────────────────────────────┐
+│ Daily Paper London Flagship │
+│ 14-16 Great Pulteney St...  │
+│ 110m away                   │
+│              [i] [↗] [▶]   │  ← separate line
+└─────────────────────────────┘
+
+After:
+┌─────────────────────────────┐
+│ Daily Paper London Flagship │
+│ 14-16 Great Pulteney St...  │
+│ 110m away        [i] [↗] [▶]│  ← same line
+└─────────────────────────────┘
+```
+
+Move the `TooltipProvider` / buttons block into the same `div` as the distance, using `flex items-center justify-between`. Remove the `flex-col gap-1.5` wrapper. Reduce button size to `h-7 w-7` with `w-3.5 h-3.5` icons.
+
+**File**: `src/components/ShopsBottomSheet.tsx` lines 388-476.
 
