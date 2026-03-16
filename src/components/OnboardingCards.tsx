@@ -240,7 +240,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
         </div>
 
         {/* Main content */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '28px 24px 0', overflowY: 'auto' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '28px 24px 0', overflowY: 'auto', position: 'relative', zIndex: 1 }}>
           <div style={{ marginBottom: 28, textAlign: 'center' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🌐</div>
             <div style={{ color: '#fff', fontSize: 22, fontWeight: 800, lineHeight: 1.25, marginBottom: 8 }}>
