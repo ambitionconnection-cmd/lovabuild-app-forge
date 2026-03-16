@@ -101,6 +101,53 @@ const MyHeardrop = () => {
 
       setSavedRoutes(routesData || []);
 
+      // Fetch followed users
+      const { data: followsData } = await supabase
+        .from('user_follows')
+        .select('id, following_id')
+        .eq('follower_id', user.id);
+
+      if (followsData && followsData.length > 0) {
+        const followingIds = followsData.map(f => f.following_id);
+        
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, display_name, avatar_url, is_pro')
+          .in('id', followingIds);
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        const { data: recentPosts } = await supabase
+          .from('street_spotted_posts')
+          .select('user_id, image_url, created_at')
+          .in('user_id', followingIds)
+          .eq('status', 'approved')
+          .gte('created_at', sevenDaysAgo.toISOString())
+          .order('created_at', { ascending: false });
+
+        const recentPostMap = new Map<string, string>();
+        (recentPosts || []).forEach(p => {
+          if (!recentPostMap.has(p.user_id)) recentPostMap.set(p.user_id, p.image_url);
+        });
+
+        const followed: FollowedUser[] = (profilesData || []).map(p => {
+          const follow = followsData.find(f => f.following_id === p.id);
+          return {
+            id: p.id,
+            display_name: p.display_name,
+            avatar_url: p.avatar_url,
+            is_pro: p.is_pro || false,
+            follow_id: follow?.id || '',
+            has_new_post: recentPostMap.has(p.id),
+            latest_post_image: recentPostMap.get(p.id) || null,
+          };
+        });
+        setFollowedUsers(followed);
+      } else {
+        setFollowedUsers([]);
+      }
+
       // Fetch recommendations based on favorite categories
       const favoriteCategories = brands
         .map(b => b.category)
