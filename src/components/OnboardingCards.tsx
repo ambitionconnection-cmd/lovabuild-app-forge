@@ -33,7 +33,7 @@ import { useTranslation } from 'react-i18next';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Lang = 'en' | 'fr' | 'ja' | 'ko' | 'zh-hans' | 'zh-hant' | 'th';
+type Lang = 'en' | 'fr' | 'ja' | 'ko' | 'zh-CN' | 'zh-TW' | 'th';
 
 // ─── Storage ──────────────────────────────────────────────────────────────────
 
