@@ -22,7 +22,7 @@ import Analytics from "./pages/Analytics";
 import NotificationHistory from "./pages/NotificationHistory";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import OnboardingSplash from "./components/OnboardingSplash";
+import OnboardingTutorial from "./components/OnboardingTutorial";
 import More from "./pages/More";
 import About from "./pages/About";
 import Settings from "./pages/Settings";
