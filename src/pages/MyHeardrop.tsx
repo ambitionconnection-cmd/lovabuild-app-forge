@@ -433,6 +433,77 @@ const MyHeardrop = () => {
                 </div>
               )}
             </section>
+
+            {/* Following */}
+            <section>
+              <h2 className="text-sm font-bold mb-2">Following</h2>
+              {followedUsers.length === 0 ? (
+                <Card>
+                  <CardContent className="py-6 text-center">
+                    <Bell className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-xs text-muted-foreground">You're not following anyone yet</p>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => navigate('/feed')}
+                      className="mt-1 text-xs"
+                    >
+                      Discover on HOT
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-1.5">
+                  {followedUsers.map((u) => (
+                    <Card key={u.id} className="overflow-hidden">
+                      <CardContent className="p-2.5">
+                        <div className="flex items-center gap-3">
+                          <div className="relative flex-shrink-0">
+                            <Avatar className="w-10 h-10 ring-1 ring-border">
+                              <AvatarImage src={u.avatar_url || undefined} />
+                              <AvatarFallback className="text-xs font-bold">
+                                {(u.display_name || 'U').charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            {u.has_new_post && (
+                              <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#AD3A49] border-2 border-card flex items-center justify-center">
+                                <Bell className="w-2 h-2 text-white fill-white" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-xs font-semibold truncate">{u.display_name || 'User'}</p>
+                              {u.is_pro && (
+                                <span className="inline-flex items-center px-1 py-0 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[8px] font-bold leading-tight">PRO</span>
+                              )}
+                            </div>
+                            {u.has_new_post ? (
+                              <p className="text-[10px] text-[#AD3A49] font-medium">New post this week!</p>
+                            ) : (
+                              <p className="text-[10px] text-muted-foreground">No recent posts</p>
+                            )}
+                          </div>
+                          {u.has_new_post && u.latest_post_image && (
+                            <div className="w-9 h-9 rounded-md overflow-hidden flex-shrink-0 ring-1 ring-border">
+                              <img src={u.latest_post_image} alt="" className="w-full h-full object-cover" />
+                            </div>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 flex-shrink-0"
+                            onClick={() => unfollowUser(u.follow_id, u.id)}
+                          >
+                            <UserMinus className="w-3 h-3 text-muted-foreground" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </section>
           </TabsContent>
 
           {/* My Routes Tab */}
