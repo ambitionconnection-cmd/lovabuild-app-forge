@@ -30,6 +30,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import urbanBg from '@/assets/urban-bg.jpg';
+import flyafLogo from '@/assets/flyaf-logo.svg';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -85,8 +87,8 @@ const CARD_DATA: CardContent[] = [
     icon: '🗺️',
     accentColor: '#c8a068',
     title: 'Plan tonight.\nWalk tomorrow.',
-    body: 'Add multiple shops to a route, reorder them with a drag, then hit Start Navigation. FLYAF hands off to Google Maps with every stop loaded — no re-entering addresses.',
-    footnote: 'Build your route at home on a big screen, then walk it on your phone.',
+    body: 'Build your route on a laptop tonight, open it on your phone tomorrow and just walk. Or build it on the spot — FLYAF hands off to Google Maps with every stop loaded, no re-entering addresses.',
+    footnote: 'Works seamlessly across devices.',
   },
   {
     icon: '🌐',
@@ -202,6 +204,8 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
   const overlay: React.CSSProperties = {
     position: 'fixed', inset: 0, zIndex: 9999,
     background: '#000',
+    backgroundImage: `url(${urbanBg})`,
+    backgroundSize: 'cover', backgroundPosition: 'center',
     display: 'flex', flexDirection: 'column',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     overflow: 'hidden',
@@ -209,11 +213,12 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
     opacity: animDir === 'out' ? 0 : 1,
   };
 
-  const logoStyle: React.CSSProperties = {
-    fontSize: 20, fontWeight: 900, fontStyle: 'italic',
-    background: 'linear-gradient(90deg,#e84020,#e8a020,#e04020)',
-    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
+  const overlayBg: React.CSSProperties = {
+    position: 'absolute', inset: 0,
+    background: 'rgba(0,0,0,0.80)',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    zIndex: 0,
   };
 
   // ══════════════════════════════════════════════════════════════════
@@ -222,9 +227,10 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
   if (step === 'language') {
     return (
       <div style={overlay} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <div style={overlayBg} />
         {/* Header */}
-        <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={logoStyle}>flyaf</span>
+        <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+          <img src={flyafLogo} alt="FLYAF" style={{ height: 24 }} />
           <button
             onClick={complete}
             style={{ background: 'none', border: 'none', color: '#333', fontSize: 12, cursor: 'pointer', padding: '4px 8px' }}
@@ -234,7 +240,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
         </div>
 
         {/* Main content */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '28px 24px 0', overflowY: 'auto' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '28px 24px 0', overflowY: 'auto', position: 'relative', zIndex: 1 }}>
           <div style={{ marginBottom: 28, textAlign: 'center' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🌐</div>
             <div style={{ color: '#fff', fontSize: 22, fontWeight: 800, lineHeight: 1.25, marginBottom: 8 }}>
@@ -276,7 +282,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
         </div>
 
         {/* CTA */}
-        <div style={{ padding: '20px 24px 36px' }}>
+        <div style={{ padding: '20px 24px 36px', position: 'relative', zIndex: 1 }}>
           <button
             onClick={advance}
             style={{
@@ -311,9 +317,10 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
 
   return (
     <div style={overlay} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <div style={overlayBg} />
       {/* Header row */}
-      <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={logoStyle}>flyaf</span>
+      <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+        <img src={flyafLogo} alt="FLYAF" style={{ height: 24 }} />
         <button
           onClick={complete}
           style={{ background: 'none', border: 'none', color: '#333', fontSize: 12, cursor: 'pointer', padding: '4px 8px' }}
@@ -323,7 +330,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
       </div>
 
       {/* Progress dots */}
-      <div style={{ display: 'flex', gap: 5, padding: '18px 24px 0', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: 5, padding: '18px 24px 0', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
         {CARD_DATA.map((_, i) => (
           <div
             key={i}
@@ -337,7 +344,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
       </div>
 
       {/* Card body */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '20px 28px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '20px 28px', position: 'relative', zIndex: 1 }}>
         {/* Icon */}
         <div style={{ marginBottom: 24 }}>
           <div style={{
@@ -382,7 +389,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
       </div>
 
       {/* CTA area */}
-      <div style={{ padding: '0 24px 36px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ padding: '0 24px 36px', display: 'flex', flexDirection: 'column', gap: 10, position: 'relative', zIndex: 1 }}>
         {isLast ? (
           <>
             {/* On last card: two options */}
