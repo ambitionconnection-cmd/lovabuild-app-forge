@@ -1,4 +1,5 @@
 import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X, Copy, Check, ChevronDown, ExternalLink, Clock, Globe, Instagram, ShoppingBag } from "lucide-react";
+import { normalizeSearch } from "@/lib/utils";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
