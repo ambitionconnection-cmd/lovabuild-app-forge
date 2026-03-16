@@ -708,6 +708,10 @@ export default function Admin() {
               <SpotModerationQueue />
             )}
 
+            {activeTab === "approved-posts" && (
+              <ApprovedPostsManager />
+            )}
+
             {activeTab === "featured-brand" && (
               <FeaturedBrandManagement brands={brands} />
             )}
