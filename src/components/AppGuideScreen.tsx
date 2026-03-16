@@ -1,37 +1,16 @@
 /**
- * FLYAF App Guide Screen
- * ─────────────────────────────────────────────────────────────────────
- * Full annotated interactive tutorial. Accessible from More → "App Guide"
- * (or Settings, wherever makes sense in your nav structure).
- *
- * HOW TO INTEGRATE:
- *   1. Add to your router in App.tsx:
- *        <Route path="/guide" element={<AppGuideScreen />} />
- *
- *   2. Link from your More page:
- *        import { useNavigate } from 'react-router-dom';
- *        const navigate = useNavigate();
- *        <button onClick={() => navigate('/guide')}>App Guide</button>
- *
- *   3. Optionally link from onboarding completion:
- *        <button onClick={() => navigate('/guide')}>Read the full guide</button>
- *
- * DEPENDENCIES: react-router-dom (already in your package.json)
- *
- * NO OTHER DEPENDENCIES. The guide is self-contained HTML/CSS/JS
- * embedded inside a React shell. Zero extra packages needed.
- * ─────────────────────────────────────────────────────────────────────
+ * FLYAF App Guide Screen — fully internationalised
  */
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-// ─── The full guide HTML ──────────────────────────────────────────────────────
-// This is the annotated interactive guide with phone mockups and callout dots.
-// All CSS variables have been converted to hardcoded dark-theme values to match
-// FLYAF's aesthetic (dark background, #e05040 accent).
+// ─── Build guide HTML with translated legend text ─────────────────────────────
+// Phone mockup visuals stay in English (they're visual screenshots).
+// Only legend descriptions, tips, headers, and tab labels are translated.
 
-const GUIDE_HTML = `
+const getGuideHtml = (t: (key: string) => string) => `
 <style>
 *{box-sizing:border-box;}
 .g{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:4px 0;}
@@ -40,8 +19,6 @@ const GUIDE_HTML = `
 .t.on{background:#e05040;color:#fff;}
 .pn{display:none;}
 .pn.on{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
-
-/* Phone frame */
 .ph{width:248px;min-width:248px;border-radius:28px;border:2px solid #2a2a2a;background:#0c0c0c;overflow:hidden;position:relative;flex-shrink:0;}
 .sb{height:22px;background:#000;display:flex;align-items:center;justify-content:space-between;padding:0 12px;}
 .sbt{color:#fff;font-size:10px;font-weight:700;}
@@ -53,14 +30,10 @@ const GUIDE_HTML = `
 .ni.on svg,.ni.on span{color:#e05040;}
 .ni:not(.on) svg,.ni:not(.on) span{color:#444;}
 .ni.hot-on svg,.ni.hot-on span{color:#7c3aed!important;}
-
-/* Callout dots */
 .cd{position:absolute;z-index:30;width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.85);pointer-events:none;}
 .r{background:#e05040;}.b{background:#2563eb;}.gr{background:#16a34a;}
 .a{background:#d97706;}.p{background:#7c3aed;}.c{background:#0891b2;}
 .pi{background:#be185d;}.o{background:#c2410c;}
-
-/* Legend */
 .lg{flex:1;min-width:180px;}
 .li{display:flex;gap:7px;margin-bottom:8px;font-size:13px;color:#e0e0e0;line-height:1.5;align-items:flex-start;}
 .ln{width:19px;height:19px;min-width:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;margin-top:2px;}
@@ -71,11 +44,11 @@ const GUIDE_HTML = `
 
 <div class="g">
 <div class="tb">
-  <button class="t on" onclick="sw('nb',this)">NEARBY</button>
-  <button class="t" onclick="sw('rt',this)">ROUTE</button>
-  <button class="t" onclick="sw('ix',this)">INDEX</button>
-  <button class="t" onclick="sw('ht',this)">HOT</button>
-  <button class="t" onclick="sw('mo',this)">MORE</button>
+  <button class="t on" onclick="sw('nb',this)">${t('guide.tabNearby')}</button>
+  <button class="t" onclick="sw('rt',this)">${t('guide.tabRoute')}</button>
+  <button class="t" onclick="sw('ix',this)">${t('guide.tabIndex')}</button>
+  <button class="t" onclick="sw('ht',this)">${t('guide.tabHot')}</button>
+  <button class="t" onclick="sw('mo',this)">${t('guide.tabMore')}</button>
 </div>
 
 <!-- NEARBY -->
@@ -172,14 +145,14 @@ const GUIDE_HTML = `
   <div class="cd c" style="top:316px;right:9px;">6</div>
 </div>
 <div class="lg">
-  <h3>Nearby — the map</h3>
-  <div class="li"><div class="ln r">1</div><div><strong>City selector</strong> — tap "London" to switch between cities: Paris, Tokyo, NYC and more. The map flies there instantly. Brand pins reload for the new city.</div></div>
-  <div class="li"><div class="ln b">2</div><div><strong>Locate me</strong> — centres the map on your GPS position. Tap this if the map doesn't find you automatically on first load.</div></div>
-  <div class="li"><div class="ln gr">3</div><div><strong>Brand pins</strong> — each circle shows the brand's actual logo. Tap any pin to slide open the shop info card at the bottom.</div></div>
-  <div class="li"><div class="ln a">4</div><div><strong>NEARBY list + count</strong> — the number (17) shows shops within range. The list below is sorted nearest first. Tap any shop name to open its full detail page.</div></div>
-  <div class="li"><div class="ln p">5</div><div><strong>✕ Close</strong> — dismisses the list and returns to the full map. Pins stay on screen.</div></div>
-  <div class="li"><div class="ln c">6</div><div><strong>Row icons (per shop)</strong> — ⓘ opens the full shop detail page · ↗ opens the shop's website · ↑ launches single-stop navigation to that shop right now.</div></div>
-  <div class="tp"><strong>Adding to your route:</strong> Tap a shop name (not the icons) to open its detail page. From there you'll find the "Add to Route" button that sends it to the Route tab.</div>
+  <h3>${t('guide.nearbyTitle')}</h3>
+  <div class="li"><div class="ln r">1</div><div>${t('guide.nearby1')}</div></div>
+  <div class="li"><div class="ln b">2</div><div>${t('guide.nearby2')}</div></div>
+  <div class="li"><div class="ln gr">3</div><div>${t('guide.nearby3')}</div></div>
+  <div class="li"><div class="ln a">4</div><div>${t('guide.nearby4')}</div></div>
+  <div class="li"><div class="ln p">5</div><div>${t('guide.nearby5')}</div></div>
+  <div class="li"><div class="ln c">6</div><div>${t('guide.nearby6')}</div></div>
+  <div class="tp">${t('guide.nearbyTip')}</div>
 </div>
 </div>
 
@@ -256,15 +229,15 @@ const GUIDE_HTML = `
   <div class="cd o" style="top:328px;left:14px;">7</div>
 </div>
 <div class="lg">
-  <h3>Route — plan your walk</h3>
-  <div class="li"><div class="ln r">1</div><div><strong>Save</strong> — name and save this route (e.g. "Soho Saturday"). It reappears in More → My FLYAF every time you open the app, ready to reload.</div></div>
-  <div class="li"><div class="ln b">2</div><div><strong>Print (PRO)</strong> — exports a printable PDF with a map overview, shop addresses, and opening hours. The lock icon means this is a Pro feature.</div></div>
-  <div class="li"><div class="ln gr">3</div><div><strong>Share</strong> — generates a shareable link to this route. Anyone with the link can open it in FLYAF on their own phone.</div></div>
-  <div class="li"><div class="ln a">4</div><div><strong>Route stats</strong> — total distance, walking time estimate, and stop count. These update live as you add or remove shops.</div></div>
-  <div class="li"><div class="ln p">5</div><div><strong>Drag handles (⋮⋮)</strong> — hold and drag any stop up or down to reorder your route. Distance and time recalculate automatically.</div></div>
-  <div class="li"><div class="ln c">6</div><div><strong>Start Navigation</strong> — opens Google Maps with every stop loaded in order. Walk the whole route hands-free without touching your phone again.</div></div>
-  <div class="li"><div class="ln o">7</div><div><strong>Clear Route</strong> — removes all stops and starts a fresh route. A confirmation prompt appears first.</div></div>
-  <div class="tp"><strong>The power move:</strong> Build tonight's route on a desktop (bigger screen, easier to plan), save it, then open the saved route on your phone tomorrow and just tap Start Navigation.</div>
+  <h3>${t('guide.routeTitle')}</h3>
+  <div class="li"><div class="ln r">1</div><div>${t('guide.route1')}</div></div>
+  <div class="li"><div class="ln b">2</div><div>${t('guide.route2')}</div></div>
+  <div class="li"><div class="ln gr">3</div><div>${t('guide.route3')}</div></div>
+  <div class="li"><div class="ln a">4</div><div>${t('guide.route4')}</div></div>
+  <div class="li"><div class="ln p">5</div><div>${t('guide.route5')}</div></div>
+  <div class="li"><div class="ln c">6</div><div>${t('guide.route6')}</div></div>
+  <div class="li"><div class="ln o">7</div><div>${t('guide.route7')}</div></div>
+  <div class="tp">${t('guide.routeTip')}</div>
 </div>
 </div>
 
@@ -358,14 +331,14 @@ const GUIDE_HTML = `
   <div class="cd c" style="top:248px;left:60px;">6</div>
 </div>
 <div class="lg">
-  <h3>Index — brand directory</h3>
-  <div class="li"><div class="ln r">1</div><div><strong>Collections</strong> — curated themed groups: "Japanese Streetwear", "London Underground Labels", "Brands Under 5K Followers". A great way to discover brands you'd never find by searching.</div></div>
-  <div class="li"><div class="ln b">2</div><div><strong>Established / New Wave</strong> — toggle between heritage brands with decades of history and emerging labels that are rising right now.</div></div>
-  <div class="li"><div class="ln gr">3</div><div><strong>Search bar</strong> — type any brand name, country, or style to filter instantly. The ▼ button opens sorting options: A–Z, most shops, newest added.</div></div>
-  <div class="li"><div class="ln a">4</div><div><strong>Category filter (All ▼)</strong> — narrow to a specific style: Sneakers, Techwear, Gorpcore, Workwear, Japanese, Women-Led, and more.</div></div>
-  <div class="li"><div class="ln p">5</div><div><strong>Heart ♡ / ♥</strong> — filled red means saved. Tap to add a brand to your watchlist in My FLYAF. You'll see their new drops there first.</div></div>
-  <div class="li"><div class="ln c">6</div><div><strong>Web / Insta / Shops pills</strong> — tap Web for the brand's site, Insta for their profile, Shops to see their pins filtered on the map.</div></div>
-  <div class="tp"><strong>Full brand page:</strong> Tap the card itself (not the pills) to open the brand profile — full description, country of origin, stockists, affiliated shops, and upcoming drops.</div>
+  <h3>${t('guide.indexTitle')}</h3>
+  <div class="li"><div class="ln r">1</div><div>${t('guide.index1')}</div></div>
+  <div class="li"><div class="ln b">2</div><div>${t('guide.index2')}</div></div>
+  <div class="li"><div class="ln gr">3</div><div>${t('guide.index3')}</div></div>
+  <div class="li"><div class="ln a">4</div><div>${t('guide.index4')}</div></div>
+  <div class="li"><div class="ln p">5</div><div>${t('guide.index5')}</div></div>
+  <div class="li"><div class="ln c">6</div><div>${t('guide.index6')}</div></div>
+  <div class="tp">${t('guide.indexTip')}</div>
 </div>
 </div>
 
@@ -448,13 +421,13 @@ const GUIDE_HTML = `
   <div class="cd p" style="bottom:56px;right:9px;">5</div>
 </div>
 <div class="lg">
-  <h3>Hot — the community lookbook</h3>
-  <div class="li"><div class="ln r">1</div><div><strong>Trending This Week</strong> — the highest fire-reacted fits of the last 7 days. Scroll right to see up to 5. The community, not an algorithm, decides what's trending.</div></div>
-  <div class="li"><div class="ln b">2</div><div><strong>Filter</strong> — narrow the feed by style tag: techwear, gorpcore, vintage, workwear, minimalist. Or filter to show only people you follow.</div></div>
-  <div class="li"><div class="ln gr">3</div><div><strong>Trending toggle</strong> — switch between newest posts first and ranked by fire count. Both feeds are entirely community-posted, no editorial curation.</div></div>
-  <div class="li"><div class="ln a">4</div><div><strong>🔥 fire + username</strong> — tap the flame to react. No likes, no comments — just fire or silence. Tap the username or avatar to follow them and see their future posts.</div></div>
-  <div class="li"><div class="ln p">5</div><div><strong>+ Upload</strong> — tap to post your fit. Select a photo from your camera roll. No caption, no hashtags, no tagging required — just post it.</div></div>
-  <div class="tp"><strong>The philosophy:</strong> HOT has no comments, no DMs, no text. Streetwear culture is image-driven — your fit speaks for itself. If someone wants to connect, your Instagram and TikTok are on every post automatically.</div>
+  <h3>${t('guide.hotTitle')}</h3>
+  <div class="li"><div class="ln r">1</div><div>${t('guide.hot1')}</div></div>
+  <div class="li"><div class="ln b">2</div><div>${t('guide.hot2')}</div></div>
+  <div class="li"><div class="ln gr">3</div><div>${t('guide.hot3')}</div></div>
+  <div class="li"><div class="ln a">4</div><div>${t('guide.hot4')}</div></div>
+  <div class="li"><div class="ln p">5</div><div>${t('guide.hot5')}</div></div>
+  <div class="tp">${t('guide.hotTip')}</div>
 </div>
 </div>
 
@@ -521,166 +494,86 @@ const GUIDE_HTML = `
   <div class="cd p" style="top:350px;left:14px;">5</div>
 </div>
 <div class="lg">
-  <h3>More — settings hub</h3>
-  <div class="li"><div class="ln r">1</div><div><strong>My FLYAF</strong> — your personal space: saved routes, favourited brands, favourited shops. Everything you've hearted anywhere in the app collects here.</div></div>
-  <div class="li"><div class="ln b">2</div><div><strong>Sign In badge</strong> — My FLYAF, Profile, and Notifications require a free account. Tap Sign In — takes under 30 seconds with Apple, Google, or email.</div></div>
-  <div class="li"><div class="ln gr">3</div><div><strong>Contact</strong> — message the FLYAF team directly. Also where to submit a brand you think should be in the Index. No sign-in needed.</div></div>
-  <div class="li"><div class="ln a">4</div><div><strong>Language section</strong> — scroll right to see all 8 languages. Tap any pill to switch the entire app instantly. Also accessible via Settings → Language.</div></div>
-  <div class="li"><div class="ln p">5</div><div><strong>Active language (red pill)</strong> — currently selected language. Tap any other language pill to switch. Your choice is saved and remembered across sessions.</div></div>
-  <div class="tp"><strong>First time?</strong> Switch your language here before exploring anything else — all menus, descriptions, and labels will be in your language from that point on.</div>
+  <h3>${t('guide.moreTitle')}</h3>
+  <div class="li"><div class="ln r">1</div><div>${t('guide.more1')}</div></div>
+  <div class="li"><div class="ln b">2</div><div>${t('guide.more2')}</div></div>
+  <div class="li"><div class="ln gr">3</div><div>${t('guide.more3')}</div></div>
+  <div class="li"><div class="ln a">4</div><div>${t('guide.more4')}</div></div>
+  <div class="li"><div class="ln p">5</div><div>${t('guide.more5')}</div></div>
+  <div class="tp">${t('guide.moreTip')}</div>
 </div>
 </div>
 
 </div>
-
-<script>
-function sw(name,btn){
-  document.querySelectorAll('.pn').forEach(function(p){p.classList.remove('on');});
-  document.querySelectorAll('.t').forEach(function(b){b.classList.remove('on');});
-  document.getElementById('p-'+name).classList.add('on');
-  btn.classList.add('on');
-}
-</script>
 `;
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 const AppGuideScreen: React.FC = () => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
-  // Inject the guide's script after the HTML mounts
+  // Define the tab-switching function on window so the onclick handlers work
   useEffect(() => {
-    // The sw() function is defined inside GUIDE_HTML's <script> tag.
-    // Because we use dangerouslySetInnerHTML, inline <script> tags don't
-    // execute automatically. We extract and eval the script manually.
-    const container = document.getElementById('flyaf-guide-content');
-    if (!container) return;
-    const scripts = container.querySelectorAll('script');
-    scripts.forEach((oldScript) => {
-      const newScript = document.createElement('script');
-      newScript.textContent = oldScript.textContent;
-      document.body.appendChild(newScript);
-      document.body.removeChild(newScript);
-    });
+    (window as any).sw = (name: string, btn: HTMLElement) => {
+      document.querySelectorAll('.pn').forEach(p => p.classList.remove('on'));
+      document.querySelectorAll('.t').forEach(b => b.classList.remove('on'));
+      document.getElementById('p-' + name)?.classList.add('on');
+      btn.classList.add('on');
+    };
+    return () => { delete (window as any).sw; };
   }, []);
 
+  const guideHtml = getGuideHtml(t);
+
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: '#0a0a0a',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* ── Header ── */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          background: 'rgba(10,10,10,0.95)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '0.5px solid rgba(255,255,255,0.08)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          padding: '14px 16px',
-        }}
-      >
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <div style={{
+        position: 'sticky', top: 0, zIndex: 100,
+        background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(12px)',
+        borderBottom: '0.5px solid rgba(255,255,255,0.08)',
+        display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
+      }}>
         <button
           onClick={() => navigate(-1)}
           style={{
-            background: 'rgba(255,255,255,0.08)',
-            border: 'none',
-            borderRadius: 8,
-            width: 34,
-            height: 34,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#fff',
-            fontSize: 18,
-            lineHeight: 1,
-            flexShrink: 0,
+            background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 8,
+            width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: '#fff', fontSize: 18, lineHeight: 1, flexShrink: 0,
           }}
           aria-label="Go back"
-        >
-          ←
-        </button>
-
+        >←</button>
         <div style={{ flex: 1 }}>
-          <div style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>
-            App Guide
-          </div>
-          <div style={{ color: '#555', fontSize: 11, marginTop: 1 }}>
-            How every section works
-          </div>
+          <div style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{t('guide.title')}</div>
+          <div style={{ color: '#555', fontSize: 11, marginTop: 1 }}>{t('guide.subtitle')}</div>
         </div>
-
-        {/* Version tag — update this when guide content changes */}
-        <div
-          style={{
-            background: 'rgba(255,255,255,0.06)',
-            borderRadius: 6,
-            padding: '3px 8px',
-            color: '#444',
-            fontSize: 10,
-            fontWeight: 600,
-          }}
-        >
-          v1.0
-        </div>
+        <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 6, padding: '3px 8px', color: '#444', fontSize: 10, fontWeight: 600 }}>v1.0</div>
       </div>
 
-      {/* ── Intro strip ── */}
-      <div
-        style={{
-          background: 'rgba(224,80,64,0.08)',
-          borderBottom: '0.5px solid rgba(224,80,64,0.15)',
-          padding: '10px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}
-      >
+      {/* Intro strip */}
+      <div style={{
+        background: 'rgba(224,80,64,0.08)', borderBottom: '0.5px solid rgba(224,80,64,0.15)',
+        padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8,
+      }}>
         <span style={{ fontSize: 14 }}>👆</span>
-        <span style={{ color: '#aaa', fontSize: 12, lineHeight: 1.4 }}>
-          Tap the tabs below to explore each section of the app.
-        </span>
+        <span style={{ color: '#aaa', fontSize: 12, lineHeight: 1.4 }}>{t('guide.introTip')}</span>
       </div>
 
-      {/* ── Guide content ── */}
+      {/* Guide content */}
       <div
         style={{ padding: '16px 16px 40px', flex: 1 }}
         id="flyaf-guide-content"
-        dangerouslySetInnerHTML={{ __html: GUIDE_HTML }}
+        dangerouslySetInnerHTML={{ __html: guideHtml }}
       />
 
-      {/* ── Footer ── */}
-      <div
-        style={{
-          padding: '16px',
-          borderTop: '0.5px solid rgba(255,255,255,0.06)',
-          textAlign: 'center',
-        }}
-      >
+      {/* Footer */}
+      <div style={{ padding: '16px', borderTop: '0.5px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
         <div style={{ color: '#333', fontSize: 11 }}>
-          Something missing or wrong? →{' '}
+          {t('guide.footerText')}{' '}
           <button
             onClick={() => navigate('/contact')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#e05040',
-              fontSize: 11,
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              padding: 0,
-            }}
+            style={{ background: 'none', border: 'none', color: '#e05040', fontSize: 11, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
           >
-            Contact us
+            {t('guide.footerContact')}
           </button>
         </div>
       </div>
@@ -689,35 +582,3 @@ const AppGuideScreen: React.FC = () => {
 };
 
 export default AppGuideScreen;
-
-/*
- * ─────────────────────────────────────────────────────────────────────────────
- * HOW TO ADD "APP GUIDE" TO YOUR MORE PAGE
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * In your More page component, add a new menu row before Contact:
- *
- *   <div onClick={() => navigate('/guide')} style={{...rowStyle}}>
- *     <div style={{...iconBoxStyle}}>
- *       <BookOpenIcon />
- *     </div>
- *     <div style={{flex:1}}>
- *       <div style={{color:'#fff', fontSize:11, fontWeight:700}}>App Guide</div>
- *       <div style={{color:'#555', fontSize:8.5}}>How every section works</div>
- *     </div>
- *     <span style={{color:'#444', fontSize:13}}>›</span>
- *   </div>
- *
- * ─────────────────────────────────────────────────────────────────────────────
- * UPDATE PROCESS (when the app UI changes)
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * 1. Open the GUIDE_HTML string above.
- * 2. Find the relevant section (<!-- NEARBY -->, <!-- ROUTE -->, etc.).
- * 3. Update the HTML mockup and/or the legend text.
- * 4. Bump the version tag in the header: v1.0 → v1.1.
- *
- * No package changes, no rebuild of separate assets. One file to maintain.
- *
- * ─────────────────────────────────────────────────────────────────────────────
- */
