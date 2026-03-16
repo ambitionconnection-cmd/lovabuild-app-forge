@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import haptic from "@/lib/haptics";
 import { useTranslation } from "react-i18next";
+import { UserProfileCard } from "@/components/UserProfileCard";
 
 interface FavoriteBrand extends Tables<'brands'> {
   favoriteId: string;
@@ -50,6 +51,7 @@ const MyHeardrop = () => {
   const [followedUsers, setFollowedUsers] = useState<FollowedUser[]>([]);
   const [recommendedBrands, setRecommendedBrands] = useState<Tables<'brands'>[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -455,7 +457,7 @@ const MyHeardrop = () => {
               ) : (
                 <div className="space-y-1.5">
                   {followedUsers.map((u) => (
-                    <Card key={u.id} className="overflow-hidden">
+                    <Card key={u.id} className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => setProfileUserId(u.id)}>
                       <CardContent className="p-2.5">
                         <div className="flex items-center gap-3">
                           <div className="relative flex-shrink-0">
@@ -493,7 +495,7 @@ const MyHeardrop = () => {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 flex-shrink-0"
-                            onClick={() => unfollowUser(u.follow_id, u.id)}
+                            onClick={(e) => { e.stopPropagation(); unfollowUser(u.follow_id, u.id); }}
                           >
                             <UserMinus className="w-3 h-3 text-muted-foreground" />
                           </Button>
@@ -650,6 +652,14 @@ const MyHeardrop = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {profileUserId && (
+        <UserProfileCard
+          userId={profileUserId}
+          open={!!profileUserId}
+          onClose={() => setProfileUserId(null)}
+        />
+      )}
     </div>
   );
 };
