@@ -282,7 +282,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
         </div>
 
         {/* CTA */}
-        <div style={{ padding: '20px 24px 36px' }}>
+        <div style={{ padding: '20px 24px 36px', position: 'relative', zIndex: 1 }}>
           <button
             onClick={advance}
             style={{
