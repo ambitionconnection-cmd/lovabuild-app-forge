@@ -330,7 +330,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
       </div>
 
       {/* Progress dots */}
-      <div style={{ display: 'flex', gap: 5, padding: '18px 24px 0', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: 5, padding: '18px 24px 0', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
         {CARD_DATA.map((_, i) => (
           <div
             key={i}
