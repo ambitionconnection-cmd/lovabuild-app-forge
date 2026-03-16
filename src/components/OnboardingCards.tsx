@@ -87,8 +87,8 @@ const CARD_DATA: CardContent[] = [
     icon: '🗺️',
     accentColor: '#c8a068',
     title: 'Plan tonight.\nWalk tomorrow.',
-    body: 'Add multiple shops to a route, reorder them with a drag, then hit Start Navigation. FLYAF hands off to Google Maps with every stop loaded — no re-entering addresses.',
-    footnote: 'Build your route at home on a big screen, then walk it on your phone.',
+    body: 'Build your route on a laptop tonight, open it on your phone tomorrow and just walk. Or build it on the spot — FLYAF hands off to Google Maps with every stop loaded, no re-entering addresses.',
+    footnote: 'Works seamlessly across devices.',
   },
   {
     icon: '🌐',
