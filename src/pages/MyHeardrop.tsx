@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import haptic from "@/lib/haptics";
 import { useTranslation } from "react-i18next";
+import { UserProfileCard } from "@/components/UserProfileCard";
 
 interface FavoriteBrand extends Tables<'brands'> {
   favoriteId: string;
