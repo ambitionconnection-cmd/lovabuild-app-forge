@@ -1,63 +1,32 @@
 /**
- * FLYAF Onboarding Tutorial
- * ─────────────────────────────────────────────────────────────────────
- * A spotlight-style overlay onboarding component for the FLYAF app.
- *
- * HOW IT WORKS:
- *   1. On first app launch, shows a full-screen language-select slide.
- *   2. Then walks through 5 feature highlights, one step at a time.
- *   3. Each step highlights a real UI element via a CSS clip-path cutout.
- *   4. "Don't show again" → saves to localStorage.
- *
- * INTEGRATION (in App.tsx or your root layout):
- *   import OnboardingTutorial from './components/OnboardingTutorial';
- *   // Inside your JSX:
- *   <OnboardingTutorial />
- *
- * TRANSLATION:
- *   All user-facing strings live in the `onboardingSteps` array and the
- *   `translations` object at the bottom of this file.
- *   Pass in the user's current language via the `lang` prop OR let the
- *   component read it from localStorage (key: 'flyaf_lang').
- *
- * DEPENDENCIES: React 18+, Tailwind CSS (already in your stack)
- *
- * FILES TO CREATE ALONGSIDE THIS:
- *   /src/components/OnboardingTutorial.tsx  ← this file
- *   /src/hooks/useOnboarding.ts             ← the hook (included below as comments)
- *
- * ─────────────────────────────────────────────────────────────────────
+ * FLYAF Onboarding Tutorial — Spotlight-style overlay
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import flyafLogo from '@/assets/flyaf-logo.svg';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Lang = 'en' | 'fr' | 'ja' | 'ko' | 'zh-hans' | 'zh-hant' | 'th';
+type Lang = 'en' | 'fr' | 'ja' | 'ko' | 'zh-CN' | 'zh-TW' | 'th';
 
 interface OnboardingStep {
-  /** data-onboarding="nearby-list" on the target element in your JSX */
   targetId: string;
-  /** Which side to show the tooltip relative to the target */
   tooltipPosition: 'top' | 'bottom' | 'left' | 'right';
   titleKey: string;
   bodyKey: string;
-  /** Optional: which tab to show the step on */
   tab?: 'nearby' | 'route' | 'index' | 'hot' | 'more';
+  navigateTo?: string;
 }
 
 interface OnboardingTutorialProps {
-  /** Override language (falls back to localStorage key 'flyaf_lang') */
   lang?: Lang;
-  /** Callback when onboarding completes or is skipped */
   onComplete?: () => void;
-  /** Set to true to force show (for debugging / re-showing from Settings) */
   forceShow?: boolean;
 }
 
 // ─── Step definitions ─────────────────────────────────────────────────────────
-// targetId must match data-onboarding="..." attributes you add to your JSX.
-// See "MARKUP CHANGES NEEDED" section at the bottom.
 
 const STEPS: OnboardingStep[] = [
   {
@@ -66,6 +35,7 @@ const STEPS: OnboardingStep[] = [
     titleKey: 'step1_title',
     bodyKey: 'step1_body',
     tab: 'nearby',
+    navigateTo: '/',
   },
   {
     targetId: 'ob-nearby-shop-icons',
@@ -73,6 +43,7 @@ const STEPS: OnboardingStep[] = [
     titleKey: 'step2_title',
     bodyKey: 'step2_body',
     tab: 'nearby',
+    navigateTo: '/',
   },
   {
     targetId: 'ob-route-start-nav',
@@ -80,6 +51,7 @@ const STEPS: OnboardingStep[] = [
     titleKey: 'step3_title',
     bodyKey: 'step3_body',
     tab: 'route',
+    navigateTo: '/',
   },
   {
     targetId: 'ob-index-collections',
@@ -87,6 +59,7 @@ const STEPS: OnboardingStep[] = [
     titleKey: 'step4_title',
     bodyKey: 'step4_body',
     tab: 'index',
+    navigateTo: '/global-index',
   },
   {
     targetId: 'ob-hot-fab',
@@ -94,13 +67,13 @@ const STEPS: OnboardingStep[] = [
     titleKey: 'step5_title',
     bodyKey: 'step5_body',
     tab: 'hot',
+    navigateTo: '/feed',
   },
 ];
 
 // ─── LocalStorage helpers ─────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'flyaf_onboarding_complete';
-const LANG_KEY = 'flyaf_lang';
 
 function hasSeenOnboarding(): boolean {
   try {
@@ -113,26 +86,22 @@ function hasSeenOnboarding(): boolean {
 function markOnboardingComplete(): void {
   try {
     localStorage.setItem(STORAGE_KEY, 'true');
-  } catch {
-    // localStorage unavailable (private mode etc.) — fail silently
-  }
+  } catch { /* ignore */ }
 }
 
 // ─── Language selector slide ──────────────────────────────────────────────────
 
 const LANGUAGE_OPTIONS: { code: Lang; label: string; flag: string }[] = [
-  { code: 'en',      label: 'English',            flag: '🇬🇧' },
-  { code: 'fr',      label: 'Français',           flag: '🇫🇷' },
-  { code: 'ja',      label: '日本語',              flag: '🇯🇵' },
-  { code: 'ko',      label: '한국어',              flag: '🇰🇷' },
-  { code: 'zh-hans', label: '简体中文',            flag: '🇨🇳' },
-  { code: 'zh-hant', label: '繁體中文',            flag: '🇹🇼' },
-  { code: 'th',      label: 'ภาษาไทย',           flag: '🇹🇭' },
+  { code: 'en',    label: 'English',   flag: '🇬🇧' },
+  { code: 'fr',    label: 'Français',  flag: '🇫🇷' },
+  { code: 'ja',    label: '日本語',     flag: '🇯🇵' },
+  { code: 'ko',    label: '한국어',     flag: '🇰🇷' },
+  { code: 'zh-CN', label: '简体中文',   flag: '🇨🇳' },
+  { code: 'zh-TW', label: '繁體中文',   flag: '🇹🇼' },
+  { code: 'th',    label: 'ภาษาไทย',  flag: '🇹🇭' },
 ];
 
 // ─── Translations ─────────────────────────────────────────────────────────────
-// Add translations for each language. Keys must match those in STEPS above.
-// This object is the ONLY file that needs to change when adding a language.
 
 type TranslationKeys =
   | 'welcome_title' | 'welcome_body' | 'select_language' | 'get_started'
@@ -224,7 +193,7 @@ const translations: Record<Lang, Record<TranslationKeys, string>> = {
     step5_title:     '스타일 포스팅',
     step5_body:      '+를 탭하여 사진을 업로드하세요. 캡션 불필요. AI가 착용 아이템을 자동으로 식별하고 쇼핑 링크를 추가합니다.',
   },
-  'zh-hans': {
+  'zh-CN': {
     welcome_title:   '欢迎使用 FLYAF',
     welcome_body:    '覆盖全球城市的潮流街头服饰地图。选择您的语言即可开始。',
     select_language: '选择语言',
@@ -244,7 +213,7 @@ const translations: Record<Lang, Record<TranslationKeys, string>> = {
     step5_title:     '发布你的穿搭',
     step5_body:      '点击 + 上传照片，无需标题。AI 自动识别你的穿搭并添加购买链接。',
   },
-  'zh-hant': {
+  'zh-TW': {
     welcome_title:   '歡迎使用 FLYAF',
     welcome_body:    '涵蓋全球城市的潮流街頭服飾地圖。選擇您的語言即可開始。',
     select_language: '選擇語言',
@@ -288,7 +257,7 @@ const translations: Record<Lang, Record<TranslationKeys, string>> = {
 
 // ─── Helper: get translation ──────────────────────────────────────────────────
 
-function t(lang: Lang, key: TranslationKeys): string {
+function tr(lang: Lang, key: TranslationKeys): string {
   return translations[lang]?.[key] ?? translations.en[key] ?? key;
 }
 
@@ -321,34 +290,51 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
   onComplete,
   forceShow = false,
 }) => {
-  // ── state ──
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { i18n } = useTranslation();
+
   const [visible,   setVisible]   = useState(false);
   const [phase,     setPhase]     = useState<'language' | 'tour' | 'done'>('language');
   const [stepIndex, setStepIndex] = useState(0);
-  const [lang,      setLang]      = useState<Lang>(propLang ?? 'en');
+  const [lang,      setLang]      = useState<Lang>(() => {
+    if (propLang) return propLang;
+    // Try to read from i18next
+    const current = i18n.language;
+    if (current && current in translations) return current as Lang;
+    return 'en';
+  });
   const [spotlight, setSpotlight] = useState<SpotlightRect | null>(null);
   const animRef = useRef<number>();
 
-  // ── show/hide logic ──
+  // show/hide logic
   useEffect(() => {
     if (forceShow || !hasSeenOnboarding()) {
-      // Small delay so the app has finished first render
       const timer = setTimeout(() => setVisible(true), 400);
       return () => clearTimeout(timer);
     }
   }, [forceShow]);
 
-  // ── read initial language from localStorage ──
+  // Navigate to the correct page when step changes during tour
   useEffect(() => {
-    if (!propLang) {
-      try {
-        const stored = localStorage.getItem(LANG_KEY) as Lang | null;
-        if (stored) setLang(stored);
-      } catch { /* ignore */ }
-    }
-  }, [propLang]);
+    if (phase !== 'tour') return;
+    const step = STEPS[stepIndex];
+    if (!step) return;
 
-  // ── update spotlight rect on step change ──
+    // Navigate to the step's page if needed
+    if (step.navigateTo && location.pathname !== step.navigateTo) {
+      navigate(step.navigateTo, { replace: true });
+    }
+
+    // For route tab, dispatch event to switch to route mode
+    if (step.tab === 'route') {
+      window.dispatchEvent(new CustomEvent('switchToRouteMode'));
+    } else if (step.tab === 'nearby' && location.pathname === '/') {
+      window.dispatchEvent(new CustomEvent('reopenShopsSheet'));
+    }
+  }, [phase, stepIndex, navigate, location.pathname]);
+
+  // update spotlight rect on step change
   const updateSpotlight = useCallback(() => {
     if (phase !== 'tour') return;
     const step = STEPS[stepIndex];
@@ -357,19 +343,36 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
     setSpotlight(rect);
   }, [phase, stepIndex]);
 
+  // Poll for element visibility (elements may not exist immediately after navigation)
+  useEffect(() => {
+    if (phase !== 'tour') return;
+    let attempts = 0;
+    const maxAttempts = 20;
+    const poll = () => {
+      updateSpotlight();
+      attempts++;
+      if (attempts < maxAttempts && !getSpotlightRect(STEPS[stepIndex]?.targetId ?? '')) {
+        animRef.current = requestAnimationFrame(poll);
+      }
+    };
+    // Small delay after navigation
+    const timer = setTimeout(poll, 300);
+    return () => {
+      clearTimeout(timer);
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, [phase, stepIndex, updateSpotlight]);
+
   useEffect(() => {
     updateSpotlight();
-    // Also re-calc on resize
     window.addEventListener('resize', updateSpotlight);
     return () => window.removeEventListener('resize', updateSpotlight);
   }, [updateSpotlight]);
 
-  // ── handlers ──
+  // handlers
   const handleLanguageSelect = (code: Lang) => {
     setLang(code);
-    try { localStorage.setItem(LANG_KEY, code); } catch { /* ignore */ }
-    // TODO: call your app's setLanguage() function here, e.g.:
-    // i18n.changeLanguage(code);
+    i18n.changeLanguage(code);
   };
 
   const handleGetStarted = () => {
@@ -389,6 +392,10 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
     markOnboardingComplete();
     setPhase('done');
     setVisible(false);
+    // Navigate back to home
+    if (location.pathname !== '/') {
+      navigate('/', { replace: true });
+    }
     onComplete?.();
   };
 
@@ -410,27 +417,26 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
           padding: '24px',
         }}
       >
-        {/* Logo / title */}
+        {/* Logo */}
         <div style={{ marginBottom: 24, textAlign: 'center' }}>
-          <div style={{
-            fontSize: 28, fontWeight: 900, fontStyle: 'italic',
-            background: 'linear-gradient(90deg,#e84020,#e8a020,#e04020)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text', marginBottom: 8,
+          <img src={flyafLogo} alt="FLYAF" style={{ height: 48, marginBottom: 8, margin: '0 auto' }} />
+          <p style={{
+            fontSize: 10, letterSpacing: '0.2em', fontWeight: 700,
+            color: '#AD3A49', textAlign: 'center', marginTop: 4,
           }}>
-            flyaf
+            STAY FLY & FABULOUS
+          </p>
+          <div style={{ color: '#fff', fontSize: 18, fontWeight: 700, marginBottom: 6, marginTop: 16 }}>
+            {tr(lang, 'welcome_title')}
           </div>
-          <div style={{ color: '#fff', fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
-            {t(lang, 'welcome_title')}
-          </div>
-          <div style={{ color: '#888', fontSize: 13, maxWidth: 280, lineHeight: 1.5 }}>
-            {t(lang, 'welcome_body')}
+          <div style={{ color: '#888', fontSize: 13, maxWidth: 280, lineHeight: 1.5, margin: '0 auto' }}>
+            {tr(lang, 'welcome_body')}
           </div>
         </div>
 
         {/* Language label */}
         <div style={{ color: '#aaa', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', marginBottom: 12, textTransform: 'uppercase' }}>
-          {t(lang, 'select_language')}
+          {tr(lang, 'select_language')}
         </div>
 
         {/* Language pills */}
@@ -442,8 +448,8 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
               style={{
                 display: 'flex', alignItems: 'center', gap: 12,
                 padding: '13px 16px', borderRadius: 12,
-                background: lang === opt.code ? '#e05040' : 'rgba(255,255,255,0.08)',
-                border: lang === opt.code ? '2px solid #e05040' : '1.5px solid rgba(255,255,255,0.12)',
+                background: lang === opt.code ? '#AD3A49' : 'rgba(255,255,255,0.08)',
+                border: lang === opt.code ? '2px solid #AD3A49' : '1.5px solid rgba(255,255,255,0.12)',
                 cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
@@ -467,12 +473,12 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
           style={{
             width: '100%', maxWidth: 300,
             padding: '16px', borderRadius: 14,
-            background: '#e05040', border: 'none',
+            background: '#AD3A49', border: 'none',
             color: '#fff', fontSize: 15, fontWeight: 800,
             letterSpacing: '0.04em', cursor: 'pointer',
           }}
         >
-          {t(lang, 'get_started')}
+          {tr(lang, 'get_started')}
         </button>
       </div>
     );
@@ -484,11 +490,11 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  // Build clip-path to cut a hole in the overlay around the spotlight
+  // Build clip-path
   let clipPath = 'none';
   if (spotlight) {
     const { top, left, width, height } = spotlight;
-    const r = 10; // border-radius of the cutout
+    const r = 10;
     clipPath = `polygon(
       0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%,
       ${left + r}px ${top}px,
@@ -503,7 +509,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
     )`;
   }
 
-  // Tooltip position calculation
+  // Tooltip position
   let tooltipStyle: React.CSSProperties = {};
   if (spotlight) {
     const { top, left, width, height } = spotlight;
@@ -545,7 +551,6 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
         break;
     }
   } else {
-    // Fallback: centre of screen
     tooltipStyle = {
       position: 'fixed',
       top: '50%', left: '50%',
@@ -585,11 +590,11 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
           boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
           pointerEvents: 'auto',
         }}
-        onClick={e => e.stopPropagation()} // don't advance on tooltip tap
+        onClick={e => e.stopPropagation()}
       >
         {/* Step counter */}
         <div style={{ color: '#555', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', marginBottom: 6 }}>
-          {stepIndex + 1} {t(lang, 'step_of')} {STEPS.length}
+          {stepIndex + 1} {tr(lang, 'step_of')} {STEPS.length}
         </div>
 
         {/* Progress dots */}
@@ -600,7 +605,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
               style={{
                 height: 3, borderRadius: 2, transition: 'all 0.2s',
                 flex: i === stepIndex ? 2 : 1,
-                background: i <= stepIndex ? '#e05040' : 'rgba(255,255,255,0.15)',
+                background: i <= stepIndex ? '#AD3A49' : 'rgba(255,255,255,0.15)',
               }}
             />
           ))}
@@ -608,10 +613,10 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
 
         {/* Content */}
         <div style={{ color: '#fff', fontSize: 14, fontWeight: 700, marginBottom: 5 }}>
-          {t(lang, currentStep.titleKey as TranslationKeys)}
+          {tr(lang, currentStep.titleKey as TranslationKeys)}
         </div>
         <div style={{ color: '#888', fontSize: 12, lineHeight: 1.55, marginBottom: 14 }}>
-          {t(lang, currentStep.bodyKey as TranslationKeys)}
+          {tr(lang, currentStep.bodyKey as TranslationKeys)}
         </div>
 
         {/* Actions */}
@@ -623,18 +628,18 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
               fontSize: 12, cursor: 'pointer', padding: '4px 0',
             }}
           >
-            {t(lang, 'skip')}
+            {tr(lang, 'skip')}
           </button>
           <button
             onClick={handleNext}
             style={{
-              background: '#e05040', border: 'none',
+              background: '#AD3A49', border: 'none',
               color: '#fff', fontSize: 12, fontWeight: 700,
               padding: '8px 18px', borderRadius: 8,
               cursor: 'pointer', letterSpacing: '0.03em',
             }}
           >
-            {isLastStep ? t(lang, 'done') : t(lang, 'next')}
+            {isLastStep ? tr(lang, 'done') : tr(lang, 'next')}
           </button>
         </div>
       </div>
@@ -643,64 +648,3 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
 };
 
 export default OnboardingTutorial;
-
-/*
- * ─────────────────────────────────────────────────────────────────────────────
- * MARKUP CHANGES NEEDED IN YOUR EXISTING COMPONENTS
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * Add data-onboarding="..." to these elements in your JSX:
- *
- * 1. The city selector pill (London dropdown) in your Nearby/Map component:
- *    <div data-onboarding="ob-city-selector" ...>London ▼</div>
- *
- * 2. The icons row (ⓘ ↗ ↑) in your shop list item:
- *    <div data-onboarding="ob-nearby-shop-icons" ...>
- *      <Icon type="info" /> <Icon type="share" /> <Icon type="navigate" />
- *    </div>
- *
- * 3. The START NAVIGATION button in the Route sheet:
- *    <button data-onboarding="ob-route-start-nav" ...>START NAVIGATION</button>
- *
- * 4. The Collections button in the Global Index header:
- *    <button data-onboarding="ob-index-collections" ...>Collections</button>
- *
- * 5. The + FAB button in the HOT feed:
- *    <button data-onboarding="ob-hot-fab" ...>+</button>
- *
- * ─────────────────────────────────────────────────────────────────────────────
- * HOW TO RE-SHOW FROM SETTINGS (e.g. "Replay tutorial" button):
- * ─────────────────────────────────────────────────────────────────────────────
- *
- *   import { useState } from 'react';
- *   import OnboardingTutorial from '../OnboardingTutorial';
- *
- *   function SettingsPage() {
- *     const [showTutorial, setShowTutorial] = useState(false);
- *
- *     return (
- *       <>
- *         <button onClick={() => setShowTutorial(true)}>
- *           Replay app tutorial
- *         </button>
- *         {showTutorial && (
- *           <OnboardingTutorial
- *             forceShow
- *             onComplete={() => setShowTutorial(false)}
- *           />
- *         )}
- *       </>
- *     );
- *   }
- *
- * ─────────────────────────────────────────────────────────────────────────────
- * ADDING A NEW LANGUAGE:
- * ─────────────────────────────────────────────────────────────────────────────
- *
- *   1. Add the language code to the Lang type above.
- *   2. Add an entry to LANGUAGE_OPTIONS with flag and label.
- *   3. Add a full translations[newLang] block (copy from 'en' and translate).
- *   Done. No other changes needed.
- *
- * ─────────────────────────────────────────────────────────────────────────────
- */

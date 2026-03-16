@@ -40,7 +40,7 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <BrowserRouter>
           <AuthProvider>
-            {showOnboarding && <OnboardingSplash onComplete={handleOnboardingComplete} />}
+            <OnboardingTutorial />
             <Routes>
               {/* Auth page - always public */}
               <Route path="/auth" element={<Auth />} />

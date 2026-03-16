@@ -30,7 +30,7 @@ export const CityChip = ({ onCitySelect, currentCity, showRecenter, onRecenter }
   const [selectedCity, setSelectedCity] = useState(currentCity || "London");
 
   return (
-    <div className="absolute top-4 lg:top-16 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+    <div data-onboarding="ob-city-selector" className="absolute top-4 lg:top-16 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/[0.06] shadow-lg hover:bg-black/90 transition-all"

@@ -100,7 +100,7 @@ export const NearbyShopsSheet = ({
                     <div className="text-[10px] text-muted-foreground mb-1.5 truncate">
                       {shop.address}, {shop.city}
                     </div>
-                    <div className="flex gap-1">
+                    <div data-onboarding="ob-nearby-shop-icons" className="flex gap-1">
                       <Button 
                         size="sm" 
                         variant="outline"
