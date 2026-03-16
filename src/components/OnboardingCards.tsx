@@ -389,7 +389,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
       </div>
 
       {/* CTA area */}
-      <div style={{ padding: '0 24px 36px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ padding: '0 24px 36px', display: 'flex', flexDirection: 'column', gap: 10, position: 'relative', zIndex: 1 }}>
         {isLast ? (
           <>
             {/* On last card: two options */}
