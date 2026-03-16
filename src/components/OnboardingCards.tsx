@@ -204,6 +204,8 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
   const overlay: React.CSSProperties = {
     position: 'fixed', inset: 0, zIndex: 9999,
     background: '#000',
+    backgroundImage: `url(${urbanBg})`,
+    backgroundSize: 'cover', backgroundPosition: 'center',
     display: 'flex', flexDirection: 'column',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     overflow: 'hidden',
