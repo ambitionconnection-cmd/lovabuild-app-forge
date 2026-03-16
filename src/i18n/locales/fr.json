@@ -276,7 +276,10 @@
     "outdoor": "Outdoor / Gorpcore",
     "heritage": "Héritage / Workwear",
     "designer": "Créateur",
-    "skate": "Skate"
+    "skate": "Skate",
+    "underground": "Underground",
+    "gothic": "Gothique",
+    "records": "Disquaires"
   },
   "contact": {
     "title": "Nous contacter",

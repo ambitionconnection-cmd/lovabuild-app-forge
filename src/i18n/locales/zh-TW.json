@@ -276,7 +276,10 @@
     "outdoor": "戶外 / Gorpcore",
     "heritage": "傳統工裝",
     "designer": "設計師品牌",
-    "skate": "滑板"
+    "skate": "滑板",
+    "underground": "地下文化",
+    "gothic": "哥特",
+    "records": "唱片店"
   },
   "contact": {
     "title": "聯絡我們",

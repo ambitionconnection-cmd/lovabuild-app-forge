@@ -276,7 +276,10 @@
     "outdoor": "アウトドア / ゴープコア",
     "heritage": "ヘリテージ / ワークウェア",
     "designer": "デザイナー",
-    "skate": "スケート"
+    "skate": "スケート",
+    "underground": "アンダーグラウンド",
+    "gothic": "ゴシック",
+    "records": "レコードショップ"
   },
   "contact": {
     "title": "お問い合わせ",
