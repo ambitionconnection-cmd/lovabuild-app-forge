@@ -122,6 +122,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
   onComplete,
 }) => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
   const [visible,  setVisible]  = useState(false);
   const [step,     setStep]     = useState<'language' | number>('language');
   const [lang,     setLang]     = useState<Lang>('en');
