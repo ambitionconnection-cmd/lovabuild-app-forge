@@ -344,7 +344,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
       </div>
 
       {/* Card body */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '20px 28px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '20px 28px', position: 'relative', zIndex: 1 }}>
         {/* Icon */}
         <div style={{ marginBottom: 24 }}>
           <div style={{
