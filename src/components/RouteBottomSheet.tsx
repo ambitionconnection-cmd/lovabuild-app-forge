@@ -346,6 +346,7 @@ export const RouteBottomSheet: React.FC<RouteBottomSheetProps> = ({
 
                 {/* Start Navigation */}
                 <Button
+                  data-onboarding="ob-route-start-nav"
                   className="w-full bg-[#C4956A] hover:bg-[#C4956A]/90 text-[#2D2D2D] font-bold uppercase tracking-wider text-xs"
                   onClick={onStartNavigation}
                 >

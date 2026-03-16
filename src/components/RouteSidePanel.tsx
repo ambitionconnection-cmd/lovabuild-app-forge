@@ -207,6 +207,7 @@ export const RouteSidePanel: React.FC<RouteSidePanelProps> = ({
       {journeyStops.length > 0 && (
         <div className="flex-shrink-0 p-3 border-t border-white/5">
           <Button
+            data-onboarding="ob-route-start-nav"
             onClick={onStartNavigation}
             className="w-full h-10 bg-[#C4956A] hover:bg-[#C4956A]/80 text-white font-semibold"
           >

@@ -243,6 +243,7 @@ const GlobalIndex = () => {
           <h1 className="text-base font-bold uppercase tracking-wider flex-1">{t('nav.globalIndex')}</h1>
           <Link to="/collections">
             <Button
+              data-onboarding="ob-index-collections"
               size="sm"
               className="h-8 gap-1.5 bg-gradient-to-r from-[#8B6DAF] to-[#AD3A49] hover:from-[#8B6DAF]/90 hover:to-[#AD3A49]/90 text-white border-0 font-semibold text-xs shadow-lg shadow-[#AD3A49]/20"
             >

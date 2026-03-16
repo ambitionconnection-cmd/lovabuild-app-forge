@@ -22,7 +22,7 @@ import Analytics from "./pages/Analytics";
 import NotificationHistory from "./pages/NotificationHistory";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import OnboardingSplash from "./components/OnboardingSplash";
+import OnboardingTutorial from "./components/OnboardingTutorial";
 import More from "./pages/More";
 import About from "./pages/About";
 import Settings from "./pages/Settings";
@@ -33,21 +33,14 @@ import Collections from "./pages/Collections";
 const queryClient = new QueryClient();
 
 function App() {
-  const [showOnboarding, setShowOnboarding] = React.useState(() => {
-    return !localStorage.getItem('flyaf_onboarding_done');
-  });
-
-  const handleOnboardingComplete = () => {
-    localStorage.setItem('flyaf_onboarding_done', 'true');
-    setShowOnboarding(false);
-  };
+  // OnboardingTutorial manages its own visibility via localStorage
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark">
         <BrowserRouter>
           <AuthProvider>
-            {showOnboarding && <OnboardingSplash onComplete={handleOnboardingComplete} />}
+            <OnboardingTutorial />
             <Routes>
               {/* Auth page - always public */}
               <Route path="/auth" element={<Auth />} />

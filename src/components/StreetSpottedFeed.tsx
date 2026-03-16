@@ -491,6 +491,7 @@ export const StreetSpottedFeed = () => {
       {/* Floating create button */}
       {user && (
         <button
+          data-onboarding="ob-hot-fab"
           onClick={() => setShowCreate(true)}
           className="fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-transform lg:bottom-8"
         >
