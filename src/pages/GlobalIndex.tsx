@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { normalizeSearch } from "@/lib/utils";
 import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X, Layers, Sparkles, Crown, Info, Check } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
