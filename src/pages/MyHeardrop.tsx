@@ -30,6 +30,16 @@ interface SavedRoute {
   created_at: string;
 }
 
+interface FollowedUser {
+  id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  is_pro: boolean;
+  follow_id: string;
+  has_new_post: boolean;
+  latest_post_image?: string | null;
+}
+
 const MyHeardrop = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
