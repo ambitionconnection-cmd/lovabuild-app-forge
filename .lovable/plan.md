@@ -1,57 +1,39 @@
 
 
-## What Can Be Automated vs. What Needs Manual Work
+## Plan: Integrate Spotlight Onboarding Tutorial
 
-### Fully Automatable
+### Assessment of the uploaded component
 
-**1. First 500 Users → 3-Month Free Pro**
-- Add a DB trigger on the `profiles` table: when a new profile is created, count total profiles. If count <= 500, automatically set `is_pro = true` and `pro_expires_at = now() + 3 months`.
-- No manual work needed. Every new signup is automatically checked and granted Pro if they're within the first 500.
-- The "founding member" messaging can be shown conditionally on the frontend based on a `is_founding_member` flag or by checking if `pro_expires_at` is set without a Stripe subscription.
+The component is well-structured. A few things to adapt for your codebase:
 
-**2. After User #500 → Standard Freemium**
-- This happens automatically once the trigger stops granting Pro (count > 500). No code change needed at that point — the existing paywall logic already works for non-Pro users.
+1. **Language codes mismatch**: The component uses `zh-hans` / `zh-hant`, but your app uses `zh-CN` / `zh-TW` via i18next. Need to align these.
+2. **Duplicate onboarding**: You already have `OnboardingSplash.tsx` using localStorage key `flyaf_onboarding_done`. The new component uses `flyaf_onboarding_complete`. We should replace the old splash entirely with this new tutorial, using the new key (so existing users see the new tutorial once).
+3. **Language selection should call `i18n.changeLanguage()`**: The TODO comment on line 372 needs to be wired to your existing i18next instance.
+4. **Tab navigation**: Steps reference different tabs (nearby, route, index, hot). The tutorial needs to actually navigate the user to those pages when each step activates, otherwise the `data-onboarding` targets won't exist in the DOM.
+5. **Inline styles vs Tailwind**: The component uses inline styles throughout. This works fine but differs from your codebase convention. Not a blocker -- we can refactor later if desired.
 
-**3. Admin Pro Bypass**
-- Update `check-subscription` edge function: if the user has the `admin` role in `user_roles`, return `subscribed: true` regardless of Stripe status. This fixes your inability to test Print and other Pro features.
+### Changes
 
-### Requires Manual Action (by you, once)
+| File | Action |
+|------|--------|
+| `src/components/OnboardingTutorial.tsx` | **Replace** current splash with uploaded component, adapted |
+| `src/App.tsx` | Replace `OnboardingSplash` import/usage with new `OnboardingTutorial` |
+| `src/pages/Directions.tsx` | Add `data-onboarding="ob-city-selector"` to city selector element |
+| `src/components/NearbyShopsSheet.tsx` or equivalent | Add `data-onboarding="ob-nearby-shop-icons"` to shop action icons |
+| `src/pages/RoutePage.tsx` | Add `data-onboarding="ob-route-start-nav"` to Start Navigation button |
+| `src/pages/GlobalIndex.tsx` | Add `data-onboarding="ob-index-collections"` to Collections button |
+| `src/pages/Feed.tsx` | Add `data-onboarding="ob-hot-fab"` to the + FAB button |
+| `src/pages/Settings.tsx` | Add "Replay tutorial" button |
 
-**4. Ambassador Permanent Pro**
-- Create an `ambassador_codes` table with redeemable codes that grant permanent Pro (no expiry).
-- You generate codes in the admin panel and send them to your 50-100 contacts.
-- They redeem during signup or on their profile page → `is_pro = true`, `pro_expires_at = null` (permanent).
-- The code generation and redemption is automated; you just need to distribute the codes manually.
+### Key adaptations
 
----
+- Map `zh-hans` to `zh-CN` and `zh-hant` to `zh-TW` to match i18next config
+- Wire `handleLanguageSelect` to `i18n.changeLanguage()`
+- Add `useNavigate()` to navigate between tabs as each step activates (e.g., step on route tab navigates to `/route`)
+- Remove old `OnboardingSplash.tsx` (or keep as backup)
+- Delete old localStorage key check (`flyaf_onboarding_done`) from App.tsx
 
-## Implementation Plan
+### What stays as-is
 
-### Step 1: Admin Pro bypass
-Modify the `check-subscription` edge function to check `user_roles` for admin role. If admin, return `subscribed: true`. Single file change.
-
-### Step 2: Auto-Pro for first 500 users
-- DB migration: modify the `handle_new_user()` trigger function to count profiles and set `is_pro`/`pro_expires_at` when count <= 500.
-- Add a `is_founding_member` boolean column to `profiles` (default false) so we can show the special "founding member" message.
-- Frontend: after signup, if user's profile has `is_founding_member = true`, show a welcome toast: "You're one of FLYAF's first 500 members. Welcome to Pro, on us for 3 months."
-
-### Step 3: Ambassador code system
-- DB migration: create `ambassador_codes` table (code, max_uses, uses_count, grants_permanent_pro, is_active) and `code_redemptions` table (code_id, user_id, redeemed_at).
-- Admin panel: new section to generate/manage ambassador codes.
-- Frontend: "Have a code?" input on the Auth page or Profile page. On redemption, set `is_pro = true` and `pro_expires_at = null`.
-- RLS: admins can manage codes; authenticated users can redeem.
-
-### Step 4: Founding member messaging
-- Update the Pro upgrade modal to show "You're one of FLYAF's first 500" for founding members approaching expiry.
-- Show a subtle badge or note on the profile for founding members.
-
-### Summary of effort
-
-| Feature | Automated? | Your manual work |
-|---------|-----------|-----------------|
-| First 500 → 3mo Pro | Fully automatic | None |
-| After #500 → freemium | Fully automatic | None |
-| Admin bypass | Fully automatic | None |
-| Ambassador codes | Code auto-redeems | You distribute ~50-100 codes to contacts |
-| Ambassador brief | N/A | You send the message (we can draft it) |
+The spotlight clip-path logic, translations, tooltip positioning, and progress UI are all solid and will be used directly.
 
