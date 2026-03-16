@@ -499,5 +499,26 @@
     "signIn": "Se connecter",
     "signInToSaveShort": "Connectez-vous pour sauvegarder vos itinéraires",
     "kmAway": "km"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Localisation, unités & préférences",
+    "locationAccess": "Accès à la localisation",
+    "locationStatus": "Statut actuel",
+    "locationDesc": "Nécessaire pour les boutiques à proximité et les itinéraires",
+    "allowed": "Autorisé",
+    "denied": "Bloqué",
+    "notSet": "Non défini",
+    "locationDeniedHint": "La localisation est bloquée. Ouvrez les paramètres de votre navigateur pour autoriser l'accès, puis réessayez.",
+    "retryLocation": "Réessayer",
+    "locationGranted": "Accès à la localisation accordé !",
+    "distanceUnits": "Unités de distance",
+    "metric": "Métrique (Kilomètres)",
+    "imperial": "Impérial (Miles)",
+    "metricDesc": "Distances affichées en km et mètres",
+    "imperialDesc": "Distances affichées en miles et pieds",
+    "unitChanged": "Unité de distance définie sur {{unit}}",
+    "language": "Langue",
+    "replayTutorial": "Rejouer le tutoriel"
   }
 }

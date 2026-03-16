@@ -499,5 +499,26 @@
     "signIn": "로그인",
     "signInToSaveShort": "경로를 저장하려면 로그인하세요",
     "kmAway": "km 떨어짐"
+  },
+  "settings": {
+    "title": "설정",
+    "subtitle": "위치, 단위 및 환경설정",
+    "locationAccess": "위치 접근",
+    "locationStatus": "현재 상태",
+    "locationDesc": "근처 매장 및 경로 기능에 필요합니다",
+    "allowed": "허용됨",
+    "denied": "차단됨",
+    "notSet": "미설정",
+    "locationDeniedHint": "위치가 차단되었습니다. 브라우저 설정에서 위치 접근을 허용한 후 다시 시도하세요.",
+    "retryLocation": "다시 시도",
+    "locationGranted": "위치 접근이 허용되었습니다!",
+    "distanceUnits": "거리 단위",
+    "metric": "미터법 (킬로미터)",
+    "imperial": "야드파운드법 (마일)",
+    "metricDesc": "거리를 km 및 미터로 표시",
+    "imperialDesc": "거리를 마일 및 피트로 표시",
+    "unitChanged": "거리 단위가 {{unit}}(으)로 변경되었습니다",
+    "language": "언어",
+    "replayTutorial": "앱 튜토리얼 다시보기"
   }
 }

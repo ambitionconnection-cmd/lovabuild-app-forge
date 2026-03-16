@@ -499,5 +499,26 @@
     "signIn": "登入",
     "signInToSaveShort": "登入以儲存您的路線",
     "kmAway": "公里"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "位置、單位與偏好",
+    "locationAccess": "位置存取",
+    "locationStatus": "目前狀態",
+    "locationDesc": "附近商店和路線功能需要此權限",
+    "allowed": "已允許",
+    "denied": "已封鎖",
+    "notSet": "未設定",
+    "locationDeniedHint": "位置已被封鎖。請在瀏覽器設定中允許位置存取，然後重試。",
+    "retryLocation": "重試",
+    "locationGranted": "位置存取已授權！",
+    "distanceUnits": "距離單位",
+    "metric": "公制（公里）",
+    "imperial": "英制（英里）",
+    "metricDesc": "距離以公里和公尺顯示",
+    "imperialDesc": "距離以英里和英尺顯示",
+    "unitChanged": "距離單位已設為{{unit}}",
+    "language": "語言",
+    "replayTutorial": "重播應用教學"
   }
 }

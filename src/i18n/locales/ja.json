@@ -499,5 +499,26 @@
     "signIn": "ログイン",
     "signInToSaveShort": "ルートを保存するにはログインしてください",
     "kmAway": "km先"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "位置情報、単位、設定",
+    "locationAccess": "位置情報アクセス",
+    "locationStatus": "現在のステータス",
+    "locationDesc": "近くの店舗やルート機能に必要です",
+    "allowed": "許可済み",
+    "denied": "ブロック",
+    "notSet": "未設定",
+    "locationDeniedHint": "位置情報がブロックされています。ブラウザの設定で位置情報を許可してから再試行してください。",
+    "retryLocation": "再試行",
+    "locationGranted": "位置情報アクセスが許可されました！",
+    "distanceUnits": "距離の単位",
+    "metric": "メートル法（キロメートル）",
+    "imperial": "ヤード・ポンド法（マイル）",
+    "metricDesc": "距離はkmとメートルで表示",
+    "imperialDesc": "距離はマイルとフィートで表示",
+    "unitChanged": "距離の単位を{{unit}}に変更しました",
+    "language": "言語",
+    "replayTutorial": "チュートリアルを再生"
   }
 }
