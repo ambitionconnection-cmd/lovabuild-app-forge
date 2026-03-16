@@ -216,7 +216,7 @@ const Settings = () => {
                 variant="outline"
                 onClick={() => {
                   localStorage.removeItem('flyaf_onboarding_complete');
-                  setShowTutorial(true);
+                  window.location.href = '/';
                 }}
                 className="w-full gap-2 border-white/10 text-white/70 hover:text-white hover:bg-white/10"
               >
