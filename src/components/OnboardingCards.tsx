@@ -54,8 +54,8 @@ const LANGS: { code: Lang; label: string; flag: string; native: string }[] = [
   { code: 'fr',      flag: '🇫🇷', label: 'French',    native: 'Français'   },
   { code: 'ja',      flag: '🇯🇵', label: 'Japanese',  native: '日本語'      },
   { code: 'ko',      flag: '🇰🇷', label: 'Korean',    native: '한국어'      },
-  { code: 'zh-hans', flag: '🇨🇳', label: 'Chinese',   native: '简体中文'   },
-  { code: 'zh-hant', flag: '🇹🇼', label: 'Chinese',   native: '繁體中文'   },
+  { code: 'zh-CN',   flag: '🇨🇳', label: 'Chinese',   native: '简体中文'   },
+  { code: 'zh-TW',   flag: '🇹🇼', label: 'Chinese',   native: '繁體中文'   },
   { code: 'th',      flag: '🇹🇭', label: 'Thai',      native: 'ภาษาไทย'   },
 ];
 
