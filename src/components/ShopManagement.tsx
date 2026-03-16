@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { normalizeSearch } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,13 +58,13 @@ export const ShopManagement = () => {
 
   const filteredShops = useMemo(() => {
     if (!searchQuery) return shops;
-    const query = searchQuery.toLowerCase();
+    const query = normalizeSearch(searchQuery);
     return shops.filter(
       (shop) =>
-        shop.name.toLowerCase().includes(query) ||
-        shop.city.toLowerCase().includes(query) ||
-        shop.country.toLowerCase().includes(query) ||
-        shop.address.toLowerCase().includes(query)
+        normalizeSearch(shop.name).includes(query) ||
+        normalizeSearch(shop.city).includes(query) ||
+        normalizeSearch(shop.country).includes(query) ||
+        normalizeSearch(shop.address).includes(query)
     );
   }, [searchQuery, shops]);
 

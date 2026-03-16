@@ -1,4 +1,5 @@
 import { Globe, Zap, Search, User, Shield, Calendar, Store } from "lucide-react";
+import { normalizeSearch } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -58,11 +59,11 @@ const Index = () => {
 
   const filteredDrops = useMemo(() => {
     if (!dropSearchQuery) return featuredDrops;
-    const searchLower = dropSearchQuery.toLowerCase();
+    const q = normalizeSearch(dropSearchQuery);
     return featuredDrops.filter(
       (drop) =>
-        drop.title.toLowerCase().includes(searchLower) ||
-        (drop.description?.toLowerCase().includes(searchLower) ?? false)
+        normalizeSearch(drop.title).includes(q) ||
+        normalizeSearch(drop.description || '').includes(q)
     );
   }, [featuredDrops, dropSearchQuery]);
 

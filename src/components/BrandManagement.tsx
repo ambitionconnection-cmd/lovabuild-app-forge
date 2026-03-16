@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { normalizeSearch } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,12 +57,12 @@ export const BrandManagement = () => {
       return;
     }
 
-    const query = searchQuery.toLowerCase();
+    const query = normalizeSearch(searchQuery);
     const filtered = brands.filter(
       (brand) =>
-        brand.name.toLowerCase().includes(query) ||
-        brand.country?.toLowerCase().includes(query) ||
-        brand.category?.toLowerCase().includes(query)
+        normalizeSearch(brand.name).includes(query) ||
+        normalizeSearch(brand.country || '').includes(query) ||
+        normalizeSearch(brand.category || '').includes(query)
     );
     setFilteredBrands(filtered);
   };

@@ -276,7 +276,10 @@
     "outdoor": "아웃도어 / 고프코어",
     "heritage": "헤리티지 / 워크웨어",
     "designer": "디자이너",
-    "skate": "스케이트"
+    "skate": "스케이트",
+    "underground": "언더그라운드",
+    "gothic": "고딕",
+    "records": "레코드숍"
   },
   "contact": {
     "title": "문의하기",

@@ -37,6 +37,7 @@ import { AdminNotificationBanner } from '@/components/AdminNotificationBanner';
 import { UserAnalytics } from '@/components/UserAnalytics';
 import { AdminNotificationPreferences } from '@/components/AdminNotificationPreferences';
 import { ShopThisFitAnalytics } from '@/components/ShopThisFitAnalytics';
+import { ApprovedPostsManager } from '@/components/ApprovedPostsManager';
 
 interface LoginAttempt {
   id: string;
@@ -705,6 +706,10 @@ export default function Admin() {
 
             {activeTab === "spot-moderation" && (
               <SpotModerationQueue />
+            )}
+
+            {activeTab === "approved-posts" && (
+              <ApprovedPostsManager />
             )}
 
             {activeTab === "featured-brand" && (

@@ -1,4 +1,5 @@
 import { ArrowLeft, Search, Filter, Calendar, Bell, BellOff, Zap, X, Copy, Check, ChevronDown, ExternalLink, Clock, Globe, Instagram, ShoppingBag } from "lucide-react";
+import { normalizeSearch } from "@/lib/utils";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -188,8 +189,9 @@ const Drops = () => {
   });
 
   const filteredDrops = dropsWithAutoStatus.filter((drop) => {
-    const matchesSearch = drop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         drop.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = normalizeSearch(searchQuery);
+    const matchesSearch = normalizeSearch(drop.title).includes(q) ||
+                         normalizeSearch(drop.description || '').includes(q);
     const matchesStatus = statusFilter === 'all' || drop.status === statusFilter;
     const matchesBrand = brandFilter === 'all' || drop.brand_id === brandFilter;
     return matchesSearch && matchesStatus && matchesBrand;

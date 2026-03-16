@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { normalizeSearch } from "@/lib/utils";
 import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { ArrowLeft, Heart, Search, ExternalLink, Instagram, Store, ChevronDown, X, Layers, Sparkles, Crown, Info, Check } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -114,10 +115,11 @@ const GlobalIndex = () => {
     }
 
     if (searchQuery) {
+      const q = normalizeSearch(searchQuery);
       filtered = filtered.filter(brand =>
-        brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        brand.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        brand.country?.toLowerCase().includes(searchQuery.toLowerCase())
+        normalizeSearch(brand.name).includes(q) ||
+        normalizeSearch(brand.description || '').includes(q) ||
+        normalizeSearch(brand.country || '').includes(q)
       );
     }
 

@@ -1,6 +1,7 @@
 import { DesktopSidePanel } from "@/components/DesktopSidePanel";
 import { RouteSidePanel } from "@/components/RouteSidePanel";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { normalizeSearch } from "@/lib/utils";
 import { ArrowLeft, MapPin, Navigation, GripVertical, Info, Maximize2, Minimize2, Filter, X, Plus, Check, Move, MapPinOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
@@ -492,11 +493,12 @@ const Directions = () => {
     let filtered = shops;
 
     if (debouncedSearchQuery) {
+      const q = normalizeSearch(debouncedSearchQuery);
       filtered = filtered.filter(shop =>
-        shop.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        shop.address?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        shop.city?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        shop.country?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+        normalizeSearch(shop.name || '').includes(q) ||
+        normalizeSearch(shop.address || '').includes(q) ||
+        normalizeSearch(shop.city || '').includes(q) ||
+        normalizeSearch(shop.country || '').includes(q)
       );
     }
 

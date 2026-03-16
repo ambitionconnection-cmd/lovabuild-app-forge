@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { normalizeSearch } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,12 +74,12 @@ export const MediaManagement = () => {
   const brandCategories = [...new Set(brands.map(b => b.category).filter(Boolean) as string[])].sort();
 
   const filteredBrands = brands.filter((brand) => {
-    const q = searchQuery.toLowerCase();
+    const q = normalizeSearch(searchQuery);
     const matchesSearch = !q || 
-      brand.name.toLowerCase().includes(q) ||
-      (brand.country?.toLowerCase().includes(q)) ||
-      (brand.category?.toLowerCase().includes(q)) ||
-      (brand.description?.toLowerCase().includes(q));
+      normalizeSearch(brand.name).includes(q) ||
+      normalizeSearch(brand.country || '').includes(q) ||
+      normalizeSearch(brand.category || '').includes(q) ||
+      normalizeSearch(brand.description || '').includes(q);
     const normalizedBrandCountry = brand.country ? normalizeCountry(brand.country) : null;
     const matchesCountry = countryFilter === "all" || normalizedBrandCountry === countryFilter;
     const matchesCategory = categoryFilter === "all" || brand.category === categoryFilter;
@@ -86,13 +87,13 @@ export const MediaManagement = () => {
   });
 
   const filteredShops = shops.filter((shop) => {
-    const q = searchQuery.toLowerCase();
+    const q = normalizeSearch(searchQuery);
     const matchesSearch = !q ||
-      shop.name.toLowerCase().includes(q) ||
-      shop.city.toLowerCase().includes(q) ||
-      shop.country.toLowerCase().includes(q) ||
-      (shop.address?.toLowerCase().includes(q)) ||
-      (shop.description?.toLowerCase().includes(q));
+      normalizeSearch(shop.name).includes(q) ||
+      normalizeSearch(shop.city).includes(q) ||
+      normalizeSearch(shop.country).includes(q) ||
+      normalizeSearch(shop.address || '').includes(q) ||
+      normalizeSearch(shop.description || '').includes(q);
     const normalizedShopCountry = shop.country ? normalizeCountry(shop.country) : null;
     const matchesCountry = countryFilter === "all" || normalizedShopCountry === countryFilter;
     const matchesCategory = categoryFilter === "all" || shop.category === categoryFilter;

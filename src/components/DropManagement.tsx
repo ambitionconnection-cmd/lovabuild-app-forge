@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { normalizeSearch } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -148,8 +149,9 @@ export function DropManagement() {
   };
 
   const filteredDrops = drops.filter(drop => {
-    const matchesSearch = drop.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         getBrandName(drop.brand_id).toLowerCase().includes(searchTerm.toLowerCase());
+    const q = normalizeSearch(searchTerm);
+    const matchesSearch = normalizeSearch(drop.title).includes(q) ||
+                         normalizeSearch(getBrandName(drop.brand_id)).includes(q);
     const matchesStatus = statusFilter === 'all' || drop.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
