@@ -1,4 +1,5 @@
 import { Globe, Zap, Search, User, Shield, Calendar, Store } from "lucide-react";
+import { normalizeSearch } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
