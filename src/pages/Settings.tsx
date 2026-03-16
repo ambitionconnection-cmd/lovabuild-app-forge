@@ -20,6 +20,7 @@ const Settings = () => {
     return (localStorage.getItem("flyaf_distance_unit") as DistanceUnit) || "metric";
   });
   const [locationStatus, setLocationStatus] = useState<LocationStatus>("unknown");
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // Check location permission status
   useEffect(() => {
