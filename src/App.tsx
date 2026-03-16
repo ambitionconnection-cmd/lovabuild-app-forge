@@ -41,7 +41,7 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <BrowserRouter>
           <AuthProvider>
-            <OnboardingTutorial />
+            <OnboardingCards />
             <Routes>
               {/* Auth page - always public */}
               <Route path="/auth" element={<Auth />} />
