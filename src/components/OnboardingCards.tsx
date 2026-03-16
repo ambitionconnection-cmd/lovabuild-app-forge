@@ -30,6 +30,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import urbanBg from '@/assets/urban-bg.jpg';
+import flyafLogo from '@/assets/flyaf-logo.svg';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
