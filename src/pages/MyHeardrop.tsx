@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Navigation, TrendingUp, MapPin, Trash2, Share2, FileText, Route } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { ArrowLeft, Heart, Navigation, TrendingUp, MapPin, Trash2, Share2, FileText, Route, UserMinus, Bell } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -29,6 +30,16 @@ interface SavedRoute {
   created_at: string;
 }
 
+interface FollowedUser {
+  id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  is_pro: boolean;
+  follow_id: string;
+  has_new_post: boolean;
+  latest_post_image?: string | null;
+}
+
 const MyHeardrop = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -36,6 +47,7 @@ const MyHeardrop = () => {
   const [favoriteBrands, setFavoriteBrands] = useState<FavoriteBrand[]>([]);
   const [favoriteShops, setFavoriteShops] = useState<FavoriteShop[]>([]);
   const [savedRoutes, setSavedRoutes] = useState<SavedRoute[]>([]);
+  const [followedUsers, setFollowedUsers] = useState<FollowedUser[]>([]);
   const [recommendedBrands, setRecommendedBrands] = useState<Tables<'brands'>[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,6 +100,53 @@ const MyHeardrop = () => {
         .order('created_at', { ascending: false });
 
       setSavedRoutes(routesData || []);
+
+      // Fetch followed users
+      const { data: followsData } = await supabase
+        .from('user_follows')
+        .select('id, following_id')
+        .eq('follower_id', user.id);
+
+      if (followsData && followsData.length > 0) {
+        const followingIds = followsData.map(f => f.following_id);
+        
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, display_name, avatar_url, is_pro')
+          .in('id', followingIds);
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        const { data: recentPosts } = await supabase
+          .from('street_spotted_posts')
+          .select('user_id, image_url, created_at')
+          .in('user_id', followingIds)
+          .eq('status', 'approved')
+          .gte('created_at', sevenDaysAgo.toISOString())
+          .order('created_at', { ascending: false });
+
+        const recentPostMap = new Map<string, string>();
+        (recentPosts || []).forEach(p => {
+          if (!recentPostMap.has(p.user_id)) recentPostMap.set(p.user_id, p.image_url);
+        });
+
+        const followed: FollowedUser[] = (profilesData || []).map(p => {
+          const follow = followsData.find(f => f.following_id === p.id);
+          return {
+            id: p.id,
+            display_name: p.display_name,
+            avatar_url: p.avatar_url,
+            is_pro: p.is_pro || false,
+            follow_id: follow?.id || '',
+            has_new_post: recentPostMap.has(p.id),
+            latest_post_image: recentPostMap.get(p.id) || null,
+          };
+        });
+        setFollowedUsers(followed);
+      } else {
+        setFollowedUsers([]);
+      }
 
       // Fetch recommendations based on favorite categories
       const favoriteCategories = brands
@@ -143,6 +202,22 @@ const MyHeardrop = () => {
       haptic.light();
       setFavoriteShops(prev => prev.filter(s => s.favoriteId !== favoriteId));
       toast.success('Removed from favorites');
+    }
+  };
+
+  const unfollowUser = async (followId: string, userId: string) => {
+    const { error } = await supabase
+      .from('user_follows')
+      .delete()
+      .eq('id', followId);
+
+    if (error) {
+      haptic.error();
+      toast.error('Failed to unfollow');
+    } else {
+      haptic.light();
+      setFollowedUsers(prev => prev.filter(u => u.id !== userId));
+      toast.success('Unfollowed');
     }
   };
 
@@ -352,6 +427,77 @@ const MyHeardrop = () => {
                         >
                           View on Map
                         </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Following */}
+            <section>
+              <h2 className="text-sm font-bold mb-2">Following</h2>
+              {followedUsers.length === 0 ? (
+                <Card>
+                  <CardContent className="py-6 text-center">
+                    <Bell className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-xs text-muted-foreground">You're not following anyone yet</p>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => navigate('/feed')}
+                      className="mt-1 text-xs"
+                    >
+                      Discover on HOT
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-1.5">
+                  {followedUsers.map((u) => (
+                    <Card key={u.id} className="overflow-hidden">
+                      <CardContent className="p-2.5">
+                        <div className="flex items-center gap-3">
+                          <div className="relative flex-shrink-0">
+                            <Avatar className="w-10 h-10 ring-1 ring-border">
+                              <AvatarImage src={u.avatar_url || undefined} />
+                              <AvatarFallback className="text-xs font-bold">
+                                {(u.display_name || 'U').charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            {u.has_new_post && (
+                              <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#AD3A49] border-2 border-card flex items-center justify-center">
+                                <Bell className="w-2 h-2 text-white fill-white" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-xs font-semibold truncate">{u.display_name || 'User'}</p>
+                              {u.is_pro && (
+                                <span className="inline-flex items-center px-1 py-0 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[8px] font-bold leading-tight">PRO</span>
+                              )}
+                            </div>
+                            {u.has_new_post ? (
+                              <p className="text-[10px] text-[#AD3A49] font-medium">New post this week!</p>
+                            ) : (
+                              <p className="text-[10px] text-muted-foreground">No recent posts</p>
+                            )}
+                          </div>
+                          {u.has_new_post && u.latest_post_image && (
+                            <div className="w-9 h-9 rounded-md overflow-hidden flex-shrink-0 ring-1 ring-border">
+                              <img src={u.latest_post_image} alt="" className="w-full h-full object-cover" />
+                            </div>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 flex-shrink-0"
+                            onClick={() => unfollowUser(u.follow_id, u.id)}
+                          >
+                            <UserMinus className="w-3 h-3 text-muted-foreground" />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
