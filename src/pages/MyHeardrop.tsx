@@ -47,6 +47,7 @@ const MyHeardrop = () => {
   const [favoriteBrands, setFavoriteBrands] = useState<FavoriteBrand[]>([]);
   const [favoriteShops, setFavoriteShops] = useState<FavoriteShop[]>([]);
   const [savedRoutes, setSavedRoutes] = useState<SavedRoute[]>([]);
+  const [followedUsers, setFollowedUsers] = useState<FollowedUser[]>([]);
   const [recommendedBrands, setRecommendedBrands] = useState<Tables<'brands'>[]>([]);
   const [loading, setLoading] = useState(true);
 
