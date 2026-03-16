@@ -115,10 +115,11 @@ const GlobalIndex = () => {
     }
 
     if (searchQuery) {
+      const q = normalizeSearch(searchQuery);
       filtered = filtered.filter(brand =>
-        brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        brand.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        brand.country?.toLowerCase().includes(searchQuery.toLowerCase())
+        normalizeSearch(brand.name).includes(q) ||
+        normalizeSearch(brand.description || '').includes(q) ||
+        normalizeSearch(brand.country || '').includes(q)
       );
     }
 
