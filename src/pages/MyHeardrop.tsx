@@ -205,6 +205,22 @@ const MyHeardrop = () => {
     }
   };
 
+  const unfollowUser = async (followId: string, userId: string) => {
+    const { error } = await supabase
+      .from('user_follows')
+      .delete()
+      .eq('id', followId);
+
+    if (error) {
+      haptic.error();
+      toast.error('Failed to unfollow');
+    } else {
+      haptic.light();
+      setFollowedUsers(prev => prev.filter(u => u.id !== userId));
+      toast.success('Unfollowed');
+    }
+  };
+
   const deleteRoute = async (routeId: string) => {
     const { error } = await (supabase.from('saved_routes') as any)
       .delete()
