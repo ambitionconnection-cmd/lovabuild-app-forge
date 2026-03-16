@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { normalizeSearch } from "@/lib/utils";
 import { X, Camera, Check, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
