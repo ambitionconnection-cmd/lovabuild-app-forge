@@ -227,9 +227,10 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
   if (step === 'language') {
     return (
       <div style={overlay} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <div style={overlayBg} />
         {/* Header */}
-        <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={logoStyle}>flyaf</span>
+        <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+          <img src={flyafLogo} alt="FLYAF" style={{ height: 24 }} />
           <button
             onClick={complete}
             style={{ background: 'none', border: 'none', color: '#333', fontSize: 12, cursor: 'pointer', padding: '4px 8px' }}
