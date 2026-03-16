@@ -22,7 +22,8 @@ import Analytics from "./pages/Analytics";
 import NotificationHistory from "./pages/NotificationHistory";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import OnboardingTutorial from "./components/OnboardingTutorial";
+import OnboardingCards from "./components/OnboardingCards";
+import AppGuideScreen from "./components/AppGuideScreen";
 import More from "./pages/More";
 import About from "./pages/About";
 import Settings from "./pages/Settings";
@@ -40,7 +41,7 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <BrowserRouter>
           <AuthProvider>
-            <OnboardingTutorial />
+            <OnboardingCards />
             <Routes>
               {/* Auth page - always public */}
               <Route path="/auth" element={<Auth />} />
@@ -54,6 +55,7 @@ function App() {
               <Route path="/drops" element={<Feed />} />
               <Route path="/feed" element={<Feed />} />
               <Route path="/collections" element={<Collections />} />
+              <Route path="/guide" element={<AppGuideScreen />} />
 
 
               {/* PROTECTED PAGES - Login required */}

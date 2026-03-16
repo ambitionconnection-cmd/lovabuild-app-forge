@@ -215,7 +215,7 @@ const Settings = () => {
               <Button
                 variant="outline"
                 onClick={() => {
-                  localStorage.removeItem('flyaf_onboarding_complete');
+                  localStorage.removeItem('flyaf_onboarded_v2');
                   window.location.href = '/';
                 }}
                 className="w-full gap-2 border-white/10 text-white/70 hover:text-white hover:bg-white/10"
