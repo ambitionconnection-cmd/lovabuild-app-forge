@@ -39,6 +39,12 @@ const menuItems: MenuItem[] = [
     requiresAuth: true,
   },
   {
+    icon: BookOpen,
+    label: "appGuide",
+    description: "appGuideDesc",
+    path: "/guide",
+  },
+  {
     icon: Mail,
     label: "contact",
     description: "contactDesc",

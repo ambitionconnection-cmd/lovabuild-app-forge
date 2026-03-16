@@ -150,7 +150,7 @@ const OnboardingCards: React.FC<OnboardingCardsProps> = ({
   const selectLang = (code: Lang) => {
     setLang(code);
     try { localStorage.setItem(LANG_KEY, code); } catch { /* ignore */ }
-    // TODO: hook into your i18n: i18n.changeLanguage(code);
+    i18n.changeLanguage(code);
   };
 
   const advance = () => {

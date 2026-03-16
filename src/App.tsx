@@ -55,6 +55,7 @@ function App() {
               <Route path="/drops" element={<Feed />} />
               <Route path="/feed" element={<Feed />} />
               <Route path="/collections" element={<Collections />} />
+              <Route path="/guide" element={<AppGuideScreen />} />
 
 
               {/* PROTECTED PAGES - Login required */}
