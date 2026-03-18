@@ -278,6 +278,7 @@ export const MediaManagement = () => {
     } finally {
       setDeletingImage(null);
       restoreScrollPosition();
+    }
   };
 
   const copyToClipboard = (url: string) => {
