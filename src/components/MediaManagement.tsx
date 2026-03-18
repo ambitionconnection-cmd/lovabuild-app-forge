@@ -277,7 +277,7 @@ export const MediaManagement = () => {
       toast.error(error.message || "Failed to delete image");
     } finally {
       setDeletingImage(null);
-    }
+      restoreScrollPosition();
   };
 
   const copyToClipboard = (url: string) => {
