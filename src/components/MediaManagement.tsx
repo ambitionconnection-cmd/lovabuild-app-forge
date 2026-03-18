@@ -589,7 +589,7 @@ export const MediaManagement = () => {
                 </TabsList>
 
                 <TabsContent value="all" className="mt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                  <div ref={brandGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
                     {filteredBrands.map((brand) => (
                       <BrandImageCard key={brand.id} brand={brand} />
                     ))}
