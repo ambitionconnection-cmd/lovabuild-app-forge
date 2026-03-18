@@ -529,7 +529,7 @@ export const MediaManagement = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Top-level Brands / Shops toggle */}
-            <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); setSearchQuery(""); setCountryFilter("all"); setCategoryFilter("all"); }}>
+            <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); activeGridRef.current = v as any; setSearchQuery(""); setCountryFilter("all"); setCategoryFilter("all"); }}>
             <TabsList className="mb-4">
               <TabsTrigger value="brands">Brands ({brands.length})</TabsTrigger>
               <TabsTrigger value="shops">Shops ({shops.length})</TabsTrigger>
