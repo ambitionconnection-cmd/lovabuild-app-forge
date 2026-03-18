@@ -35,6 +35,21 @@ export const MediaManagement = () => {
   const shopGridRef = useRef<HTMLDivElement>(null);
   const brandGridRef = useRef<HTMLDivElement>(null);
   const savedScrollRef = useRef<number>(0);
+  const activeGridRef = useRef<'brands' | 'shops'>('brands');
+
+  const saveScrollPosition = useCallback(() => {
+    const ref = activeGridRef.current === 'shops' ? shopGridRef : brandGridRef;
+    savedScrollRef.current = ref.current?.scrollTop || 0;
+  }, []);
+
+  const restoreScrollPosition = useCallback(() => {
+    requestAnimationFrame(() => {
+      const ref = activeGridRef.current === 'shops' ? shopGridRef : brandGridRef;
+      if (ref.current) {
+        ref.current.scrollTop = savedScrollRef.current;
+      }
+    });
+  }, []);
 
   useEffect(() => {
     fetchData();
