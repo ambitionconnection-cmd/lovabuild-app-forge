@@ -772,7 +772,7 @@ export const MediaManagement = () => {
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => { setNewUrl(""); setUploadMode("file"); }}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => { setNewUrl(""); setUploadMode("file"); restoreScrollPosition(); }}>Cancel</AlertDialogCancel>
             {uploadMode === "url" && (
               <AlertDialogAction
                 onClick={() => {
