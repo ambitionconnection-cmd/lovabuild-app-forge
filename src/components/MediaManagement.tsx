@@ -32,6 +32,9 @@ export const MediaManagement = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [mediaTab, setMediaTab] = useState<"brands" | "shops">("brands");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const shopGridRef = useRef<HTMLDivElement>(null);
+  const brandGridRef = useRef<HTMLDivElement>(null);
+  const savedScrollRef = useRef<number>(0);
 
   useEffect(() => {
     fetchData();
