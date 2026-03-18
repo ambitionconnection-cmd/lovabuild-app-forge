@@ -664,7 +664,7 @@ export const MediaManagement = () => {
       </Card>
 
       {/* Upload Dialog */}
-      <AlertDialog open={isUploadDialogOpen} onOpenChange={() => { setSelectedBrand(null); setSelectedShop(null); setNewUrl(""); setUploadMode("file"); }}>
+      <AlertDialog open={isUploadDialogOpen} onOpenChange={() => { setSelectedBrand(null); setSelectedShop(null); setNewUrl(""); setUploadMode("file"); restoreScrollPosition(); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
