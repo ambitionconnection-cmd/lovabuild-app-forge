@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { normalizeSearch } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,24 @@ export const MediaManagement = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [mediaTab, setMediaTab] = useState<"brands" | "shops">("brands");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const shopGridRef = useRef<HTMLDivElement>(null);
+  const brandGridRef = useRef<HTMLDivElement>(null);
+  const savedScrollRef = useRef<number>(0);
+  const activeGridRef = useRef<'brands' | 'shops'>('brands');
+
+  const saveScrollPosition = useCallback(() => {
+    const ref = activeGridRef.current === 'shops' ? shopGridRef : brandGridRef;
+    savedScrollRef.current = ref.current?.scrollTop || 0;
+  }, []);
+
+  const restoreScrollPosition = useCallback(() => {
+    requestAnimationFrame(() => {
+      const ref = activeGridRef.current === 'shops' ? shopGridRef : brandGridRef;
+      if (ref.current) {
+        ref.current.scrollTop = savedScrollRef.current;
+      }
+    });
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -188,6 +206,7 @@ export const MediaManagement = () => {
       ));
       setSelectedBrand(null);
       setNewUrl("");
+      restoreScrollPosition();
     } catch (error: any) {
       console.error("Error updating image:", error);
       toast.error(error.message || "Failed to update image");
@@ -211,6 +230,7 @@ export const MediaManagement = () => {
       ));
       setSelectedShop(null);
       setNewUrl("");
+      restoreScrollPosition();
     } catch (error: any) {
       console.error("Error updating image:", error);
       toast.error(error.message || "Failed to update image");
@@ -257,6 +277,7 @@ export const MediaManagement = () => {
       toast.error(error.message || "Failed to delete image");
     } finally {
       setDeletingImage(null);
+      restoreScrollPosition();
     }
   };
 
@@ -305,6 +326,7 @@ export const MediaManagement = () => {
               size="sm"
               className="flex-1 text-xs"
               onClick={() => {
+                saveScrollPosition();
                 setSelectedBrand(brand);
                 setSelectedShop(null);
                 setUploadType("logo");
@@ -318,7 +340,7 @@ export const MediaManagement = () => {
                 <Button variant="ghost" size="sm" onClick={() => copyToClipboard(brand.logo_url!)}>
                   <Copy className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ brand, type: "logo" })}>
+                <Button variant="ghost" size="sm" onClick={() => { saveScrollPosition(); setDeletingImage({ brand, type: "logo" }); }}>
                   <Trash2 className="w-3 h-3 text-destructive" />
                 </Button>
               </>
@@ -352,6 +374,7 @@ export const MediaManagement = () => {
               size="sm"
               className="flex-1 text-xs"
               onClick={() => {
+                saveScrollPosition();
                 setSelectedBrand(brand);
                 setSelectedShop(null);
                 setUploadType("banner");
@@ -365,7 +388,7 @@ export const MediaManagement = () => {
                 <Button variant="ghost" size="sm" onClick={() => copyToClipboard(brand.banner_url!)}>
                   <Copy className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ brand, type: "banner" })}>
+                <Button variant="ghost" size="sm" onClick={() => { saveScrollPosition(); setDeletingImage({ brand, type: "banner" }); }}>
                   <Trash2 className="w-3 h-3 text-destructive" />
                 </Button>
               </>
@@ -410,6 +433,7 @@ export const MediaManagement = () => {
               size="sm"
               className="flex-1 text-xs"
               onClick={() => {
+                saveScrollPosition();
                 setSelectedShop(shop);
                 setSelectedBrand(null);
                 setUploadType("shop-logo");
@@ -423,7 +447,7 @@ export const MediaManagement = () => {
                 <Button variant="ghost" size="sm" onClick={() => copyToClipboard(shop.logo_url!)}>
                   <Copy className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ shop, type: "shop-logo" })}>
+                <Button variant="ghost" size="sm" onClick={() => { saveScrollPosition(); setDeletingImage({ shop, type: "shop-logo" }); }}>
                   <Trash2 className="w-3 h-3 text-destructive" />
                 </Button>
               </>
@@ -457,6 +481,7 @@ export const MediaManagement = () => {
               size="sm"
               className="flex-1 text-xs"
               onClick={() => {
+                saveScrollPosition();
                 setSelectedShop(shop);
                 setSelectedBrand(null);
                 setUploadType("shop");
@@ -470,7 +495,7 @@ export const MediaManagement = () => {
                 <Button variant="ghost" size="sm" onClick={() => copyToClipboard(shop.image_url!)}>
                   <Copy className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ shop, type: "shop" })}>
+                <Button variant="ghost" size="sm" onClick={() => { saveScrollPosition(); setDeletingImage({ shop, type: "shop" }); }}>
                   <Trash2 className="w-3 h-3 text-destructive" />
                 </Button>
               </>
@@ -504,7 +529,7 @@ export const MediaManagement = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Top-level Brands / Shops toggle */}
-            <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); setSearchQuery(""); setCountryFilter("all"); setCategoryFilter("all"); }}>
+            <Tabs value={mediaTab} onValueChange={(v) => { setMediaTab(v as any); activeGridRef.current = v as any; setSearchQuery(""); setCountryFilter("all"); setCategoryFilter("all"); }}>
             <TabsList className="mb-4">
               <TabsTrigger value="brands">Brands ({brands.length})</TabsTrigger>
               <TabsTrigger value="shops">Shops ({shops.length})</TabsTrigger>
@@ -564,7 +589,7 @@ export const MediaManagement = () => {
                 </TabsList>
 
                 <TabsContent value="all" className="mt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                  <div ref={brandGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
                     {filteredBrands.map((brand) => (
                       <BrandImageCard key={brand.id} brand={brand} />
                     ))}
@@ -606,7 +631,7 @@ export const MediaManagement = () => {
                 </TabsList>
 
                 <TabsContent value="all" className="mt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
+                  <div ref={shopGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
                     {filteredShops.map((shop) => (
                       <ShopImageCard key={shop.id} shop={shop} />
                     ))}
@@ -639,7 +664,7 @@ export const MediaManagement = () => {
       </Card>
 
       {/* Upload Dialog */}
-      <AlertDialog open={isUploadDialogOpen} onOpenChange={() => { setSelectedBrand(null); setSelectedShop(null); setNewUrl(""); setUploadMode("file"); }}>
+      <AlertDialog open={isUploadDialogOpen} onOpenChange={() => { setSelectedBrand(null); setSelectedShop(null); setNewUrl(""); setUploadMode("file"); restoreScrollPosition(); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -747,7 +772,7 @@ export const MediaManagement = () => {
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => { setNewUrl(""); setUploadMode("file"); }}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => { setNewUrl(""); setUploadMode("file"); restoreScrollPosition(); }}>Cancel</AlertDialogCancel>
             {uploadMode === "url" && (
               <AlertDialogAction
                 onClick={() => {
@@ -764,7 +789,7 @@ export const MediaManagement = () => {
       </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deletingImage} onOpenChange={() => setDeletingImage(null)}>
+      <AlertDialog open={!!deletingImage} onOpenChange={() => { setDeletingImage(null); restoreScrollPosition(); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {deletingImage?.type === "shop" ? "image" : deletingImage?.type === "shop-logo" ? "logo" : deletingImage?.type}</AlertDialogTitle>
