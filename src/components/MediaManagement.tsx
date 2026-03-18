@@ -230,6 +230,7 @@ export const MediaManagement = () => {
       ));
       setSelectedShop(null);
       setNewUrl("");
+      restoreScrollPosition();
     } catch (error: any) {
       console.error("Error updating image:", error);
       toast.error(error.message || "Failed to update image");
