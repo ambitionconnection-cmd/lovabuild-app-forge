@@ -388,7 +388,7 @@ export const MediaManagement = () => {
                 <Button variant="ghost" size="sm" onClick={() => copyToClipboard(brand.banner_url!)}>
                   <Copy className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => setDeletingImage({ brand, type: "banner" })}>
+                <Button variant="ghost" size="sm" onClick={() => { saveScrollPosition(); setDeletingImage({ brand, type: "banner" }); }}>
                   <Trash2 className="w-3 h-3 text-destructive" />
                 </Button>
               </>
