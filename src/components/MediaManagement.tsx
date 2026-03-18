@@ -325,6 +325,7 @@ export const MediaManagement = () => {
               size="sm"
               className="flex-1 text-xs"
               onClick={() => {
+                saveScrollPosition();
                 setSelectedBrand(brand);
                 setSelectedShop(null);
                 setUploadType("logo");
