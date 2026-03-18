@@ -789,7 +789,7 @@ export const MediaManagement = () => {
       </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deletingImage} onOpenChange={() => setDeletingImage(null)}>
+      <AlertDialog open={!!deletingImage} onOpenChange={() => { setDeletingImage(null); restoreScrollPosition(); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {deletingImage?.type === "shop" ? "image" : deletingImage?.type === "shop-logo" ? "logo" : deletingImage?.type}</AlertDialogTitle>
