@@ -123,6 +123,7 @@ const Directions = () => {
     };
   }, []);
 
+  const { shops: shopsData, brands: brandsData, loading: dataLoading } = useShopsData();
   const [shops, setShops] = useState<ShopType[]>([]);
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
