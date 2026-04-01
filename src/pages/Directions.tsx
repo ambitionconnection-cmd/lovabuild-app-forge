@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
+
 import { Tables } from "@/integrations/supabase/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,7 @@ import haptic from "@/lib/haptics";
 import { useTranslation } from "react-i18next";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useShopsCache } from "@/hooks/useShopsCache";
+import { useShopsData } from "@/hooks/useShopsData";
 import { CityChip } from "@/components/CityChip";
 import { BrandOfTheWeek } from "@/components/BrandOfTheWeek";
 import {
@@ -122,6 +123,7 @@ const Directions = () => {
     };
   }, []);
 
+  const { shops: shopsData, brands: brandsData, loading: dataLoading } = useShopsData();
   const [shops, setShops] = useState<ShopType[]>([]);
   const [filteredShops, setFilteredShops] = useState<ShopType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -424,33 +426,17 @@ const Directions = () => {
     }
   };
 
-  // Fetch shops and brands
+  // Sync data from useShopsData hook (includes localStorage pre-cache)
   useEffect(() => {
-    const fetchData = async () => {
-      // Fetch shops and brands in parallel
-      const [shopsResult, brandsResult] = await Promise.all([
-        supabase.from('shops_public').select('*').order('name'),
-        supabase.from('brands').select('id, slug, name, logo_url, banner_url, description, history, instagram_url, tiktok_url, official_website, country, category').eq('is_active', true)
-      ]);
-
-      if (shopsResult.error) {
-        console.error('Error fetching shops:', shopsResult.error);
-      } else {
-        setShops(shopsResult.data || []);
-        setFilteredShops(shopsResult.data || []);
-      }
-      
-      if (brandsResult.error) {
-        console.error('Error fetching brands:', brandsResult.error);
-      } else {
-        setBrands(brandsResult.data || []);
-      }
-      
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
+    if (shopsData.length > 0) {
+      setShops(shopsData);
+      setFilteredShops(shopsData);
+    }
+    if (brandsData.length > 0) {
+      setBrands(brandsData);
+    }
+    setLoading(dataLoading && shopsData.length === 0);
+  }, [shopsData, brandsData, dataLoading]);
 
   // Handle URL parameters for centering map on specific shop
   useEffect(() => {
