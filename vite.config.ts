@@ -66,13 +66,59 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
+            // Supabase data queries (shops, brands) — serve stale cache instantly, revalidate in background
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/(shops|brands|shops_public).*/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "supabase-data-cache",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24, // 24 hours
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            // Supabase storage (images, logos) — cache first, long TTL
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "supabase-storage-cache",
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            // Other Supabase API calls — network first with short cache
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
             handler: "NetworkFirst",
             options: {
-              cacheName: "supabase-cache",
+              cacheName: "supabase-api-cache",
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 5, // 5 minutes
+              },
+            },
+          },
+          {
+            // Mapbox tiles — cache aggressively
+            urlPattern: /^https:\/\/.*\.tiles\.mapbox\.com\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "mapbox-tiles-cache",
+              expiration: {
+                maxEntries: 500,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
               },
             },
           },
