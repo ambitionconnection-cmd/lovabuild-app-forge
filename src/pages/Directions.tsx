@@ -426,33 +426,17 @@ const Directions = () => {
     }
   };
 
-  // Fetch shops and brands
+  // Sync data from useShopsData hook (includes localStorage pre-cache)
   useEffect(() => {
-    const fetchData = async () => {
-      // Fetch shops and brands in parallel
-      const [shopsResult, brandsResult] = await Promise.all([
-        supabase.from('shops_public').select('*').order('name'),
-        supabase.from('brands').select('id, slug, name, logo_url, banner_url, description, history, instagram_url, tiktok_url, official_website, country, category').eq('is_active', true)
-      ]);
-
-      if (shopsResult.error) {
-        console.error('Error fetching shops:', shopsResult.error);
-      } else {
-        setShops(shopsResult.data || []);
-        setFilteredShops(shopsResult.data || []);
-      }
-      
-      if (brandsResult.error) {
-        console.error('Error fetching brands:', brandsResult.error);
-      } else {
-        setBrands(brandsResult.data || []);
-      }
-      
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
+    if (shopsData.length > 0) {
+      setShops(shopsData);
+      setFilteredShops(shopsData);
+    }
+    if (brandsData.length > 0) {
+      setBrands(brandsData);
+    }
+    setLoading(dataLoading && shopsData.length === 0);
+  }, [shopsData, brandsData, dataLoading]);
 
   // Handle URL parameters for centering map on specific shop
   useEffect(() => {
