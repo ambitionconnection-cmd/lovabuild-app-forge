@@ -576,12 +576,7 @@ const Map: React.FC<MapProps> = ({
         // On mobile, skip popup — use detail bottom sheet instead
         const isMobile = window.innerWidth < 1024;
         if (isMobile) {
-          // Center on shop
-          map.current.jumpTo({
-            center: coordinates,
-            zoom: Math.max(map.current.getZoom(), 15)
-          });
-          // Open shop detail bottom sheet
+          // Open shop detail bottom sheet without recentering the map
           window.dispatchEvent(new CustomEvent('map:openShopDetail', { detail: { shopId: shop.id } }));
           return;
         }
