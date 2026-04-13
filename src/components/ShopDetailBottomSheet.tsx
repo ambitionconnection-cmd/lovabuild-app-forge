@@ -8,6 +8,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { ProUpgradeModal } from '@/components/ProUpgradeModal';
 import { Tables } from '@/integrations/supabase/types';
 import { useTranslation } from 'react-i18next';
+import { trackEvent } from '@/lib/analytics';
 
 type ShopType = Tables<'shops_public'>;
 
