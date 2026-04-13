@@ -1,57 +1,78 @@
 
 
-## What Can Be Automated vs. What Needs Manual Work
+## Plan: Comprehensive Visitor & Usage Analytics System
 
-### Fully Automatable
+This is a large feature spanning database tables, a tracking library, instrumentation across all pages, a full analytics dashboard component, PDF export, and cleanup of Drops references from the admin UI.
 
-**1. First 500 Users → 3-Month Free Pro**
-- Add a DB trigger on the `profiles` table: when a new profile is created, count total profiles. If count <= 500, automatically set `is_pro = true` and `pro_expires_at = now() + 3 months`.
-- No manual work needed. Every new signup is automatically checked and granted Pro if they're within the first 500.
-- The "founding member" messaging can be shown conditionally on the frontend based on a `is_founding_member` flag or by checking if `pro_expires_at` is set without a Stripe subscription.
+### Database Changes
 
-**2. After User #500 → Standard Freemium**
-- This happens automatically once the trigger stops granting Pro (count > 500). No code change needed at that point — the existing paywall logic already works for non-Pro users.
+Create 3 new tables via migration:
 
-**3. Admin Pro Bypass**
-- Update `check-subscription` edge function: if the user has the `admin` role in `user_roles`, return `subscribed: true` regardless of Stripe status. This fixes your inability to test Print and other Pro features.
+**`visitor_sessions`** — tracks anonymous/authenticated sessions
+- `id` (uuid, PK), `session_id` (text, unique), `first_seen` (timestamptz), `last_seen` (timestamptz), `page_count` (int, default 0), `device_type` (text), `browser` (text), `country` (text), `referrer` (text), `user_id` (uuid, nullable), `is_authenticated` (boolean, default false)
+- RLS: anon/authenticated can INSERT and UPDATE (upsert pattern); admins can SELECT all
 
-### Requires Manual Action (by you, once)
+**`page_views`** — every page/tab navigation
+- `id` (uuid, PK), `session_id` (text), `page_name` (text), `viewed_at` (timestamptz, default now()), `is_authenticated` (boolean), `user_id` (uuid, nullable)
+- RLS: anon/authenticated can INSERT; admins can SELECT all
 
-**4. Ambassador Permanent Pro**
-- Create an `ambassador_codes` table with redeemable codes that grant permanent Pro (no expiry).
-- You generate codes in the admin panel and send them to your 50-100 contacts.
-- They redeem during signup or on their profile page → `is_pro = true`, `pro_expires_at = null` (permanent).
-- The code generation and redemption is automated; you just need to distribute the codes manually.
+**`app_events`** — conversion funnel events
+- `id` (uuid, PK), `session_id` (text), `event_name` (text), `created_at` (timestamptz, default now()), `is_authenticated` (boolean), `user_id` (uuid, nullable), `metadata` (jsonb, default '{}')
+- RLS: anon/authenticated can INSERT; admins can SELECT all
 
----
+All writes are open to anon+authenticated for INSERT only (lightweight fire-and-forget from the client). Only admins can read.
 
-## Implementation Plan
+### New Files
 
-### Step 1: Admin Pro bypass
-Modify the `check-subscription` edge function to check `user_roles` for admin role. If admin, return `subscribed: true`. Single file change.
+| # | File | Purpose |
+|---|------|---------|
+| 1 | `src/lib/analytics.ts` | Core tracking library — generates/stores session ID in localStorage, detects device/browser/country from timezone, provides `trackPageView()`, `trackEvent()`, `updateSession()` functions. All calls are non-blocking async with silent error handling. |
+| 2 | `src/hooks/usePageTracking.ts` | React hook that calls `trackPageView()` on mount with the current page name. Used in every page component. |
+| 3 | `src/components/VisitorAnalyticsDashboard.tsx` | Full admin analytics dashboard component with: overview cards, traffic sources bar chart, page popularity bar chart, conversion funnel visualization, geography table, device split pie chart, retention chart, date range picker (today/7d/30d/custom), auto-refresh every 5 min, and PDF export button. |
 
-### Step 2: Auto-Pro for first 500 users
-- DB migration: modify the `handle_new_user()` trigger function to count profiles and set `is_pro`/`pro_expires_at` when count <= 500.
-- Add a `is_founding_member` boolean column to `profiles` (default false) so we can show the special "founding member" message.
-- Frontend: after signup, if user's profile has `is_founding_member = true`, show a welcome toast: "You're one of FLYAF's first 500 members. Welcome to Pro, on us for 3 months."
+### Modified Files
 
-### Step 3: Ambassador code system
-- DB migration: create `ambassador_codes` table (code, max_uses, uses_count, grants_permanent_pro, is_active) and `code_redemptions` table (code_id, user_id, redeemed_at).
-- Admin panel: new section to generate/manage ambassador codes.
-- Frontend: "Have a code?" input on the Auth page or Profile page. On redemption, set `is_pro = true` and `pro_expires_at = null`.
-- RLS: admins can manage codes; authenticated users can redeem.
+| # | File | Change |
+|---|------|--------|
+| 4 | `src/pages/Directions.tsx` | Add `usePageTracking('nearby')` + `trackEvent('map_loaded')` after map init |
+| 5 | `src/pages/GlobalIndex.tsx` | Add `usePageTracking('index')` + `trackEvent('index_opened')` |
+| 6 | `src/pages/Feed.tsx` | Add `usePageTracking('hot')` + `trackEvent('hot_opened')` |
+| 7 | `src/pages/BrandDetail.tsx` | Add `usePageTracking('brand')` + `trackEvent('brand_viewed')` |
+| 8 | `src/pages/More.tsx` | Add `usePageTracking('more')` |
+| 9 | `src/pages/RoutePage.tsx` | Add `usePageTracking('route')` |
+| 10 | `src/pages/Collections.tsx` | Add `usePageTracking('collections')` |
+| 11 | `src/pages/Auth.tsx` | Track `signup_started`, `signup_completed`, `login_completed` events |
+| 12 | `src/components/Map.tsx` | Track `pin_tapped` event on marker click |
+| 13 | `src/components/ShopDetailBottomSheet.tsx` or `ShopDetailsModal.tsx` | Track `shop_viewed` event |
+| 14 | `src/App.tsx` | Initialize analytics session on app mount (`trackEvent('app_opened')`) |
+| 15 | `src/components/AdminSidebar.tsx` | Add "Visitor Analytics" item under Data group; remove or relabel Drops-related items if present |
+| 16 | `src/pages/Admin.tsx` | Import and render `VisitorAnalyticsDashboard` for the new tab; remove Drops analytics references from the dashboard header stats |
+| 17 | `src/components/UserAnalytics.tsx` | Remove the entire "Affiliate Analytics" section that references Drops (the drop-specific charts, tables, pie chart). Keep user growth metrics. |
+| 18 | `src/components/AdminStatsCards.tsx` | Remove "Upcoming Drops" card |
 
-### Step 4: Founding member messaging
-- Update the Pro upgrade modal to show "You're one of FLYAF's first 500" for founding members approaching expiry.
-- Show a subtle badge or note on the profile for founding members.
+### PDF Export
 
-### Summary of effort
+Use `jsPDF` + `jspdf-autotable` (client-side). The export button captures the currently visible analytics data (respecting date filter), renders: FLYAF logo, date range header, overview metrics, traffic sources, page popularity, funnel with drop-off %, geography table, device split. No server processing needed.
 
-| Feature | Automated? | Your manual work |
-|---------|-----------|-----------------|
-| First 500 → 3mo Pro | Fully automatic | None |
-| After #500 → freemium | Fully automatic | None |
-| Admin bypass | Fully automatic | None |
-| Ambassador codes | Code auto-redeems | You distribute ~50-100 codes to contacts |
-| Ambassador brief | N/A | You send the message (we can draft it) |
+### Drops Cleanup (Frontend Only)
+
+- Remove Drops-related analytics sections from `UserAnalytics.tsx` (affiliate charts/tables)
+- Remove "Upcoming Drops" stat card from `AdminStatsCards.tsx`
+- Keep Drops management pages (content CRUD) intact — only analytics UI references are removed
+- Keep all database tables and edge functions untouched
+
+### Performance Guarantees
+
+- All tracking calls use fire-and-forget pattern: `supabase.from(...).insert(...).then(() => {}).catch(() => {})` — never awaited in the render path
+- Session ID generated once and cached in localStorage
+- No additional network requests on page load beyond the single insert
+- Dashboard queries only run in the admin panel, never for regular users
+
+### Technical Details
+
+- Device detection: `navigator.userAgent` parsed for mobile/desktop + browser name
+- Country detection: `Intl.DateTimeFormat().resolvedOptions().timeZone` mapped to country
+- Session upsert: uses Supabase upsert on `session_id` to update `last_seen` and `page_count`
+- Funnel visualization: sequential bars showing count at each step with percentage drop-off labels between steps
+- Auto-refresh: `setInterval` every 5 minutes re-fetches dashboard data
 
