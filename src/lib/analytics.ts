@@ -114,7 +114,7 @@ export function initSession(): void {
       referrer: getReferrer(),
       is_authenticated: isAuthenticated,
       user_id: userId,
-    }, { onConflict: 'session_id' }).then(() => {}).catch(() => {});
+    }, { onConflict: 'session_id' }).then(() => {});
   } catch {}
 }
 
@@ -129,15 +129,9 @@ export function trackPageView(pageName: string): void {
       page_name: pageName,
       is_authenticated: isAuthenticated,
       user_id: userId,
-    }).then(() => {}).catch(() => {});
+    }).then(() => {});
 
-    // Bump page_count on session
-    supabase.from('visitor_sessions')
-      .update({ last_seen: new Date().toISOString(), page_count: undefined })
-      .eq('session_id', sessionId)
-      .then(() => {}).catch(() => {});
-
-    // Increment page_count via raw SQL isn't possible, so we do a select + update
+    // Increment page_count on session
     supabase.from('visitor_sessions')
       .select('page_count')
       .eq('session_id', sessionId)
@@ -147,9 +141,9 @@ export function trackPageView(pageName: string): void {
           supabase.from('visitor_sessions')
             .update({ page_count: (data.page_count || 0) + 1, last_seen: new Date().toISOString() })
             .eq('session_id', sessionId)
-            .then(() => {}).catch(() => {});
+            .then(() => {});
         }
-      }).catch(() => {});
+      });
   } catch {}
 }
 
@@ -165,6 +159,6 @@ export function trackEvent(eventName: string, metadata: Record<string, any> = {}
       is_authenticated: isAuthenticated,
       user_id: userId,
       metadata,
-    }).then(() => {}).catch(() => {});
+    }).then(() => {});
   } catch {}
 }
