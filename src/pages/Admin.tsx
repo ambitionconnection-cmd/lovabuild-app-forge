@@ -492,7 +492,6 @@ export default function Admin() {
             <AdminStatsCards
               totalBrands={stats.totalBrands}
               totalShops={stats.totalShops}
-              upcomingDrops={stats.upcomingDrops}
               lockedAccounts={stats.lockedAccounts}
               loading={loading}
               trends={trends}
