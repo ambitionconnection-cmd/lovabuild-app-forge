@@ -13,6 +13,8 @@ import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicato
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { usePageTracking } from "@/hooks/usePageTracking";
+import { trackEvent } from "@/lib/analytics";
 
 const signInSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255),
@@ -63,6 +65,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  usePageTracking('auth');
   const [isLoading, setIsLoading] = React.useState(false);
   const [showForgotPassword, setShowForgotPassword] = React.useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = React.useState(false);
@@ -120,11 +123,13 @@ const Auth = () => {
   const onSignIn = async (data: SignInFormValues) => {
     setIsLoading(true);
     await signIn(data.email, data.password);
+    trackEvent('login_completed');
     setIsLoading(false);
   };
 
   const onSignUp = async (data: SignUpFormValues) => {
     setIsLoading(true);
+    trackEvent('signup_started');
     
     // Check password against breach database
     try {
@@ -162,6 +167,7 @@ const Auth = () => {
     setIsLoading(false);
     
     if (!error) {
+      trackEvent('signup_completed');
       setVerificationEmail(data.email);
       setShowVerificationMessage(true);
     }

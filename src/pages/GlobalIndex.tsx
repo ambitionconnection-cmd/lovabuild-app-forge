@@ -23,6 +23,7 @@ import { trackEvent } from "@/lib/analytics";
 
 
 const GlobalIndex = () => {
+  usePageTracking('index');
   const { user, isPro } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

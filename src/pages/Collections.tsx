@@ -20,6 +20,7 @@ interface Collection {
 }
 
 const Collections = () => {
+  usePageTracking('collections');
   const navigate = useNavigate();
   const [collections, setCollections] = useState<Collection[]>([]);
   const [brandsMap, setBrandsMap] = useState<Record<string, Tables<'brands'>>>({});

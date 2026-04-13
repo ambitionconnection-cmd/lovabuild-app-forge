@@ -73,6 +73,7 @@ const menuItems: MenuItem[] = [
 ];
 
 const More = () => {
+  usePageTracking('more');
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();

@@ -103,6 +103,7 @@ const SortableStop = ({ stop, index, onRemove }: SortableStopProps) => {
 };
 
 const Directions = () => {
+  usePageTracking('nearby');
   const [searchParams] = useSearchParams();
   const [isRouteMode, setIsRouteMode] = useState(searchParams.get('mode') === 'route');
   const navigate = useNavigate();
