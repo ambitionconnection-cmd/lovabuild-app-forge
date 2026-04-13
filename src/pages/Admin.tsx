@@ -38,6 +38,7 @@ import { UserAnalytics } from '@/components/UserAnalytics';
 import { AdminNotificationPreferences } from '@/components/AdminNotificationPreferences';
 import { ShopThisFitAnalytics } from '@/components/ShopThisFitAnalytics';
 import { ApprovedPostsManager } from '@/components/ApprovedPostsManager';
+import { VisitorAnalyticsDashboard } from '@/components/VisitorAnalyticsDashboard';
 
 interface LoginAttempt {
   id: string;
@@ -742,6 +743,10 @@ export default function Admin() {
 
             {activeTab === "user-analytics" && (
               <UserAnalytics />
+            )}
+
+            {activeTab === "visitor-analytics" && (
+              <VisitorAnalyticsDashboard />
             )}
 
             {activeTab === "email-notifications" && (
