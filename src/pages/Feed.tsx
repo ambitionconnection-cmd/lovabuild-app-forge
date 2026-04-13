@@ -8,7 +8,7 @@ import { trackEvent } from "@/lib/analytics";
 
 const Feed = () => {
   usePageTracking('hot');
-  trackEvent('hot_opened');
+
   return (
     <div className="relative min-h-screen bg-background pb-20 pt-0 lg:pt-14 animate-fade-in">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${urbanBg})` }} />
