@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useTranslation } from "react-i18next";
+import { usePageTracking } from "@/hooks/usePageTracking";
 
 interface MenuItem {
   icon: typeof Heart;
@@ -72,6 +73,7 @@ const menuItems: MenuItem[] = [
 ];
 
 const More = () => {
+  usePageTracking('more');
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();

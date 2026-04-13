@@ -134,6 +134,36 @@ export type Database = {
         }
         Relationships: []
       }
+      app_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          is_authenticated: boolean
+          metadata: Json | null
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          is_authenticated?: boolean
+          metadata?: Json | null
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          is_authenticated?: boolean
+          metadata?: Json | null
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       brand_radar_items: {
         Row: {
           brand_id: string
@@ -624,6 +654,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      page_views: {
+        Row: {
+          id: string
+          is_authenticated: boolean
+          page_name: string
+          session_id: string
+          user_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          is_authenticated?: boolean
+          page_name: string
+          session_id: string
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          is_authenticated?: boolean
+          page_name?: string
+          session_id?: string
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1206,6 +1263,48 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      visitor_sessions: {
+        Row: {
+          browser: string | null
+          country: string | null
+          device_type: string | null
+          first_seen: string
+          id: string
+          is_authenticated: boolean
+          last_seen: string
+          page_count: number
+          referrer: string | null
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          browser?: string | null
+          country?: string | null
+          device_type?: string | null
+          first_seen?: string
+          id?: string
+          is_authenticated?: boolean
+          last_seen?: string
+          page_count?: number
+          referrer?: string | null
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          browser?: string | null
+          country?: string | null
+          device_type?: string | null
+          first_seen?: string
+          id?: string
+          is_authenticated?: boolean
+          last_seen?: string
+          page_count?: number
+          referrer?: string | null
+          session_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }

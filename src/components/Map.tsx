@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tables } from '@/integrations/supabase/types';
 import MapLoadingOverlay from '@/components/MapLoadingOverlay';
+import { trackEvent } from '@/lib/analytics';
 // Debug mode - enable via URL param ?mapDebug=true or localStorage
 const getDebugMode = () => {
   if (typeof window === 'undefined') return false;
@@ -559,6 +560,7 @@ const Map: React.FC<MapProps> = ({
       map.current.on('click', 'unclustered-point', (e) => {
         if (!map.current || !e.features?.[0]) return;
         mapLog.events('Unclustered point clicked');
+        trackEvent('pin_tapped');
         
         isUserInteracting.current = true;
         const coordinates = (e.features[0].geometry as GeoJSON.Point).coordinates.slice() as [number, number];

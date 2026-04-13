@@ -18,10 +18,13 @@ import { getCountryFlag } from "@/lib/countryFlags";
 import haptic from "@/lib/haptics";
 import { useLocation } from "react-router-dom";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { usePageTracking } from "@/hooks/usePageTracking";
+import { trackEvent } from "@/lib/analytics";
 import { useTranslation } from "react-i18next";
 import urbanBg from "@/assets/urban-bg.jpg";
 
 const BrandDetail = () => {
+  usePageTracking('brand');
   const { slug } = useParams<{ slug: string }>();
   const { user, isPro } = useAuth();
   const navigate = useNavigate();

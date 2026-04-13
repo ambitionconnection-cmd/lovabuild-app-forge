@@ -8,6 +8,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { ProUpgradeModal } from '@/components/ProUpgradeModal';
 import { Tables } from '@/integrations/supabase/types';
 import { useTranslation } from 'react-i18next';
+import { trackEvent } from '@/lib/analytics';
 
 type ShopType = Tables<'shops_public'>;
 
@@ -55,6 +56,13 @@ const ShopDetailBottomSheet: React.FC<ShopDetailBottomSheetProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  // Track shop viewed event
+  React.useEffect(() => {
+    if (shop) {
+      trackEvent('shop_viewed', { shop_id: shop.id, shop_name: shop.name });
+    }
+  }, [shop?.id]);
   const { isFavorite, toggleFavorite } = useFavorites('shop');
   const [showProModal, setShowProModal] = useState(false);
   const [sheetState, setSheetState] = useState<'expanded' | 'full'>('expanded');

@@ -3,8 +3,12 @@ import urbanBg from "@/assets/urban-bg.jpg";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { StreetSpottedFeed } from "@/components/StreetSpottedFeed";
+import { usePageTracking } from "@/hooks/usePageTracking";
+import { trackEvent } from "@/lib/analytics";
 
 const Feed = () => {
+  usePageTracking('hot');
+
   return (
     <div className="relative min-h-screen bg-background pb-20 pt-0 lg:pt-14 animate-fade-in">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${urbanBg})` }} />

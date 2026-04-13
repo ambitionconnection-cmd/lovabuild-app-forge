@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { getCountryFlag } from '@/lib/countryFlags';
+import { usePageTracking } from '@/hooks/usePageTracking';
 
 interface Collection {
   id: string;
@@ -19,6 +20,7 @@ interface Collection {
 }
 
 const Collections = () => {
+  usePageTracking('collections');
   const navigate = useNavigate();
   const [collections, setCollections] = useState<Collection[]>([]);
   const [brandsMap, setBrandsMap] = useState<Record<string, Tables<'brands'>>>({});
