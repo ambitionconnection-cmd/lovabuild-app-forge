@@ -25,6 +25,7 @@ import { useTranslation } from "react-i18next";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useShopsCache } from "@/hooks/useShopsCache";
 import { useShopsData } from "@/hooks/useShopsData";
+import { usePageTracking } from "@/hooks/usePageTracking";
 import { CityChip } from "@/components/CityChip";
 import { BrandOfTheWeek } from "@/components/BrandOfTheWeek";
 import {

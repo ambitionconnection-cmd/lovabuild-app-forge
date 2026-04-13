@@ -18,6 +18,8 @@ import { getCountryFlag } from "@/lib/countryFlags";
 import { useTranslation } from "react-i18next";
 import haptic from "@/lib/haptics";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { usePageTracking } from "@/hooks/usePageTracking";
+import { trackEvent } from "@/lib/analytics";
 
 
 const GlobalIndex = () => {

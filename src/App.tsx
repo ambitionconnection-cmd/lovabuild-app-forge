@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -34,6 +34,14 @@ import Collections from "./pages/Collections";
 const queryClient = new QueryClient();
 
 function App() {
+  // Initialize analytics session on app mount
+  useEffect(() => {
+    import('@/lib/analytics').then(({ initSession, trackEvent }) => {
+      initSession();
+      trackEvent('app_opened');
+    });
+  }, []);
+
   // OnboardingTutorial manages its own visibility via localStorage
 
   return (
