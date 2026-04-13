@@ -12,13 +12,11 @@ interface TrendData {
 interface AdminStatsCardsProps {
   totalBrands: number;
   totalShops: number;
-  upcomingDrops: number;
   lockedAccounts: number;
   loading: boolean;
   trends?: {
     brands?: TrendData;
     shops?: TrendData;
-    drops?: TrendData;
     locked?: TrendData;
   };
 }
@@ -26,7 +24,6 @@ interface AdminStatsCardsProps {
 export function AdminStatsCards({
   totalBrands,
   totalShops,
-  upcomingDrops,
   lockedAccounts,
   loading,
   trends,
@@ -51,22 +48,13 @@ export function AdminStatsCards({
       isPositiveGood: true,
     },
     {
-      title: "Upcoming Drops",
-      value: upcomingDrops,
-      icon: Calendar,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-      trend: trends?.drops,
-      isPositiveGood: true,
-    },
-    {
       title: "Locked Accounts",
       value: lockedAccounts,
       icon: ShieldAlert,
       color: "text-destructive",
       bgColor: "bg-destructive/10",
       trend: trends?.locked,
-      isPositiveGood: false, // For locked accounts, decrease is good
+      isPositiveGood: false,
     },
   ];
 
