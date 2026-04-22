@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Plus, ExternalLink, Copy } from "lucide-react";
+import PromoterOnboarding from "@/components/PromoterOnboarding";
 
 interface PromoterRow {
   id: string;
@@ -147,6 +148,7 @@ export default function AdminPromoters() {
       </header>
 
       <main className="p-6">
+        <PromoterOnboarding promoterCount={rows.length} onCreated={load} />
         <Card>
           <CardHeader><CardTitle>All promoters</CardTitle></CardHeader>
           <CardContent>
