@@ -732,6 +732,14 @@ export default function Admin() {
               <AmbassadorCodeManagement />
             )}
 
+            {activeTab === "promoters" && (
+              <div>
+                <Button onClick={() => navigate('/admin/promoters')} className="bg-[#AD3A49] hover:bg-[#AD3A49]/90">
+                  Open Street Promoters Dashboard →
+                </Button>
+              </div>
+            )}
+
             {activeTab === "brand-requests" && (
               <BrandRequestsQueue />
             )}
