@@ -65,6 +65,7 @@ const navGroups = [
     icon: Gift,
     items: [
       { title: "Ambassador Codes", value: "ambassador-codes", icon: Gift },
+      { title: "Street Promoters", value: "promoters", icon: Users },
     ],
   },
   {
