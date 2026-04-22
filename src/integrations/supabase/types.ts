@@ -736,6 +736,151 @@ export type Database = {
         }
         Relationships: []
       }
+      promoter_campaigns: {
+        Row: {
+          city: string
+          created_at: string
+          daily_cap: number
+          end_date: string | null
+          id: string
+          promoter_id: string
+          rate_post_signin: number
+          rate_signin: number
+          rate_visit: number
+          start_date: string
+          status: string
+          target_signins: number
+          target_visits: number
+          total_payout: number
+          updated_at: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          daily_cap?: number
+          end_date?: string | null
+          id?: string
+          promoter_id: string
+          rate_post_signin?: number
+          rate_signin?: number
+          rate_visit?: number
+          start_date?: string
+          status?: string
+          target_signins?: number
+          target_visits?: number
+          total_payout?: number
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          daily_cap?: number
+          end_date?: string | null
+          id?: string
+          promoter_id?: string
+          rate_post_signin?: number
+          rate_signin?: number
+          rate_visit?: number
+          start_date?: string
+          status?: string
+          target_signins?: number
+          target_visits?: number
+          total_payout?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promoter_campaigns_promoter_id_fkey"
+            columns: ["promoter_id"]
+            isOneToOne: false
+            referencedRelation: "promoters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promoter_visits: {
+        Row: {
+          capped: boolean
+          duplicate: boolean
+          id: string
+          ip_hash: string | null
+          post_campaign: boolean
+          promoter_id: string
+          qualified: boolean
+          session_id: string
+          signed_in: boolean
+          signed_in_at: string | null
+          user_id: string | null
+          visited_at: string
+        }
+        Insert: {
+          capped?: boolean
+          duplicate?: boolean
+          id?: string
+          ip_hash?: string | null
+          post_campaign?: boolean
+          promoter_id: string
+          qualified?: boolean
+          session_id: string
+          signed_in?: boolean
+          signed_in_at?: string | null
+          user_id?: string | null
+          visited_at?: string
+        }
+        Update: {
+          capped?: boolean
+          duplicate?: boolean
+          id?: string
+          ip_hash?: string | null
+          post_campaign?: boolean
+          promoter_id?: string
+          qualified?: boolean
+          session_id?: string
+          signed_in?: boolean
+          signed_in_at?: string | null
+          user_id?: string | null
+          visited_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promoter_visits_promoter_id_fkey"
+            columns: ["promoter_id"]
+            isOneToOne: false
+            referencedRelation: "promoters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promoters: {
+        Row: {
+          active: boolean
+          city: string
+          code: string
+          created_at: string
+          id: string
+          name: string
+          paid_at: string | null
+        }
+        Insert: {
+          active?: boolean
+          city: string
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          paid_at?: string | null
+        }
+        Update: {
+          active?: boolean
+          city?: string
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          paid_at?: string | null
+        }
+        Relationships: []
+      }
       saved_routes: {
         Row: {
           created_at: string | null
@@ -1410,6 +1555,20 @@ export type Database = {
           name: string
         }[]
       }
+      get_promoter_results: {
+        Args: { _code: string }
+        Returns: {
+          city: string
+          conversion_rate: number
+          earnings_today: number
+          earnings_total: number
+          promoter_name: string
+          qualified_visits: number
+          signins: number
+          target_signins: number
+          target_visits: number
+        }[]
+      }
       get_user_email_if_public: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -1417,6 +1576,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      promoter_earnings_today: {
+        Args: { _promoter_id: string }
+        Returns: number
+      }
+      recalc_campaign_payout: {
+        Args: { _promoter_id: string }
+        Returns: undefined
       }
     }
     Enums: {
