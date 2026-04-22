@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { trackEvent } from "@/lib/analytics";
+import { creditPromoterSignin } from "@/lib/promoterTracking";
 
 const signInSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255),
@@ -74,10 +75,13 @@ const Auth = () => {
   const searchParams = new URLSearchParams(location.search);
   const mode = searchParams.get('mode');
   const isResetMode = mode === 'reset';
+  const initialTab = searchParams.get('tab') === 'signup' ? 'signup' : 'signin';
+  const promoterRef = searchParams.get('ref');
 
   React.useEffect(() => {
     if (user && !isResetMode) {
-      navigate("/");
+      // Credit promoter (if any) before redirecting
+      creditPromoterSignin(user.id).finally(() => navigate("/"));
     }
   }, [user, navigate, isResetMode]);
 
@@ -402,7 +406,7 @@ const Auth = () => {
           <h1 className="text-3xl font-bold tracking-tight">FLYAF</h1>
         </div>
 
-        <Tabs defaultValue="signin" className="w-full">
+        <Tabs defaultValue={initialTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 h-11">
             <TabsTrigger value="signin" className="min-h-[40px] touch-manipulation">{t('auth.signIn')}</TabsTrigger>
             <TabsTrigger value="signup" className="min-h-[40px] touch-manipulation">{t('auth.signUp')}</TabsTrigger>

@@ -30,6 +30,10 @@ import Settings from "./pages/Settings";
 import RoutePage from "./pages/RoutePage";
 import SharedRoute from "./pages/SharedRoute";
 import Collections from "./pages/Collections";
+import PromoterLanding from "./pages/PromoterLanding";
+import PromoterResults from "./pages/PromoterResults";
+import AdminPromoters from "./pages/AdminPromoters";
+import AdminPromoterDetail from "./pages/AdminPromoterDetail";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +80,12 @@ function App() {
 
               {/* Legacy route - redirect old home to map */}
               <Route path="/index" element={<Directions />} />
+
+              {/* Promoter system */}
+              <Route path="/ref/:code" element={<PromoterLanding />} />
+              <Route path="/results/:code" element={<PromoterResults />} />
+              <Route path="/admin/promoters" element={<ProtectedRoute><AdminPromoters /></ProtectedRoute>} />
+              <Route path="/admin/promoters/:id" element={<ProtectedRoute><AdminPromoterDetail /></ProtectedRoute>} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="/route/:code" element={<SharedRoute />} />
