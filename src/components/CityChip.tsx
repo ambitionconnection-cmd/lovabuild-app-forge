@@ -16,6 +16,14 @@ const CITIES: City[] = [
   { name: "Shanghai", center: [121.4737, 31.2304], zoom: 12 },
   { name: "Beijing", center: [116.4074, 39.9042], zoom: 12 },
   { name: "Bangkok", center: [100.5018, 13.7563], zoom: 13 },
+  { name: "Lagos", center: [3.3792, 6.5244], zoom: 12 },
+  { name: "Nairobi", center: [36.8219, -1.2921], zoom: 13 },
+  { name: "Johannesburg", center: [28.0473, -26.2041], zoom: 12 },
+  { name: "Cape Town", center: [18.4241, -33.9249], zoom: 12 },
+  { name: "Accra", center: [-0.1870, 5.6037], zoom: 13 },
+  { name: "Dakar", center: [-17.4467, 14.6928], zoom: 13 },
+  { name: "Casablanca", center: [-7.5898, 33.5731], zoom: 13 },
+  { name: "Kigali", center: [30.0619, -1.9403], zoom: 13 },
 ];
 
 interface CityChipProps {
