@@ -1,43 +1,69 @@
 
+# Expand FLYAF to Africa
 
-## Plan: Street Promoter System — PDF Tutorial
+## Current State
+- **3 African brands** in DB: KituKali (Kenya), Unlimited Legacy (Nigeria), Baye Fall Spirit (Senegal)
+- **1 African shop**: KituKali Nairobi
+- **Zero African cities** in CityChip selector
+- Missing many African countries from the flags/dropdown lists
 
-Create a polished, branded PDF guide explaining how admins use the new Street Promoter Tracking System end-to-end.
+---
 
-### Output
+## Phase 1 -- Research African Streetwear Brands (AI web search)
 
-Single file: `/mnt/documents/FLYAF_Street_Promoter_Guide.pdf` (multi-page, A4, FLYAF-branded).
+Use multiple web searches to compile 30-50 streetwear, contemporary, and designer brands across:
+- **West Africa**: Nigeria, Ghana, Senegal, Ivory Coast, Cameroon
+- **East Africa**: Kenya, Tanzania, Uganda, Rwanda, Ethiopia
+- **Southern Africa**: South Africa, Zimbabwe, Botswana, Namibia
 
-### Approach
+For each brand: name, country, Instagram URL, official website, category, short description.
 
-Generate via Python `reportlab` (already-supported in sandbox) using FLYAF's color palette: deep red `#AD3A49`, charcoal, cream/neutral. Clean serif/sans pairing, generous spacing, no overlapping elements. QA by rendering to images and visually inspecting every page before delivery.
+## Phase 2 -- Research African Retail Locations (AI web search)
 
-### Document Structure (8 pages)
+Search for physical streetwear/fashion retail stores, concept shops, and multi-brand retailers in:
+- Lagos, Abuja (Nigeria)
+- Accra (Ghana)
+- Nairobi (Kenya)
+- Johannesburg, Cape Town (South Africa)
+- Dakar (Senegal)
+- Kigali (Rwanda)
+- Dar es Salaam (Tanzania)
+- Addis Ababa (Ethiopia)
+- Casablanca (Morocco)
+- Abidjan (Ivory Coast)
 
-1. **Cover** — FLYAF wordmark, title "Street Promoter System", subtitle "Admin Guide", version + date.
-2. **What it is & why it exists** — One-paragraph overview, the 4 system parts (promoters, /ref landing, admin dashboard, public results), and the payout model summary.
-3. **Quick start (3-step onboarding)** — Walks through the in-app onboarding card: create promoter → copy link → test /ref redirect. Includes the URL pattern `flyaf.app/ref/CODE`.
-4. **Creating & managing promoters** — Fields (name, code, city), how to pause/resume, how to mark a campaign complete, how to copy referral links and open the public results page.
-5. **How tracking & qualification work** — Session ID + IP hash dedup (24h window), 30-second qualification via `sendBeacon`, first-promoter-wins attribution, the `capped` flag when daily cap is hit.
-6. **Payout model** — Plain-English formula:
-   `(qualified visits × £0.50) + (campaign sign-ins × £1.00) + (post-campaign sign-ins × £0.20)`, daily cap £20, 7-day post-campaign window. Worked example with numbers.
-7. **Reading the dashboard** — Explains every column on `/admin/promoters` (visits today/total, sign-ins, conversion %, payout today/total, CAP REACHED badge) and the detail page (visit log, editable campaign settings, Mark as Paid).
-8. **Sharing the public results link** — `flyaf.app/results/CODE`, what the promoter sees (progress bars, earnings, motivational tier message), and best-practice tips for promoters in the field.
+For each shop: name, address, city, country, coordinates (8+ decimal places), brand associations, Instagram, website.
 
-### Visual Style
+## Phase 3 -- Database Inserts (automated)
 
-- A4 portrait, 20mm margins.
-- Page header on pages 2+: small FLYAF mark left, "Street Promoter Guide" right, thin red rule.
-- Page footer: page number + "FLYAF Admin Documentation".
-- Section titles in deep red, body in dark charcoal, callout boxes (light cream fill, red left border) for tips and formulas.
-- Monospace inline code for URLs and codes (e.g., `JAY01`, `/ref/JAY01`).
-- No images required — pure typographic layout with shaped callouts and a simple step-flow diagram on page 3.
+I will insert all discovered brands and shops directly into the database using the insert tool:
+- New brands into `brands` table (with slug, country, category, links, `is_active: true`, `brand_tier: 'new_wave'`)
+- New shops into `shops` table (with precise coordinates, city, country, brand linkages where applicable)
+- No manual work required from you
 
-### Technical Notes
+## Phase 4 -- Update Country and City Infrastructure (code changes)
 
-- Use `reportlab.platypus` (`SimpleDocTemplate`, `Paragraph`, `Spacer`, `Table`, `KeepTogether`) for clean flowable layout.
-- Custom `ParagraphStyle`s for H1/H2/body/code/callout.
-- Use `<super>`/`<sub>` XML tags if needed — never Unicode super/subscripts (per skill guidance).
-- After generation: convert to JPEGs at 150 DPI, view every page, fix any overflow/overlap, regenerate, re-verify.
-- Emit final artifact via `<lov-artifact path="FLYAF_Street_Promoter_Guide.pdf" mime_type="application/pdf">`.
+1. **CityChip selector** (`src/components/CityChip.tsx`): Add Lagos, Nairobi, Johannesburg, Cape Town, Accra, Dakar with correct coordinates and zoom levels.
 
+2. **Country flags** (`src/lib/countryFlags.ts`): Add missing African countries (Rwanda, Tanzania, Uganda, Cameroon, Ivory Coast, Ethiopia, Zimbabwe, Botswana, Mozambique, Namibia, Togo, Benin, Burkina Faso, DR Congo, Angola, Mauritius, Madagascar).
+
+3. **Country dropdown** in the same file: Add all new countries to `getCountryList()`.
+
+4. **CSV reference files**: Append new entries to `public/brands-list.csv`, `public/shops-by-brand.csv`, `public/brands-list-full.csv`.
+
+5. **Memory**: Update international city support memory to include African hubs.
+
+## Phase 5 -- QA
+
+Verify new shops appear on the map at correct locations. Confirm new cities work in CityChip. Spot-check brand pages load correctly.
+
+---
+
+### Technical Details
+
+- Coordinates use 8+ decimal places per project standards
+- Emerging African brands get `brand_tier: 'new_wave'`
+- Brand-owned stores get `is_unique_shop: true`; multi-brand retailers get `false`
+- Research uses `websearch--web_search` calls batched by region
+- Database inserts use the Supabase insert tool (not migrations)
+- Estimated scope: 30-50 new brands, 40-60 new shops across 10+ cities
