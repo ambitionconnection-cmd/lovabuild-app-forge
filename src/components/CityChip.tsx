@@ -24,6 +24,10 @@ const CITIES: City[] = [
   { name: "Dakar", center: [-17.4467, 14.6928], zoom: 13 },
   { name: "Casablanca", center: [-7.5898, 33.5731], zoom: 13 },
   { name: "Kigali", center: [30.0619, -1.9403], zoom: 13 },
+  { name: "Guadeloupe", center: [-61.5510, 16.2650], zoom: 11 },
+  { name: "Martinique", center: [-61.0242, 14.6415], zoom: 11 },
+  { name: "Saint Lucia", center: [-60.9789, 13.9094], zoom: 11 },
+  { name: "Dominica", center: [-61.3710, 15.4150], zoom: 11 },
 ];
 
 interface CityChipProps {
