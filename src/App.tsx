@@ -34,6 +34,8 @@ import PromoterLanding from "./pages/PromoterLanding";
 import PromoterResults from "./pages/PromoterResults";
 import AdminPromoters from "./pages/AdminPromoters";
 import AdminPromoterDetail from "./pages/AdminPromoterDetail";
+import WestIndies from "./pages/WestIndies";
+import WestIndiesIsland from "./pages/WestIndiesIsland";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +95,8 @@ function App() {
               <Route path="/more" element={<More />} />
               <Route path="/about" element={<About />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/west-indies" element={<WestIndies />} />
+              <Route path="/west-indies/:island" element={<WestIndiesIsland />} />
               <Route path="*" element={<NotFound />} />
              </Routes>
              <DesktopTopNav />
