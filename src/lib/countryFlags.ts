@@ -89,6 +89,11 @@ export const getCountryFlag = (country: string): string => {
     'Algeria': '🇩🇿',
     'Libya': '🇱🇾',
     'Zambia': '🇿🇲',
+    'Guadeloupe': '🇬🇵',
+    'Martinique': '🇲🇶',
+    'Saint Lucia': '🇱🇨',
+    'St. Lucia': '🇱🇨',
+    'Dominica': '🇩🇲',
   };
 
   return countryFlags[country] || '🌍';
@@ -111,6 +116,7 @@ export const getCountryList = (): { name: string; flag: string }[] => {
     'Spain', 'Sudan', 'Sweden', 'Switzerland', 'Taiwan', 'Tanzania',
     'Thailand', 'Togo', 'Tunisia', 'Turkey', 'UAE', 'UK', 'Uganda',
     'Ukraine', 'USA', 'Vietnam', 'Zambia', 'Zimbabwe',
+    'Guadeloupe', 'Martinique', 'Saint Lucia', 'Dominica',
   ];
   return countries.map(name => ({ name, flag: getCountryFlag(name) }));
 };

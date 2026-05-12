@@ -262,6 +262,7 @@ export type Database = {
           id: string
           instagram_url: string | null
           is_active: boolean | null
+          is_west_indies: boolean
           logo_url: string | null
           name: string
           official_website: string | null
@@ -281,6 +282,7 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           is_active?: boolean | null
+          is_west_indies?: boolean
           logo_url?: string | null
           name: string
           official_website?: string | null
@@ -300,6 +302,7 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           is_active?: boolean | null
+          is_west_indies?: boolean
           logo_url?: string | null
           name?: string
           official_website?: string | null
@@ -1066,6 +1069,7 @@ export type Database = {
           instagram_url: string | null
           is_active: boolean | null
           is_unique_shop: boolean | null
+          is_west_indies: boolean
           latitude: number | null
           logo_url: string | null
           longitude: number | null
@@ -1090,6 +1094,7 @@ export type Database = {
           instagram_url?: string | null
           is_active?: boolean | null
           is_unique_shop?: boolean | null
+          is_west_indies?: boolean
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
@@ -1114,6 +1119,7 @@ export type Database = {
           instagram_url?: string | null
           is_active?: boolean | null
           is_unique_shop?: boolean | null
+          is_west_indies?: boolean
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
@@ -1480,6 +1486,7 @@ export type Database = {
           instagram_url: string | null
           is_active: boolean | null
           is_unique_shop: boolean | null
+          is_west_indies: boolean | null
           latitude: number | null
           logo_url: string | null
           longitude: number | null
@@ -1502,6 +1509,7 @@ export type Database = {
           instagram_url?: string | null
           is_active?: boolean | null
           is_unique_shop?: boolean | null
+          is_west_indies?: boolean | null
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
@@ -1524,6 +1532,7 @@ export type Database = {
           instagram_url?: string | null
           is_active?: boolean | null
           is_unique_shop?: boolean | null
+          is_west_indies?: boolean | null
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
